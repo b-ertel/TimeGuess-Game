@@ -1,7 +1,7 @@
-package at.qe.sepm.skeleton.ui.controllers;
+package at.qe.skeleton.ui.controllers;
 
-import at.qe.sepm.skeleton.model.User;
-import at.qe.sepm.skeleton.services.UserService;
+import at.qe.skeleton.model.Userx;
+import at.qe.skeleton.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class UserDetailController {
     /**
      * Attribute to cache the currently displayed user
      */
-    private User user;
+    private Userx user;
 
     /**
      * Sets the currently displayed user and reloads it form db. This user is
@@ -33,7 +33,7 @@ public class UserDetailController {
      *
      * @param user
      */
-    public void setUser(User user) {
+    public void setUser(Userx user) {
         this.user = user;
         doReloadUser();
     }
@@ -43,7 +43,7 @@ public class UserDetailController {
      *
      * @return
      */
-    public User getUser() {
+    public Userx getUser() {
         return user;
     }
 

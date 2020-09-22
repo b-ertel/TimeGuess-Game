@@ -1,8 +1,8 @@
-package at.qe.sepm.skeleton.tests;
+package at.qe.skeleton.tests;
 
-import at.qe.sepm.skeleton.model.UserRole;
-import at.qe.sepm.skeleton.services.UserService;
-import at.qe.sepm.skeleton.ui.beans.SessionInfoBean;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.services.UserService;
+import at.qe.skeleton.ui.beans.SessionInfoBean;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

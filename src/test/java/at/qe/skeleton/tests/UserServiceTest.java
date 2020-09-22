@@ -1,8 +1,8 @@
-package at.qe.sepm.skeleton.tests;
+package at.qe.skeleton.tests;
 
-import at.qe.sepm.skeleton.model.User;
-import at.qe.sepm.skeleton.model.UserRole;
-import at.qe.sepm.skeleton.services.UserService;
+import at.qe.skeleton.model.Userx;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.services.UserService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +33,7 @@ public class UserServiceTest {
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testDatainitialization() {
         Assert.assertEquals("Insufficient amount of users initialized for test data source", 3, userService.getAllUsers().size());
-        for (User user : userService.getAllUsers()) {
+        for (Userx user : userService.getAllUsers()) {
             if ("admin".equals(user.getUsername())) {
                 Assert.assertTrue("User \"admin\" does not have role ADMIN", user.getRoles().contains(UserRole.ADMIN));
                 Assert.assertNotNull("User \"admin\" does not have a createUser defined", user.getCreateUser());
@@ -62,18 +62,18 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testDeleteUser() {
-        User adminUser = userService.loadUser("admin");
+        Userx adminUser = userService.loadUser("admin");
         Assert.assertNotNull("Admin user could not be loaded from test data source", adminUser);
-        User toBeDeletedUser = userService.loadUser("user1");
+        Userx toBeDeletedUser = userService.loadUser("user1");
         Assert.assertNotNull("User1 could not be loaded from test data source", toBeDeletedUser);
 
         userService.deleteUser(toBeDeletedUser);
 
         Assert.assertEquals("No user has been deleted after calling UserService.deleteUser", 2, userService.getAllUsers().size());
-        User deletedUser = userService.loadUser("user1");
+        Userx deletedUser = userService.loadUser("user1");
         Assert.assertNull("Deleted User1 could still be loaded from test data source via UserService.loadUser", deletedUser);
 
-        for (User remainingUser : userService.getAllUsers()) {
+        for (Userx remainingUser : userService.getAllUsers()) {
             Assert.assertNotEquals("Deleted User1 could still be loaded from test data source via UserService.getAllUsers", toBeDeletedUser.getUsername(), remainingUser.getUsername());
         }
     }
@@ -82,9 +82,9 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testUpdateUser() {
-        User adminUser = userService.loadUser("admin");
+        Userx adminUser = userService.loadUser("admin");
         Assert.assertNotNull("Admin user could not be loaded from test data source", adminUser);
-        User toBeSavedUser = userService.loadUser("user1");
+        Userx toBeSavedUser = userService.loadUser("user1");
         Assert.assertNotNull("User1 could not be loaded from test data source", toBeSavedUser);
 
         Assert.assertNull("User \"user1\" has a updateUser defined", toBeSavedUser.getUpdateUser());
@@ -93,7 +93,7 @@ public class UserServiceTest {
         toBeSavedUser.setEmail("changed-email@whatever.wherever");
         userService.saveUser(toBeSavedUser);
 
-        User freshlyLoadedUser = userService.loadUser("user1");
+        Userx freshlyLoadedUser = userService.loadUser("user1");
         Assert.assertNotNull("User1 could not be loaded from test data source after being saved", freshlyLoadedUser);
         Assert.assertNotNull("User \"user1\" does not have a updateUser defined after being saved", freshlyLoadedUser.getUpdateUser());
         Assert.assertEquals("User \"user1\" has wrong updateUser set", adminUser, freshlyLoadedUser.getUpdateUser());
@@ -105,10 +105,10 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testCreateUser() {
-        User adminUser = userService.loadUser("admin");
+        Userx adminUser = userService.loadUser("admin");
         Assert.assertNotNull("Admin user could not be loaded from test data source", adminUser);
 
-        User toBeCreatedUser = new User();
+        Userx toBeCreatedUser = new Userx();
         toBeCreatedUser.setUsername("newuser");
         toBeCreatedUser.setPassword("passwd");
         toBeCreatedUser.setEnabled(true);
@@ -119,7 +119,7 @@ public class UserServiceTest {
         toBeCreatedUser.setRoles(Sets.newSet(UserRole.EMPLOYEE, UserRole.MANAGER));
         userService.saveUser(toBeCreatedUser);
 
-        User freshlyCreatedUser = userService.loadUser("newuser");
+        Userx freshlyCreatedUser = userService.loadUser("newuser");
         Assert.assertNotNull("New user could not be loaded from test data source after being saved", freshlyCreatedUser);
         Assert.assertEquals("User \"newuser\" does not have a the correct username attribute stored being saved", "newuser", freshlyCreatedUser.getUsername());
         Assert.assertEquals("User \"newuser\" does not have a the correct password attribute stored being saved", "passwd", freshlyCreatedUser.getPassword());
@@ -137,16 +137,16 @@ public class UserServiceTest {
     @Test(expected = org.springframework.orm.jpa.JpaSystemException.class)
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testExceptionForEmptyUsername() {
-        User adminUser = userService.loadUser("admin");
+        Userx adminUser = userService.loadUser("admin");
         Assert.assertNotNull("Admin user could not be loaded from test data source", adminUser);
 
-        User toBeCreatedUser = new User();
+        Userx toBeCreatedUser = new Userx();
         userService.saveUser(toBeCreatedUser);
     }
 
     @Test(expected = org.springframework.security.authentication.AuthenticationCredentialsNotFoundException.class)
     public void testUnauthenticateddLoadUsers() {
-        for (User user : userService.getAllUsers()) {
+        for (Userx user : userService.getAllUsers()) {
             Assert.fail("Call to userService.getAllUsers should not work without proper authorization");
         }
     }
@@ -154,7 +154,7 @@ public class UserServiceTest {
     @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "user", authorities = {"EMPLOYEE"})
     public void testUnauthorizedLoadUsers() {
-        for (User user : userService.getAllUsers()) {
+        for (Userx user : userService.getAllUsers()) {
             Assert.fail("Call to userService.getAllUsers should not work without proper authorization");
         }
     }
@@ -162,20 +162,20 @@ public class UserServiceTest {
     @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "user1", authorities = {"EMPLOYEE"})
     public void testUnauthorizedLoadUser() {
-        User user = userService.loadUser("admin");
+        Userx user = userService.loadUser("admin");
         Assert.fail("Call to userService.loadUser should not work without proper authorization for other users than the authenticated one");
     }
 
     @WithMockUser(username = "user1", authorities = {"EMPLOYEE"})
     public void testAuthorizedLoadUser() {
-        User user = userService.loadUser("user1");
+        Userx user = userService.loadUser("user1");
         Assert.assertEquals("Call to userService.loadUser returned wrong user", "user1", user.getUsername());
     }
 
     @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "user1", authorities = {"EMPLOYEE"})
     public void testUnauthorizedSaveUser() {
-        User user = userService.loadUser("user1");
+        Userx user = userService.loadUser("user1");
         Assert.assertEquals("Call to userService.loadUser returned wrong user", "user1", user.getUsername());
         userService.saveUser(user);
     }
@@ -183,7 +183,7 @@ public class UserServiceTest {
     @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "user1", authorities = {"EMPLOYEE"})
     public void testUnauthorizedDeleteUser() {
-        User user = userService.loadUser("user1");
+        Userx user = userService.loadUser("user1");
         Assert.assertEquals("Call to userService.loadUser returned wrong user", "user1", user.getUsername());
         userService.deleteUser(user);
     }

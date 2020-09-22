@@ -1,4 +1,4 @@
-package at.qe.sepm.skeleton.configs;
+package at.qe.skeleton.configs;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

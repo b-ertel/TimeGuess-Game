@@ -1,8 +1,8 @@
-package at.qe.sepm.skeleton.ui.beans;
+package at.qe.skeleton.ui.beans;
 
-import at.qe.sepm.skeleton.model.User;
-import at.qe.sepm.skeleton.model.UserRole;
-import at.qe.sepm.skeleton.services.UserService;
+import at.qe.skeleton.model.Userx;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
@@ -27,7 +27,7 @@ public class SessionInfoBean {
     /**
      * Attribute to cache the current user.
      */
-    private User currentUser;
+    private Userx currentUser;
 
     /**
      * Returns the currently logged on user, null if no user is authenticated
@@ -35,7 +35,7 @@ public class SessionInfoBean {
      *
      * @return
      */
-    public User getCurrentUser() {
+    public Userx getCurrentUser() {
         if (currentUser == null) {
             String currentUserName = getCurrentUserName();
             if (currentUserName.isEmpty()) {

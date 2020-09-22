@@ -1,7 +1,7 @@
-package at.qe.sepm.skeleton.ui.controllers;
+package at.qe.skeleton.ui.controllers;
 
-import at.qe.sepm.skeleton.model.User;
-import at.qe.sepm.skeleton.services.UserService;
+import at.qe.skeleton.model.Userx;
+import at.qe.skeleton.services.UserService;
 import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -26,7 +26,7 @@ public class UserListController {
      *
      * @return
      */
-    public Collection<User> getUsers() {
+    public Collection<Userx> getUsers() {
         return userService.getAllUsers();
     }
 
