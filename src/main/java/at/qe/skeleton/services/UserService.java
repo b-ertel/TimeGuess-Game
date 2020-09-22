@@ -1,7 +1,7 @@
-package at.qe.sepm.skeleton.services;
+package at.qe.skeleton.services;
 
-import at.qe.sepm.skeleton.model.User;
-import at.qe.sepm.skeleton.repositories.UserRepository;
+import at.qe.skeleton.model.Userx;
+import at.qe.skeleton.repositories.UserRepository;
 import java.util.Collection;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class UserService {
      * @return
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Collection<User> getAllUsers() {
+    public Collection<Userx> getAllUsers() {
         return userRepository.findAll();
     }
 
@@ -42,21 +42,21 @@ public class UserService {
      * @return the user with the given username
      */
     @PreAuthorize("hasAuthority('ADMIN') or principal.username eq #username")
-    public User loadUser(String username) {
+    public Userx loadUser(String username) {
         return userRepository.findFirstByUsername(username);
     }
 
     /**
-     * Saves the user. This method will also set {@link User#createDate} for new
-     * entities or {@link User#updateDate} for updated entities. The user
-     * requesting this operation will also be stored as {@link User#createDate}
-     * or {@link User#updateUser} respectively.
+     * Saves the user. This method will also set {@link Userx#createDate} for new
+     * entities or {@link Userx#updateDate} for updated entities. The user
+     * requesting this operation will also be stored as {@link Userx#createDate}
+     * or {@link Userx#updateUser} respectively.
      *
      * @param user the user to save
      * @return the updated user
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    public User saveUser(User user) {
+    public Userx saveUser(Userx user) {
         if (user.isNew()) {
             user.setCreateDate(new Date());
             user.setCreateUser(getAuthenticatedUser());
@@ -73,12 +73,12 @@ public class UserService {
      * @param user the user to delete
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void deleteUser(User user) {
+    public void deleteUser(Userx user) {
         userRepository.delete(user);
         // :TODO: write some audit log stating who and when this user was permanently deleted.
     }
 
-    private User getAuthenticatedUser() {
+    private Userx getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findFirstByUsername(auth.getName());
     }

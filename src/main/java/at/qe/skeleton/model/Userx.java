@@ -1,4 +1,4 @@
-package at.qe.sepm.skeleton.model;
+package at.qe.skeleton.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -25,7 +25,7 @@ import org.springframework.data.domain.Persistable;
  * University of Innsbruck.
  */
 @Entity
-public class User implements Persistable<String>, Serializable {
+public class Userx implements Persistable<String>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,12 +34,12 @@ public class User implements Persistable<String>, Serializable {
     private String username;
 
     @ManyToOne(optional = false)
-    private User createUser;
+    private Userx createUser;
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
     @ManyToOne(optional = true)
-    private User updateUser;
+    private Userx updateUser;
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateDate;
 
@@ -121,11 +121,11 @@ public class User implements Persistable<String>, Serializable {
         this.roles = roles;
     }
 
-    public User getCreateUser() {
+    public Userx getCreateUser() {
         return createUser;
     }
 
-    public void setCreateUser(User createUser) {
+    public void setCreateUser(Userx createUser) {
         this.createUser = createUser;
     }
 
@@ -137,11 +137,11 @@ public class User implements Persistable<String>, Serializable {
         this.createDate = createDate;
     }
 
-    public User getUpdateUser() {
+    public Userx getUpdateUser() {
         return updateUser;
     }
 
-    public void setUpdateUser(User updateUser) {
+    public void setUpdateUser(Userx updateUser) {
         this.updateUser = updateUser;
     }
 
@@ -165,10 +165,10 @@ public class User implements Persistable<String>, Serializable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof User)) {
+        if (!(obj instanceof Userx)) {
             return false;
         }
-        final User other = (User) obj;
+        final Userx other = (Userx) obj;
         if (!Objects.equals(this.username, other.username)) {
             return false;
         }

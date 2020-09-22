@@ -1,4 +1,4 @@
-package at.qe.sepm.skeleton.configs;
+package at.qe.skeleton.configs;
 
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;

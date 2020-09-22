@@ -1,7 +1,7 @@
-package at.qe.sepm.skeleton.tests;
+package at.qe.skeleton.tests;
 
-import at.qe.sepm.skeleton.model.User;
-import at.qe.sepm.skeleton.model.UserRole;
+import at.qe.skeleton.model.Userx;
+import at.qe.skeleton.model.UserRole;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
@@ -19,11 +19,11 @@ public class EqualsImplementationTest {
 
     @Test
     public void testUserEqualsContract() {
-        User user1 = new User();
+        Userx user1 = new Userx();
         user1.setUsername("user1");
-        User user2 = new User();
+        Userx user2 = new Userx();
         user2.setUsername("user2");
-        EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2).suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
+        EqualsVerifier.forClass(Userx.class).withPrefabValues(Userx.class, user1, user2).suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test

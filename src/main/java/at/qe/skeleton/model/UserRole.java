@@ -1,4 +1,4 @@
-package at.qe.sepm.skeleton.model;
+package at.qe.skeleton.model;
 
 /**
  * Enumeration of available user roles.

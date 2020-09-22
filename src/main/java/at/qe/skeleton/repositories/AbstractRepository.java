@@ -1,4 +1,4 @@
-package at.qe.sepm.skeleton.repositories;
+package at.qe.skeleton.repositories;
 
 import java.io.Serializable;
 import java.util.List;
