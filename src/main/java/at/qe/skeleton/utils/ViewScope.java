@@ -1,4 +1,4 @@
-package at.qe.sepm.skeleton.utils;
+package at.qe.skeleton.utils;
 
 import java.util.Map;
 import javax.faces.context.FacesContext;

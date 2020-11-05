@@ -2,7 +2,7 @@ package at.qe.skeleton;
 
 import at.qe.skeleton.configs.CustomServletContextInitializer;
 import at.qe.skeleton.configs.WebSecurityConfig;
-import at.qe.sepm.skeleton.utils.ViewScope;
+import at.qe.skeleton.utils.ViewScope;
 import java.util.HashMap;
 import javax.faces.webapp.FacesServlet;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
