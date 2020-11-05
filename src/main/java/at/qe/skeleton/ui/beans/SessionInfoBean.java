@@ -3,6 +3,7 @@ package at.qe.skeleton.ui.beans;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.UserService;
+import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("session")
-public class SessionInfoBean {
+public class SessionInfoBean implements Serializable {
 
     @Autowired
     private UserService userService;

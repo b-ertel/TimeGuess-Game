@@ -177,7 +177,7 @@ public class User implements Persistable<String>, Serializable {
 
     @Override
     public String toString() {
-        return "at.qe.sepm.skeleton.model.User[ id=" + username + " ]";
+        return "at.qe.skeleton.model.User[ id=" + username + " ]";
     }
 
     @Override

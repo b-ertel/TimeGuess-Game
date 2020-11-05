@@ -2,6 +2,7 @@ package at.qe.skeleton.ui.controllers;
 
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.services.UserService;
+import java.io.Serializable;
 import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("view")
-public class UserListController {
+public class UserListController implements Serializable {
 
     @Autowired
     private UserService userService;
