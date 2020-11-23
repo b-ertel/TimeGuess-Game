@@ -136,7 +136,6 @@
                     <argLine>
                         ${coverageAgent}
                     </argLine>
-                    <useSystemClassloader>true</useSystemClassloader>
                 </configuration>
             </plugin>
             <plugin>
