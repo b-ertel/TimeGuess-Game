@@ -34,6 +34,7 @@
                 <p:commandButton value="Close" action="#{securityTestBean.doHideOkDialog}" update="okDialog"/>
             </p:dialog>
 
+<!--
             <p:ajaxExceptionHandler type="org.springframework.security.access.AccessDeniedException"
                                     update="accessDeniedExceptionDialog"
                                     onexception="PF('accessDeniedExceptionDialog').show();" />
@@ -44,6 +45,7 @@
                 <div style="width: 750px; height: 400px; overflow-x: scroll; white-space: nowrap;"><h:outputText value="#{pfExceptionHandler.formattedStackTrace}" escape="false"/></div><br/>
                 <p:button value="Close" onclick="PF('accessDeniedExceptionDialog').hide();"/>
             </p:dialog>
+-->
         </h:form>
     </ui:define>
 </ui:composition>
