@@ -70,19 +70,6 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.faces</groupId>
-            <artifactId>jsf-api</artifactId>
-            <version>2.2.20</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.faces</groupId>
-            <artifactId>jsf-impl</artifactId>
-            <version>2.2.20</version>
-            <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <scope>compile</scope>
@@ -98,6 +85,18 @@
             <version>8.0</version>
             <scope>compile</scope>
         </dependency>
+
+		<!-- special websockets dependencies -->
+		<dependency>
+			<groupId>org.joinfaces</groupId>
+			<artifactId>omnifaces3-spring-boot-starter</artifactId>
+			<version>4.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.joinfaces</groupId>
+			<artifactId>weld-spring-boot-starter</artifactId>
+			<version>4.4.2</version>
+		</dependency>
 
         <!-- special test dependencies -->
         <dependency>

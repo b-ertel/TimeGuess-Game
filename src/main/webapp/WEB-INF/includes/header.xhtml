@@ -25,9 +25,14 @@
                     </p:submenu>
                     <p:submenu label="Test Submenu" rendered="#{sessionInfoBean.loggedIn}">
                         <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
+                    </p:submenu>                    
+                    <p:submenu label="Demos" rendered="#{sessionInfoBean.loggedIn}">                    
+						<p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>                    
                     </p:submenu>
+                    
                     <p:menuitem value="Login" url="/login.xhtml" rendered="#{!sessionInfoBean.loggedIn}"/>
-                    <p:menuitem value="Logout" url="/logout" rendered="#{sessionInfoBean.loggedIn}"/>
+                    <p:menuitem value="Logout" url="/logout" rendered="#{sessionInfoBean.loggedIn}"/>                    
+                    
                 </p:menubar>
             </h:form>
         </ui:composition>

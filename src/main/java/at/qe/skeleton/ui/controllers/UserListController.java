@@ -19,7 +19,11 @@ import org.springframework.stereotype.Component;
 @Scope("view")
 public class UserListController implements Serializable {
 
-    @Autowired
+    /**
+	 *
+	 */
+	private static final long serialVersionUID = -174521650843617720L;
+	@Autowired
     private UserService userService;
 
     /**

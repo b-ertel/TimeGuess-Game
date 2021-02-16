@@ -2,6 +2,7 @@ package at.qe.skeleton.configs;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,10 +16,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CustomServletContextInitializer implements ServletContextInitializer {
 
-    @Override
-    public void onStartup(ServletContext sc) throws ServletException {
-        sc.setInitParameter("javax.faces.DEFAULT_SUFFIX", ".xhtml");
-        sc.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
-    }
-
+	@Override
+	public void onStartup(ServletContext sc) throws ServletException {
+		sc.setInitParameter("javax.faces.DEFAULT_SUFFIX", ".xhtml");
+		sc.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
+		// websockets configuration
+		sc.setInitParameter("javax.faces.ENABLE_CDI_RESOLVER_CHAIN", "true");
+		sc.setInitParameter("org.omnifaces.SOCKET_ENDPOINT_ENABLED", "true");
+	}
 }

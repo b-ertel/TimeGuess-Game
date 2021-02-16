@@ -25,7 +25,7 @@ import org.springframework.data.domain.Persistable;
  * University of Innsbruck.
  */
 @Entity
-public class User implements Persistable<String>, Serializable {
+public class User implements Persistable<String>, Serializable, Comparable<User> {
 
     private static final long serialVersionUID = 1L;
 
@@ -193,5 +193,10 @@ public class User implements Persistable<String>, Serializable {
     public boolean isNew() {
         return (null == createDate);
     }
+
+	@Override
+	public int compareTo(User o) {
+		return this.username.compareTo(o.getUsername());
+	}
 
 }
