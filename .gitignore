@@ -1,0 +1,6 @@
+/bin/
+/target/
+/.classpath
+/.settings/
+/.project
+/src/main/webapp/WEB-INF/.faces-config.xml.jsfdia
