@@ -1,4 +1,4 @@
-package at.qe.skeleton.ui.controllers.demo;
+package at.qe.skeleton.model.demo;
 
 import at.qe.skeleton.model.User;
 

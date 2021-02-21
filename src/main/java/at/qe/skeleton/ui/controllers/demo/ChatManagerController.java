@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.demo.Message;
 import at.qe.skeleton.repositories.UserRepository;
 import at.qe.skeleton.spring.CustomizedLogoutSuccessHandler;
 import at.qe.skeleton.spring.LoginSuccessHandler;
