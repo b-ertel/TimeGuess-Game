@@ -12,6 +12,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.demo.LogEntry;
+import at.qe.skeleton.model.demo.LogEntryType;
+import at.qe.skeleton.model.demo.UserStatus;
+import at.qe.skeleton.model.demo.UserStatusInfo;
 import at.qe.skeleton.repositories.UserRepository;
 import at.qe.skeleton.spring.UserStatusInitializationHandler;
 import at.qe.skeleton.ui.websockets.WebSocketManager;
