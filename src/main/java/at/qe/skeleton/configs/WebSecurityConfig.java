@@ -69,10 +69,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/login.xhtml")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/secured/welcome.xhtml");
+                
         // :TODO: user failureUrl(/login.xhtml?error) and make sure that a corresponding message is displayed
-
-        //http.exceptionHandling().accessDeniedPage("/error/access_denied.xhtml");
-
+                
+        http.exceptionHandling().accessDeniedPage("/error/access_denied.xhtml");
         http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
 
     }
