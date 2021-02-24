@@ -27,7 +27,7 @@ import at.qe.skeleton.ui.beans.SessionInfoBean;
  */
 @Controller
 @Scope("session")
-public class UserChatController implements Serializable{
+public class UserChatController implements Serializable {
 
 	/**
 	 *

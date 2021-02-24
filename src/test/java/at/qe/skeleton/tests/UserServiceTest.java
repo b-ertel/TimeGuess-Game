@@ -1,20 +1,17 @@
 package at.qe.skeleton.tests;
 
-import at.qe.skeleton.configs.CustomServletContextInitializer;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-import at.qe.skeleton.services.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
+
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.services.UserService;
 
 /**
  * Some very basic tests for {@link UserService}.
@@ -23,18 +20,17 @@ import org.springframework.test.context.web.WebAppConfiguration;
  * courses "Software Architecture" and "Software Engineering" offered by the
  * University of Innsbruck.
  */
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = CustomServletContextInitializer.class)
+@SpringBootTest
 @WebAppConfiguration
 public class UserServiceTest {
 
     @Autowired
     UserService userService;
-    
+
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testDatainitialization() {
-        Assertions.assertEquals(3, userService.getAllUsers().size(), "Insufficient amount of users initialized for test data source");
+        Assertions.assertEquals(4, userService.getAllUsers().size(), "Insufficient amount of users initialized for test data source");
         for (User user : userService.getAllUsers()) {
             if ("admin".equals(user.getUsername())) {
                 Assertions.assertTrue(user.getRoles().contains(UserRole.ADMIN), "User \"" + user + "\" does not have role ADMIN");
@@ -50,6 +46,12 @@ public class UserServiceTest {
                 Assertions.assertNull(user.getUpdateDate(), "User \"" + user +"\" has a updateDate defined");
             } else if ("user2".equals(user.getUsername())) {
                 Assertions.assertTrue(user.getRoles().contains(UserRole.EMPLOYEE), "User \"" + user + "\" does not have role EMPLOYEE");
+                Assertions.assertNotNull(user.getCreateUser(), "User \"" + user + "\" does not have a createUser defined");
+                Assertions.assertNotNull(user.getCreateDate(), "User \"" + user + "\" does not have a createDate defined");
+                Assertions.assertNull(user.getUpdateUser(), "User \"" + user + "\" has a updateUser defined");
+                Assertions.assertNull(user.getUpdateDate(), "User \"" + user + "\" has a updateDate defined");
+            } else  if ("elvis".equals(user.getUsername())) {
+                Assertions.assertTrue(user.getRoles().contains(UserRole.ADMIN), "User \"" + user + "\" does not have role ADMIN");
                 Assertions.assertNotNull(user.getCreateUser(), "User \"" + user + "\" does not have a createUser defined");
                 Assertions.assertNotNull(user.getCreateDate(), "User \"" + user + "\" does not have a createDate defined");
                 Assertions.assertNull(user.getUpdateUser(), "User \"" + user + "\" has a updateUser defined");
@@ -72,7 +74,7 @@ public class UserServiceTest {
 
         userService.deleteUser(toBeDeletedUser);
 
-        Assertions.assertEquals(2, userService.getAllUsers().size(), "No user has been deleted after calling UserService.deleteUser");
+        Assertions.assertEquals(3, userService.getAllUsers().size(), "No user has been deleted after calling UserService.deleteUser");
         User deletedUser = userService.loadUser(username);
         Assertions.assertNull(deletedUser, "Deleted User \"" + username + "\" could still be loaded from test data source via UserService.loadUser");
 
@@ -113,7 +115,7 @@ public class UserServiceTest {
         Assertions.assertNotNull(adminUser, "Admin user could not be loaded from test data source");
 
         String username = "newuser";
-        String password = "passwd"; 
+        String password = "passwd";
         String fName = "New";
         String lName = "User";
         String email = "new-email@whatever.wherever";

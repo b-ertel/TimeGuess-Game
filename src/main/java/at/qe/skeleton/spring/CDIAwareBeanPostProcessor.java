@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import at.qe.skeleton.ui.websockets.WebSocketManager;
@@ -25,6 +26,13 @@ import at.qe.skeleton.utils.CDIContextRelated;
  *
  */
 @Component
+/*
+ * CDI-injection for pushContext does not makes sense in test-mode (presumably
+ * highly interlinked with the FacesContext which is not available in test-mode)
+ * => only perform the custom CDI-injection in production-mode (where the
+ * FacesContext is available)
+ */
+@Profile("!test")
 public class CDIAwareBeanPostProcessor implements BeanPostProcessor {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CDIAwareBeanPostProcessor.class);

@@ -4,11 +4,9 @@ import java.util.HashMap;
 
 import javax.faces.webapp.FacesServlet;
 
-import org.apache.catalina.startup.ContextConfig;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +15,6 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
-import at.qe.skeleton.configs.CustomServletContextInitializer;
-import at.qe.skeleton.configs.WebSecurityConfig;
 import at.qe.skeleton.utils.ViewScope;
 
 /**
@@ -44,12 +40,6 @@ public class Main extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Main.class, args);
-	}
-
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(Main.class, CustomServletContextInitializer.class, WebSecurityConfig.class,
-				ContextConfig.class);
 	}
 
 	@Bean
