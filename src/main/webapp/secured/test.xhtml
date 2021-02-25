@@ -33,19 +33,6 @@
                 <p>You could successfully call the action <strong><h:outputText value="#{securityTestBean.performedAction}"/></strong>.</p>
                 <p:commandButton value="Close" action="#{securityTestBean.doHideOkDialog}" update="okDialog"/>
             </p:dialog>
-
-<!--
-            <p:ajaxExceptionHandler type="org.springframework.security.access.AccessDeniedException"
-                                    update="accessDeniedExceptionDialog"
-                                    onexception="PF('accessDeniedExceptionDialog').show();" />
-
-            <p:dialog id="accessDeniedExceptionDialog" header="Access Denied Exception occured!" widgetVar="accessDeniedExceptionDialog" width="800px" height="500px">
-                <strong>Message:</strong> #{pfExceptionHandler.message} <br/>
-                <strong>StackTrace:</strong><br/>
-                <div style="width: 750px; height: 400px; overflow-x: scroll; white-space: nowrap;"><h:outputText value="#{pfExceptionHandler.formattedStackTrace}" escape="false"/></div><br/>
-                <p:button value="Close" onclick="PF('accessDeniedExceptionDialog').hide();"/>
-            </p:dialog>
--->
         </h:form>
     </ui:define>
 </ui:composition>
