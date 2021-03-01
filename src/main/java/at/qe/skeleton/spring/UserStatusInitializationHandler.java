@@ -19,13 +19,13 @@ import at.qe.skeleton.ui.controllers.demo.UserStatusController;
 @Component
 public class UserStatusInitializationHandler implements ApplicationListener<ContextRefreshedEvent> {
 
-	@Autowired
-	private UserStatusController userStatusController;
+    @Autowired
+    private UserStatusController userStatusController;
 
-	@Override
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		// init
-		this.userStatusController.setupUserStatus();
-	}
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        // init
+        this.userStatusController.setupUserStatus();
+    }
 
 }

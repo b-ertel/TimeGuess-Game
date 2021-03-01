@@ -26,21 +26,21 @@ import at.qe.skeleton.ui.controllers.demo.UserStatusController;
 @Component
 public class CustomizedLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler implements LogoutSuccessHandler {
 
-	@Autowired
-	private UserStatusController userStatusController;
-	@Autowired
-	private ChatManagerController chatManagerController;
+    @Autowired
+    private UserStatusController userStatusController;
+    @Autowired
+    private ChatManagerController chatManagerController;
 
-	@Override
-	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-			throws IOException, ServletException {
-		String username = authentication.getName();
-		// update chat-manager
-		this.chatManagerController.onLogout(username);
-		// update online-status
-		this.userStatusController.afterLogout(username);
-		// continue as expected
-		super.onLogoutSuccess(request, response, authentication);
-	}
+    @Override
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+                    throws IOException, ServletException {
+        String username = authentication.getName();
+        // update chat-manager
+        this.chatManagerController.onLogout(username);
+        // update online-status
+        this.userStatusController.afterLogout(username);
+        // continue as expected
+        super.onLogoutSuccess(request, response, authentication);
+    }
 
 }

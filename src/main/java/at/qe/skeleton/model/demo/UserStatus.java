@@ -8,5 +8,5 @@ package at.qe.skeleton.model.demo;
  * University of Innsbruck.
  */
 public enum UserStatus {
-	ONLINE, OFFLINE
+    ONLINE, OFFLINE
 }

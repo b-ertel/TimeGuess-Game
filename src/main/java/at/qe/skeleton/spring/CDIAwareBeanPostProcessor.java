@@ -35,35 +35,35 @@ import at.qe.skeleton.utils.CDIContextRelated;
 @Profile("!test")
 public class CDIAwareBeanPostProcessor implements BeanPostProcessor {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CDIAwareBeanPostProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CDIAwareBeanPostProcessor.class);
 
-	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		// only if controller has a webSocketManager
-		Class<? extends Object> beanClass = bean.getClass();
-		/*
-		 * proceed only if bean uses websockets (i.e. in our case cdi-managed
-		 * webSocket-infrastructure)
-		 */
-		if (beanClass.isAnnotationPresent(CDIContextRelated.class)) {
-			// check for @CDIAutowired on fields to find the websocket-managing field
-			for (Field field : beanClass.getDeclaredFields()) {
-				field.setAccessible(true);
-				// when annotation is present, perform a manual "autowiring"
-				if (field.isAnnotationPresent(CDIAutowired.class)) {
-					Class<?> fieldType = field.getType();
-					Object cdiManagedBean = CDI.current().select(fieldType).get();
-					LOGGER.info("Field '{}' of '{}' successfully autowired", field.getName(), bean.getClass());
-					try {
-						field.set(bean, cdiManagedBean);
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						LOGGER.error("Manual CDI-injection failed", e);
-					}
-				}
-			}
-		}
-		// simply returns bean
-		return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
-	}
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        // only if controller has a webSocketManager
+        Class<? extends Object> beanClass = bean.getClass();
+        /*
+         * proceed only if bean uses websockets (i.e. in our case cdi-managed
+         * webSocket-infrastructure)
+         */
+        if (beanClass.isAnnotationPresent(CDIContextRelated.class)) {
+            // check for @CDIAutowired on fields to find the websocket-managing field
+            for (Field field : beanClass.getDeclaredFields()) {
+                field.setAccessible(true);
+                // when annotation is present, perform a manual "autowiring"
+                if (field.isAnnotationPresent(CDIAutowired.class)) {
+                    Class<?> fieldType = field.getType();
+                    Object cdiManagedBean = CDI.current().select(fieldType).get();
+                    LOGGER.info("Field '{}' of '{}' successfully autowired", field.getName(), bean.getClass());
+                    try {
+                        field.set(bean, cdiManagedBean);
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        LOGGER.error("Manual CDI-injection failed", e);
+                    }
+                }
+            }
+        }
+        // simply returns bean
+        return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
+    }
 
 }

@@ -19,18 +19,18 @@ import at.qe.skeleton.ui.controllers.demo.UserStatusController;
 @Component
 public class LoginSuccessHandler implements ApplicationListener<InteractiveAuthenticationSuccessEvent> {
 
-	@Autowired
-	private UserStatusController userStatusController;
-	@Autowired
-	private ChatManagerController chatManagerController;
+    @Autowired
+    private UserStatusController userStatusController;
+    @Autowired
+    private ChatManagerController chatManagerController;
 
-	@Override
-	public void onApplicationEvent(InteractiveAuthenticationSuccessEvent event) {
-		String username = event.getAuthentication().getName();
-		// update chat-manager
-		this.chatManagerController.onLogin(username);
-		// update online-status
-		this.userStatusController.afterLogin(username);
-	}
+    @Override
+    public void onApplicationEvent(InteractiveAuthenticationSuccessEvent event) {
+        String username = event.getAuthentication().getName();
+        // update chat-manager
+        this.chatManagerController.onLogin(username);
+        // update online-status
+        this.userStatusController.afterLogin(username);
+    }
 
 }

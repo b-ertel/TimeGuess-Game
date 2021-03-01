@@ -16,15 +16,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CustomServletContextInitializer implements ServletContextInitializer {
 
-	@Override
-	public void onStartup(ServletContext sc) throws ServletException {
-            sc.setInitParameter("com.sun.faces.forceLoadConfiguration", "true");
-            sc.setInitParameter("javax.faces.DEFAULT_SUFFIX", ".xhtml");
-            sc.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
-            sc.setInitParameter("javax.faces.STATE_SAVING_METHOD", "server");
-            sc.setInitParameter("javax.faces.FACELETS_SKIP_COMMENTS", "true");
-            // websockets configuration
-            sc.setInitParameter("javax.faces.ENABLE_CDI_RESOLVER_CHAIN", "true");
-            sc.setInitParameter("org.omnifaces.SOCKET_ENDPOINT_ENABLED", "true");
-	}
+    @Override
+    public void onStartup(ServletContext sc) throws ServletException {
+        sc.setInitParameter("com.sun.faces.forceLoadConfiguration", "true");
+        sc.setInitParameter("javax.faces.DEFAULT_SUFFIX", ".xhtml");
+        sc.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
+        sc.setInitParameter("javax.faces.STATE_SAVING_METHOD", "server");
+        sc.setInitParameter("javax.faces.FACELETS_SKIP_COMMENTS", "true");
+        // websockets configuration
+        sc.setInitParameter("javax.faces.ENABLE_CDI_RESOLVER_CHAIN", "true");
+        sc.setInitParameter("org.omnifaces.SOCKET_ENDPOINT_ENABLED", "true");
+    }
 }

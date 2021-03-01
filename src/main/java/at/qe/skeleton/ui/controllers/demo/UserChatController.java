@@ -29,76 +29,76 @@ import at.qe.skeleton.ui.beans.SessionInfoBean;
 @Scope("session")
 public class UserChatController implements Serializable {
 
-	@Autowired
-	private ChatManagerController chatController;
-	@Autowired
-	private SessionInfoBean sessionInfoBean;
-	private Message currentMessage = new Message();
-	private List<Message> chatContent;
+    @Autowired
+    private ChatManagerController chatController;
+    @Autowired
+    private SessionInfoBean sessionInfoBean;
+    private Message currentMessage = new Message();
+    private List<Message> chatContent;
 
-	/**
-	 *
-	 * invoked when bean constructed (user navigates to chat-page, i.e. opens the
-	 * chat)
-	 */
-	@PostConstruct
-	public void setup() {
-		User currentUser = this.sessionInfoBean.getCurrentUser();
-		// get the reference once at setup, then reuse it
-		this.chatContent = this.chatController.getChatContentRef(currentUser);
-	}
+    /**
+     *
+     * invoked when bean constructed (user navigates to chat-page, i.e. opens the
+     * chat)
+     */
+    @PostConstruct
+    public void setup() {
+        User currentUser = this.sessionInfoBean.getCurrentUser();
+        // get the reference once at setup, then reuse it
+        this.chatContent = this.chatController.getChatContentRef(currentUser);
+    }
 
-	/**
-	 * Sends a message to selected recipients using websockets
-	 *
-	 * @return Navigation-target
-	 */
-	public String sendMessage() {
-		this.currentMessage.setFrom(this.sessionInfoBean.getCurrentUser());
-		this.currentMessage.setTimestamp(new Date());
-		this.chatController.deliver(this.currentMessage);
-		return this.clearChat();
-	}
+    /**
+     * Sends a message to selected recipients using websockets
+     *
+     * @return Navigation-target
+     */
+    public String sendMessage() {
+        this.currentMessage.setFrom(this.sessionInfoBean.getCurrentUser());
+        this.currentMessage.setTimestamp(new Date());
+        this.chatController.deliver(this.currentMessage);
+        return this.clearChat();
+    }
 
-	/**
-	 * When a user logs out, there shouldn't be the possibility to send him messages
-	 * anymore and hence it should be removed from any undelivered
-	 * message-recipient-list
-	 */
-	public void synchronizeRecipients() {
-		if (!this.currentMessage.getTo().isEmpty()) {
-			this.currentMessage.getTo().removeIf(user -> !this.chatController.getPossibleRecipients().contains(user));
-		}
-	}
+    /**
+     * When a user logs out, there shouldn't be the possibility to send him messages
+     * anymore and hence it should be removed from any undelivered
+     * message-recipient-list
+     */
+    public void synchronizeRecipients() {
+        if (!this.currentMessage.getTo().isEmpty()) {
+            this.currentMessage.getTo().removeIf(user -> !this.chatController.getPossibleRecipients().contains(user));
+        }
+    }
 
-	/**
-	 * Reset current message.
-	 *
-	 * @return Navigation-target
-	 */
-	private String clearChat() {
-		this.currentMessage = new Message();
-		return "";
-	}
+    /**
+     * Reset current message.
+     *
+     * @return Navigation-target
+     */
+    private String clearChat() {
+        this.currentMessage = new Message();
+        return "";
+    }
 
-	public Message getCurrentMessage() {
-		return currentMessage;
-	}
+    public Message getCurrentMessage() {
+        return currentMessage;
+    }
 
-	/**
-	 * Constructs the selectable recipient-list. It must be individual for every
-	 * user, because a user should not send a message to itself
-	 *
-	 * @return The selectable recipients
-	 */
-	public List<SelectItem> getPossibleRecipients() {
-		Set<User> loggedInUsers = this.chatController.getPossibleRecipients();
-		return loggedInUsers.stream().filter(u -> !u.equals(this.sessionInfoBean.getCurrentUser()))
-				.map(user -> new SelectItem(user, user.getUsername())).collect(Collectors.toList());
-	}
+    /**
+     * Constructs the selectable recipient-list. It must be individual for every
+     * user, because a user should not send a message to itself
+     *
+     * @return The selectable recipients
+     */
+    public List<SelectItem> getPossibleRecipients() {
+        Set<User> loggedInUsers = this.chatController.getPossibleRecipients();
+        return loggedInUsers.stream().filter(u -> !u.equals(this.sessionInfoBean.getCurrentUser()))
+                        .map(user -> new SelectItem(user, user.getUsername())).collect(Collectors.toList());
+    }
 
-	public List<Message> getChatContent() {
-		return chatContent;
-	}
+    public List<Message> getChatContent() {
+        return chatContent;
+    }
 
 }
