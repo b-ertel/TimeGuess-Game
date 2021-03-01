@@ -10,7 +10,7 @@ import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
 
 /**
- * Dueto technical restrictions (see [1] and [2]), spring cannot initialize the
+ * Due to technical restrictions (see [1] and [2]), spring cannot initialize the
  * pushContexts required for websockets (with simpler words: autowiring does not
  * work). Only a CDI-implementation (in our case "Weld" by jBoss) is capable of
  * doing that. Hence this class is used as a "container" for the required
@@ -40,24 +40,20 @@ import org.omnifaces.cdi.PushContext;
 @SessionScoped
 public class WebSocketManager implements Serializable {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -269863755915285547L;
-	// add other channels here + getter for them
-	@Inject
-	@Push(channel = "userRegistrationChannel")
-	private PushContext userRegistrationChannel;
-	@Inject
-	@Push(channel = "messageChannel")
-	private PushContext messageChannel;
+    // add other channels here + getter for them
+    @Inject
+    @Push(channel = "userRegistrationChannel")
+    private PushContext userRegistrationChannel;
+    @Inject
+    @Push(channel = "messageChannel")
+    private PushContext messageChannel;
 
-	public PushContext getUserRegistrationChannel() {
-		return userRegistrationChannel;
-	}
+    public PushContext getUserRegistrationChannel() {
+        return userRegistrationChannel;
+    }
 
-	public PushContext getMessageChannel() {
-		return messageChannel;
-	}
+    public PushContext getMessageChannel() {
+        return messageChannel;
+    }
 
 }

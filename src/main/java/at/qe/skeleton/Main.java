@@ -33,19 +33,19 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @ComponentScan(basePackages = "at.qe.skeleton", excludeFilters = @Filter(type = FilterType.REGEX, pattern = "at.qe.skeleton.ui.websockets.*"))
 public class Main extends SpringBootServletInitializer {
 
-	public static void main(String[] args) {
-		SpringApplication.run(Main.class, args);
-	}
+    public static void main(String[] args) {
+            SpringApplication.run(Main.class, args);
+    }
 
-	@Bean
-	public ServletRegistrationBean<FacesServlet> servletRegistrationBean() {
-		FacesServlet servlet = new FacesServlet();
-		ServletRegistrationBean<FacesServlet> servletRegistrationBean = new ServletRegistrationBean<>(servlet,
-				"*.xhtml");
-		servletRegistrationBean.setName("Faces Servlet");
-		servletRegistrationBean.setAsyncSupported(true);
-		servletRegistrationBean.setLoadOnStartup(1);
-		return servletRegistrationBean;
-	}
+    @Bean
+    public ServletRegistrationBean<FacesServlet> servletRegistrationBean() {
+            FacesServlet servlet = new FacesServlet();
+            ServletRegistrationBean<FacesServlet> servletRegistrationBean = new ServletRegistrationBean<>(servlet,
+                            "*.xhtml");
+            servletRegistrationBean.setName("Faces Servlet");
+            servletRegistrationBean.setAsyncSupported(true);
+            servletRegistrationBean.setLoadOnStartup(1);
+            return servletRegistrationBean;
+    }
 
 }
