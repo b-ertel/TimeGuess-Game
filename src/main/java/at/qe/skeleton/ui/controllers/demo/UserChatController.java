@@ -29,10 +29,6 @@ import at.qe.skeleton.ui.beans.SessionInfoBean;
 @Scope("session")
 public class UserChatController implements Serializable {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 3967144439567235115L;
 	@Autowired
 	private ChatManagerController chatController;
 	@Autowired
