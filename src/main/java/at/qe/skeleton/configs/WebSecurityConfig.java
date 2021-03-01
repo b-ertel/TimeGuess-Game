@@ -63,15 +63,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Allow only certain roles to use websockets (only logged in users)
                 .antMatchers("/omnifaces.push/**")
                 .hasAnyAuthority("ADMIN", "MANAGER", "EMPLOYEE")
-                //If user doesn't have permission, forward him to login page
-                .and()
-                .formLogin()
+                .and().formLogin()
                 .loginPage("/login.xhtml")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/secured/welcome.xhtml");
                 
         // :TODO: user failureUrl(/login.xhtml?error) and make sure that a corresponding message is displayed
-                
+ 
         http.exceptionHandling().accessDeniedPage("/error/access_denied.xhtml");
         http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
 
@@ -88,6 +86,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public static PasswordEncoder passwordEncoder() {
         // :TODO: use proper passwordEncoder and do not store passwords in plain text
-        return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
+        return NoOpPasswordEncoder.getInstance();
     }
 }

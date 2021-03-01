@@ -11,7 +11,7 @@
         <h:form>
             <p:panel header="Security Test Page" >
                 <p>You can use the following buttons to test the security settings for specific user roles</p>
-                <p>If the currently logged on user does not have the denoted role, you will be directed to the access-denied-page.</p>
+                <p>If the currently logged on user does not have the denoted role, an AccessDeniedException is thrown.</p>
                 <h:panelGrid columns="3">
                     <p:commandButton action="#{securityTestBean.doEmployeeAction}" value="EMPLOYEE" update="okDialog"/>
                     <p:commandButton action="#{securityTestBean.doManagerAction}" value="MANAGER" update="okDialog"/>

@@ -1,10 +1,7 @@
 package at.qe.skeleton;
 
-import java.util.HashMap;
-
 import javax.faces.webapp.FacesServlet;
 
-import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -14,8 +11,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-
-import at.qe.skeleton.utils.ViewScope;
 
 /**
  * Spring boot application. Execute maven with <code>mvn spring-boot:run</code>
@@ -51,15 +46,6 @@ public class Main extends SpringBootServletInitializer {
 		servletRegistrationBean.setAsyncSupported(true);
 		servletRegistrationBean.setLoadOnStartup(1);
 		return servletRegistrationBean;
-	}
-
-	@Bean
-	public CustomScopeConfigurer customScopeConfigurer() {
-		CustomScopeConfigurer customScopeConfigurer = new CustomScopeConfigurer();
-		HashMap<String, Object> customScopes = new HashMap<>();
-		customScopes.put("view", new ViewScope());
-		customScopeConfigurer.setScopes(customScopes);
-		return customScopeConfigurer;
 	}
 
 }
