@@ -1,4 +1,4 @@
-package at.qe.skeleton.tests;
+package at.timeflip.backend.tests;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
