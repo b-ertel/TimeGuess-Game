@@ -1,10 +1,11 @@
 package at.qe.skeleton.tests;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
+
+import at.timeflip.backend.model.User;
+import at.timeflip.backend.model.UserRole;
 
 /**
  * Tests to ensure that each entity's implementation of equals conforms to the
