@@ -30,7 +30,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
  * spring. It is reserved for the CDI-injection-mechanisms (Weld). Only add
  * CDI-managed components.
  */
-@ComponentScan(basePackages = "at.qe.skeleton", excludeFilters = @Filter(type = FilterType.REGEX, pattern = "at.timeflip.backend.ui.websockets.*"))
+@ComponentScan(basePackages = "at.timeflip.backend", excludeFilters = @Filter(type = FilterType.REGEX, pattern = "at.timeflip.backend.ui.websockets.*"))
 public class Main extends SpringBootServletInitializer {
 
     public static void main(String[] args) {

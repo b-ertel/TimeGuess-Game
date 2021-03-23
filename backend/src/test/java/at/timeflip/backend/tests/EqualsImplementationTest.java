@@ -1,4 +1,4 @@
-package at.qe.skeleton.tests;
+package at.timeflip.backend.tests;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
