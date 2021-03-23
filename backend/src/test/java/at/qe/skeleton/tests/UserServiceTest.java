@@ -9,9 +9,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-import at.qe.skeleton.services.UserService;
+import at.timeflip.backend.model.User;
+import at.timeflip.backend.model.UserRole;
+import at.timeflip.backend.services.UserService;
 
 /**
  * Some very basic tests for {@link UserService}.
