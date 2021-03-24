@@ -19,6 +19,9 @@ public class Team {
 	@ManyToMany(mappedBy = "teams")
 	private Set<Game> games;
 	
+	@ManyToMany // to be adapted once User is updated
+	private Set<User> teamMembers; 
+	
 	public Long getId() {
 		return id;
 	}
