@@ -1,8 +1,11 @@
 package at.timeguess.backend.model;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 
 @Entity
 public class Game {
@@ -18,6 +21,9 @@ public class Game {
 	private boolean status;
 	
 	private int roundNr;
+	
+	@ManyToMany
+	private Set<Team> teams;
 
 	
 	public Long getId() {
@@ -58,6 +64,14 @@ public class Game {
 
 	public void setRoundNr(int roundNr) {
 		this.roundNr = roundNr;
+	}
+
+	public Set<Team> getTeams() {
+		return teams;
+	}
+
+	public void setTeams(Set<Team> teams) {
+		this.teams = teams;
 	}
 
 }

@@ -1,8 +1,11 @@
 package at.timeguess.backend.model;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 
 @Entity
 public class Team {
@@ -12,6 +15,9 @@ public class Team {
 	
 	@Column
 	private String name;
+	
+	@ManyToMany(mappedBy = "teams")
+	private Set<Game> games;
 	
 	public Long getId() {
 		return id;
@@ -27,6 +33,14 @@ public class Team {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public Set<Game> getGames() {
+		return games;
+	}
+
+	public void setGames(Set<Game> games) {
+		this.games = games;
 	}
 
 	
