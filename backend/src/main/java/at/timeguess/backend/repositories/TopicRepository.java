@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import at.timeguess.backend.model.Topic;
 
-public interface TopicRepository extends AbstractRepository<Round, Long> {
+public interface TopicRepository extends AbstractRepository<Topic, Long> {
 	
     String findByName(String name);
     

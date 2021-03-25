@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import at.timeguess.backend.model.Term;
 
-public interface TermRepository extends AbstractRepository<Round, Long> {
+public interface TermRepository extends AbstractRepository<Term, Long> {
 	
     List<Term> findByTopic(Topic topic);
     Term findById(Long id);
