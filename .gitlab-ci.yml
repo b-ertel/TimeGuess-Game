@@ -1,6 +1,17 @@
 image: docker.uibk.ac.at:443/informatik/qe/sepsss21/group1/g1t1
 
+variables:
+  MAVEN_OPTS: "-Dhttp.proxyHost=proxy.uibk.ac.at  -Dhttp.proxyPort=3128  -Dhttps.proxyHost=proxy.uibk.ac.at -Dhttps.proxyPort=3128 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+
+cache:
+    paths:
+    - $CI_PROJECT_DIR/.m2/
+    - $CI_PROJECT_DIR/backend/target/
+
+
 stages:
+- Build
 - Static Analysis
 - Test
 
@@ -21,7 +32,6 @@ pmd:
     - cd raspberry
     - /opt/pmd-bin-6.31.0/bin/run.sh pmd -d src/main/java/ -f text -R rulesets/java/quickstart.xml -cache pmd_cache.txt
 
-
 raspberry-test:
     stage: Test
     script:
@@ -37,3 +47,18 @@ raspberry-test:
       paths:
       - raspberry-test
 
+maven_build_backend:
+  stage: Build
+  script:
+    - cd backend/
+    - 'mvn $MAVEN_CLI_OPTS compile'
+
+
+maven_verify_backend:
+  stage: Test
+  script:
+    - cd backend/
+    - echo "Testing backend project with maven"
+    - 'mvn $MAVEN_CLI_OPTS verify'
+    - cat target/site/jacoco/index.html | grep -o 'Total[^%]*%' | sed 's/<.*>/ /; s/Total/Jacoco Coverage Total:/'
+  coverage: "/Total.*?([0-9]{1,3})%/"
