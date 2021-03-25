@@ -1,4 +1,4 @@
-image: docker.uibk.ac.at:443/informatik/qe/sepss21/group1/g1t1
+image: docker.uibk.ac.at:443/informatik/qe/sepsss21/group1/g1t1
 
 stages:
 - Static Analysis
