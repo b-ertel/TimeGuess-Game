@@ -1,8 +1,5 @@
 package at.timeguess.backend.model;
 
-import java.util.Set;
-
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,11 +7,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Transient;
 
 import org.springframework.data.domain.Persistable;
-
-import at.timeguess.backend.model.Topic;
 
 /**
  * Entity representing Terms.
