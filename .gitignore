@@ -1,0 +1,6 @@
+/backend/bin/
+/backend/target/
+/backend/.classpath
+/backend/.settings/
+/backend/.project
+/backend/src/main/webapp/WEB-INF/.faces-config.xml.jsfdia
