@@ -14,6 +14,8 @@ import javax.persistence.Transient;
 
 import org.springframework.data.domain.Persistable;
 
+import at.timeguess.backend.model.Term;
+
 /**
  * Entity representing Topics.
  */
@@ -22,6 +24,10 @@ import org.springframework.data.domain.Persistable;
 public class Topic implements Persistable<Long> {
 
     @Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
+	private Long id;
+
+    @Column(name="name", unique=true)
     private String name;
 
     public String getName() {
@@ -31,5 +37,15 @@ public class Topic implements Persistable<Long> {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+	public Long getId() {
+		return this.id;
+	}
+
+	@Override
+	public boolean isNew() {
+		return false;
+	}
     
 }

@@ -14,6 +14,8 @@ import javax.persistence.Transient;
 
 import org.springframework.data.domain.Persistable;
 
+import at.timeguess.backend.model.Topic;
+
 /**
  * Entity representing Terms.
  */
@@ -28,7 +30,7 @@ public class Term implements Persistable<Long> {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name="topic", nullable=False)
+    @JoinColumn(name="topic", nullable=false)
     private Topic topic;
 
     public String getName() {
@@ -39,12 +41,22 @@ public class Term implements Persistable<Long> {
         this.name = name;
     }
 
-    public String getTopic() {
+    public Topic getTopic() {
         return topic;
     }
 
     public void setTopic(Topic topic) {
         this.topic = topic;
     }
+
+    @Override
+	public Long getId() {
+		return this.id;
+	}
+
+	@Override
+	public boolean isNew() {
+		return false;
+	}
     
 }

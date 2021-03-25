@@ -2,10 +2,8 @@ package at.timeguess.backend.repositories;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import at.timeguess.backend.model.Term;
+import at.timeguess.backend.model.Topic;
 
 public interface TermRepository extends AbstractRepository<Term, Long> {
 	
