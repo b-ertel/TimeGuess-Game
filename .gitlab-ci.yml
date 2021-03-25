@@ -1,0 +1,39 @@
+image: docker.uibk.ac.at:443/informatik/qe/sepsss21/group1/g1t1
+
+stages:
+- Static Analysis
+- Test
+
+before_script:
+    - mvn -version
+    - java -version
+    - echo $JAVA_HOME
+    - echo $MAVEN_HOME
+    - python3 --version
+    - pip3 --version
+    - echo $CI_PROJECT_DIR
+
+# See: https://pmd.github.io/
+pmd:
+    stage: Static Analysis
+    allow_failure: true
+    script:
+    - cd raspberry
+    - /opt/pmd-bin-6.31.0/bin/run.sh pmd -d src/main/java/ -f text -R rulesets/java/quickstart.xml -cache pmd_cache.txt
+
+
+raspberry-test:
+    stage: Test
+    script:
+    - mkdir raspberry-test
+    - cd raspberry
+    - mvn clean install
+    - JACOCO_SCORE=$(awk -F, '{ instructions += $4 + $5; covered += $5 } END { printf "%.2f\n", 100*covered/instructions }' target/site/jacoco/jacoco.csv)
+    - anybadge --label=jacoco-coverage --file=target/site/jacoco/jacoco.svg --value=$JACOCO_SCORE coverage
+    - mvn dependency:tree -DoutputFile="$CI_PROJECT_DIR/raspberry-test/mvn_dependencies.txt"
+    - cp -r target/site/jacoco $CI_PROJECT_DIR/raspberry-test/jacoco
+    - cp -r target/apidocs $CI_PROJECT_DIR/raspberry-test/apidocs
+    artifacts:
+      paths:
+      - raspberry-test
+
