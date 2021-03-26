@@ -10,7 +10,7 @@ import at.timeguess.backend.model.Round;
 public interface RoundRepository extends AbstractRepository<Round, Long> {
 	
 	
-	List<Round> findByUsername(String username);
+	List<Round> findByGuessingUser(String username);
 	
 	//TODO: Query to find Terms
 	
