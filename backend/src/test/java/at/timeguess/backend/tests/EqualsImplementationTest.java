@@ -28,7 +28,6 @@ public class EqualsImplementationTest {
         Team team1 = new Team();
         Team team2 = new Team();
         EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2).withPrefabValues(Team.class, team1, team2).suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
- //       EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2).suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test
