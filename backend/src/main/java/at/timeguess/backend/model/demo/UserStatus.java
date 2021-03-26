@@ -1,4 +1,4 @@
-package at.timeguess.backend.demo;
+package at.timeguess.backend.model.demo;
 
 /**
  * Simply denotes a user-status.
