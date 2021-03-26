@@ -25,6 +25,10 @@ public class Game {
 	private int roundNr;
 	
 	@ManyToMany
+	@JoinTable(
+			name = "game_team", 
+			joinColumns = @JoinColumn(name = "game_id"), 
+			inverseJoinColumns = @JoinColumn(name = "team_id"))
 	private Set<Team> teams;
 
 	
