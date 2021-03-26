@@ -2,7 +2,7 @@ package at.timeguess.backend.model;
 
 public class TopicStatistics {
 
-	//private Topic currentDisplayedTopic;
+	private Topic currentDisplayedTopic;
 	
 	private Integer nrGamesPlayed;
 	
@@ -10,7 +10,7 @@ public class TopicStatistics {
 	
 	private Integer nrOfIncorrectRounds;
 
-	/*
+	
 	public TopicStatistics(Topic currentDisplayedTopic, Integer nrGamesPlayed, Integer nrOfCorrectRounds,
 			Integer nrOfIncorrectRounds) {
 		super();
@@ -27,7 +27,7 @@ public class TopicStatistics {
 	public void setCurrentDisplayedTopic(Topic currentDisplayedTopic) {
 		this.currentDisplayedTopic = currentDisplayedTopic;
 	}
-	*/
+	
 	
 	public Integer getNrGamesPlayed() {
 		return nrGamesPlayed;

@@ -29,11 +29,11 @@ public class Round implements Persistable<Long> {
 	@JoinColumn(name="guessing_User", nullable=false)
 	private User guessingUser;
 	
-	//@Column(nullable = false)
-	//private Team guessingTeam;
+	@Column(nullable = false)
+	private Team guessingTeam;
 	
-	//@Transient
-	//private Set<Team> verifyingTeams;
+	@Transient
+	private Set<Team> verifyingTeams;
 
 	@Column(nullable = false)
 	private boolean correctAnswer = false;
@@ -57,7 +57,7 @@ public class Round implements Persistable<Long> {
 	public void setGuessingUser(User guessingUser) {
 		this.guessingUser = guessingUser;
 	}
-/*
+
 	public Team getGuessingTeam() {
 		return guessingTeam;
 	}
@@ -65,7 +65,7 @@ public class Round implements Persistable<Long> {
 	public void setGuessingTeam(Team guessingTeam) {
 		this.guessingTeam = guessingTeam;
 	}
-*/
+
 	public boolean isCorrectAnswer() {
 		return correctAnswer;
 	}
@@ -77,7 +77,7 @@ public class Round implements Persistable<Long> {
 	public void setId(Long id) {
 		this.id = id;
 	}
-/*	
+
 	public Set<Team> getVerifyingTeams() {
 		return verifyingTeams;
 	}
@@ -85,7 +85,7 @@ public class Round implements Persistable<Long> {
 	public void setVerifyingTeams(Set<Team> verifyingTeams) {
 		this.verifyingTeams = verifyingTeams;
 	}
-*/	
+
 
 	@Override
 	public Long getId() {
