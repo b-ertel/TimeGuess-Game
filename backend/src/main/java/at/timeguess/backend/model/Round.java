@@ -29,7 +29,8 @@ public class Round implements Persistable<Long> {
 	@JoinColumn(name="guessing_User", nullable=false)
 	private User guessingUser;
 	
-	@Column(nullable = false)
+	@ManyToOne
+	@JoinColumn(name="guessing_Team", nullable=false)
 	private Team guessingTeam;
 	
 	@Transient
