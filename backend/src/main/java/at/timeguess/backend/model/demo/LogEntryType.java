@@ -1,4 +1,4 @@
-package at.timeguess.backend.demo;
+package at.timeguess.backend.model.demo;
 
 /**
  * A class which denotes a type of a logEntry.

@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import at.timeguess.backend.demo.Message;
 import at.timeguess.backend.model.User;
+import at.timeguess.backend.model.demo.Message;
 import at.timeguess.backend.repositories.UserRepository;
 import at.timeguess.backend.spring.CustomizedLogoutSuccessHandler;
 import at.timeguess.backend.spring.LoginSuccessHandler;

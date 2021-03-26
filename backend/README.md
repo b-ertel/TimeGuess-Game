@@ -7,4 +7,16 @@ To run:
  and connect to http://localhost:8080/ to access the skeleton
  web application. 
  
-Login: with "admin" and "passwd".
+Logins: 
+  - `admin:passwd`
+  - `user1:passwd`
+  - `user2:passwd`
+  - `elvis:passwd`
+  
+### Employee Submenu
+
+doesn't appear to do anything. Is this correct?
+
+### Websocket chat
+
+To get the chat app working at least two different users need to be logged in.
