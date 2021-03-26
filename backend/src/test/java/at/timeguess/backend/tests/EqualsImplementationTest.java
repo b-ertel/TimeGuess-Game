@@ -4,6 +4,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
+import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
 
@@ -24,7 +25,10 @@ public class EqualsImplementationTest {
         user1.setUsername("user1");
         User user2 = new User();
         user2.setUsername("user2");
-        EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2).suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
+        Team team1 = new Team();
+        Team team2 = new Team();
+        EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2).withPrefabValues(Team.class, team1, team2).suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
+ //       EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2).suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test
