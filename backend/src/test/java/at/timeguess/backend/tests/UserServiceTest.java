@@ -149,7 +149,7 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testExceptionForEmptyUsername() {
-        Assertions.assertThrows(org.springframework.orm.jpa.JpaSystemException.class, () -> {
+        Assertions.assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () -> {
             User adminUser = userService.loadUser("admin");
             Assertions.assertNotNull(adminUser, "Admin user could not be loaded from test data source");
 

@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -23,17 +25,17 @@ import org.springframework.data.domain.Persistable;
 /**
  * Entity representing users.
  *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
  */
 @Entity
-public class User implements Persistable<String>, Serializable, Comparable<User> {
+public class User implements Persistable<Long>, Serializable, Comparable<User> {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(length = 100)
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+    @Column(length = 100, nullable = false)
     private String username;
 
     @ManyToOne(optional = false)
@@ -56,7 +58,7 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
     boolean enabled;
 
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "User_UserRole")
+    @CollectionTable(name = "User_Role")
     @Enumerated(EnumType.STRING)
     private Set<UserRole> roles;
     
@@ -66,7 +68,16 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
 			joinColumns = @JoinColumn(name = "user_id"), 
 			inverseJoinColumns = @JoinColumn(name = "team_id"))
     private Set<Team> teams;
-    
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -165,21 +176,20 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 59 * hash + Objects.hashCode(this.username);
-        return hash;
+    	int prime = 7;
+        int result = 59;
+        result = prime * result + (this.id == null ? 0 : Long.hashCode(this.id));
+        result = prime * result + Objects.hashCode(this.username);
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (obj == null || !(obj instanceof User)) {
             return false;
         }
-        if (!(obj instanceof User)) {
-            return false;
-        }
-        final User other = (User) obj;
-        if (!Objects.equals(this.username, other.username)) {
+        final User other = (User)obj;
+        if (!(Objects.equals(this.id, other.id) && Objects.equals(this.username, other.username))) {
             return false;
         }
         return true;
@@ -187,16 +197,7 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
 
     @Override
     public String toString() {
-        return "at.timeguess.backend.model.User[ id=" + username + " ]";
-    }
-
-    @Override
-    public String getId() {
-        return getUsername();
-    }
-
-    public void setId(String id) {
-        setUsername(id);
+        return String.format("at.timeguess.backend.model.User[ id=%d, username=%s ]", id, username);
     }
 
     @Override
