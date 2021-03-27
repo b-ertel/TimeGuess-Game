@@ -2,6 +2,9 @@ package at.timeguess.backend.services;
 
 import java.util.Collection;
 import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,13 +18,12 @@ import at.timeguess.backend.repositories.UserRepository;
 /**
  * Service for accessing and manipulating user data.
  *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
  */
 @Component
 @Scope("application")
 public class UserService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -76,7 +78,9 @@ public class UserService {
     @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteUser(User user) {
         userRepository.delete(user);
-        // :TODO: write some audit log stating who and when this user was permanently deleted.
+        
+        User authUser = getAuthenticatedUser();
+        LOGGER.info("User {} '{}' was deleted by User {} '{}'", user.getId(), user.getUsername(), authUser.getId(), authUser.getUsername());
     }
 
     private User getAuthenticatedUser() {
