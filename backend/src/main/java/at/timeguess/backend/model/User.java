@@ -12,6 +12,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -56,7 +59,14 @@ public class User implements Persistable<String>, Serializable, Comparable<User>
     @CollectionTable(name = "User_UserRole")
     @Enumerated(EnumType.STRING)
     private Set<UserRole> roles;
-
+    
+    @ManyToMany
+	@JoinTable(
+			name = "team_user", 
+			joinColumns = @JoinColumn(name = "user_id"), 
+			inverseJoinColumns = @JoinColumn(name = "team_id"))
+    private Set<Team> teams;
+    
     public String getUsername() {
         return username;
     }
