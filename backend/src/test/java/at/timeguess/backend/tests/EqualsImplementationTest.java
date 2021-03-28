@@ -5,6 +5,8 @@ import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
 import at.timeguess.backend.model.Team;
+import at.timeguess.backend.model.Term;
+import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
 
@@ -33,6 +35,38 @@ public class EqualsImplementationTest {
     @Test
     public void testUserRoleEqualsContract() {
         EqualsVerifier.forClass(UserRole.class).verify();
+    }
+
+    @Test
+    public void testTermEqualsContract() {
+        Term newTerm1 = new Term();
+        newTerm1.setName("Test Term 1");
+        Term newTerm2 = new Term();
+        newTerm2.setName("Test Term 2");
+        Topic newTopic1 = new Topic();
+        newTopic1.setName("Test Topic 1");
+        Topic newTopic2 = new Topic();
+        newTopic2.setName("Test Topic 2");
+        EqualsVerifier
+            .simple()
+            .forClass(Term.class)
+            .withPrefabValues(Term.class, newTerm1, newTerm2)
+            .withPrefabValues(Topic.class, newTopic1, newTopic2)
+            .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED)
+            .verify();
+    }
+
+    @Test
+    public void testTopicEqualsContract() {
+        Topic newTopic1 = new Topic();
+        newTopic1.setName("Test Topic 1");
+        Topic newTopic2 = new Topic();
+        newTopic2.setName("Test Topic 2");
+        EqualsVerifier
+            .forClass(Topic.class)
+            .withPrefabValues(Topic.class, newTopic1, newTopic2)
+            .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED)
+            .verify();
     }
 
 }
