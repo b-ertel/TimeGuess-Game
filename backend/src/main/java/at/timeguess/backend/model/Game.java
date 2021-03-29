@@ -11,27 +11,26 @@ import javax.persistence.ManyToMany;
 
 @Entity
 public class Game {
-	
+
 	@Id
 	private Long id;
-	
+
 	@Column
 	private String name;
-	
+
 	private int maxPoints;
-	
+
 	private boolean status;
-	
-	private int roundNr;
-	
-	@ManyToMany
-	@JoinTable(
-			name = "game_team", 
-			joinColumns = @JoinColumn(name = "game_id"), 
-			inverseJoinColumns = @JoinColumn(name = "team_id"))
-	private Set<Team> teams;
+	private GameState state;
 
 	
+
+	private int roundNr;
+
+	@ManyToMany
+	@JoinTable(name = "game_team", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "team_id"))
+	private Set<Team> teams;
+
 	public Long getId() {
 		return id;
 	}
@@ -80,4 +79,11 @@ public class Game {
 		this.teams = teams;
 	}
 
+	public GameState getState() {
+		return state;
+	}
+
+	public void setState(GameState state) {
+		this.state = state;
+	}
 }
