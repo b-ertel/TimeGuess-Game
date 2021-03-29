@@ -8,31 +8,33 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
 @Entity
 public class Game {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Column
 	private String name;
-	
+
 	private int maxPoints;
-	
+
 	private boolean status;
+	private GameState state;
+
 	
+
 	private int roundNr;
-	
-	@OneToMany(mappedBy = "game")
-    private Set<GameTeam> teams;
-	
-	@ManyToOne
-	private Topic topic; 
-	
+
+	@ManyToMany
+	@JoinTable(name = "game_team", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "team_id"))
+	private Set<Team> teams;
+
 	public Long getId() {
 		return id;
 	}
@@ -81,11 +83,11 @@ public class Game {
 		this.teams = teams.stream().map(t -> new GameTeam(this, t)).collect(Collectors.toSet());
 	}
 
-	public Topic getTopic() {
-		return topic;
+	public GameState getState() {
+		return state;
 	}
 
-	public void setTopic(Topic topic) {
-		this.topic = topic;
+	public void setState(GameState state) {
+		this.state = state;
 	}
 }
