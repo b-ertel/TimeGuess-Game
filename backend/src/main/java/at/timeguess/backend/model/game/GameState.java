@@ -1,4 +1,4 @@
-package at.timeguess.backend.model;
+package at.timeguess.backend.model.game;
 
 public enum GameState {
 	SETUP,

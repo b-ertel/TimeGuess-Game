@@ -12,6 +12,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import at.timeguess.backend.model.game.GameException;
+import at.timeguess.backend.model.game.GameState;
+
 @Entity
 public class Game {
 
@@ -88,6 +91,11 @@ public class Game {
 	}
 
 	public void setState(GameState state) {
+		this.state = state;
+	}
+
+	public void advanceState(GameState state) throws GameException {
+		// TODO - check if transition is allowed 
 		this.state = state;
 	}
 }
