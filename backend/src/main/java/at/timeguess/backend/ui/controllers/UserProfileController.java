@@ -63,4 +63,13 @@ public class UserProfileController implements Serializable {
     public Collection<User> getTeammates() {
     	return userService.getTeammates(user);
     }
+
+    /**
+     * Returns the total number of games played by the current user.
+     *
+     * @return
+     */
+    public int getTotalGames() {
+    	return userService.getTotalGames(user);
+    }
 }

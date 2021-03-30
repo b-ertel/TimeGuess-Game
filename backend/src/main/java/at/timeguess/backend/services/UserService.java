@@ -49,12 +49,22 @@ public class UserService {
     }
 
     /**
-     * Returns a list of all users being team mates of the current user (i.e. belonging to the same teams).
+     * Returns a list of all users being team mates of the given user (i.e. belonging to the same teams).
      *
      * @return
      */
     public Collection<User> getTeammates(User user) {
         return userRepository.findByTeams(user);
+    }
+
+
+    /**
+     * Returns the total number of games played by the given user.
+     *
+     * @return
+     */
+    public int getTotalGames(User user) {
+    	return userRepository.getTotalGames(user);
     }
 
     /**

@@ -26,4 +26,7 @@ public interface UserRepository extends AbstractRepository<User, String> {
 	
     @Query("SELECT m FROM User m JOIN m.teams tm WHERE tm IN (SELECT tu FROM User u JOIN u.teams tu WHERE u = ?1) AND m <> ?1")
     List<User> findByTeams(User user);
+	
+    @Query("SELECT COUNT(g) FROM User u JOIN u.teams t JOIN t.games g WHERE u = ?1")
+    int getTotalGames(User user);
 }

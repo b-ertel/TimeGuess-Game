@@ -51,6 +51,11 @@
 					</p:dataTable>
                     <p:separator />
                     <h:panelGrid columns="2">
+                        <p:outputLabel for="totalGames" value="Total Games played: " />
+                        <p:outputLabel id="totalGames" value="#{userProfileController.totalGames}"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="2">
                         <p:commandButton value="Reload" action="#{userProfileController.doReloadUser()}" update=":userForm:userData"/>
                         <p:commandButton value="Abort" onclick="PF('userProfileDialog').hide()"/>
                     </h:panelGrid>
