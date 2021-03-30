@@ -8,6 +8,8 @@
         <ui:composition>
             <h:form>
                 <p:menubar>
+                    <p:menuitem value="User Profiles" url="/secured/users.xhtml" rendered="#{sessionInfoBean.hasRole('PLAYER')}"/>
+                    
                     <p:submenu label="Employee Submenu 1" rendered="#{sessionInfoBean.hasRole('PLAYER')}">
                         <p:menuitem value="Employee Action 1 - 1"/>
                         <p:menuitem value="Employee Action 1 - 2"/>

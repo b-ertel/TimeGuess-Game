@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.User;
+import at.timeguess.backend.model.UserRole;
 import at.timeguess.backend.repositories.UserRepository;
 
 /**
@@ -39,12 +40,30 @@ public class UserService {
     }
 
     /**
+     * Returns a collection of all users with role 'PLAYER'.
+     *
+     * @return
+     */
+    public Collection<User> getAllPlayers() {
+        return userRepository.findByRole(UserRole.PLAYER);
+    }
+
+    /**
+     * Returns a list of all users being team mates of the current user (i.e. belonging to the same teams).
+     *
+     * @return
+     */
+    public Collection<User> getTeammates(User user) {
+        return userRepository.findByTeams(user);
+    }
+
+    /**
      * Loads a single user identified by its username.
      *
      * @param username the username to search for
      * @return the user with the given username
      */
-    @PreAuthorize("hasAuthority('ADMIN') or principal.username eq #username")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #username")
     public User loadUser(String username) {
         return userRepository.findFirstByUsername(username);
     }

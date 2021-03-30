@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name ="content">
+        <h:form id="userForm">
+            <p:dataTable id="usersTable" var="user" value="#{userListController.allPlayers}">
+                <p:column headerText="Username">
+                    <h:outputText value="#{user.username}"/>
+                </p:column>
+                <p:column style="width:100px;text-align: center">
+                    <p:commandButton update=":userForm:userProfileDialog" oncomplete="PF('userProfileDialog').show()" icon="ui-icon-person" title="Profile">
+                        <f:setPropertyActionListener value="#{user}" target="#{userProfileController.user}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:dialog header="Edit User" id="userProfileDialog" widgetVar="userProfileDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" responsive="true" width="330">
+	        	<c:set var="curr" value="#{userProfileController.user}" scope="request" />
+                <p:outputPanel id="userData" rendered="#{not empty curr}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="username" value="Username: " />
+                        <p:inputText id="username" value="#{curr.username}" disabled="true"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="firstName" value="First Name: " />
+                        <p:inputText id="firstName" value="#{curr.firstName}"/>
+                        <p:outputLabel for="firstName" value="Last Name: " />
+                        <p:inputText id="lastName" value="#{curr.lastName}"/>
+                        <p:outputLabel for="email" value="E-Mail: " />
+                        <p:inputText id="email" value="#{curr.email}"/>
+                        <p:outputLabel for="phone" value="Phone: " />
+                        <p:inputMask id="phone" value="#{curr.phone}" mask="+99? 999 9999999"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="enabled" value="Enabled: " />
+                        <p:selectBooleanCheckbox id="enabled" value="#{curr.enabled}"/>
+                    </h:panelGrid>
+                    <p:separator />
+					<p:dataTable id="mateTable" var="mate" value="#{userProfileController.teammates}">
+						<p:column headerText="Teammates">
+							<p:outputLabel value="#{mate.username}" />
+						</p:column>
+					</p:dataTable>
+                    <p:separator />
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="Reload" action="#{userProfileController.doReloadUser()}" update=":userForm:userData"/>
+                        <p:commandButton value="Abort" onclick="PF('userProfileDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

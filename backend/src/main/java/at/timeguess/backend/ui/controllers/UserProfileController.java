@@ -1,6 +1,8 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -9,12 +11,12 @@ import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.UserService;
 
 /**
- * Controller for the user detail view.
+ * Controller for the user profile view.
  *
  */
 @Component
 @Scope("view")
-public class UserDetailController implements Serializable {
+public class UserProfileController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -28,9 +30,7 @@ public class UserDetailController implements Serializable {
 
     /**
      * Sets the currently displayed user and reloads it form db. This user is
-     * targeted by any further calls of
-     * {@link #doReloadUser()}, {@link #doSaveUser()} and
-     * {@link #doDeleteUser()}.
+     * targeted by any further calls of {@link #doReloadUser()}
      *
      * @param user
      */
@@ -56,18 +56,11 @@ public class UserDetailController implements Serializable {
     }
 
     /**
-     * Action to save the currently displayed user.
+     * Returns a list of all users being team mates of the current user (i.e. belonging to the same teams).
+     *
+     * @return
      */
-    public void doSaveUser() {
-        user = this.userService.saveUser(user);
+    public Collection<User> getTeammates() {
+    	return userService.getTeammates(user);
     }
-
-    /**
-     * Action to delete the currently displayed user.
-     */
-    public void doDeleteUser() {
-        this.userService.deleteUser(user);
-        user = null;
-    }
-
 }
