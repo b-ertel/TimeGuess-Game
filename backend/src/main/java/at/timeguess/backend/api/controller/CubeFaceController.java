@@ -3,13 +3,12 @@ package at.timeguess.backend.api.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import at.timeguess.backend.api.services.CubeService;
 import at.timeguess.backend.model.CubeFace;
-import at.timeguess.backend.model.Team;
 
 @RestController
 public class CubeFaceController {
@@ -28,7 +27,7 @@ public class CubeFaceController {
 	}
 	
 	@PatchMapping("/dice")
-	private CubeFace updateCubeFace(/*@PathVariable Long id, */@RequestBody CubeFace cubeFace) {
+	private CubeFace updateCubeFace(@RequestBody CubeFace cubeFace) {    //there is only one cubeFace relevant for the game, passed faces are not saved
 		return cubeService.updateCubeFace(cubeFace);
 	}
 	
