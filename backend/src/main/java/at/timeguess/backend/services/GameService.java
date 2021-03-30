@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.model.*;
+import at.timeguess.backend.model.game.GameState;
 
 @Component
 @Scope("application")
