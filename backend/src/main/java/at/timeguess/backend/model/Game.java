@@ -12,11 +12,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import org.springframework.data.domain.Persistable;
+
 import at.timeguess.backend.model.game.GameException;
 import at.timeguess.backend.model.game.GameState;
 
 @Entity
-public class Game {
+public class Game implements Persistable<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -97,5 +99,11 @@ public class Game {
 	public void advanceState(GameState state) throws GameException {
 		// TODO - check if transition is allowed 
 		this.state = state;
+	}
+
+	@Override
+	public boolean isNew() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
