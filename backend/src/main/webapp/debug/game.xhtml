@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+<ui:define name ="content">
+
+<h1> DEBUGGING GAME EDITOR</h1>
+
+<h2>New Game</h2>
+<h:form id="newGame" header="new game">
+  <h:panelGrid columns="2">
+  <p:outputLabel for="name" value="Name: " />
+  <p:inputText id="name" value="#{newGameBean.gameName}" />
+  <p:outputLabel for="maxPoints" value="maxPoints: " />
+  <p:inputText id="maxPoints" value="#{newGameBean.maxPoints}" />
+  <p:commandButton value="Save" action="#{newGameBean.create}" update=":gameForm" />
+  </h:panelGrid>
+</h:form>
+
+<p:separator />
+
+<h2>Games in Db</h2>
+
+<h:form id="gameForm">
+<p:dataTable id="gamesTable" var="tgame" 
+value="#{gameDebugController.games}">
+ <p:column headerText="id"> <h:outputText value="#{tgame.id}"/> </p:column>
+ <p:column headerText="name"> <h:outputText value="#{tgame.name}"/> </p:column>
+ <p:column headerText="max points"> <h:outputText value="#{tgame.maxPoints}"/> </p:column>
+ <p:column headerText="status"> <h:outputText value="#{tgame.status}"/> </p:column>
+ <p:column headerText="roundNr"> <h:outputText value="#{tgame.roundNr}"/> </p:column>
+ <p:column headerText="topic"> <h:outputText value="#{tgame.topic.name}"/> </p:column>
+ <p:column style="width:100px;text-align: center">
+ <p:commandButton update=":gameForm:gameEditDialog" oncomplete="PF('gameEditDialog').show()" icon="ui-icon-note" title="Edit">
+ <f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />
+ </p:commandButton>
+ </p:column>
+</p:dataTable>
+
+<p:dialog header="Edit Game" id="gameEditDialog" widgetVar="gameEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+<p:outputPanel id="gameData" rendered="#{not empty gameDetailController.game}">
+<h:panelGrid columns="2">
+<p:outputLabel for="name" value="Name of game: " />
+<p:inputText id="name" value="#{gameDetailController.game.name}" />
+</h:panelGrid>
+<p:separator />
+
+<h:panelGrid columns="2">
+<p:outputLabel for="maxPoints" value="Maximum of points" />
+<p:inputNumber id="maxPoints" value="#{gameDetailController.game.maxPoints}"
+                              minValue = "1" maxValue="999"/>
+
+<p:outputLabel for="roundEd" value="Game round" />
+<p:inputNumber id="roundEd" value="#{gameDetailController.game.roundNr}"
+                              minValue = "0" maxValue="999"/>
+</h:panelGrid>
+<p:separator />
+
+<h:panelGrid columns="2">
+
+<h:outputLabel for="state" value="state" />
+<h:selectOneMenu id="state" value="#{gameDetailController.game.status}">
+<f:selectItems value="#{dataBean.states}" />
+</h:selectOneMenu>
+
+</h:panelGrid>
+
+<h:panelGrid columns="2">
+
+<h:outputLabel for="topic" value="Choose topic" />
+<h:selectOneMenu id="topic" value="#{gameDetailController.game.topic}">
+<f:selectItem itemLabel="Select" noSelectionOption="true" />
+<f:selectItems value="#{topicService.allTopics}" 
+               var="topval"
+               itemLabel="#{topval.name}"/>
+</h:selectOneMenu>
+</h:panelGrid>
+
+<p:separator />
+<h:panelGrid columns="3">
+<p:commandButton value="Save" action="#{gameDetailController.doSaveGame()}" oncomplete="PF('gameEditDialog').hide()" update=":gameForm:gamesTable"/>
+<p:commandButton value="Delete" action="#{gameDetailController.doDeleteGame()}" oncomplete="PF('gameEditDialog').hide()" update=":gameForm:gamesTable"/>
+<p:commandButton value="Reload" action="#{gameDetailController.doReloadGame()}" update=":gameForm:gameData"/>
+<p:commandButton value="Abort" onclick="PF('gameEditDialog').hide()"/>
+</h:panelGrid>
+</p:outputPanel>
+</p:dialog>
+</h:form>
+
+<p:separator />
+
+</ui:define>
+</ui:composition>

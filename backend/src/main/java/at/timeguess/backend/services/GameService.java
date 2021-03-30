@@ -15,7 +15,6 @@ import at.timeguess.backend.model.GameState;
 public class GameService {
 	@Autowired
     private GameRepository gameRepo;
-	
    
     @PreAuthorize("hasAuthority('USER')")
     public Collection<Game> getAllGames() {
