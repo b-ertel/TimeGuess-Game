@@ -10,6 +10,7 @@ public class TopicStatistics {
 	
 	private Integer nrOfIncorrectRounds;
 
+	public TopicStatistics() {}
 	
 	public TopicStatistics(Topic currentDisplayedTopic, Integer nrGamesPlayed, Integer nrOfCorrectRounds,
 			Integer nrOfIncorrectRounds) {
