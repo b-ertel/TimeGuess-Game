@@ -176,23 +176,24 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
 
     @Override
     public int hashCode() {
-    	int prime = 7;
+    	final int prime = 7;
         int result = 59;
-        result = prime * result + (this.id == null ? 0 : Long.hashCode(this.id));
+        result = prime * result + (this.id == null ? 0 : this.id.hashCode());
         result = prime * result + Objects.hashCode(this.username);
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof User)) {
+    	if (this == obj)
+    		return true;
+    	
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
+        
         final User other = (User)obj;
-        if (!(Objects.equals(this.id, other.id) && Objects.equals(this.username, other.username))) {
-            return false;
-        }
-        return true;
+        return Objects.equals(getId(), other.getId()) && Objects.equals(getUsername(), other.getUsername());
     }
 
     @Override

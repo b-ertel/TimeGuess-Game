@@ -25,18 +25,18 @@
                 <p:outputPanel id="userData" rendered="#{not empty curr}">
                     <h:panelGrid columns="2">
                         <p:outputLabel for="username" value="Username: " />
-                        <p:inputText id="username" value="#{curr.username}" disabled="true"/>
+                        <p:outputLabel id="username" value="#{curr.username}" disabled="true"/>
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="2">
                         <p:outputLabel for="firstName" value="First Name: " />
-                        <p:inputText id="firstName" value="#{curr.firstName}"/>
+                        <p:outputLabel id="firstName" value="#{curr.firstName}"/>
                         <p:outputLabel for="firstName" value="Last Name: " />
-                        <p:inputText id="lastName" value="#{curr.lastName}"/>
+                        <p:outputLabel id="lastName" value="#{curr.lastName}"/>
                         <p:outputLabel for="email" value="E-Mail: " />
-                        <p:inputText id="email" value="#{curr.email}"/>
+                        <p:outputLabel id="email" value="#{curr.email}"/>
                         <p:outputLabel for="phone" value="Phone: " />
-                        <p:inputMask id="phone" value="#{curr.phone}" mask="+99? 999 9999999"/>
+                        <p:outputLabel id="phone" value="#{curr.phone}" mask="+99? 999 9999999"/>
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="2">
