@@ -26,5 +26,7 @@ public class CustomServletContextInitializer implements ServletContextInitialize
         // websockets configuration
         sc.setInitParameter("javax.faces.ENABLE_CDI_RESOLVER_CHAIN", "true");
         sc.setInitParameter("org.omnifaces.SOCKET_ENDPOINT_ENABLED", "true");
+		// set timezone for all components to system default
+		sc.setInitParameter("javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE", "true");
     }
 }

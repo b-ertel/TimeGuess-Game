@@ -1,7 +1,10 @@
-/backend/bin/
-/backend/target/
-/backend/.classpath
-/backend/.settings/
-/backend/.project
-/backend/src/main/webapp/WEB-INF/.faces-config.xml.jsfdia
+# Eclipse
 .project
+.classpath
+.settings/
+
+# Maven
+target/
+
+# Other
+*.bak
