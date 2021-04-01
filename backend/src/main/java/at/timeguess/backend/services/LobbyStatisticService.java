@@ -63,4 +63,15 @@ public class LobbyStatisticService {
 		return roundRepository.getNrCorrectAnswerByTopic(topic.getId());
 	}
 	
+	public Integer nrOfInCorrectRounds(Topic topic) {
+		return roundRepository.getNrIncorrectAnswerByTopic(topic.getId());
+	}
+	
+	public Integer nrGamePlayedPerTopic(Topic topic) {
+		return gameRepository.countByTopicId(topic.getId());
+	}
+	
+	public List<Topic> getTopics() {
+		return topicRepository.findAll();
+	}
 }

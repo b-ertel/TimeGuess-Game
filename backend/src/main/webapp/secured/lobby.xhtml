@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	template="/WEB-INF/templates/gamelobbymain.xhtml">
+    <ui:define name="content">
+        <h:form id="statForm">
+            <div>
+		        <p:dataTable id="topic" var="topic" value="#{lobbyStatisticController.topics}">
+		            <p:column headerText="Name">
+		                <h:outputText value="#{topic.name}" />
+		            </p:column>
+		            <p:column style="width:100px;text-align: center">
+	                    <p:commandButton update=":statForm:topicStatDialog" oncomplete="PF('topicStatDialog').show()" icon="ui-icon-info" title="Edit">
+	                        <f:setPropertyActionListener value="#{topic}" target="#{lobbyStatisticController.topic}" />
+	                    </p:commandButton>
+	                </p:column>
+		        </p:dataTable>
+		    </div>
+		    
+		    <p:dialog header="Topic Statistics" id="topicStatDialog" widgetVar="topicStatDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="topicStat" rendered="#{not empty lobbyStatisticController.topic}">
+				    <p:panelGrid columns="2">
+					    <f:facet name="header">
+				            <h:outputText value="#{lobbyStatisticController.topic.name}"/>
+				        </f:facet>
+				       <h:outputText value="Games:"/>
+				       <h:outputText value="#{lobbyStatisticController.gamesPlayedWithTopic}"/>
+				    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
