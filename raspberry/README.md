@@ -10,20 +10,22 @@ the `skeleton-bleclient` project, in particular, that JDK 8, Maven,
 BlueZ 5.47 and tinyb have been installed.
 
 Following this, just clone this repo on the Raspberry Pi, `cd` into the
-`raspberry` folder (which is the folder where this file is located)
-and enter one of the commands shown below to build the program.
+`raspberry` folder and build with either
 
-**Build:**
+    mvn clean package -Dmaven.test.skip=true -Dmaven.javadoc.skip=true
 
-     mvn clean package -Dmaven.test.skip=true -Dmaven.javadoc.skip=true
+(*without* tests and Javadoc) or
 
-**Build with Tests and Javadoc:**
+    mvn clean install
 
-     mvn clean install
+(*with* tests and Javadoc).
 
 If a Timeflip device is within reach, you can run the program with the
 following command.
 
-**Run:**
+    java -cp target/raspberry.jar:./lib/tinyb.jar:./target/dependencies/* at.timeguess.raspberry.Main 98:07:2D:EE:23:28
 
-     sudo java -cp target/raspberry.jar:./lib/tinyb.jar:./target/dependencies/* at.timeguess.raspberry.Main 
+Useful ressources:
+- [TimeFlip protocol](https://github.com/DI-GROUP/TimeFlip.Docs/blob/master/Hardware/BLE_device_commutication_protocol_v3.0_en.md)
+- [TinyB Java documentation](http://iotdk.intel.com/docs/master/tinyb/java/index.html)
+- [TinyB Java examples](https://github.com/intel-iot-devkit/tinyb/tree/master/examples/java)
