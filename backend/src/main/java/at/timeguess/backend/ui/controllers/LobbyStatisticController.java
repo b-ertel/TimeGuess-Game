@@ -42,4 +42,17 @@ public class LobbyStatisticController {
 		return statService.nrGamePlayedPerTopic(topic);
 	}
 	
+	
+	public Integer getNumberOfTopics() {
+		return statService.nrOfTopics();
+	}
+	
+	public Integer getNumberOfTerms() {
+		return statService.nrOfTerms();
+	}
+	
+	public Integer getNumberOfPlayers() {
+		return statService.nrOfPlayers();
+	}
+	
 }

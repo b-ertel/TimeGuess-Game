@@ -12,8 +12,13 @@
             <div>
 	            <p:panelGrid columns="2" style="width: 100%;">
 	                <p:panel header="General" style="border: none; width: 400px">
-                            <p>Hier kommen allgemeine Statistiken</p>
-                    </p:panel>
+                            <h:outputText value="Number of players: #{lobbyStatisticController.numberOfPlayers}" /> 
+                            <br />
+                            <h:outputText value="Number of terms: #{lobbyStatisticController.numberOfTerms}" />  
+                            <br />
+                            <h:outputText value="Number of topics: #{lobbyStatisticController.numberOfTopics}"/>
+                            <br />        
+                 	</p:panel>
 
                     <p:panel header="Topics" style=" border: none;">
 	                    <p:dataTable id="topic" var="topic" value="#{lobbyStatisticController.topics}">
