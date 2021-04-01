@@ -4,6 +4,6 @@ import at.timeguess.backend.model.Topic;
 
 public interface TopicRepository extends AbstractRepository<Topic, Long> {
 	
-    String findByName(String name);
+    Topic findByName(String name);
     
 }
