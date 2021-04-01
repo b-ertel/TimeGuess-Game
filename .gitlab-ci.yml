@@ -12,7 +12,7 @@ cache:
 
 stages:
 - Build
-- Static Analysis
+# - Static Analysis
 - Test
 
 before_script:
@@ -25,12 +25,12 @@ before_script:
     - echo $CI_PROJECT_DIR
 
 # See: https://pmd.github.io/
-pmd:
-    stage: Static Analysis
-    allow_failure: true
-    script:
-    - cd raspberry
-    - /opt/pmd-bin-6.31.0/bin/run.sh pmd -d src/main/java/ -f text -R rulesets/java/quickstart.xml -cache pmd_cache.txt
+# pmd:
+#     stage: Static Analysis
+#     allow_failure: true
+#     script:
+#     - cd raspberry
+#     - /opt/pmd-bin-6.31.0/bin/run.sh pmd -d src/main/java/ -f text -R rulesets/java/quickstart.xml -cache pmd_cache.txt
 
 raspberry-test:
     stage: Test
