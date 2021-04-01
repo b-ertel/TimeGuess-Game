@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.model.TopicStatistics;
 import at.timeguess.backend.services.LobbyStatisticService;
 
 @Component
