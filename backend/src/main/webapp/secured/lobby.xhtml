@@ -10,16 +10,24 @@
     <ui:define name="content">
         <h:form id="statForm">
             <div>
-		        <p:dataTable id="topic" var="topic" value="#{lobbyStatisticController.topics}">
-		            <p:column headerText="Name">
-		                <h:outputText value="#{topic.name}" />
-		            </p:column>
-		            <p:column style="width:100px;text-align: center">
-	                    <p:commandButton update=":statForm:topicStatDialog" oncomplete="PF('topicStatDialog').show()" icon="ui-icon-info" title="Edit">
-	                        <f:setPropertyActionListener value="#{topic}" target="#{lobbyStatisticController.topic}" />
-	                    </p:commandButton>
-	                </p:column>
-		        </p:dataTable>
+	            <p:panelGrid columns="2" style="width: 100%;">
+	                <p:panel header="General" style="border: none; width: 400px">
+                            <p>Hier kommen allgemeine Statistiken</p>
+                    </p:panel>
+
+                    <p:panel header="Topics" style=" border: none;">
+	                    <p:dataTable id="topic" var="topic" value="#{lobbyStatisticController.topics}">
+				            <p:column headerText="Name">
+				                <h:outputText value="#{topic.name}" />
+				            </p:column>
+				            <p:column style="width:100px;text-align: center">
+			                    <p:commandButton update=":statForm:topicStatDialog" oncomplete="PF('topicStatDialog').show()" icon="ui-icon-info" title="Edit">
+			                        <f:setPropertyActionListener value="#{topic}" target="#{lobbyStatisticController.topic}" />
+			                    </p:commandButton>
+			                </p:column>
+				        </p:dataTable> 
+                    </p:panel>
+	            </p:panelGrid>
 		    </div>
 		    
 		    <p:dialog header="Topic Statistics" id="topicStatDialog" widgetVar="topicStatDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
@@ -30,6 +38,12 @@
 				        </f:facet>
 				       <h:outputText value="Games:"/>
 				       <h:outputText value="#{lobbyStatisticController.gamesPlayedWithTopic}"/>
+				       
+				       <h:outputText value="Correct Answers:"/>
+				       <h:outputText value="#{lobbyStatisticController.correctRounds}"/>
+				       
+				       <h:outputText value="Incorrect Answers:"/>
+				       <h:outputText value="#{lobbyStatisticController.incorrectRounds}"/>
 				    </p:panelGrid>
                 </p:outputPanel>
             </p:dialog>
