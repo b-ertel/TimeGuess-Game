@@ -10,7 +10,7 @@ import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.repositories.CubeFaceRepository;
 
 @Service
-public class CubeService {
+public class CubeFaceService {
 
 	private CubeFace cubeFace;
 	private Cube cube;

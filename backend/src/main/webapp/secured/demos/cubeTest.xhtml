@@ -23,7 +23,7 @@
                 </p:column>
                 <p:column style="width:100px;text-align: center">
                     <p:commandButton update=":cubeForm:cubeEditDialog" oncomplete="PF('cubeEditDialog').show()" icon="ui-icon-note" title="Edit">
-                        <f:setPropertyActionListener value="#{user}" target="#{cubeFaceController.cubeFace}" />
+                        <f:setPropertyActionListener value="#{cubeFace}" target="#{cubeFaceController.cubeFace}" />
                     </p:commandButton>
               <!--        <p:commandButton action="#{userDetailController.doDeleteUser}" icon="ui-icon-trash" title="Delete" update=":userForm:usersTable">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
