@@ -1,8 +1,11 @@
 package at.timeguess.backend.api.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.repositories.CubeFaceRepository;
 
@@ -10,20 +13,28 @@ import at.timeguess.backend.repositories.CubeFaceRepository;
 public class CubeService {
 
 	private CubeFace cubeFace;
+	private Cube cube;
 	
 	@Autowired
 	private CubeFaceRepository cubeRepo;
 
 	public CubeFace addCubeFace(CubeFace cubeFace) {
 		this.cubeFace = new CubeFace();
-		this.cubeFace.setActivity(cubeFace.getActivity());
-		this.cubeFace.setPoints(cubeFace.getPoints());
-		this.cubeFace.setTime(cubeFace.getTime());
+	//	this.cubeFace.setActivity(cubeFace.getActivity());
+	//	this.cubeFace.setPoints(cubeFace.getPoints());
+	//	this.cubeFace.setTime(cubeFace.getTime());
+		this.cubeFace.setId(cubeFace.getId());
+	//	this.cubeFace.setCube(this.cube);
+		cubeRepo.save(cubeFace);
 		return this.cubeFace;
+	}
+	
+	public void saveCubeFace(CubeFace cubeFace) {
+		cubeRepo.save(cubeFace);
 	}
 
 
-	public CubeFace updateCubeFace(CubeFace cubeFace) {
+/*	public CubeFace updateCubeFace(CubeFace cubeFace) {
 		
 		if(cubeFace.getActivity() != null)
 			this.cubeFace.setActivity(cubeFace.getActivity());
@@ -56,6 +67,21 @@ public class CubeService {
 		
 		cubeRepo.save(cubeFace);
 		return cubeFace;
+	}
+
+*/
+	public Cube getCube() {
+		return cube;
+	}
+
+
+	public void setCube(Cube cube) {
+		this.cube = cube;
+	}
+
+	public List<CubeFace> getAllCubeFaces() {
+		return cubeRepo.findAll();
+		
 	}
 	
 	

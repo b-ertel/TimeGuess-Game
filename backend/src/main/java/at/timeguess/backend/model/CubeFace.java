@@ -2,6 +2,7 @@ package at.timeguess.backend.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 /**
@@ -21,7 +22,7 @@ public class CubeFace {
 	
 	private Activity activity;
 	
-	@OneToMany(mappedBy="cubeFaces")
+	@ManyToOne
 	private Cube cube;
 		
 	public Integer getTime() {
