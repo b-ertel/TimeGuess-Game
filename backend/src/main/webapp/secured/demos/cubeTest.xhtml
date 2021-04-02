@@ -8,7 +8,25 @@
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
         <h:form id="cubeForm">
-            <p:dataTable id="cubeTable" var="cubeFace" value="#{cubeFaceController.allCubeFaces}">
+          
+            <p:dataTable id="cubeTable" var="cube" value="#{cubeController.allCubes}">
+                <p:column headerText="CubeId">
+                    <h:outputText value="#{cube.id}"/>
+                </p:column>
+                <p:column headerText="Device Number: ">
+                    <h:outputText value="#{cube.deviceNo}"/>
+                </p:column>
+                <p:column>
+                <p:commandButton value="choose">
+                        <f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />
+                </p:commandButton>
+                </p:column>
+            </p:dataTable>
+ 
+            <p:separator />
+            <p:separator />           
+           
+            <p:dataTable id="cubeFaceTable" var="cubeFace" value="#{cubeFaceController.allCubeFaces}">
                 <p:column headerText="CubeId">
                     <h:outputText value="#{cubeFace.id}"/>
                 </p:column>
@@ -31,7 +49,7 @@
                     </p:commandButton>  -->
                 </p:column>
             </p:dataTable>
-
+       
             <p:dialog header="Edit CubeFace" id="cubeEditDialog" widgetVar="cubeEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="cubeData" rendered="#{not empty cubeFaceController.cubeFace}">
                     <h:panelGrid columns="2">
@@ -44,12 +62,13 @@
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="3">
-                        <p:commandButton value="Save" action="#{cubeFaceController.saveCubeFace()}" oncomplete="PF('cubeEditDialog').hide()" update=":cubeForm:cubeTable"/>
+                        <p:commandButton value="Save" action="#{cubeFaceController.saveCubeFace()}" oncomplete="PF('cubeEditDialog').hide()" update=":cubeForm:cubeFaceTable"/>
                     <!--     <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}" update=":userForm:userData"/> -->
                         <p:commandButton value="Abort" onclick="PF('cubeEditDialog').hide()"/>
                     </h:panelGrid>
                 </p:outputPanel>
             </p:dialog>
+            
 
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />

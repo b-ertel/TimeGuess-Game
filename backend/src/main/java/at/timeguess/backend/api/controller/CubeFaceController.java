@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.timeguess.backend.api.services.CubeFaceService;
+import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 
 @RestController
@@ -20,6 +21,7 @@ public class CubeFaceController {
 	private CubeFaceService cubeService;
 	
 	private CubeFace cubeFace;
+	private Cube cube;
 	
 	@PostMapping("/cubeFace")
 	public CubeFace createCubeFace(@RequestBody CubeFace cubeFace) {
@@ -28,6 +30,7 @@ public class CubeFaceController {
 	//	this.cubeFace.setPoints(cubeFace.getPoints());
 	//	this.cubeFace.setTime(cubeFace.getTime());
 		this.cubeFace.setId(cubeFace.getId());
+		this.cubeFace.setCube(cube);
 	//	this.cubeFace.setCube(this.cube);
 	//	cubeRepo.save(cubeFace);
 		return cubeService.addCubeFace(this.cubeFace);
@@ -48,6 +51,16 @@ public class CubeFaceController {
 	public List<CubeFace> getAllCubeFaces() {
 		return cubeService.getAllCubeFaces();
 	}
+	
+	public void setCube(Cube cube) {
+		this.cube = cube;
+	}
+
+	public Cube getCube() {
+		return cube;
+	}
+	
+	
 	
 	
 	
