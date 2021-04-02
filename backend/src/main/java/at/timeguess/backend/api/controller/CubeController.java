@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.timeguess.backend.api.services.CubeFaceService;
+import at.timeguess.backend.api.services.CubeService;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 
