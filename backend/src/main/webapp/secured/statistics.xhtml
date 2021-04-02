@@ -6,28 +6,32 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
 	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
-	template="/WEB-INF/templates/gamelobbymain.xhtml">
+	template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
         <h:form id="statForm">
             <div>
 	            <p:panelGrid columns="2" style="width: 100%;">
 	                <p:panel header="General" style="border: none; width: 400px">
-                            <h:outputText value="Number of players: #{lobbyStatisticController.numberOfPlayers}" /> 
+                            <h:outputText value="Number of players: #{topicStatisticController.numberOfPlayers}" /> 
                             <br />
-                            <h:outputText value="Number of terms: #{lobbyStatisticController.numberOfTerms}" />  
+                            <h:outputText value="Number of terms: #{topicStatisticController.numberOfTerms}" />  
                             <br />
-                            <h:outputText value="Number of topics: #{lobbyStatisticController.numberOfTopics}"/>
-                            <br />        
+                            <h:outputText value="Number of topics: #{topicStatisticController.numberOfTopics}"/>
+                            <br />   
+                            <h:outputText value="Most used topic: #{topicStatisticController.mostUsedTopic.name}"/>
+                            <br />   
+                            <h:outputText value="Least used topic: #{topicStatisticController.leastUsedTopic.name}"/>
+                            <br />          
                  	</p:panel>
 
                     <p:panel header="Topics" style=" border: none;">
-	                    <p:dataTable id="topic" var="topic" value="#{lobbyStatisticController.topics}">
+	                    <p:dataTable id="topic" var="topic" value="#{topicStatisticController.topics}">
 				            <p:column headerText="Name">
 				                <h:outputText value="#{topic.name}" />
 				            </p:column>
 				            <p:column style="width:100px;text-align: center">
 			                    <p:commandButton update=":statForm:topicStatDialog" oncomplete="PF('topicStatDialog').show()" icon="ui-icon-info" title="Edit">
-			                        <f:setPropertyActionListener value="#{topic}" target="#{lobbyStatisticController.topic}" />
+			                        <f:setPropertyActionListener value="#{topic}" target="#{topicStatisticController.topic}" />
 			                    </p:commandButton>
 			                </p:column>
 				        </p:dataTable> 
@@ -36,19 +40,22 @@
 		    </div>
 		    
 		    <p:dialog header="Topic Statistics" id="topicStatDialog" widgetVar="topicStatDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                <p:outputPanel id="topicStat" rendered="#{not empty lobbyStatisticController.topic}">
+                <p:outputPanel id="topicStat" rendered="#{not empty topicStatisticController.topic}">
 				    <p:panelGrid columns="2">
 					    <f:facet name="header">
-				            <h:outputText value="#{lobbyStatisticController.topic.name}"/>
+				            <h:outputText value="#{topicStatisticController.topic.name}"/>
 				        </f:facet>
 				       <h:outputText value="Games:"/>
-				       <h:outputText value="#{lobbyStatisticController.gamesPlayedWithTopic}"/>
+				       <h:outputText value="#{topicStatisticController.gamesPlayedWithTopic}"/>
 				       
 				       <h:outputText value="Correct Answers:"/>
-				       <h:outputText value="#{lobbyStatisticController.correctRounds}"/>
+				       <h:outputText value="#{topicStatisticController.correctRounds}"/>
 				       
 				       <h:outputText value="Incorrect Answers:"/>
-				       <h:outputText value="#{lobbyStatisticController.incorrectRounds}"/>
+				       <h:outputText value="#{topicStatisticController.incorrectRounds}"/>
+				       
+				       <h:outputText value="Number Of Terms:"/>
+				       <h:outputText value="#{topicStatisticController.nrOfTermsPerTopic}"/>
 				    </p:panelGrid>
                 </p:outputPanel>
             </p:dialog>

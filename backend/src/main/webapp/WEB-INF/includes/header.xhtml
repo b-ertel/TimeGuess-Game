@@ -18,10 +18,9 @@
                         <p:menuitem value="Employee Action 2 - 1"/>
                         <p:menuitem value="Employee Action 2 - 2"/>
                     </p:submenu>
-                    <p:submenu label="Manager Submenu" rendered="#{sessionInfoBean.hasRole('MANAGER')}">
-                        <p:menuitem value="Manager Action 1"/>
-                        <p:menuitem value="Manager Action 2"/>
-                    </p:submenu>
+                    
+                    <p:menuitem value="Statistics" url="/secured/statistics.xhtml" rendered="#{sessionInfoBean.loggedIn}"/>
+              
                     <p:submenu label="Admin Submenu" rendered="#{sessionInfoBean.hasRole('ADMIN')}">
                         <p:menuitem value="Manage Users" url="/admin/users.xhtml"/>
                     </p:submenu>

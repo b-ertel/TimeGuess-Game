@@ -7,14 +7,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.services.LobbyStatisticService;
+import at.timeguess.backend.services.TopicStatisticService;
 
 @Component
 @Scope("view")
-public class LobbyStatisticController {
+public class TopicStatisticController {
 
 	@Autowired
-	LobbyStatisticService statService;
+	TopicStatisticService statService;
 	
 	private Topic topic;
 	
@@ -53,6 +53,18 @@ public class LobbyStatisticController {
 	
 	public Integer getNumberOfPlayers() {
 		return statService.nrOfPlayers();
+	}
+	
+	public Topic getMostUsedTopic() {
+		return statService.getMostUsedTopic();
+	}
+	
+	public Topic getLeastUsedTopic() {
+		return statService.getLeastUsedTopic();
+	}
+	
+	public Integer getNrOfTermsPerTopic() {
+		return statService.getNrOfTermsPerTopic(topic);
 	}
 	
 }

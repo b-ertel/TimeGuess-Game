@@ -1,7 +1,7 @@
 package at.timeguess.backend.services;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -21,7 +21,7 @@ import at.timeguess.backend.repositories.UserRepository;
  */
 @Component
 @Scope("application")
-public class LobbyStatisticService {
+public class TopicStatisticService {
 
 	@Autowired
 	private GameRepository gameRepository;
@@ -97,4 +97,27 @@ public class LobbyStatisticService {
 		return userRepository.findByRole(UserRole.PLAYER).size();
 	}
 	
+	public Topic getMostUsedTopic() {
+		List<Object[]> list = gameRepository.getTopicAndOccurency();
+		return (Topic) list.get(0)[0];	
+	}
+	
+	public Topic getLeastUsedTopic() {
+		List<Object[]> list = gameRepository.getTopicAndOccurency();
+		List<Topic> usedTopics = new ArrayList<>();
+		for(Object[] ob : list) {
+			usedTopics.add((Topic) ob[0]);
+		}
+		List<Topic> allTopics = getTopics();
+		for(Topic topic : allTopics) {
+			if(!usedTopics.contains(topic)) {
+				return topic;
+			}
+		}
+		return (Topic) list.get(list.size()-1)[0];	
+	}
+	
+	public Integer getNrOfTermsPerTopic(Topic topic) {
+		return termRepository.nrOfTermPerTopic(topic);
+	}
 }
