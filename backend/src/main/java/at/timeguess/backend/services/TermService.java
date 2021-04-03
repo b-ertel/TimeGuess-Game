@@ -86,4 +86,14 @@ public class TermService {
         }
     }
 
+    /**
+     * Deletes the term.
+     *
+     * @param term the term to delete
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void deleteTerm(Term term) {
+        termRepository.delete(term);
+    }
+
 }
