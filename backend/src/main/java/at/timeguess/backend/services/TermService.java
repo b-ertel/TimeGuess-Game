@@ -27,13 +27,23 @@ public class TermService {
     private TermRepository termRepository;
 
     /**
+     * Returns a list of all terms.
+     *
+     * @return list of all terms
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Term> getAllTerms() {
+        return termRepository.findAll();
+    }
+
+    /**
      * Returns a list of all terms from a single topic.
      *
      * @param topic the topic whose terms are returned
      * @return list of terms
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<Term> getAllTopics(Topic topic) {
+    public List<Term> getAllTermsOfTopic(Topic topic) {
         return termRepository.findByTopic(topic);
     }
 
