@@ -1,9 +1,23 @@
 This folder was initialized with the [Skeleton project template](https://git.uibk.ac.at/informatik/qe/skeleton).
 See the original readme in [SKELETON_README.md](SKELETON_README.md).
 
-## Reminders
-To run:
- execute  `mvn spring-boot:run` to start the skeleton project
+## Code
+The project utilizes Spring Boot and is configured as maven web application with:
+- all relevant Spring Framework features enabled
+- embedded Tomcat with support for JSF2
+- embedded H2 in-memory database (including H2 console)
+- support for PrimeFaces
+  ??Stimmt das so??
+
+
+`src` contains source code
+
+`target` contains compiled code (should not be of any interest for development)
+
+
+
+## Running the project
+ Execute  `mvn spring-boot:run` to start the skeleton project
  and connect to http://localhost:8080/ to access the skeleton
  web application. 
  
