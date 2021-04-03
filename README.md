@@ -1,11 +1,18 @@
-This is the top-level README file of our project.
+This is a project for the course **SoftwareEngineering** at Leopold-Franzens
+University. The goal is to implement a prototype of a game called **TimeGuess.**
 
-We should add some meaningful content here. :)
+In this repository:
 
-In the meantime, just note that the project consists of two
-separate parts:
+- `diagrams` gives an overview of our project with a class diagramm, a component diagramm and a use case diagramm.
 
-- a central server backend (see folder `backend`)
-- a program that runs on a Raspberry Pi and connects the TimeFlip
-  device with the central server backend (see folder `raspberry`)
+- `backend` contains the implementation of the server-side backend
+
+- `raspberry` contains the source code that is running on a Raspberry Pi and connects the TimeFlip
+  device with the central server backend
+
+- `time-records` contains tables with time records
+###todo:
+- `gitlab-ci` not sure about this one yet???
+
+
 
