@@ -9,11 +9,15 @@
     <ui:define name ="content">
         <h:form id="toolbarForm">
             <p:menubar id="toolbar">
-                <p:menuitem value="Add new Terms" icon="ui-icon-document"
-                            action="#{termDetailController.doCreateTerms}"
+                <p:menuitem value="Add new Term" icon="ui-icon-plus"
+                            action="#{termListController.doCreateTerm}"
+                            oncomplete="PF('newTermDialog').show()"
+                            update=":termsForm:termsTable :toolbarForm:toolbar"/>
+                <p:menuitem value="Load new Terms from JSON file" icon="ui-icon-document"
+                            action="#{termListController.doLoadTermsJSON}"
                             update=":termsForm:termsTable :toolbarForm:toolbar"/>
                 <p:menuitem value="Refresh" icon="ui-icon-arrowrefresh-1-e"
-                            action="#{termDetailController.reloadTerms()}"
+                            action="#{termListController.reloadTerms()}"
                             update=":termsForm:termsTable :toolbarForm:toolbar"/>
             </p:menubar>
         </h:form>
@@ -42,11 +46,11 @@
                         <p:outputLabel for="name" value="Name: " />
                         <p:inputText id="name" value="#{termDetailController.term.name}"/>
                         <p:outputLabel for="topic" value="Topic: " />
-                        <p:password id="topic" value="#{termDetailController.term.topic.name}"/>
+                        <p:inputText id="topic" value="#{termDetailController.term.topic.name}" disabled="true"/>
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="3">
-                        <p:commandButton value="Save" action="#{termDetailController.doSaveTerm()}" oncomplete="PF('termEditDialog').hide()" update=":termsForm:termsTable"/>
+                        <p:commandButton value="Save" action="#{termDetailController.doUpdateTerm()}" oncomplete="PF('termEditDialog').hide();#{termListController.reloadTerms()}" update=":termsForm:termsTable"/>
                         <p:commandButton value="Reload" action="#{termDetailController.doReloadTerm()}" update=":termsForm:termData"/>
                         <p:commandButton value="Abort" onclick="PF('termEditDialog').hide()"/>
                     </h:panelGrid>

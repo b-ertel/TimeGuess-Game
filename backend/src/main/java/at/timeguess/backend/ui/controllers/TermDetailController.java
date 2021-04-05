@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Term;
+import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.Exceptions.TermAlreadyExistsException;
 import at.timeguess.backend.services.TermService;
 
@@ -65,6 +66,13 @@ public class TermDetailController implements Serializable {
         } catch (TermAlreadyExistsException e) {
             ;   //TODO: show dialog that term already exists
         }
+    }
+
+    /**
+     * Action to update the currently displayed term.
+     */
+    public void doUpdateTerm() {
+        term = this.termService.updateTerm(term);
     }
 
     /**

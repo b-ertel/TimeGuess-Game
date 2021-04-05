@@ -1,5 +1,6 @@
 package at.timeguess.backend.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +16,7 @@ import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.Exceptions.TermAlreadyExistsException;
 import at.timeguess.backend.repositories.TermRepository;
+import at.timeguess.backend.repositories.TopicRepository;
 
 /**
  * Provides an interface to the model for managing {@link Term} entities.
@@ -26,12 +28,15 @@ public class TermService {
     @Autowired
     private TermRepository termRepository;
 
+    @Autowired
+    private TopicRepository topicRepository;
+
     /**
      * Returns a list of all terms.
      *
      * @return list of all terms
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public List<Term> getAllTerms() {
         return termRepository.findAll();
     }
@@ -42,7 +47,7 @@ public class TermService {
      * @param topic the topic whose terms are returned
      * @return list of terms
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public List<Term> getAllTermsOfTopic(Topic topic) {
         return termRepository.findByTopic(topic);
     }
@@ -53,7 +58,7 @@ public class TermService {
      * @param id the id of the term to load
      * @return a single Term
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public Term loadTerm(Long id) {
         return termRepository.findById(id);
     }
@@ -64,7 +69,7 @@ public class TermService {
      * @param name the name of the term to load
      * @return a single Term
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public Term loadTerm(String name, Topic topic) {
         return termRepository.findByName(name, topic);
     }
@@ -76,7 +81,7 @@ public class TermService {
      * @return the new term
      * @throws TermAlreadyExistsException
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public Term saveTerm(Term term) throws TermAlreadyExistsException {
         if (term.isNew()) {
             Term newTerm = termRepository.save(term);
@@ -87,11 +92,38 @@ public class TermService {
     }
 
     /**
+     * Updates the Term. 
+     *
+     * @param term the term to update
+     * @return the updated term
+     */
+    @PreAuthorize("hasAuthority('MANAGER')")
+    public Term updateTerm(Term term) {
+        String topicName = term.getTopic().getName();
+        List<Topic> topicList = topicRepository.findAll();
+        List<String> topicNames = new ArrayList<>();
+        for (Topic t : topicList) {
+            topicNames.add(t.getName());
+        }
+        if (topicNames.contains(topicName)) {
+            Topic newTopic = topicRepository.findByName(topicName);
+            term.setTopic(newTopic);
+        } else {
+            Topic newTopic = new Topic();
+            newTopic.setName(topicName);
+            topicRepository.save(newTopic);
+            term.setTopic(newTopic);
+        }
+        Term newTerm = termRepository.save(term);
+        return newTerm;
+    }
+
+    /**
      * Deletes the term.
      *
      * @param term the term to delete
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public void deleteTerm(Term term) {
         termRepository.delete(term);
     }
