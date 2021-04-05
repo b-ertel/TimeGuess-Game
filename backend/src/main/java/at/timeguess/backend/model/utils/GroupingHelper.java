@@ -1,4 +1,4 @@
-package at.timeguess.backend.model.util;
+package at.timeguess.backend.model.utils;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
-import at.timeguess.backend.model.util.GroupingHelper;
+import at.timeguess.backend.model.utils.GroupingHelper;
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.repositories.UserRepository;
 

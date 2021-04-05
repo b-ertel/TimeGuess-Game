@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 
 import at.timeguess.backend.model.Game;
-import at.timeguess.backend.model.util.GroupingHelper;
+import at.timeguess.backend.model.utils.GroupingHelper;
 
 /**
  * Repository for managing {@link Game} entities.
