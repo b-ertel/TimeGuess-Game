@@ -12,15 +12,14 @@ import at.timeguess.backend.services.UserService;
 /**
  * Controller for the user list view.
  *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
  */
 @Component
 @Scope("view")
 public class UserListController implements Serializable {
 
-    @Autowired
+    private static final long serialVersionUID = 1L;
+	
+	@Autowired
     private UserService userService;
 
     /**
@@ -30,6 +29,15 @@ public class UserListController implements Serializable {
      */
     public Collection<User> getUsers() {
         return userService.getAllUsers();
+    }
+
+    /**
+     * Returns a list of all users with role 'PLAYER'.
+     *
+     * @return
+     */
+    public Collection<User> getAllPlayers() {
+        return userService.getAllPlayers();
     }
 
 }

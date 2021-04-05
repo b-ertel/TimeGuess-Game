@@ -1,23 +1,28 @@
 package at.timeguess.backend.model;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Team {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@Column
 	private String name;
 	
-	@ManyToMany(mappedBy = "teams")
-	private Set<Game> games;
+	@OneToMany(mappedBy = "team")
+	private Set<GameTeam> games;
 	
 	@ManyToMany (mappedBy = "teams")
 	private Set<User> teamMembers; 
@@ -39,12 +44,6 @@ public class Team {
 	}
 	
 	public Set<Game> getGames() {
-		return games;
+		return games.stream().map(GameTeam::getGame).collect(Collectors.toSet());
 	}
-
-	public void setGames(Set<Game> games) {
-		this.games = games;
-	}
-
-	
 }

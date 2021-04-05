@@ -38,11 +38,25 @@ public class Round implements Persistable<Long> {
 
 	@Column(nullable = false)
 	private boolean correctAnswer = false;
+	
+	private int points = 0;
 
 	@ManyToOne
 	@JoinColumn(name="termId", nullable=false)
 	private Term termToGuess;
-
+	
+	@ManyToOne
+	@JoinColumn(name="gameId", nullable=false)
+	private Game game;
+	
+	public int getPoints() {
+		return this.points;
+	}
+	
+	public void setPoints(int points) {
+		this.points = points;
+	}
+	
 	public int getNr() {
 		return nr;
 	}

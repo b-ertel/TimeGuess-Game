@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -18,9 +20,6 @@ import at.timeguess.backend.spring.CustomizedLogoutSuccessHandler;
 /**
  * Spring configuration for web security.
  *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
  */
 @Configuration
 @EnableWebSecurity()
@@ -52,23 +51,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //Permit access to the H2 console
                 .antMatchers("/h2-console/**").permitAll()
                 //Permit access for all to error pages
-                .antMatchers("/error/**")
-                .permitAll()
+                .antMatchers("/error/**").permitAll()
                 // Only access with admin role
-                .antMatchers("/admin/**")
-                .hasAnyAuthority("ADMIN")
+                .antMatchers("/admin/**").hasAnyAuthority("ADMIN")
                 //Permit access only for some roles
-                .antMatchers("/secured/**")
-                .hasAnyAuthority("ADMIN", "MANAGER", "EMPLOYEE")
+                .antMatchers("/secured/**").hasAnyAuthority("ADMIN", "MANAGER", "PLAYER")
                 // Allow only certain roles to use websockets (only logged in users)
-                .antMatchers("/omnifaces.push/**")
-                .hasAnyAuthority("ADMIN", "MANAGER", "EMPLOYEE")
-                .and().formLogin()
+                .antMatchers("/omnifaces.push/**").hasAnyAuthority("ADMIN", "MANAGER", "PLAYER").and().formLogin()
                 .loginPage("/login.xhtml")
                 .loginProcessingUrl("/login")
-                .failureUrl("/error/login_error.xhtml")
-                .defaultSuccessUrl("/secured/welcome.xhtml");
-                
+                .defaultSuccessUrl("/secured/welcome.xhtml")
+        		.failureUrl("/login.xhtml?error");
         http.exceptionHandling().accessDeniedPage("/error/access_denied.xhtml");
         http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
 
@@ -78,13 +71,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         //Configure roles and passwords via datasource
         auth.jdbcAuthentication().dataSource(dataSource)
-                .usersByUsernameQuery("select username, password, enabled from user where username=?")
-                .authoritiesByUsernameQuery("select user_username, roles from user_user_role where user_username=?");
+                .usersByUsernameQuery("SELECT username, password, enabled FROM user WHERE username=?")
+                .authoritiesByUsernameQuery("SELECT username, roles FROM user_role r JOIN user u ON r.user_id=u.id WHERE u.username=?");
     }
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
-        // :TODO: use proper passwordEncoder and do not store passwords in plain text
-        return NoOpPasswordEncoder.getInstance();
+    	PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    	((DelegatingPasswordEncoder)encoder).setDefaultPasswordEncoderForMatches(NoOpPasswordEncoder.getInstance());
+    	return encoder;
     }
 }
