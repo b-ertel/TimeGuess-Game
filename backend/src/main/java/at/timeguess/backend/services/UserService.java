@@ -2,6 +2,7 @@ package at.timeguess.backend.services;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +82,15 @@ public class UserService {
     public int getTotalGamesWon(User user) {
         GroupingHelper.List winners = new GroupingHelper.List(gameRepository.findWinnerTeams());
         return winners.getSumForIds(userRepository.findAllTeamsIn(user, winners.getIds()));
+    }
+
+    /**
+     * Returns the total number of games won by the given user, split up by topic.
+     * @return
+     */
+    public Map<String, Integer> getTotalGamesWonByTopic(User user) {
+        GroupingHelper.List winners = new GroupingHelper.List(gameRepository.findWinnerTeamsByTopic());
+        return winners.getSumForIdsGroupedByName(userRepository.findAllTeamsIn(user, winners.getIds()));
     }
 
     /**

@@ -2,6 +2,7 @@ package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -82,5 +83,13 @@ public class UserProfileController implements Serializable {
      */
     public int getTotalGamesWon() {
         return userService.getTotalGamesWon(user);
+    }
+
+    /**
+     * Returns the total number of games won by the current user, grouped by topic.
+     * @return
+     */
+    public Map<String, Integer> getTotalGamesWonByTopic() {
+        return userService.getTotalGamesWonByTopic(user);
     }
 }

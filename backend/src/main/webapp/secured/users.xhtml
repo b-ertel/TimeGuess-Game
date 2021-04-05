@@ -20,7 +20,7 @@
                 </p:column>
             </p:dataTable>
 
-            <p:dialog header="Edit User" id="userProfileDialog" widgetVar="userProfileDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" responsive="true" width="330">
+            <p:dialog header="Edit User" id="userProfileDialog" widgetVar="userProfileDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" responsive="true" width="400">
                 <c:set var="curr" value="#{userProfileController.user}" scope="request" />
                 <p:outputPanel id="userData" rendered="#{not empty curr}">
                     <h:panelGrid columns="2">
@@ -62,6 +62,15 @@
                         <p:outputLabel for="totalGamesLost" value="Total Games lost: " />
                         <p:outputLabel id="totalGamesLost" value="#{userProfileController.totalGamesLost}"/>
                     </h:panelGrid>
+                    <p:separator />
+                    <p:dataTable id="topicTable" var="topic" value="#{userProfileController.totalGamesWonByTopic}">
+                        <p:column headerText="Topic">
+                            <p:outputLabel value="#{topic.key}" />
+                        </p:column>
+                        <p:column headerText="Total Games won">
+                            <p:outputLabel value="#{topic.value}" />
+                        </p:column>
+                    </p:dataTable>
                     <p:separator />
                     <h:panelGrid columns="2">
                         <p:commandButton value="Reload" action="#{userProfileController.doReloadUser()}" update=":userForm:userData"/>
