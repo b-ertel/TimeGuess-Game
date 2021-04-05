@@ -19,5 +19,9 @@
                 </button>
             </h:panelGrid>
         </form>
+        
+        <p>
+	        <p:outputLabel style="color:crimson" value="#{param['error'] == null ? '' : 'Login failed! Enter valid data and try again'}" />
+	    </p>
     </ui:define>
 </ui:composition>
