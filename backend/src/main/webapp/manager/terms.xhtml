@@ -57,6 +57,23 @@
                 </p:outputPanel>
             </p:dialog>
 
+            <p:dialog header="New Term" id="newTermDialog" widgetVar="newTermDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="newTermData" rendered="#{not empty termDetailController.term}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="name" value="Name: " />
+                        <p:inputText id="name" value="#{termDetailController.term.name}"/>
+                        <p:outputLabel for="topic" value="Topic: " />
+                        <p:inputText id="topic" value="#{termDetailController.term.topic.name}" disabled="true"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="3">
+                        <p:commandButton value="Save" action="#{termDetailController.doUpdateTerm()}" oncomplete="PF('newTermDialog').hide();#{termListController.reloadTerms()}" update=":termsForm:termsTable"/>
+                        <p:commandButton value="Reload" action="#{termDetailController.doReloadTerm()}" update=":termsForm:termData"/>
+                        <p:commandButton value="Abort" onclick="PF('newTermDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
