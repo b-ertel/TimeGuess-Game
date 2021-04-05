@@ -1,6 +1,5 @@
 package at.timeguess.backend.model;
 
-import java.io.Serializable;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -9,128 +8,84 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-
-import org.springframework.data.domain.Persistable;
-
-import at.timeguess.backend.model.Exceptions.GameException;
+import javax.persistence.OneToMany;
 
 @Entity
-public class Game implements Persistable<Long>, Serializable {
+public class Game {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@Column
+	private String name;
+	
+	private int maxPoints;
+	
+    private GameState status; // more finegrained replacement for status
+	
+	private int roundNr;
+	
+	@OneToMany(mappedBy = "game")
+    private Set<GameTeam> teams;
+	
+	@ManyToOne
+	private Topic topic; 
+	
+	public Long getId() {
+		return id;
+	}
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 7796168379870118060L;
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	public String getName() {
+		return name;
+	}
 
-    @Column
-    private String name;
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    private int maxPoints;
+	public int getMaxPoints() {
+		return maxPoints;
+	}
 
-    private boolean status;
-    private GameState state;
+	public void setMaxPoints(int maxPoints) {
+		this.maxPoints = maxPoints;
+	}
 
-    private int roundNr;
+	public GameState getStatus() {
+		return status;
+	}
 
-    @ManyToMany
-    @JoinTable(name = "game_team", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "team_id"))
-    private Set<Team> teams;
+	public void setStatus(GameState status) {
+		this.status = status;
+	}
 
-    @ManyToOne
-    private Topic topic;
+	public int getRoundNr() {
+		return roundNr;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setRoundNr(int roundNr) {
+		this.roundNr = roundNr;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public Set<Team> getTeams() {
+		return teams.stream().map(GameTeam::getTeam).collect(Collectors.toSet());
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setTeams(Set<Team> teams) {
+		this.teams = teams.stream().map(t -> new GameTeam(this, t)).collect(Collectors.toSet());
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public Topic getTopic() {
+		return topic;
+	}
 
-    public int getMaxPoints() {
-        return maxPoints;
-    }
-
-    public void setMaxPoints(int maxPoints) {
-        this.maxPoints = maxPoints;
-    }
-
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public int getRoundNr() {
-        return roundNr;
-    }
-
-    public void setRoundNr(int roundNr) {
-        this.roundNr = roundNr;
-    }
-
-    public Set<Team> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(Set<Team> teams) {
-        this.teams = teams;
-    }
-
-    /**
-     * @return the topic
-     */
-    public Topic getTopic() {
-        return topic;
-    }
-
-    /**
-     * @param topic the topic to set
-     */
-    public void setTopic(Topic topic) {
-        this.topic = topic;
-    }
-
-    public GameState getState() {
-        return state;
-    }
-
-    public void setState(GameState state) {
-        this.state = state;
-    }
-
-    public void advanceState(GameState state) throws GameException {
-        // TODO - check if transition is allowed
-        this.state = state;
-    }
-
-    public boolean canBePlayed() {
-        // TODO
-        // check for number teams, teams sufficient players
-        return false;
-    }
-
-    @Override
-    public boolean isNew() {
-        // TODO Auto-generated method stub
-        return false;
-    }
+	public void setTopic(Topic topic) {
+		this.topic = topic;
+	}
 }
