@@ -1,4 +1,4 @@
-package at.timeguess.backend.model.game;
+package at.timeguess.backend.model;
 
 public enum GameState {
     SETUP, // just created, contains invalid settings

@@ -1,4 +1,4 @@
-package at.timeguess.backend.model.game;
+package at.timeguess.backend.model.Exceptions;
 
 
 /**
@@ -6,4 +6,9 @@ package at.timeguess.backend.model.game;
  *
  */
 public class GameException extends Exception {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4416553034997073070L;
 }

@@ -16,8 +16,7 @@ import javax.persistence.ManyToOne;
 
 import org.springframework.data.domain.Persistable;
 
-import at.timeguess.backend.model.game.GameException;
-import at.timeguess.backend.model.game.GameState;
+import at.timeguess.backend.model.Exceptions.GameException;
 
 @Entity
 public class Game implements Persistable<Long>, Serializable {
