@@ -13,7 +13,7 @@
                 <p:column headerText="Username">
                     <h:outputText value="#{user.username}"/>
                 </p:column>
-                <p:column style="width:100px;text-align: center">
+                <p:column headerText="Profile" style="width:100px;text-align: center">
                     <p:commandButton update=":userForm:userProfileDialog" oncomplete="PF('userProfileDialog').show()" icon="ui-icon-person" title="Profile">
                         <f:setPropertyActionListener value="#{user}" target="#{userProfileController.user}" />
                     </p:commandButton>
@@ -54,6 +54,10 @@
                         <p:outputLabel for="totalGames" value="Total Games played: " />
                         <p:outputLabel id="totalGames" value="#{userProfileController.totalGames}"/>
                     </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="totalGamesWon" value="Total Games won: " />
+                        <p:outputLabel id="totalGamesWon" value="#{userProfileController.totalGamesWon}"/>
+                    </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="2">
                         <p:commandButton value="Reload" action="#{userProfileController.doReloadUser()}" update=":userForm:userData"/>
@@ -61,12 +65,6 @@
                     </h:panelGrid>
                 </p:outputPanel>
             </p:dialog>
-
-            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
-            </p:confirmDialog>
-
         </h:form>
     </ui:define>
 </ui:composition>
