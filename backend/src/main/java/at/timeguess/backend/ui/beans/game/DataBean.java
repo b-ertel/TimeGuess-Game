@@ -3,7 +3,7 @@ package at.timeguess.backend.ui.beans.game;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
 
-import at.timeguess.backend.model.game.GameState;
+import at.timeguess.backend.model.GameState;
 
 @ManagedBean
 @ApplicationScoped

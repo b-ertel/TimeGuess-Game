@@ -50,6 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 //Permit access to the H2 console
                 .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/debug/**").permitAll()
                 //Permit access for all to error pages
                 .antMatchers("/error/**").permitAll()
                 // Only access with admin role

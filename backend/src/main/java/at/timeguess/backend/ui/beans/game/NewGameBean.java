@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Game;
-import at.timeguess.backend.model.game.GameState;
+import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.services.GameService;
 
 @Component
@@ -28,8 +28,7 @@ public class NewGameBean implements Serializable {
 		game.setName(gameName);
 		game.setMaxPoints(maxPoints);
 
-		game.setStatus(false);
-		game.setState(GameState.SETUP);
+        game.setStatus(GameState.SETUP);
 
 		gameService.saveGame(game);
 
