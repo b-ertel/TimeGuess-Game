@@ -21,7 +21,7 @@
             </p:dataTable>
 
             <p:dialog header="Edit User" id="userProfileDialog" widgetVar="userProfileDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" responsive="true" width="330">
-	        	<c:set var="curr" value="#{userProfileController.user}" scope="request" />
+                <c:set var="curr" value="#{userProfileController.user}" scope="request" />
                 <p:outputPanel id="userData" rendered="#{not empty curr}">
                     <h:panelGrid columns="2">
                         <p:outputLabel for="username" value="Username: " />
@@ -44,11 +44,11 @@
                         <p:selectBooleanCheckbox id="enabled" value="#{curr.enabled}"/>
                     </h:panelGrid>
                     <p:separator />
-					<p:dataTable id="mateTable" var="mate" value="#{userProfileController.teammates}">
-						<p:column headerText="Teammates">
-							<p:outputLabel value="#{mate.username}" />
-						</p:column>
-					</p:dataTable>
+                    <p:dataTable id="mateTable" var="mate" value="#{userProfileController.teammates}">
+                        <p:column headerText="Teammates">
+                            <p:outputLabel value="#{mate.username}" />
+                        </p:column>
+                    </p:dataTable>
                     <p:separator />
                     <h:panelGrid columns="2">
                         <p:outputLabel for="totalGames" value="Total Games played: " />
@@ -57,6 +57,10 @@
                     <h:panelGrid columns="2">
                         <p:outputLabel for="totalGamesWon" value="Total Games won: " />
                         <p:outputLabel id="totalGamesWon" value="#{userProfileController.totalGamesWon}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="totalGamesLost" value="Total Games lost: " />
+                        <p:outputLabel id="totalGamesLost" value="#{userProfileController.totalGamesLost}"/>
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="2">

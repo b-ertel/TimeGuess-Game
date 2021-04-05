@@ -66,6 +66,15 @@ public class UserService {
     }
 
     /**
+     * Returns the total number of games lost by the given user.
+     * @return
+     */
+    public int getTotalGamesLost(User user) {
+        GroupingHelper.List losers = new GroupingHelper.List(gameRepository.findLoserTeams());
+        return losers.getSumForIds(userRepository.findAllTeamsIn(user, losers.getIds()));
+    }
+
+    /**
      * Returns the total number of games won by the given user.
      * @return
      */

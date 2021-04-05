@@ -69,6 +69,14 @@ public class UserProfileController implements Serializable {
     }
 
     /**
+     * Returns the total number of games lost by the current user.
+     * @return
+     */
+    public int getTotalGamesLost() {
+        return userService.getTotalGamesLost(user);
+    }
+
+    /**
      * Returns the total number of games won by the current user.
      * @return
      */
