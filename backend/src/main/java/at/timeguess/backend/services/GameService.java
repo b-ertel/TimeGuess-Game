@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.model.*;
-import at.timeguess.backend.model.game.GameState;
+import at.timeguess.backend.model.GameState;
 
 @Component
 @Scope("application")
@@ -22,8 +22,8 @@ public class GameService {
         return gameRepo.findAll();
         }
     @PreAuthorize("hasAuthority('MANAGER')")
-    public Collection<Game> getByState(GameState gs){
-    	return gameRepo.findByState(gs);
+    public Collection<Game> getByStatus(GameState gs){
+    	return gameRepo.findByStatus(gs);
     }
     
     @PreAuthorize("hasAuthority('MANAGER') ")

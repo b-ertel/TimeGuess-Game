@@ -18,5 +18,5 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
      * @return
      */
     @Query("SELECT g FROM Game g WHERE :status =  g.status")
-    Collection<Game> findByState(@Param("status") GameState status);
+    Collection<Game> findByStatus(@Param("status") GameState status);
 }
