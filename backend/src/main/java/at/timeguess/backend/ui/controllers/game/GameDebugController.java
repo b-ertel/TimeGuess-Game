@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.timeguess.backend.model.game.GameState;
+import at.timeguess.backend.model.Game;
 import at.timeguess.backend.services.GameService;
 
 @Component
