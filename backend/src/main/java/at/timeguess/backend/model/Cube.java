@@ -12,6 +12,10 @@ public class Cube {
 	@Id
 	private Long id;
 	
+	private String macAddress;
+	
+	private boolean config;
+	
 	private Long deviceNo;
 	
 	@OneToMany(mappedBy="cube")

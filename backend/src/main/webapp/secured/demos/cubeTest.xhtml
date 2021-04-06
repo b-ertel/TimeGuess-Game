@@ -9,7 +9,7 @@
     <ui:define name ="content">
         <h:form id="cubeForm">
           
-            <p:dataTable id="cubeTable" var="cube" value="#{cubeController.allCubes}">
+            <p:dataTable id="cubeTable" style="width:600px" var="cube" value="#{cubeController.allCubes}">
                 <p:column headerText="CubeId">
                     <h:outputText value="#{cube.id}"/>
                 </p:column>
@@ -26,7 +26,7 @@
             <p:separator />
             <p:separator />           
            
-            <p:dataTable id="cubeFaceTable" var="cubeFace" value="#{cubeFaceController.allCubeFaces}">
+            <p:dataTable id="cubeFaceTable" style="width:600px" var="cubeFace" value="#{cubeFaceController.allCubeFaces}">
                 <p:column headerText="CubeId">
                     <h:outputText value="#{cubeFace.id}"/>
                 </p:column>
