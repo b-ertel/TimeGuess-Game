@@ -30,7 +30,7 @@ public class CubeFaceController {
 	//	this.cubeFace.setPoints(cubeFace.getPoints());
 	//	this.cubeFace.setTime(cubeFace.getTime());
 		this.cubeFace.setId(cubeFace.getId());
-		this.cubeFace.setCube(cube);
+	//	this.cubeFace.setCube(cube);
 	//	this.cubeFace.setCube(this.cube);
 	//	cubeRepo.save(cubeFace);
 		return cubeService.addCubeFace(this.cubeFace);

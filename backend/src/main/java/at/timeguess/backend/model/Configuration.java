@@ -16,7 +16,7 @@ public class Configuration {
 	private Cube cube;
 	
 	@ManyToOne
-	@JoinColumn(name = "cube_id")
+	@JoinColumn(name = "cubeface_id")
 	private CubeFace cubeface;
 	
 	private Integer configuration = 0;;

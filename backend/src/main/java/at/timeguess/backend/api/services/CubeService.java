@@ -21,7 +21,7 @@ public class CubeService {
 	public Cube addCube(Cube cube) {
 		this.cube = new Cube();
 		this.cube.setId(cube.getId());
-		this.cube.setDeviceNo(cube.getDeviceNo());
+//		this.cube.setDeviceNo(cube.getDeviceNo());
 
 		cubeRepo.save(this.cube);
 		return this.cube;

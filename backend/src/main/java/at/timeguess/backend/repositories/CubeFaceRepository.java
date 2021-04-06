@@ -6,6 +6,6 @@ import at.timeguess.backend.model.CubeFace;
 
 public interface CubeFaceRepository extends AbstractRepository<CubeFace, Long> {
 	
-	CubeFace findById(Long id);
+	CubeFace findById(String id);
     
 }
