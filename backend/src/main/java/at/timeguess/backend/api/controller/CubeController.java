@@ -27,7 +27,9 @@ public class CubeController {
 	public Cube createCube(@RequestBody Cube cube) {
 		this.cube = new Cube();
 		this.cube.setId(cube.getId());
-	//	this.cube.setDeviceNo(cube.getDeviceNo());
+		this.cube.setConfigNo(false);
+		this.cube.setMacAddress(cube.getMacAddress());
+		this.cube.setName(cube.getName());
 		return cubeService.addCube(this.cube);
 	}
 	

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
+import at.timeguess.backend.repositories.ConfigurationRepository;
 import at.timeguess.backend.repositories.CubeFaceRepository;
 
 @Service
@@ -17,6 +18,8 @@ public class CubeFaceService {
 	
 	@Autowired
 	private CubeFaceRepository cubeRepo;
+	@Autowired
+	private ConfigurationRepository configRepo;
 
 	public CubeFace addCubeFace(CubeFace cubeFace) {
 		this.cubeFace = new CubeFace();
@@ -24,8 +27,10 @@ public class CubeFaceService {
 	//	this.cubeFace.setPoints(cubeFace.getPoints());
 	//	this.cubeFace.setTime(cubeFace.getTime());
 		this.cubeFace.setId(cubeFace.getId());
+
 	//	this.cubeFace.setCube(this.cube);
 		cubeRepo.save(cubeFace);
+		configRepo.save(cubeFace.getConfigs().get(0));
 		return this.cubeFace;
 	}
 	

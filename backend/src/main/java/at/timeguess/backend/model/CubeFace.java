@@ -1,5 +1,6 @@
 package at.timeguess.backend.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -24,8 +25,8 @@ public class CubeFace {
 	
 	private Activity activity;
 	
-	@OneToMany
-	private List<Configuration> configs;
+	@OneToMany(mappedBy="cubeface")
+	private List<Configuration> configs = new ArrayList<>();
 		
 	public Integer getTime() {
 		return time;
@@ -57,6 +58,14 @@ public class CubeFace {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public void addConfiguration(Configuration config) {
+		this.configs.add(config);
+	}
+	
+	public List<Configuration> getConfigs() {
+		return this.configs;
 	}
 	
 }

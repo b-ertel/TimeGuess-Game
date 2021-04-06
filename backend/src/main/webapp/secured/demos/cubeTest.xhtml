@@ -9,13 +9,22 @@
     <ui:define name ="content">
         <h:form id="cubeForm">
           
-            <p:dataTable id="cubeTable" style="width:600px" var="cube" value="#{cubeController.allCubes}">
+            <p:dataTable id="cubeTable" style="width:800px" var="cube" value="#{cubeController.allCubes}">
                 <p:column headerText="CubeId">
                     <h:outputText value="#{cube.id}"/>
                 </p:column>
-                <p:column headerText="Device Number: ">
-                    <h:outputText value="#{cube.deviceNo}"/>
+                <p:column headerText="MacAddress: ">
+                    <h:outputText value="#{cube.macAddress}"/>
                 </p:column>
+                <p:column headerText="Status: ">
+                    <h:outputText value="#{cube.status}"/>
+                </p:column>
+                <p:column headerText="Name: ">
+                    <h:outputText value="#{cube.name}"/>
+                </p:column>  
+                <p:column headerText="Configured: ">
+                    <h:outputText value="#{cube.configNo}"/>
+                </p:column>              
                 <p:column>
                 <p:commandButton value="choose">
                         <f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />
@@ -26,8 +35,8 @@
             <p:separator />
             <p:separator />           
            
-            <p:dataTable id="cubeFaceTable" style="width:600px" var="cubeFace" value="#{cubeFaceController.allCubeFaces}">
-                <p:column headerText="CubeId">
+            <p:dataTable id="cubeFaceTable" style="width:800px" var="cubeFace" value="#{cubeFaceController.allCubeFaces}">
+                <p:column headerText="CubeFaceId">
                     <h:outputText value="#{cubeFace.id}"/>
                 </p:column>
                 <p:column headerText="Activity">

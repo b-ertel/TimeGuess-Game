@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.timeguess.backend.api.services.CubeFaceService;
+import at.timeguess.backend.model.Configuration;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 
@@ -30,6 +31,7 @@ public class CubeFaceController {
 	//	this.cubeFace.setPoints(cubeFace.getPoints());
 	//	this.cubeFace.setTime(cubeFace.getTime());
 		this.cubeFace.setId(cubeFace.getId());
+		this.cubeFace.addConfiguration(new Configuration(cube, cubeFace, cube.getMacAddress()));
 	//	this.cubeFace.setCube(cube);
 	//	this.cubeFace.setCube(this.cube);
 	//	cubeRepo.save(cubeFace);

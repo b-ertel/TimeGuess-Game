@@ -6,11 +6,11 @@ import at.timeguess.backend.model.Configuration;
 
 public interface ConfigurationRepository extends AbstractRepository<Configuration, Long> {
 
-	public Configuration findById();
+	public Configuration findById(Long id);
 	
-	public Configuration findByCubeId();
+	public Configuration findByCube(Long id);
 
-	public Configuration findByCubeFaceId();
+	public Configuration findByCubeface(Long id);
 	
-	public Configuration findByMacAddress();
+	public Configuration findByMacAddress(String mac);
 }

@@ -23,8 +23,8 @@ public class CubeService {
 		this.cube.setId(cube.getId());
 //		this.cube.setDeviceNo(cube.getDeviceNo());
 
-		cubeRepo.save(this.cube);
-		return this.cube;
+		cubeRepo.save(cube);
+		return cube;
 	}
 	
 

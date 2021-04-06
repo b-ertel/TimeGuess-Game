@@ -1,6 +1,8 @@
 package at.timeguess.backend.model;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -9,6 +11,7 @@ import javax.persistence.ManyToOne;
 public class Configuration {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@ManyToOne
@@ -19,10 +22,19 @@ public class Configuration {
 	@JoinColumn(name = "cubeface_id")
 	private CubeFace cubeface;
 	
-	private Integer configuration = 0;;
+	private Integer configuration = 0;
 	
 	private String macAddress;
 
+	public Configuration() {
+		
+	}
+	
+	public Configuration(Cube cube, CubeFace cubeFace, String mac) {
+		setCube(cube);
+		setCubeface(cubeFace);
+		setMacAddress(mac);
+	}
 	
 	public Long getId() {
 		return id;
