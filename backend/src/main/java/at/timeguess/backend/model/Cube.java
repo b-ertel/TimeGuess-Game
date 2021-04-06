@@ -14,12 +14,14 @@ public class Cube {
 	
 	private String macAddress;
 	
-	private boolean config;
+	private boolean configNo;
 	
-	private Long deviceNo;
+	private String status;
+	
+	private String name;
 	
 	@OneToMany(mappedBy="cube")
-	private List<CubeFace> cubeFaces;
+	private List<Configuration> configs;
 
 	public Long getId() {
 		return id;
@@ -29,21 +31,47 @@ public class Cube {
 		this.id = id;
 	}
 
-	public List<CubeFace> getCubeFaces() {
-		return cubeFaces;
+	public String getMacAddress() {
+		return macAddress;
 	}
 
-	public void setCubeFaces(List<CubeFace> cubeFaces) {
-		this.cubeFaces = cubeFaces;
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
 	}
 
-	public Long getDeviceNo() {
-		return deviceNo;
+	public boolean isConfigNo() {
+		return configNo;
 	}
 
-	public void setDeviceNo(Long deviceNo) {
-		this.deviceNo = deviceNo;
+	public void setConfigNo(boolean configNo) {
+		this.configNo = configNo;
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public List<Configuration> getConfigs() {
+		return configs;
+	}
+
+	public void setConfigs(List<Configuration> configs) {
+		this.configs = configs;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	
 	
 	
 	

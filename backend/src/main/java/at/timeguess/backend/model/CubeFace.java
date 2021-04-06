@@ -1,5 +1,7 @@
 package at.timeguess.backend.model;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -14,7 +16,7 @@ import javax.persistence.OneToMany;
 public class CubeFace {
 	
 	@Id
-	private Long id;
+	private String id;
 	
 	private Integer time;
 	
@@ -22,8 +24,8 @@ public class CubeFace {
 	
 	private Activity activity;
 	
-	@ManyToOne
-	private Cube cube;
+	@OneToMany
+	private List<Configuration> configs;
 		
 	public Integer getTime() {
 		return time;
@@ -49,20 +51,12 @@ public class CubeFace {
 		this.activity = activity;
 	}
 	
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
-	}
-
-	public Cube getCube() {
-		return cube;
-	}
-
-	public void setCube(Cube cube) {
-		this.cube = cube;
 	}
 	
 }
