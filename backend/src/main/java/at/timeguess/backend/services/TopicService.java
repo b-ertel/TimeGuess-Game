@@ -59,4 +59,8 @@ public class TopicService {
         }
     }
     
+    @PreAuthorize("hasAuthority('MANAGER') ")
+    public Topic loadTopicId(Long topicId) {
+        return topicRepository.findById(topicId).get();
+    }
 }
