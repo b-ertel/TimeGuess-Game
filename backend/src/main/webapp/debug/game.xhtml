@@ -35,6 +35,7 @@ value="#{gameDebugController.games}">
  <p:column headerText="status"> <h:outputText value="#{tgame.status}"/> </p:column>
  <p:column headerText="roundNr"> <h:outputText value="#{tgame.roundNr}"/> </p:column>
  <p:column headerText="topic"> <h:outputText value="#{tgame.topic.name}"/> </p:column>
+ <p:column headerText="topic"> <h:outputText value="#{tgame.creator.username}"/> </p:column>
  <p:column style="width:100px;text-align: center">
  <p:commandButton update=":gameForm:gameEditDialog" oncomplete="PF('gameEditDialog').show()" icon="ui-icon-note" title="Edit">
  <f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />

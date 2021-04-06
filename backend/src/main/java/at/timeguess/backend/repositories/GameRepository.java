@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
+import at.timeguess.backend.model.utils.GroupingHelper;
 
 public interface GameRepository extends AbstractRepository<Game, Long> {
     /**
@@ -19,12 +20,12 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     @Query("SELECT g FROM Game g WHERE :status =  g.status")
     List<Game> findByStatus(@Param("status") GameState status);
 
-	int countByTopicId(long topicid);
-	
-	@Query("SELECT g.topic, COUNT(g.topic) AS occ FROM Game g GROUP BY g.topic ORDER BY occ DESC")
-	List<Object[]> getTopicAndOccurency();
-	
-	@Query("SELECT new GroupingHelper(g.game.id, MAX(g.points)) FROM GameTeam g GROUP BY g.game.id")
+    int countByTopicId(long topicid);
+    
+    @Query("SELECT g.topic, COUNT(g.topic) AS occ FROM Game g GROUP BY g.topic ORDER BY occ DESC")
+    List<Object[]> getTopicAndOccurency();
+    
+    @Query("SELECT new GroupingHelper(g.game.id, MAX(g.points)) FROM GameTeam g GROUP BY g.game.id")
     List<GroupingHelper> findMaxPointsReached();
 
     @Query("SELECT new GroupingHelper(o.team.id, COUNT(*)) FROM GameTeam o WHERE o.points < (SELECT MAX(i.points) FROM GameTeam i WHERE i.game=o.game GROUP BY i.game) GROUP BY o.team.id")

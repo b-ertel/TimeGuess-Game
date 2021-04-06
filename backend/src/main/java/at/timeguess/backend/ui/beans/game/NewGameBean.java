@@ -4,62 +4,76 @@ import java.io.Serializable;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.services.GameService;
+import at.timeguess.backend.services.UserService;
 
 @Component
 @Scope("session")
 public class NewGameBean implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -4340754545184734831L;
-	@Autowired
-	private GameService gameService;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4340754545184734831L;
+    @Autowired
+    private GameService gameService;
 
-	private String gameName;
-	private int maxPoints = 10;
+    @Autowired
+    private UserService  userService;
 
-	public void create() {
-		Game game = new Game();
-		game.setName(gameName);
-		game.setMaxPoints(maxPoints);
+    private String gameName;
+    private int maxPoints = 10;
+
+    public void create() {
+
+        Game game = new Game();
+        game.setName(gameName);
+        game.setMaxPoints(maxPoints);
 
         game.setStatus(GameState.SETUP);
 
-		gameService.saveGame(game);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (principal instanceof UserDetails) {
+			String username = ((UserDetails) principal).getUsername();
+			User creator = userService.loadUser(username);
+			game.setCreator(creator);
+		} 
+        gameService.saveGame(game);
 
-	}
+    }
 
-	/**
-	 * @return the gameName
-	 */
-	public String getGameName() {
-		return gameName;
-	}
+    /**
+     * @return the gameName
+     */
+    public String getGameName() {
+        return gameName;
+    }
 
-	/**
-	 * @param gameName the gameName to set
-	 */
-	public void setGameName(String gameName) {
-		this.gameName = gameName;
-	}
+    /**
+     * @param gameName the gameName to set
+     */
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
+    }
 
-	/**
-	 * @return the maxPoints
-	 */
-	public int getMaxPoints() {
-		return maxPoints;
-	}
+    /**
+     * @return the maxPoints
+     */
+    public int getMaxPoints() {
+        return maxPoints;
+    }
 
-	/**
-	 * @param maxPoints the maxPoints to set
-	 */
-	public void setMaxPoints(int maxPoints) {
-		this.maxPoints = maxPoints;
-	}
+    /**
+     * @param maxPoints the maxPoints to set
+     */
+    public void setMaxPoints(int maxPoints) {
+        this.maxPoints = maxPoints;
+    }
 
 }

@@ -25,17 +25,15 @@ public class GameService {
         return gameRepo.findAll();
     }
 
-    @PreAuthorize("hasAuthority('MANAGER')")
     public Collection<Game> getByStatus(GameState gs) {
         return gameRepo.findByStatus(gs);
     }
 
-    @PreAuthorize("hasAuthority('MANAGER') ")
     public Game loadGame(Long gameId) {
         return gameRepo.findById(gameId).get();
     }
 
-    @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER') or hasAuthority('ADMIN')")
     public Game saveGame(Game g) {
         // TODO: confirm validity
         LOGGER.info("Saving game with id {} started.", g.getId());
@@ -44,7 +42,7 @@ public class GameService {
         return g2;
     }
 
-    @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER') or hasAuthority('ADMIN')")
     public void deleteGame(Game g) {
         gameRepo.delete(g);
     }
