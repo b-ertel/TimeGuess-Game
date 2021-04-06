@@ -40,6 +40,9 @@ public class Game {
 	
 	@ManyToOne
 	private Topic topic; 
+
+	@ManyToOne
+	private User creator; 
 	
 	public Long getId() {
 		return id;
@@ -109,6 +112,20 @@ public class Game {
 
 	public void setTopic(Topic topic) {
 		this.topic = topic;
-	}
+    }
+
+    /**
+     * @return the creator
+     */
+    public User getCreator() {
+        return creator;
+    }
+
+    /**
+     * @param creator the creator to set
+     */
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
 
 }
