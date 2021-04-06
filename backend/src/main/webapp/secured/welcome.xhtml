@@ -1,20 +1,23 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
-	template="/WEB-INF/templates/main.xhtml">
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+    template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
         <h:form>
-            <p:panel header="What do you see here?">
-                    <div style="height: 50px">This is a simple PrimeFaces 8.0
-                            project running on Spring Boot 2.4.3.</div>
+            <p:panel header="Where are you?">
+                <p>This is the entrance room of the TimeGuess online IOT game.</p>
             </p:panel>
-            <p:panel header="JSF 2.3 Bean Access">
-                #{helloWorldBean.hello}
+            <p:spacer height="15" />
+            <p:panel header="How can you participate in a game?">
+                <p>First, go to the virtual lobby.</p>
+                <p>There you can either wait until you are invited to a game started by somebody else:<br/>
+                Just accept the invitation and you will be sent to your game room.</p>
+                <p>Or, if you have a Timeflip cube nearby, you can start a game yourself by assembling teams and inviting your friends to your game.</p>
             </p:panel>
         </h:form>
     </ui:define>

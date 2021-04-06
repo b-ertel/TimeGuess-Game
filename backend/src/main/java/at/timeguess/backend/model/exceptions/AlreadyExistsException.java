@@ -1,4 +1,4 @@
-package at.timeguess.backend.model.Exceptions;
+package at.timeguess.backend.model.exceptions;
 
 /**
  * Base class for exceptions for already existing Topics/Terms.

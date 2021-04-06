@@ -3,9 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
     <body>
         <ui:composition>
+            <c:set var="isLoggedIn" value="#{sessionInfoBean.loggedIn}" scope="request" />
+            <c:set var="isPlayer" value="#{sessionInfoBean.hasRole('PLAYER')}" scope="request" />
+            <c:set var="isManager" value="#{sessionInfoBean.hasRole('MANAGER')}" scope="request" />
+            <c:set var="isAdmin" value="#{sessionInfoBean.hasRole('ADMIN')}" scope="request" />
             <h:form>
                 <p:menubar>
                     <p:menuitem icon="fa fa-users" value="&nbsp;User Profiles&nbsp;" url="/secured/users.xhtml" rendered="#{isPlayer}"/>
@@ -18,15 +23,19 @@
                         <p:menuitem icon="fa fa-history" value="&nbsp;Past Games" rendered="#{isAdmin}"/>
                         <p:menuitem icon="fa fa-users" value="&nbsp;Users" url="/admin/users.xhtml" rendered="#{isAdmin}"/>
                         <p:menuitem icon="fa fa-cubes" value="&nbsp;Timeflip Cubes" rendered="#{isAdmin}"/>
-                    </p:submenu>    
-                    <p:menuitem value="Statistics" url="/secured/statistics.xhtml" rendered="#{sessionInfoBean.loggedIn}"/>               
-                    <p:submenu label="Demos" rendered="#{sessionInfoBean.loggedIn}">                    
-						<p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>                    
                     </p:submenu>
-                    
-                    <p:menuitem value="Login" url="/login.xhtml" rendered="#{!sessionInfoBean.loggedIn}"/>
-                    <p:menuitem value="Logout" url="/logout" rendered="#{sessionInfoBean.loggedIn}"/>                    
-                    
+
+                    <p:submenu label="Demos" rendered="#{isLoggedIn}">
+                        <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
+                        <p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>
+                    </p:submenu>
+
+                    <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
+
+                    <p:submenu label="Other" rendered="#{isLoggedIn}">
+                        <p:menuitem icon="fa fa-info" value="&nbsp;Info" url="/secured/welcome.xhtml"/>
+                        <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout" url="/logout"/>
+                    </p:submenu>
                 </p:menubar>
             </h:form>
         </ui:composition>
