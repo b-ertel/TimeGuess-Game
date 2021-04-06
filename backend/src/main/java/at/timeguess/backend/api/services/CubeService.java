@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import at.timeguess.backend.model.Cube;
-import at.timeguess.backend.model.CubeFace;
-import at.timeguess.backend.repositories.CubeFaceRepository;
 import at.timeguess.backend.repositories.CubeRepository;
 
 @Service
