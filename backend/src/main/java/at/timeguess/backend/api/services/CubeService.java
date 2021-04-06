@@ -18,33 +18,29 @@ public class CubeService {
 	@Autowired
 	private CubeRepository cubeRepo;
 
-	public Cube addCube(Cube cube) {
-		this.cube = new Cube();
-		this.cube.setId(cube.getId());
-//		this.cube.setDeviceNo(cube.getDeviceNo());
-
-		cubeRepo.save(cube);
-		return cube;
-	}
-	
-
 	public void saveCube(Cube cube) {
 		cubeRepo.save(cube);
 	}
-
 
 	public Cube getCube() {
 		return this.cube;
 	}
 
-
 	public void setCube(Cube cube) {
 		this.cube = cube;
 	}
 
-
 	public List<Cube> getAllCubes() {
 		return cubeRepo.findAll();
+	}
+
+	public boolean isMacAddressKnown(Cube cube) {
+		if(cubeRepo.findByMacAddress(cube.getMacAddress())==null){
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 
 

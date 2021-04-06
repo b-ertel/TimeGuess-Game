@@ -25,12 +25,36 @@ public class CubeController {
 	
 	@PostMapping("/cube")
 	public Cube createCube(@RequestBody Cube cube) {
+		
+		if(cube.isConfigured()) {
+			// cube is known
+		}
+		else if(!cube.isConfigured() && isMacAddressKnown()) {
+			
+			// cube is known and has no configuration (i.e. first time to configure or configuration is lost)
+		}
+		
+		else {
+			
+			// cube is either configured nor is it known - admin has to register the cube first before configuration is possible
+			
+		}
+		
+
+		return registerCube(cube);
+	}
+	
+	public Cube registerCube(Cube cube) {
+		
 		this.cube = new Cube();
 		this.cube.setId(cube.getId());
-		this.cube.setConfigNo(false);
 		this.cube.setMacAddress(cube.getMacAddress());
 		this.cube.setName(cube.getName());
-		return cubeService.addCube(this.cube);
+		this.cube.setStatus("in configuration");
+		saveCube();
+		
+		return this.cube;
+		
 	}
 	
 	public Cube getCube() {
@@ -49,6 +73,9 @@ public class CubeController {
 		return cubeService.getAllCubes();
 	}
 	
+	public boolean isMacAddressKnown(){
+		return cubeService.isMacAddressKnown(this.cube);
+	}
 
 }
 
