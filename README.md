@@ -11,8 +11,8 @@ In this repository:
   device with the central server backend
 
 - `time-records` contains tables with time records
-###todo:
-- `gitlab-ci` not sure about this one yet???
+
+- `gitlab-ci` files for the pipeline of the CI in gitlab
 
 
 

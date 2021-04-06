@@ -8,12 +8,7 @@ The project utilizes Spring Boot and is configured as maven web application with
 - embedded H2 in-memory database (including H2 console)
 - support for PrimeFaces
   ??Stimmt das so??
-
-
-`src` contains source code
-
-`target` contains compiled code (should not be of any interest for development)
-
+  
 
 
 ## Running the project
