@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import at.timeguess.backend.api.services.CubeService;
 import at.timeguess.backend.model.Cube;
-import at.timeguess.backend.model.CubeFace;
 
 @RestController
 public class CubeController {
@@ -25,10 +24,10 @@ public class CubeController {
 	@PostMapping("/cube")
 	public Cube createCube(@RequestBody Cube cube) {
 		
-		if(cube.isConfigured()) {
+	/*	if(cube.isConfigured()) {
 			// cube is known
 		}
-		else if(!cube.isConfigured() && isMacAddressKnown()) {
+		else if(!cube.isConfigured() && isMacAddressKnown(cube)) {
 			
 			// cube is known and has no configuration (i.e. first time to configure or configuration is lost)
 		}
@@ -38,7 +37,7 @@ public class CubeController {
 			// cube is either configured nor is it known - admin has to register the cube first before configuration is possible
 			
 		}
-		
+		*/
 		return registerCube(cube);
 	}
 	
@@ -71,8 +70,8 @@ public class CubeController {
 		return cubeService.getAllCubes();
 	}
 	
-	public boolean isMacAddressKnown(){
-		return cubeService.isMacAddressKnown(this.cube);
+	public boolean isMacAddressKnown(Cube cube){
+		return cubeService.isMacAddressKnown(cube);
 	}
 
 }

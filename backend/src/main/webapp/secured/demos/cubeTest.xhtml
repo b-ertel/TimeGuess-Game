@@ -22,14 +22,14 @@
                 <p:column headerText="Name: ">
                     <h:outputText value="#{cube.name}"/>
                 </p:column>  
-                <p:column headerText="Configured: ">
-                    <h:outputText value="#{cube.configNo}"/>
+        <!--    <p:column headerText="Configured: ">
+                    <h:outputText value="#{cube.isConfigured}"/>
                 </p:column>              
                 <p:column>
                 <p:commandButton value="choose">
                         <f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />
                 </p:commandButton>
-                </p:column>
+                </p:column>    -->
             </p:dataTable>
  
             <p:separator />
@@ -48,15 +48,15 @@
                 <p:column headerText="Points">
                     <h:outputText value="#{cubFace.points}" />
                 </p:column>
-                <p:column style="width:100px;text-align: center">
+       <!--          <p:column style="width:100px;text-align: center">
                     <p:commandButton update=":cubeForm:cubeEditDialog" oncomplete="PF('cubeEditDialog').show()" icon="ui-icon-note" title="Edit">
                         <f:setPropertyActionListener value="#{cubeFace}" target="#{cubeFaceController.cubeFace}" />
                     </p:commandButton>
-              <!--        <p:commandButton action="#{userDetailController.doDeleteUser}" icon="ui-icon-trash" title="Delete" update=":userForm:usersTable">
+                     <p:commandButton action="#{userDetailController.doDeleteUser}" icon="ui-icon-trash" title="Delete" update=":userForm:usersTable">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                         <p:confirm header="Confirmation" message="Are you sure that you want to delete this user? You cannot undo this operation." icon="ui-icon-alert" />
-                    </p:commandButton>  -->
-                </p:column>
+                    </p:commandButton>  
+                </p:column> -->
             </p:dataTable>
        
             <p:dialog header="Edit CubeFace" id="cubeEditDialog" widgetVar="cubeEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">

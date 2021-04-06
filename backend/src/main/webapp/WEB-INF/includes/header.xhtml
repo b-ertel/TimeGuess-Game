@@ -31,10 +31,8 @@
                     <p:submenu label="Demos" rendered="#{sessionInfoBean.loggedIn}">                    
 						<p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>                    
                     </p:submenu>
-                    <p:submenu label="Cube" rendered="#{sessionInfoBean.loggedIn}">                    
-						<p:menuitem value="Cube" url="/secured/demos/cubeTest.xhtml"/>                    
-                    </p:submenu>
-                    
+                    <p:menuitem value="CubeTest" rendered="#{sessionInfoBean.loggedIn}" url="/secured/demos/cubeTest.xhtml"/>                    
+					          
                     <p:menuitem value="Login" url="/login.xhtml" rendered="#{!sessionInfoBean.loggedIn}"/>
                     <p:menuitem value="Logout" url="/logout" rendered="#{sessionInfoBean.loggedIn}"/>                    
                     
