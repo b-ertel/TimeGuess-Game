@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.utils.GroupingHelper;
 
 public interface GameRepository extends AbstractRepository<Game, Long> {
 
