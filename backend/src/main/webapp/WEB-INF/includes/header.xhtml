@@ -8,25 +8,18 @@
         <ui:composition>
             <h:form>
                 <p:menubar>
-                    <p:menuitem value="User Profiles" url="/secured/users.xhtml" rendered="#{sessionInfoBean.hasRole('PLAYER')}"/>
-                    
-                    <p:submenu label="Employee Submenu 1" rendered="#{sessionInfoBean.hasRole('PLAYER')}">
-                        <p:menuitem value="Employee Action 1 - 1"/>
-                        <p:menuitem value="Employee Action 1 - 2"/>
-                    </p:submenu>
-                    <p:submenu label="Employee Submenu 2" rendered="#{sessionInfoBean.hasRole('PLAYER')}">
-                        <p:menuitem value="Employee Action 2 - 1"/>
-                        <p:menuitem value="Employee Action 2 - 2"/>
-                    </p:submenu>
-                    
-                    <p:menuitem value="Statistics" url="/secured/statistics.xhtml" rendered="#{sessionInfoBean.loggedIn}"/>
-              
-                    <p:submenu label="Admin Submenu" rendered="#{sessionInfoBean.hasRole('ADMIN')}">
-                        <p:menuitem value="Manage Users" url="/admin/users.xhtml"/>
-                    </p:submenu>
-                    <p:submenu label="Test Submenu" rendered="#{sessionInfoBean.loggedIn}">
-                        <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
-                    </p:submenu>                    
+                    <p:menuitem icon="fa fa-users" value="&nbsp;User Profiles&nbsp;" url="/secured/users.xhtml" rendered="#{isPlayer}"/>
+
+                    <p:menuitem icon="fa fa-cube" value="&nbsp;Virtual Lobby&nbsp;" rendered="#{isPlayer}"/>
+
+                    <p:submenu label="Administration" rendered="#{isManager}">
+                        <p:menuitem icon="fa fa-globe" value="&nbsp;Topics and Terms"/>
+                        <p:menuitem icon="fa fa-cogs" value="&nbsp;Current Games"/>
+                        <p:menuitem icon="fa fa-history" value="&nbsp;Past Games" rendered="#{isAdmin}"/>
+                        <p:menuitem icon="fa fa-users" value="&nbsp;Users" url="/admin/users.xhtml" rendered="#{isAdmin}"/>
+                        <p:menuitem icon="fa fa-cubes" value="&nbsp;Timeflip Cubes" rendered="#{isAdmin}"/>
+                    </p:submenu>    
+                    <p:menuitem value="Statistics" url="/secured/statistics.xhtml" rendered="#{sessionInfoBean.loggedIn}"/>               
                     <p:submenu label="Demos" rendered="#{sessionInfoBean.loggedIn}">                    
 						<p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>                    
                     </p:submenu>
