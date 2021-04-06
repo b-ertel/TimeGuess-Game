@@ -1,5 +1,6 @@
 package at.timeguess.backend.model;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,8 @@ public class Game {
 	
 	private int roundNr;
 	
+	// NOTE: need this to implement deletion! Otherwise will get data integrity exceptions.
+	// TODO derive roundNr from this list to be consistent.
 	@OneToMany(mappedBy = "game", cascade = {CascadeType.ALL},  orphanRemoval=true)
     private Set<Round> rounds;
 
