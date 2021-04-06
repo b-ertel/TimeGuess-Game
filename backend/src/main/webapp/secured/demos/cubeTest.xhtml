@@ -13,13 +13,13 @@
                 <p:column headerText="CubeId">
                     <h:outputText value="#{cube.id}"/>
                 </p:column>
-                <p:column headerText="MacAddress: ">
+                <p:column headerText="MacAddress">
                     <h:outputText value="#{cube.macAddress}"/>
                 </p:column>
-                <p:column headerText="Status: ">
+                <p:column headerText="Status">
                     <h:outputText value="#{cube.status}"/>
                 </p:column>
-                <p:column headerText="Name: ">
+                <p:column headerText="Name">
                     <h:outputText value="#{cube.name}"/>
                 </p:column>  
         <!--    <p:column headerText="Configured: ">
@@ -35,7 +35,7 @@
             <p:separator />
             <p:separator />           
            
-            <p:dataTable id="cubeFaceTable" style="width:800px" var="cubeFace" value="#{cubeFaceController.allCubeFaces}">
+            <p:dataTable id="cubeFaceTable" style="width:1000px" var="cubeFace" value="#{cubeFaceController.allCubeFaces}">
                 <p:column headerText="CubeFaceId">
                     <h:outputText value="#{cubeFace.id}"/>
                 </p:column>
