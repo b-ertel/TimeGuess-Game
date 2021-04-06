@@ -2,6 +2,8 @@ package at.timeguess.backend.repositories;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
 
@@ -41,7 +43,7 @@ public interface AbstractRepository<T, ID extends Serializable> extends Reposito
      * @return The entity with the given id or {@literal null} if none found.
      * @throws IllegalArgumentException If {@code id} is {@literal null}.
      */
-    T findById(ID id);
+    Optional<T> findById(ID id);
 
     /**
      * Saves a given entity. Use the returned instance for further operations as

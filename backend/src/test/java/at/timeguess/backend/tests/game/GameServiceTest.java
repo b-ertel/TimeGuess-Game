@@ -1,5 +1,7 @@
 package at.timeguess.backend.tests.game;
 
+import java.util.NoSuchElementException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
@@ -46,6 +48,15 @@ public class GameServiceTest {
     @DirtiesContext
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN", "MANAGER"})
+    public void canFindGame() {
+        long id = 1;
+        Game game = gameService.loadGame(id);
+        Assertions.assertNotNull(game, "Game \"" + id + "\" could not be loaded from test data source");
+    }
+
+    @DirtiesContext
+    @Test
+    @WithMockUser(username = "admin", authorities = {"ADMIN", "MANAGER"})
     public void testDeleteGame() {
         long id_to_del = 3;
         int ctBefore = gameService.getAllGames().size();
@@ -55,9 +66,7 @@ public class GameServiceTest {
         gameService.deleteGame(gameToDelete);
 
         Assertions.assertEquals(ctBefore - 1, gameService.getAllGames().size(), "No game has been deleted after calling gameService.deleteGame");
-        Game deletedGame = gameService.loadGame(id_to_del);
-        Assertions.assertNull(deletedGame, "Deleted Game \"" + id_to_del + "\" could still be loaded from test data source via gameService.loadGame");
-
+        Assertions.assertThrows(NoSuchElementException.class, () ->  gameService.loadGame(id_to_del));
     }
 
 }

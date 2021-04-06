@@ -32,7 +32,7 @@ public class GameService {
 
     @PreAuthorize("hasAuthority('MANAGER') ")
     public Game loadGame(Long gameId) {
-        return gameRepo.findById(gameId);
+        return gameRepo.findById(gameId).get();
     }
 
     @PreAuthorize("hasAuthority('MANAGER') or hasAuthority('ADMIN')")

@@ -3,6 +3,7 @@ package at.timeguess.backend.model;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
 
 @Entity
 public class Game {
@@ -27,7 +29,10 @@ public class Game {
 	
 	private int roundNr;
 	
-	@OneToMany(mappedBy = "game")
+	@OneToMany(mappedBy = "game", cascade = {CascadeType.ALL},  orphanRemoval=true)
+    private Set<Round> rounds;
+
+	@OneToMany(mappedBy = "game", cascade = {CascadeType.ALL},  orphanRemoval=true)
     private Set<GameTeam> teams;
 	
 	@ManyToOne
@@ -73,7 +78,21 @@ public class Game {
 		this.roundNr = roundNr;
 	}
 
-	public Set<Team> getTeams() {
+    /**
+     * @return the rounds
+     */
+    public Set<Round> getRounds() {
+        return rounds;
+    }
+
+    /**
+     * @param rounds the rounds to set
+     */
+    public void setRounds(Set<Round> rounds) {
+        this.rounds = rounds;
+    }
+
+    public Set<Team> getTeams() {
 		return teams.stream().map(GameTeam::getTeam).collect(Collectors.toSet());
 	}
 

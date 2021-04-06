@@ -45,7 +45,7 @@ public class TermService {
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public Term loadTerm(Long id) {
-        return termRepository.findById(id);
+        return termRepository.findById(id).get();
     }
 
     /**
