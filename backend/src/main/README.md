@@ -1,0 +1,3 @@
+- `java` basically contains backend implementation such as classes, repositories, exceptions, controllers etc.
+- `resources` contains information about resources that are used such as database etc
+- `webapp` contains the frontend (.xhtml files)

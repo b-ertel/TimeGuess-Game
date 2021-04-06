@@ -1,0 +1,203 @@
+/* This will be applied to all HTML in the page and not just PrimeFaces components*/
+root {
+    font-size: 12px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* font-size value can be adjusted to make PrimeFaces components stand out by making them larger or smaller */
+.ui-widget {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 1em;
+}
+.ui-widget .ui-widget {
+    font-size: 1em;
+}
+
+html * {
+    font-size: 1em !important;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    margin: 0 auto !important;
+    background-repeat: no-repeat;
+    background-size: cover !important;
+    min-width: 100%;
+    min-height: 100%;
+    background-size: cover;
+    background-color: #7d9aab;
+}
+
+.login-block {
+    width: 300px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    -webkit-box-shadow: 0 0 15px 5px #195478;
+    box-shadow: 0 0 15px 5px #195478;
+}
+
+.login-logo {
+    border-radius: 10px;
+    max-width: 280px;
+    background: transparent;
+    margin: 10px;
+}
+
+.login-input {
+    width: 100%;
+    margin: 15px 0;
+    text-align: center;
+    position: relative;
+}
+
+#error_msg {
+    color: crimson;
+}
+
+.eye-button {
+    position: relative;
+    float: right;
+}
+
+.eye-button-login {
+    left: -18px;
+    top: -31px;
+    height: 31px !important;
+}
+
+.eye-button-profile {
+    top: 48px;
+    left: -1px;
+    z-index: 10;
+}
+
+#header {
+    z-index: 10000 !important;
+}
+
+#footer {
+    background-color: #5b7573;
+    color: white;
+    position: fixed;
+    opacity: 0.9;
+    bottom: 0;
+    width: 99%;
+    padding: 10px 50px 10px 0;
+    z-index: 101 !important;
+}
+
+#content {
+    padding: 15px 15px 15px 15px !important;
+    z-index: 100 !important;
+}
+
+#activityForm {
+    margin-bottom: 30px !important;
+}
+
+.main-menu .ui-widget-content {
+    z-index: 100000 !important;
+}
+
+.ui-widget-content {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.ui-menu-child {
+    padding-right: 15px !important;
+    background: transparent;
+}
+
+.ui-menuitem {
+    background-color: #306585;
+    margin: 5px !important;
+    opacity: 0.9;
+}
+
+.ui-datepicker-calendar .ui-state-default {
+    color: #195478 !important;
+}
+
+.ui-datepicker-calendar td {
+    border: 1px solid rgba(91, 125, 122, 0.54) !important;
+}
+
+.ui-widget-content a {
+    color: rgb(255, 255, 255) !important;
+}
+
+.profile-out-panel td:nth-child(1) {
+    width: 90px !important;
+ }
+
+.ui-widget-header {
+    background: rgba(91, 125, 122, 0.89) !important;
+    border: 1px solid #638498;
+    color: white !important;
+    text-shadow: 0 1px 0 black !important;
+}
+
+.ui-dialog {
+    border-radius: 10px !important;
+    -webkit-box-shadow: 0 0 15px 5px #195478 !important;
+    box-shadow: 0 0 15px 5px #195478 !important;
+    max-width: 600px !important;
+}
+
+.ui-tabs-panel, .ui-tabs-panels {
+    padding: 0.3em !important;
+}
+
+.ui-tabs {
+    border-radius: 10px !important;
+}
+
+.ui-tabs .ui-tabs-nav{
+    background-color: transparent !important;
+}
+
+.ui-tabs-header {
+    background-color: #acacac !important;
+}
+
+.ui-datatable-tablewrapper {
+    overflow: auto;
+    margin: revert;
+    border: 1px solid #176D15 !important;
+    border-radius: 5px !important;
+}
+
+.ui-datatable thead th {
+    -webkit-background: rgba(91, 125, 122, 0.89) !important;
+    background: rgba(91, 125, 122, 0.89) !important;
+    text-shadow: none !important;
+    color: white;
+}
+
+.fc-button {
+    border-radius: 10px !important;
+    background-color: #306585 !important;
+    /*z-index: 101 !important;*/
+}
+
+.user-data-block {
+    background: rgba(255, 255, 255, 0.6);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.edit-profile-button {
+    background: #306585 !important;
+    text-shadow: none !important;
+    color: white!important;
+    border-radius: 5px;
+}
+
+/* custom class to postfix too long lines with '...' */
+.truncate {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
