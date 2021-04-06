@@ -3,36 +3,39 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
     <body>
         <ui:composition>
+            <c:set var="isLoggedIn" value="#{sessionInfoBean.loggedIn}" scope="request" />
+            <c:set var="isPlayer" value="#{sessionInfoBean.hasRole('PLAYER')}" scope="request" />
+            <c:set var="isManager" value="#{sessionInfoBean.hasRole('MANAGER')}" scope="request" />
+            <c:set var="isAdmin" value="#{sessionInfoBean.hasRole('ADMIN')}" scope="request" />
             <h:form>
                 <p:menubar>
-                    <p:submenu label="Employee Submenu 1" rendered="#{sessionInfoBean.hasRole('EMPLOYEE')}">
-                        <p:menuitem value="Employee Action 1 - 1"/>
-                        <p:menuitem value="Employee Action 1 - 2"/>
+                    <p:menuitem icon="fa fa-users" value="&nbsp;User Profiles&nbsp;" url="/secured/users.xhtml" rendered="#{isPlayer}"/>
+
+                    <p:menuitem icon="fa fa-cube" value="&nbsp;Virtual Lobby&nbsp;" rendered="#{isPlayer}"/>
+
+                    <p:submenu label="Administration" rendered="#{isManager}">
+                        <p:menuitem icon="fa fa-globe" value="&nbsp;Topics and Terms"/>
+                        <p:menuitem icon="fa fa-cogs" value="&nbsp;Current Games"/>
+                        <p:menuitem icon="fa fa-history" value="&nbsp;Past Games" rendered="#{isAdmin}"/>
+                        <p:menuitem icon="fa fa-users" value="&nbsp;Users" url="/admin/users.xhtml" rendered="#{isAdmin}"/>
+                        <p:menuitem icon="fa fa-cubes" value="&nbsp;Timeflip Cubes" rendered="#{isAdmin}"/>
                     </p:submenu>
-                    <p:submenu label="Employee Submenu 2" rendered="#{sessionInfoBean.hasRole('EMPLOYEE')}">
-                        <p:menuitem value="Employee Action 2 - 1"/>
-                        <p:menuitem value="Employee Action 2 - 2"/>
-                    </p:submenu>
-                    <p:submenu label="Manager Submenu" rendered="#{sessionInfoBean.hasRole('MANAGER')}">
-                        <p:menuitem value="Manager Action 1"/>
-                        <p:menuitem value="Manager Action 2"/>
-                    </p:submenu>
-                    <p:submenu label="Admin Submenu" rendered="#{sessionInfoBean.hasRole('ADMIN')}">
-                        <p:menuitem value="Manage Users" url="/admin/users.xhtml"/>
-                    </p:submenu>
-                    <p:submenu label="Test Submenu" rendered="#{sessionInfoBean.loggedIn}">
+
+                    <p:submenu label="Demos" rendered="#{isLoggedIn}">
                         <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
-                    </p:submenu>                    
-                    <p:submenu label="Demos" rendered="#{sessionInfoBean.loggedIn}">                    
-						<p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>                    
+                        <p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>
                     </p:submenu>
-                    
-                    <p:menuitem value="Login" url="/login.xhtml" rendered="#{!sessionInfoBean.loggedIn}"/>
-                    <p:menuitem value="Logout" url="/logout" rendered="#{sessionInfoBean.loggedIn}"/>                    
-                    
+
+                    <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
+
+                    <p:submenu label="Other" rendered="#{isLoggedIn}">
+                        <p:menuitem icon="fa fa-info" value="&nbsp;Info" url="/secured/welcome.xhtml"/>
+                        <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout" url="/logout"/>
+                    </p:submenu>
                 </p:menubar>
             </h:form>
         </ui:composition>

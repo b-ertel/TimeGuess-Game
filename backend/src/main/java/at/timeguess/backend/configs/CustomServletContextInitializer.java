@@ -8,10 +8,6 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Spring configuration for servlet context.
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
  */
 @Configuration
 public class CustomServletContextInitializer implements ServletContextInitializer {
@@ -26,5 +22,9 @@ public class CustomServletContextInitializer implements ServletContextInitialize
         // websockets configuration
         sc.setInitParameter("javax.faces.ENABLE_CDI_RESOLVER_CHAIN", "true");
         sc.setInitParameter("org.omnifaces.SOCKET_ENDPOINT_ENABLED", "true");
+        // set timezone for all components to system default
+        sc.setInitParameter("javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE", "true");
+        // enable gui features
+        sc.setInitParameter("primefaces.FONT_AWESOME", "true");
     }
 }

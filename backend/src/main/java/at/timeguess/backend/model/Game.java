@@ -1,18 +1,21 @@
 package at.timeguess.backend.model;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Game {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@Column
@@ -24,13 +27,11 @@ public class Game {
 	
 	private int roundNr;
 	
-	@ManyToMany
-	@JoinTable(
-			name = "game_team", 
-			joinColumns = @JoinColumn(name = "game_id"), 
-			inverseJoinColumns = @JoinColumn(name = "team_id"))
-	private Set<Team> teams;
-
+	@OneToMany(mappedBy = "game")
+    private Set<GameTeam> teams;
+	
+	@ManyToOne
+	private Topic topic; 
 	
 	public Long getId() {
 		return id;
@@ -73,11 +74,18 @@ public class Game {
 	}
 
 	public Set<Team> getTeams() {
-		return teams;
+		return teams.stream().map(GameTeam::getTeam).collect(Collectors.toSet());
 	}
 
 	public void setTeams(Set<Team> teams) {
-		this.teams = teams;
+		this.teams = teams.stream().map(t -> new GameTeam(this, t)).collect(Collectors.toSet());
 	}
 
+	public Topic getTopic() {
+		return topic;
+	}
+
+	public void setTopic(Topic topic) {
+		this.topic = topic;
+	}
 }
