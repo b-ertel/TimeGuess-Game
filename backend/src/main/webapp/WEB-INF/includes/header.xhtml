@@ -31,6 +31,8 @@
                     </p:submenu>
 
                     <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
+    
+                     <p:menuitem icon="fa fa-sign-in" url="/statistics.xhtml" rendered="#{!isLoggedIn}"/>
 
                     <p:submenu label="Other" rendered="#{isLoggedIn}">
                         <p:menuitem icon="fa fa-info" value="&nbsp;Info" url="/secured/welcome.xhtml"/>
