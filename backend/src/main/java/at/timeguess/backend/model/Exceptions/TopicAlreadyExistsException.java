@@ -1,4 +1,4 @@
-package at.timeguess.backend.model.Exceptions;
+package at.timeguess.backend.model.exceptions;
 
 /**
  * Exception to indicate that a topic already exists.

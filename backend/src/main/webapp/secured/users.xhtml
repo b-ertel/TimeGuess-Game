@@ -13,15 +13,15 @@
                 <p:column headerText="Username">
                     <h:outputText value="#{user.username}"/>
                 </p:column>
-                <p:column style="width:100px;text-align: center">
+                <p:column headerText="Profile" style="width:100px;text-align: center">
                     <p:commandButton update=":userForm:userProfileDialog" oncomplete="PF('userProfileDialog').show()" icon="ui-icon-person" title="Profile">
                         <f:setPropertyActionListener value="#{user}" target="#{userProfileController.user}" />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
 
-            <p:dialog header="Edit User" id="userProfileDialog" widgetVar="userProfileDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" responsive="true" width="330">
-	        	<c:set var="curr" value="#{userProfileController.user}" scope="request" />
+            <p:dialog header="Edit User" id="userProfileDialog" widgetVar="userProfileDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" responsive="true" width="400">
+                <c:set var="curr" value="#{userProfileController.user}" scope="request" />
                 <p:outputPanel id="userData" rendered="#{not empty curr}">
                     <h:panelGrid columns="2">
                         <p:outputLabel for="username" value="Username: " />
@@ -44,16 +44,33 @@
                         <p:selectBooleanCheckbox id="enabled" value="#{curr.enabled}"/>
                     </h:panelGrid>
                     <p:separator />
-					<p:dataTable id="mateTable" var="mate" value="#{userProfileController.teammates}">
-						<p:column headerText="Teammates">
-							<p:outputLabel value="#{mate.username}" />
-						</p:column>
-					</p:dataTable>
+                    <p:dataTable id="mateTable" var="mate" value="#{userProfileController.teammates}">
+                        <p:column headerText="Teammates">
+                            <p:outputLabel value="#{mate.username}" />
+                        </p:column>
+                    </p:dataTable>
                     <p:separator />
                     <h:panelGrid columns="2">
                         <p:outputLabel for="totalGames" value="Total Games played: " />
                         <p:outputLabel id="totalGames" value="#{userProfileController.totalGames}"/>
                     </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="totalGamesWon" value="Total Games won: " />
+                        <p:outputLabel id="totalGamesWon" value="#{userProfileController.totalGamesWon}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="totalGamesLost" value="Total Games lost: " />
+                        <p:outputLabel id="totalGamesLost" value="#{userProfileController.totalGamesLost}"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <p:dataTable id="topicTable" var="topic" value="#{userProfileController.totalGamesWonByTopic}">
+                        <p:column headerText="Topic">
+                            <p:outputLabel value="#{topic.key}" />
+                        </p:column>
+                        <p:column headerText="Total Games won">
+                            <p:outputLabel value="#{topic.value}" />
+                        </p:column>
+                    </p:dataTable>
                     <p:separator />
                     <h:panelGrid columns="2">
                         <p:commandButton value="Reload" action="#{userProfileController.doReloadUser()}" update=":userForm:userData"/>
@@ -61,12 +78,6 @@
                     </h:panelGrid>
                 </p:outputPanel>
             </p:dialog>
-
-            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
-            </p:confirmDialog>
-
         </h:form>
     </ui:define>
 </ui:composition>
