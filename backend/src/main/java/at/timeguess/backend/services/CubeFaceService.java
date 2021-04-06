@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.repositories.CubeFaceRepository;
 
+/**
+ * a service to manage {@link CubeFace} entities
+ *
+ */
 @Component
 @Scope("application")
 public class CubeFaceService {
@@ -16,6 +20,9 @@ public class CubeFaceService {
 	@Autowired
 	CubeFaceRepository cubeFaceRepo;
 	
+	/**
+	 * @return a list of all CubeFace entities
+	 */
 	public List<CubeFace> allCubeFaces(){
 		return cubeFaceRepo.findAll();
 	}

@@ -3,6 +3,7 @@ package at.timeguess.backend.api.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import at.timeguess.backend.api.services.CubeService;
 import at.timeguess.backend.model.Cube;
 
+/**
+ *  api controller which handles httpRequests of new {@link Cube} entities 
+ *
+ */
 @RestController
 public class CubeController {
 	
@@ -20,7 +25,7 @@ public class CubeController {
 	private CubeService cubeService;
 	
 	private Cube cube;
-	
+
 	@PostMapping("/cube")
 	public Cube createCube(@RequestBody Cube cube) {
 		
@@ -41,6 +46,11 @@ public class CubeController {
 		return registerCube(cube);
 	}
 	
+	/**
+	 * @param cube to register -> i.e. which has to be saved in the database
+	 * @return registered Cube
+	 */
+    @PreAuthorize("hasAuthority('ADMIN')")
 	public Cube registerCube(Cube cube) {
 		
 		this.cube = new Cube();

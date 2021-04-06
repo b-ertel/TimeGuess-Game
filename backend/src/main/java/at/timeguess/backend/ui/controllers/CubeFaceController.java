@@ -10,6 +10,10 @@ import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.services.CubeFaceService;
 
+/**
+ * @author a controller to manage {@link CubeFace} un UI 
+ *
+ */
 @Component
 @Scope("view")
 public class CubeFaceController {
@@ -19,6 +23,9 @@ public class CubeFaceController {
 	
 	private CubeFace cubeFace;
 	
+	/**
+	 * @return a list of all CubeFace entities
+	 */
 	public List<CubeFace> getAllCubeFaces(){
 		return cubeFaceService.allCubeFaces();
 	}
