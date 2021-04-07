@@ -36,9 +36,8 @@
                         <p:menuitem icon="fa fa-info" value="&nbsp;Info" url="/secured/welcome.xhtml"/>
                     </p:submenu>
                     
-                    <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout" url="/logout" rendered="#{sessionInfoBean.loggedIn}"/> 
-                    <p:menuitem value="CubeTest" rendered="#{sessionInfoBean.loggedIn}" url="/secured/demos/cubeTest.xhtml"/>                
-                    <p:menuitem value="Login" url="/login.xhtml" rendered="#{!sessionInfoBean.loggedIn}"/>
+                    <p:menuitem value="CubeTest" rendered="#{sessionInfoBean.loggedIn}" url="/secured/demos/cubeTest.xhtml"/>  
+                    <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout" url="/logout" rendered="#{sessionInfoBean.loggedIn}"/>               
 
                 </p:menubar>
             </h:form>
