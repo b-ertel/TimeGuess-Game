@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -20,7 +19,6 @@ import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
-import at.timeguess.backend.model.UserRole;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TopicService;
 import at.timeguess.backend.services.UserService;
@@ -123,19 +121,6 @@ public class GameServiceTest {
         Assertions.assertNotEquals(oldCreator, newCreator, "Game user is same as user2");
         game.setCreator(newCreator);
 
-        // TODO Team and Round need work,
-        // probably require services to be setup
-        //
-        // currently errors:
-        // org.hibernate.LazyInitializationException: failed to lazily initialize a
-        // collection of role: at.timeguess.backend.model.Game.teams, could not
-        // initialize proxy - no Session
-        // at
-        // at.timeguess.backend.tests.game.GameServiceTest.testUpdateGame(GameServiceTest.java:113)
-        //
-        // Set<Team> oldTeams = game.getTeams();
-        // int oldTeamLen = oldTeams.size();
-        // Assertions.assertTrue(oldTeamLen > 0, "Needs one team");
 
         gameService.saveGame(game);
 
@@ -205,6 +190,8 @@ public class GameServiceTest {
         List<Team> rl = teams.stream().collect(Collectors.toList());
         teams.remove(rl.get(0));
 
+        // NOTE need to explicitely setTeams
+        game.setTeams(teams);
         gameService.saveGame(game);
 
         Game saveGame = gameService.loadGame(id);

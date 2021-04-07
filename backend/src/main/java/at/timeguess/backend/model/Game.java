@@ -107,6 +107,11 @@ public class Game {
         this.rounds = rounds;
     }
 
+    /**
+     * NOTE the set can not be directly updated - changes need to be saved via setTeams
+     *
+     * @return
+     */
     public Set<Team> getTeams() {
         return teams.stream().map(GameTeam::getTeam).collect(Collectors.toSet());
     }
