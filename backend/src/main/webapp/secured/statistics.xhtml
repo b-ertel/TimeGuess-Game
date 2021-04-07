@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	template="/WEB-INF/templates/main.xhtml">
+    <ui:define name="content">
+        <h:form id="statForm">
+            <div>
+	            <p:panelGrid columns="2" style="width: 100%;">
+	                <p:panel header="General" style="border: none; width: 400px">
+                            <h:outputText value="Number of players: #{topicStatisticController.numberOfPlayers}" /> 
+                            <br />
+                            <h:outputText value="Number of terms: #{topicStatisticController.numberOfTerms}" />  
+                            <br />
+                            <h:outputText value="Number of topics: #{topicStatisticController.numberOfTopics}"/>
+                            <br />   
+                            <h:outputText value="Most used topic: #{topicStatisticController.mostUsedTopic.name}"/>
+                            <br />   
+                            <h:outputText value="Least used topic: #{topicStatisticController.leastUsedTopic.name}"/>
+                            <br />          
+                 	</p:panel>
+
+                    <p:panel header="Topics" style=" border: none;">
+	                    <p:dataTable id="topic" var="topic" value="#{topicStatisticController.topics}">
+				            <p:column headerText="Name">
+				                <h:outputText value="#{topic.name}" />
+				            </p:column>
+				            <p:column style="width:100px;text-align: center">
+			                    <p:commandButton update=":statForm:topicStatDialog" oncomplete="PF('topicStatDialog').show()" icon="ui-icon-info" title="Edit">
+			                        <f:setPropertyActionListener value="#{topic}" target="#{topicStatisticController.topic}" />
+			                    </p:commandButton>
+			                </p:column>
+				        </p:dataTable> 
+                    </p:panel>
+	            </p:panelGrid>
+		    </div>
+		    
+		    <p:dialog header="Topic Statistics" id="topicStatDialog" widgetVar="topicStatDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="topicStat" rendered="#{not empty topicStatisticController.topic}">
+				    <p:panelGrid columns="2">
+					    <f:facet name="header">
+				            <h:outputText value="#{topicStatisticController.topic.name}"/>
+				        </f:facet>
+				       <h:outputText value="Games:"/>
+				       <h:outputText value="#{topicStatisticController.gamesPlayedWithTopic}"/>
+				       
+				       <h:outputText value="Correct Answers:"/>
+				       <h:outputText value="#{topicStatisticController.correctRounds}"/>
+				       
+				       <h:outputText value="Incorrect Answers:"/>
+				       <h:outputText value="#{topicStatisticController.incorrectRounds}"/>
+				       
+				       <h:outputText value="Number Of Terms:"/>
+				       <h:outputText value="#{topicStatisticController.nrOfTermsPerTopic}"/>
+				    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
