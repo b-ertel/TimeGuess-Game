@@ -41,7 +41,11 @@
 <p:column style="width:100px;text-align: center">
 
 
-<!--TODO somehow gameDetailController sometimes is not set -->
+<!--TODO 
+  - Problem editing games with a set topic
+  - somehow gameDetailController gets stuck at the problematic game
+  - games with Topic/teams/rounds can not get deleted (although the controller tests show the controller can delete)
+-->
 <p:commandButton update=":gameForm:gameEditDialog" oncomplete="PF('gameEditDialog').show()" icon="ui-icon-note" title="Edit">
 <f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />
 </p:commandButton>

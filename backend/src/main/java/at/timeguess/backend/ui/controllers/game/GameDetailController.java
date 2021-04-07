@@ -3,7 +3,6 @@ package at.timeguess.backend.ui.controllers.game;
 import java.io.Serializable;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Game;
@@ -11,13 +10,8 @@ import at.timeguess.backend.services.GameService;
 
 /**
  * Controller for the game detail view.
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
  */
 @Component
-@Scope("view")
 public class GameDetailController implements Serializable {
 
     /**

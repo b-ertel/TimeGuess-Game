@@ -24,6 +24,7 @@ public class Game {
     @Column
     private String name;
 
+
     private int maxPoints;
 
     private GameState status; // more finegrained replacement for status
@@ -140,5 +141,19 @@ public class Game {
     public void setCreator(User creator) {
         this.creator = creator;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        final Game o2 = (Game) obj;
+       
+        return id.equals(o2.getId()) 
+                && name.equals(o2.getName()) 
+                && status.equals(o2.getStatus()) 
+                && topic.equals(o2.getTopic()) 
+                && creator.equals(o2.getCreator());
+    }
+
 
 }
