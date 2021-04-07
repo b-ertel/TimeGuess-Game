@@ -20,40 +20,53 @@
                 </p:column>
             </p:dataTable>
 
-            <p:dialog header="User Profile" id="userProfileDialog" widgetVar="userProfileDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" responsive="true" width="330">
+            <p:dialog header="User Profile" id="userProfileDialog" widgetVar="userProfileDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" responsive="true" width="300">
                 <c:set var="curr" value="#{userProfileController.user}" scope="request" />
                 <p:outputPanel id="userData" rendered="#{not empty curr}">
                     <div class="p-grid">
-                        <div class="p-col-5"><p:outputLabel for="username" value="Username: " /></div>
-                        <div class="p-col-7"><p:outputLabel id="username" value="#{curr.username}" disabled="true"/></div>
+                        <div class="p-col-8"><p:outputLabel for="username" value="Username: " /></div>
+                        <div class="p-col-4"><p:outputLabel id="username" value="#{curr.username}" disabled="true" styleClass="rightm20"/></div>
                     </div>
-                    <p:separator style="margin-bottom:16px" />
                     <div class="p-grid">
-                        <div class="p-col-5"><p:outputLabel for="firstName" value="First Name: "/></div>
-                        <div class="p-col-7"><p:outputLabel id="firstName" value="#{curr.firstName}"/></div>
-                        <div class="p-col-5"><p:outputLabel for="firstName" value="Last Name: " /></div>
-                        <div class="p-col-7"><p:outputLabel id="lastName" value="#{curr.lastName}"/></div>
-                        <div class="p-col-5"><p:outputLabel for="email" value="E-Mail: " /></div>
-                        <div class="p-col-7"><p:outputLabel id="email" value="#{curr.email}"/></div>
-                        <div class="p-col-5"><p:outputLabel for="phone" value="Phone: " /></div>
-                        <div class="p-col-7"><p:outputLabel id="phone" value="#{curr.phone}" mask="+99? 999 9999999"/></div>
+                        <div class="p-col-8"><p:outputLabel for="enabled" value="Enabled: "/></div>
+                        <div class="p-col-4"><p:selectBooleanCheckbox id="enabled" value="#{curr.enabled}" disabled="true" styleClass="rightm20"/></div>
                     </div>
                     <p:separator style="margin-bottom:16px" />
-                    <div class="p-grid">
-                        <div class="p-col-5"><p:outputLabel for="enabled" value="Enabled: "/></div>
-                        <div class="p-col-7"><p:selectBooleanCheckbox id="enabled" value="#{curr.enabled}" disabled="true"/></div>
-                    </div>
-                    <p:separator style="margin-bottom:16px" />
+                    
                     <p:dataTable id="mateTable" var="mate" value="#{userProfileController.teammates}">
-                        <p:column headerText="Teammates so far">
+                        <p:column headerText="Teammates">
                             <p:outputLabel value="#{mate.username}" />
                         </p:column>
                     </p:dataTable>
-                    <p:spacer />
+                    <div style="height:12px" />
+                    
                     <div class="p-grid">
-                        <div class="p-col-7"><p:outputLabel for="totalGames" value="Total Games played: " /></div>
-                        <div class="p-col-5"><p:outputLabel id="totalGames" value="#{userProfileController.totalGames}"/></div>
+                        <div class="p-col-8"><p:outputLabel for="totalGames" value="Total Games played: " /></div>
+                        <div class="p-col-4"><p:outputLabel id="totalGames" value="#{userProfileController.totalGames}" styleClass="rightm20"/></div>
                     </div>
+                    <div class="p-grid">
+                        <div class="p-col-8"><p:outputLabel for="totalGamesWon" value="Total Games won: " /></div>
+                        <div class="p-col-4"><p:outputLabel id="totalGamesWon" value="#{userProfileController.totalGamesWon}" styleClass="rightm20"/></div>
+                    </div>
+                    <div class="p-grid">
+                        <div class="p-col-8"><p:outputLabel for="totalGamesLost" value="Total Games lost: " /></div>
+                        <div class="p-col-4"><p:outputLabel id="totalGamesLost" value="#{userProfileController.totalGamesLost}" styleClass="rightm20"/></div>
+                    </div>
+                    <div style="height:8px" />
+                    
+                    <p:dataTable id="topicTable" var="topic" value="#{userProfileController.totalGamesWonByTopic}">
+                        <p:columnGroup type="header">
+                            <p:row>
+                                <p:column colspan="2" headerText="Total Games won by Topic"/>
+                            </p:row>
+                        </p:columnGroup>
+                        <p:column>
+                            <p:outputLabel value="#{topic.key}" />
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel value="#{topic.value}" styleClass="rightm10" />
+                        </p:column>
+                    </p:dataTable>
                     <p:separator style="margin-bottom:16px" />
                     <div class="p-grid">
                         <div class="p-col-8"><p:commandButton value="Reload" action="#{userProfileController.doReloadUser()}" update=":userForm:userData"/></div>
