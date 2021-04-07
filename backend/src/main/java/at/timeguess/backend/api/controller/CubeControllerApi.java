@@ -23,6 +23,7 @@ import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.model.api.FacetsResponse;
 import at.timeguess.backend.model.api.RSSIMessage;
 import at.timeguess.backend.model.api.RSSIResponse;
+import at.timeguess.backend.ui.controllers.CubeController;
 
 /**
  *  api controller which handles httpRequests of new {@link Cube} entities 
@@ -30,18 +31,27 @@ import at.timeguess.backend.model.api.RSSIResponse;
  */
 
 @RestController
-public class CubeController {
-	
+public class CubeControllerApi {
 	
 	@Autowired
-	private CubeService cubeService;
-
-	private Cube cube;
-
+	private CubeController cubeController;
+	
+	/**
+	 * process the physical TimeFlip device which is represented by Cube entity in our model
+	 * 
+	 * @param cube the Cube
+	 * @return Cube entity (at the moment)
+	 */
 	@PostMapping("/api/cube")
 	public Cube createCube(@RequestBody Cube cube) {
 		
-	/*	if(cube.isConfigured()) {
+		// do something .. 
+		
+		
+	/*	
+	 * this logic may be implemented in UI
+	 * 
+	 * if(cube.isConfigured()) {
 			// cube is known
 		}
 		else if(!cube.isConfigured() && isMacAddressKnown(cube)) {
@@ -55,47 +65,9 @@ public class CubeController {
 			
 		}
 		*/
-		return registerCube(cube);
+		return cubeController.registerCube(cube);
 	}
 	
-	/**
-	 * @param cube to register -> i.e. which has to be saved in the database
-	 * @return registered Cube
-	 */
-    @PreAuthorize("hasAuthority('ADMIN')")
-	public Cube registerCube(Cube cube) {
-		
-		this.cube = new Cube();
-		this.cube.setId(cube.getId());
-		this.cube.setMacAddress(cube.getMacAddress());
-		this.cube.setName(cube.getName());
-		this.cube.setStatus("in configuration");
-		saveCube();
-		
-		return this.cube;
-		
-	}
-	
-	public Cube getCube() {
-		return this.cube;
-	}
-	
-	public void setCube(Cube cube) {
-		this.cube = cube;
-	}
-	
-	public void saveCube() {
-		cubeService.saveCube(this.cube);
-	}
-	
-	public List<Cube> getAllCubes() {
-		return cubeService.getAllCubes();
-	}
-	
-	public boolean isMacAddressKnown(Cube cube){
-		return cubeService.isMacAddressKnown(cube);
-	}
-
     /**
      * Process messages from a TimeFlip device signaling
      * a change of the Battery level characteristic.
