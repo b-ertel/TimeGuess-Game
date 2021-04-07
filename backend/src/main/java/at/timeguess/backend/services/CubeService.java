@@ -1,4 +1,4 @@
-package at.timeguess.backend.api.services;
+package at.timeguess.backend.services;
 
 import java.util.List;
 
