@@ -1,7 +1,6 @@
 package at.timeguess.backend.ui.controllers.game;
 
 import java.io.Serializable;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -22,7 +21,7 @@ import at.timeguess.backend.services.GameService;
 public class GameDetailController implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -3429788166384535247L;
 
@@ -36,16 +35,14 @@ public class GameDetailController implements Serializable {
 
     /**
      * Sets the currently displayed game and reloads it form db. This game is
-     * targeted by any further calls of
-     * {@link #doReloadGame()}, {@link #doSaveGame()} and
-     * {@link #doDeleteGame()}.
+     * targeted by any further calls of {@link #doReloadGame()},
+     * {@link #doSaveGame()} and {@link #doDeleteGame()}.
      *
      * @param game
      */
     public void setGame(Game game) {
         this.game = game;
-        // TODO
-        //doReloadGame();
+        doReloadGame();
     }
 
     /**
@@ -75,8 +72,10 @@ public class GameDetailController implements Serializable {
      * Action to delete the currently displayed game.
      */
     public void doDeleteGame() {
-        this.gameService.deleteGame(game);
-        game = null;
+        if (game != null) {
+            this.gameService.deleteGame(game);
+            game = null;
+        }
     }
 
 }

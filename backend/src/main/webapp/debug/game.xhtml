@@ -28,21 +28,30 @@
 
 <h:form id="gameForm">
 <p:dataTable id="gamesTable" var="tgame" 
-value="#{gameDebugController.games}">
- <p:column headerText="id"> <h:outputText value="#{tgame.id}"/> </p:column>
- <p:column headerText="name"> <h:outputText value="#{tgame.name}"/> </p:column>
- <p:column headerText="max points"> <h:outputText value="#{tgame.maxPoints}"/> </p:column>
- <p:column headerText="status"> <h:outputText value="#{tgame.status}"/> </p:column>
- <p:column headerText="roundNr"> <h:outputText value="#{tgame.roundNr}"/> </p:column>
- <p:column headerText="topic"> <h:outputText value="#{tgame.topic.name}"/> </p:column>
- <p:column headerText="creator"> <h:outputText value="#{tgame.creator.username}"/> </p:column>
- <p:column headerText="# rounds"> <h:outputText value="#{tgame.rounds.size()}"/> </p:column>
- <p:column headerText="# teams"> <h:outputText value="#{tgame.teams.size()}"/> </p:column>
- <p:column style="width:100px;text-align: center">
- <p:commandButton update=":gameForm:gameEditDialog" oncomplete="PF('gameEditDialog').show()" icon="ui-icon-note" title="Edit">
- <f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />
- </p:commandButton>
- </p:column>
+                             value="#{gameDebugController.games}">
+<p:column headerText="id"> <h:outputText value="#{tgame.id}"/> </p:column>
+<p:column headerText="name"> <h:outputText value="#{tgame.name}"/> </p:column>
+<p:column headerText="max points"> <h:outputText value="#{tgame.maxPoints}"/> </p:column>
+<p:column headerText="status"> <h:outputText value="#{tgame.status}"/> </p:column>
+<p:column headerText="roundNr"> <h:outputText value="#{tgame.roundNr}"/> </p:column>
+<p:column headerText="topic"> <h:outputText value="#{tgame.topic.name}"/> </p:column>
+<p:column headerText="creator"> <h:outputText value="#{tgame.creator.username}"/> </p:column>
+<p:column headerText="# rounds"> <h:outputText value="#{tgame.rounds.size()}"/> </p:column>
+<p:column headerText="# teams"> <h:outputText value="#{tgame.teams.size()}"/> </p:column>
+<p:column style="width:100px;text-align: center">
+
+
+<!--TODO somehow gameDetailController sometimes is not set -->
+<p:commandButton update=":gameForm:gameEditDialog" oncomplete="PF('gameEditDialog').show()" icon="ui-icon-note" title="Edit">
+<f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />
+</p:commandButton>
+
+<p:commandButton action="#{gameDetailController.doDeleteGame}" icon="fa fa-trash" title="Delete" update=":gameForm:gamesTable">
+<f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />
+<p:confirm header="Confirmation" message="Are you sure about deleting this game? It cannot be undone." icon="fa-fa-exlamation-triangle" />
+</p:commandButton>
+
+</p:column>
 </p:dataTable>
 
 <p:dialog header="Edit Game" id="gameEditDialog" widgetVar="gameEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
@@ -50,6 +59,9 @@ value="#{gameDebugController.games}">
 <h:panelGrid columns="2">
 <p:outputLabel for="name" value="Name of game: " />
 <p:inputText id="name" value="#{gameDetailController.game.name}" />
+
+<p:outputLabel for="creator" value="Managed by: " />
+<p:outputLabel id="creator" value="#{gameDetailController.game.creator.username}" />
 </h:panelGrid>
 <p:separator />
 

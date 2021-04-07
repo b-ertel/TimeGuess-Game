@@ -1,7 +1,6 @@
 package at.timeguess.backend.model;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,10 +41,10 @@ public class Game {
 	//		are there alternatives?
 	//		`Hibernate.initialize(game);` does not work
     @OneToMany(mappedBy = "game", cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<Round> rounds;
+    private Set<Round> rounds = new HashSet<>();
 
     @OneToMany(mappedBy = "game", cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<GameTeam> teams;
+    private Set<GameTeam> teams = new HashSet<>();
 
     @ManyToOne
     private Topic topic;
