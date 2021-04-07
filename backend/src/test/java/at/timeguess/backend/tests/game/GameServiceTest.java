@@ -1,7 +1,9 @@
 package at.timeguess.backend.tests.game;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
+import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
@@ -39,22 +42,27 @@ public class GameServiceTest {
     @Autowired
     TopicService topicService;
 
+    @Autowired
+    UserService userService;
+
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testDatainitialization() {
-        Assertions.assertTrue(gameService.getAllGames().size() >= 5, "Insufficient amount of games initialized for test data source");
+        Assertions.assertTrue(gameService.getAllGames().size() >= 5,
+                "Insufficient amount of games initialized for test data source");
         for (Game game : gameService.getAllGames()) {
             if ("Game 1".equals(game.getName())) {
-                Assertions.assertTrue(game.getMaxPoints() == 40, "Game \"" + game + "\" does not have 45 maxPoints (it has" + game.getMaxPoints() + ").");
+                Assertions.assertTrue(game.getMaxPoints() == 40,
+                        "Game \"" + game + "\" does not have 45 maxPoints (it has" + game.getMaxPoints() + ").");
                 Assertions.assertTrue(game.getStatus() == GameState.FINISHED, "Game \"" + game + "\" is not finished");
                 Assertions.assertTrue(game.getTopic().getId() == 1, "Game \"" + game + "\" has wrong topic");
-            }  
+            }
         }
     }
 
     @DirtiesContext
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN", "MANAGER"})
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void canFindGame() {
         long id = 1;
         Game game = gameService.loadGame(id);
@@ -63,7 +71,7 @@ public class GameServiceTest {
 
     @DirtiesContext
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN", "MANAGER"})
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void testDeleteGame() {
         long id_to_del = 3;
         int ctBefore = gameService.getAllGames().size();
@@ -72,13 +80,14 @@ public class GameServiceTest {
 
         gameService.deleteGame(gameToDelete);
 
-        Assertions.assertEquals(ctBefore - 1, gameService.getAllGames().size(), "No game has been deleted after calling gameService.deleteGame");
-        Assertions.assertThrows(NoSuchElementException.class, () ->  gameService.loadGame(id_to_del));
+        Assertions.assertEquals(ctBefore - 1, gameService.getAllGames().size(),
+                "No game has been deleted after calling gameService.deleteGame");
+        Assertions.assertThrows(NoSuchElementException.class, () -> gameService.loadGame(id_to_del));
     }
 
     @DirtiesContext
     @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN", "MANAGER"})
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void testUpdateGame() {
         long id = 4;
         Game game = gameService.loadGame(id);
@@ -92,7 +101,7 @@ public class GameServiceTest {
 
         int origPoints = game.getMaxPoints();
         int newPoints = 100;
-        game.setMaxPoints(newPoints);  
+        game.setMaxPoints(newPoints);
 
         int origRound = game.getRoundNr();
         int newRound = 10;
@@ -109,22 +118,27 @@ public class GameServiceTest {
 
         game.setTopic(newTopic);
 
+        User oldCreator = game.getCreator();
+        User newCreator = userService.loadUser("user2");
+        Assertions.assertNotEquals(oldCreator, newCreator, "Game user is same as user2");
+        game.setCreator(newCreator);
 
         // TODO Team and Round need work,
         // probably require services to be setup
         //
         // currently errors:
-        // org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: at.timeguess.backend.model.Game.teams, could not initialize proxy - no Session
-        //  at at.timeguess.backend.tests.game.GameServiceTest.testUpdateGame(GameServiceTest.java:113)
+        // org.hibernate.LazyInitializationException: failed to lazily initialize a
+        // collection of role: at.timeguess.backend.model.Game.teams, could not
+        // initialize proxy - no Session
+        // at
+        // at.timeguess.backend.tests.game.GameServiceTest.testUpdateGame(GameServiceTest.java:113)
         //
-        //Set<Team> oldTeams = game.getTeams();
-        //int oldTeamLen = oldTeams.size();
-        //Assertions.assertTrue(oldTeamLen > 0, "Needs one team");
+        // Set<Team> oldTeams = game.getTeams();
+        // int oldTeamLen = oldTeams.size();
+        // Assertions.assertTrue(oldTeamLen > 0, "Needs one team");
 
         gameService.saveGame(game);
 
-
-        
         Game saveGame = gameService.loadGame(id);
         Assertions.assertNotNull(saveGame, "Game \"" + id + "\" could not be reloaded from test data source");
 
@@ -143,6 +157,59 @@ public class GameServiceTest {
         Assertions.assertNotEquals(saveGame.getTopic(), oldTopic, "Games still has original Topic");
         Assertions.assertEquals(saveGame.getTopic(), newTopic, "Games Topic was not updated");
 
+        Assertions.assertNotEquals(saveGame.getCreator(), oldCreator, "Games still has original Creator");
+        Assertions.assertEquals(saveGame.getCreator(), newCreator, "Games Creator was not updated");
     }
 
+    @DirtiesContext
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
+    public void testUpdateGameRound() {
+        long id = 4;
+        Game game = gameService.loadGame(id);
+        Assertions.assertNotNull(game, "Game \"" + id + "\" could not be loaded from test data source");
+        Set<Round> rounds = game.getRounds();
+
+        Assertions.assertTrue(rounds.size() > 0, "there should be rounds");
+
+        int roundSizeBefore = rounds.size();
+
+        // TODO check adding round
+        // quickly find an element to remove
+        List<Round> rl = rounds.stream().collect(Collectors.toList());
+        rounds.remove(rl.get(0));
+
+        gameService.saveGame(game);
+
+        Game saveGame = gameService.loadGame(id);
+        int roundSizeAfter = saveGame.getRounds().size();
+
+        Assertions.assertEquals(roundSizeBefore-1, roundSizeAfter, "Should be one less");
+    }
+
+    @DirtiesContext
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
+    public void testUpdateGameTeams() {
+        long id = 4;
+        Game game = gameService.loadGame(id);
+        Assertions.assertNotNull(game, "Game \"" + id + "\" could not be loaded from test data source");
+        Set<Team> teams = game.getTeams();
+
+        Assertions.assertTrue(teams.size() > 0, "there should be teams");
+
+        int teamSizeBefore = teams.size();
+
+        // TODO check adding team
+        // quickly find an element to remove
+        List<Team> rl = teams.stream().collect(Collectors.toList());
+        teams.remove(rl.get(0));
+
+        gameService.saveGame(game);
+
+        Game saveGame = gameService.loadGame(id);
+        int teamSizeAfter = saveGame.getTeams().size();
+
+        Assertions.assertEquals(teamSizeBefore-1, teamSizeAfter, "Should be one less");
+    }
 }
