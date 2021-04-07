@@ -29,11 +29,14 @@
                         <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
                         <p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>
                     </p:submenu>
+                    
+                    <p:submenu label="Statistics" rendered="#{isLoggedIn}">
+                        <p:menuitem icon="fa fa-bar-chart-o" value="&nbsp;General&nbsp;" url="/secured/statistics.xhtml"/>
+                        <p:menuitem icon="fa fa-trophy" value="&nbsp;Highscores"/>
+                    </p:submenu>
 
                     <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
     
-                     <p:menuitem icon="fa fa-sign-in" url="/statistics.xhtml" rendered="#{!isLoggedIn}"/>
-
                     <p:submenu label="Other" rendered="#{isLoggedIn}">
                         <p:menuitem icon="fa fa-info" value="&nbsp;Info" url="/secured/welcome.xhtml"/>
                         <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout" url="/logout"/>
