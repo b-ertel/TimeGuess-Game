@@ -21,19 +21,14 @@ public class Configuration {
 	@ManyToOne
 	@JoinColumn(name = "cubeface_id")
 	private CubeFace cubeface;
-	
-	private Integer configuration = 0;
-	
-	private String macAddress;
-
+		
 	public Configuration() {
 		
 	}
 	
-	public Configuration(Cube cube, CubeFace cubeFace, String mac) {
+	public Configuration(Cube cube, CubeFace cubeFace) {
 		setCube(cube);
 		setCubeface(cubeFace);
-		setMacAddress(mac);
 	}
 	
 	public Long getId() {
@@ -59,22 +54,4 @@ public class Configuration {
 	public void setCubeface(CubeFace cubeface) {
 		this.cubeface = cubeface;
 	}
-
-	public Integer getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Integer configuration) {
-		this.configuration = configuration;
-	}
-
-	public String getMacAddress() {
-		return macAddress;
-	}
-
-	public void setMacAddress(String macAddress) {
-		this.macAddress = macAddress;
-	}
-	
-	
 }

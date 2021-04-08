@@ -109,7 +109,6 @@ public class CubeController {
 		this.cube.setId(cube.getId());
 		this.cube.setMacAddress(cube.getMacAddress());
 		this.cube.setName(cube.getName());
-		this.cube.setStatus("in configuration");
 		saveCube();
 		
 		return this.cube;

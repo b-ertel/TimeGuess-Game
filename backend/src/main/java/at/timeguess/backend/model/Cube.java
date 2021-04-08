@@ -17,9 +17,9 @@ public class Cube {
 	
 	private boolean isConfigured;
 	
-	private String status;
-	
 	private String name;
+	
+	private Integer configuration = 0;
 	
 	@OneToMany(mappedBy="cube")
 	private List<Configuration> configs = new ArrayList<>();
@@ -64,15 +64,13 @@ public class Cube {
 		this.configs.add(config);
 	}
 
-	public String getStatus() {
-		return status;
+	public Integer getConfiguration() {
+		return configuration;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setConfiguration(Integer configuration) {
+		this.configuration = configuration;
 	}
-
-	
 	
 	
 	
