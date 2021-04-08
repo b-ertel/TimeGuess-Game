@@ -35,7 +35,7 @@ public class GameListController {
      * Returns a list of all games.
      */
     public Collection<Game> getGames() {
-        return isAdmin ? gameService.getAllGames() : gameService.getAllCurrent();
+        return isAdmin != null && isAdmin ? gameService.getAllGames() : gameService.getAllCurrent();
     }
 
     /**

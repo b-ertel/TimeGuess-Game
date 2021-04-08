@@ -18,7 +18,13 @@
   <p:inputText id="name" value="#{newGameBean.gameName}" />
   <p:outputLabel for="maxPoints" value="maxPoints: " />
   <p:inputText id="maxPoints" value="#{newGameBean.maxPoints}" />
-  <p:commandButton value="Save" action="#{newGameBean.create}" update=":gameForm" />
+  <p:outputLabel for="topic" value="Topic: " />
+  <p:selectOneMenu id="topic" value="#{newGameBean.topic}" converter="omnifaces.SelectItemsConverter">
+	<p:ajax event="change" process="@this" />
+	<f:selectItem itemLabel="Select" noSelectionOption="true" />
+	<f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
+  </p:selectOneMenu>
+  <p:commandButton value="Save" action="#{newGameBean.createGame}" update=":gameForm" />
   </h:panelGrid>
 </h:form>
 
@@ -28,7 +34,7 @@
 
 <h:form id="gameForm">
 <p:dataTable id="gamesTable" var="tgame" 
-                             value="#{gameDebugController.games}">
+                             value="#{gameListController.games}">
 <p:column headerText="id"> <h:outputText value="#{tgame.id}"/> </p:column>
 <p:column headerText="name"> <h:outputText value="#{tgame.name}"/> </p:column>
 <p:column headerText="max points"> <h:outputText value="#{tgame.maxPoints}"/> </p:column>
@@ -92,9 +98,10 @@
 <h:panelGrid columns="2">
 
 <h:outputLabel for="topic" value="Choose topic" />
-<h:selectOneMenu id="topic" value="#{gameDetailController.game.topic}">
+<h:selectOneMenu id="topic" value="#{gameDetailController.game.topic}" converter="omnifaces.SelectItemsConverter">
+<p:ajax event="change" process="@this" />
 <f:selectItem itemLabel="Select" noSelectionOption="true" />
-<f:selectItems value="#{topicService.allTopics}" 
+<f:selectItems value="#{topicListController.topics}" 
                var="topval"
                itemLabel="#{topval.name}"/>
 </h:selectOneMenu>
