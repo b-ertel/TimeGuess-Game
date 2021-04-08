@@ -16,16 +16,13 @@
                 <p:column headerText="MacAddress">
                     <h:outputText value="#{cube.macAddress}"/>
                 </p:column>
-                <p:column headerText="Status">
-                    <h:outputText value="#{cube.status}"/>
-                </p:column>
                 <p:column headerText="Name">
                     <h:outputText value="#{cube.name}"/>
                 </p:column>  
-        <!--    <p:column headerText="Configured: ">
+                <p:column headerText="Configured">
                     <h:outputText value="#{cube.isConfigured}"/>
                 </p:column>              
-                <p:column>
+        <!--         <p:column>
                 <p:commandButton value="choose">
                         <f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />
                 </p:commandButton>

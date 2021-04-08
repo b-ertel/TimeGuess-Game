@@ -15,7 +15,7 @@ public class Cube {
 	
 	private String macAddress;
 	
-	private boolean isConfigured;
+	private boolean isConfigured = false;
 	
 	private String name;
 	
@@ -40,7 +40,7 @@ public class Cube {
 		this.macAddress = macAddress;
 	}
 
-	public boolean isConfigured() {
+	public boolean getIsConfigured() {
 		return isConfigured;
 	}
 
