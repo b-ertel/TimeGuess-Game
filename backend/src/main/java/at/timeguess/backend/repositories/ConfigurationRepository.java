@@ -12,4 +12,5 @@ public interface ConfigurationRepository extends AbstractRepository<Configuratio
 
 	public Configuration findByCubeface(Long id);
 	
+	public Configuration findByFacet(Integer facet);
 }

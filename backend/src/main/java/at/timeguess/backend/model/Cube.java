@@ -21,6 +21,8 @@ public class Cube {
 	
 	private Integer configuration = 0;
 	
+	private CubeStatus status = CubeStatus.OFFLINE;
+	
 	@OneToMany(mappedBy="cube")
 	private List<Configuration> configs = new ArrayList<>();
 
@@ -70,6 +72,14 @@ public class Cube {
 
 	public void setConfiguration(Integer configuration) {
 		this.configuration = configuration;
+	}
+
+	public CubeStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(CubeStatus status) {
+		this.status = status;
 	}
 	
 	

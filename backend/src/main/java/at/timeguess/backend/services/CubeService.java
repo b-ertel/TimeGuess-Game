@@ -39,19 +39,38 @@ public class CubeService {
 	 * @return true if mac address is known, false otherwise
 	 */
     @PreAuthorize("hasAuthority('ADMIN')")
-	public boolean isMacAddressKnown(Cube cube) {
-		if(cubeRepo.findByMacAddress(cube.getMacAddress())==null){
+	public boolean isMacAddressKnown(String macAddress) {
+		if(cubeRepo.findByMacAddress(macAddress)==null){
 			return false;
 		}
 		else {
 			return true;
 		}
 	}
+    
+    /**
+     * to find out if cube there exists a configuration for the given Cube
+     * 
+     * @param cube the cube to find out if it is configured
+     * @return true if is configured, otherwise false
+     */
+    public boolean isConfigured(Cube cube) {
+    	
+    	if(cubeRepo.findById(cube.getId()).getIsConfigured()) {
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    public Cube findCubeById(Long id) {
+    	return cubeRepo.findById(id);
+    }
+    
+    public Cube findBueByMacAddress(String mac) {
+    	return cubeRepo.findByMacAddress(mac);
+    }
 
-
-
-
-	
 	
 	
 }

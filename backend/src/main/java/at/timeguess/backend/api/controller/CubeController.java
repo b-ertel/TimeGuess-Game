@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import at.timeguess.backend.services.CubeFaceService;
 import at.timeguess.backend.services.CubeService;
+import at.timeguess.backend.ui.controllers.demo.CubeStatusController;
 import at.timeguess.backend.model.Cube;
-
+import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.api.BatteryLevelMessage;
 import at.timeguess.backend.model.api.BatteryLevelResponse;
 import at.timeguess.backend.model.api.ConnectedMessage;
@@ -33,9 +35,15 @@ import at.timeguess.backend.model.api.RSSIResponse;
 public class CubeController {
 	
 	@Autowired
+	private CubeStatusController cubeStatusController;
+	
+	@Autowired
 	private CubeService cubeService;
+	@Autowired
+	private CubeFaceService cubeFaceService;
 	
 	private Cube cube;
+	private CubeFace cubeFace;
 		
     /**
      * Process messages from a TimeFlip device signaling
@@ -76,7 +84,19 @@ public class CubeController {
      */
     @PostMapping("/api/facets")
     private FacetsResponse processFacets(@RequestBody FacetsMessage message) {
-        // do something ...
+
+    	if(cubeService.isMacAddressKnown(message.getIdentifier())) {  // game is running, facet is processed to actual game
+
+    	//	cubeService.isConfigured(this.cube);
+    		cubeStatusController.setupCubeStatus();
+    		
+    		this.cube = cubeService.findBueByMacAddress(message.getIdentifier());
+    		
+    	}
+    	else {   // timeflip is in configuration
+    		
+    	}
+    	
         FacetsResponse response = new FacetsResponse();
         response.setSuccess(true);
         response.setConfiguration(0);
@@ -131,9 +151,6 @@ public class CubeController {
 		return cubeService.getAllCubes();
 	}
 	
-	public boolean isMacAddressKnown(Cube cube){
-		return cubeService.isMacAddressKnown(cube);
-	}
 
 }
 
