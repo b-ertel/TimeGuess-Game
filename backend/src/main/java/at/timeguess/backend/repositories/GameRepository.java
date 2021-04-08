@@ -26,5 +26,5 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     @Query("SELECT new GroupingHelper(o.team.id, g.topic.name, COUNT(*)) FROM GameTeam o JOIN Game g ON g.id=o.game.id WHERE (o.game.id, o.points) IN (SELECT i.game.id, MAX(i.points) FROM GameTeam i GROUP BY i.game.id) GROUP BY o.team.id, g.topic.name")
     List<GroupingHelper> findWinnerTeamsByTopic();
 
-
+    
 }
