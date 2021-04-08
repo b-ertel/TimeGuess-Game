@@ -31,7 +31,7 @@
                     </p:commandButton>
                     <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-trash" title="Delete" update=":userForm:usersTable">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
-                        <p:confirm header="Confirmation" message="Are you sure about deleting this user? It cannot be undone." icon="fa-fa-exlamation-triangle" />
+                        <p:confirm header="Confirmation" message="Are you sure about deleting this user? This cannot be undone." icon="fa-fa-exlamation-triangle" />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>

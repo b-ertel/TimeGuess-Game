@@ -4,13 +4,16 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,7 +27,6 @@ import org.springframework.data.domain.Persistable;
 
 /**
  * Entity representing users.
- *
  */
 @Entity
 public class User implements Persistable<Long>, Serializable, Comparable<User> {
@@ -69,6 +71,15 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
 			inverseJoinColumns = @JoinColumn(name = "team_id"))
     private Set<Team> teams;
 
+    //@ManyToMany(mappedBy = "confirmedUsers", fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Game.class)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Game.class)
+    @JoinTable(name = "game_user",
+            joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "game_id", nullable = false, updatable = false),
+            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
+            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+    private Set<Game> confirmedGames;
+    
     @Override
     public Long getId() {
         return id;
@@ -210,5 +221,4 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
 	public int compareTo(User o) {
 		return this.username.compareTo(o.getUsername());
 	}
-
 }

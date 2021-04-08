@@ -15,8 +15,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
+import at.timeguess.backend.model.GameTeam;
 import at.timeguess.backend.model.Round;
-import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.GameService;
@@ -24,11 +24,7 @@ import at.timeguess.backend.services.TopicService;
 import at.timeguess.backend.services.UserService;
 
 /**
- * Some very basic tests for {@link UserService}.
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
+ * Some very basic tests for {@link GameService}.
  */
 @SpringBootTest
 @WebAppConfiguration
@@ -121,7 +117,6 @@ public class GameServiceTest {
         Assertions.assertNotEquals(oldCreator, newCreator, "Game user is same as user2");
         game.setCreator(newCreator);
 
-
         gameService.saveGame(game);
 
         Game saveGame = gameService.loadGame(id);
@@ -169,7 +164,7 @@ public class GameServiceTest {
         Game saveGame = gameService.loadGame(id);
         int roundSizeAfter = saveGame.getRounds().size();
 
-        Assertions.assertEquals(roundSizeBefore-1, roundSizeAfter, "Should be one less");
+        Assertions.assertEquals(roundSizeBefore - 1, roundSizeAfter, "Should be one less");
     }
 
     @DirtiesContext
@@ -179,7 +174,7 @@ public class GameServiceTest {
         long id = 4;
         Game game = gameService.loadGame(id);
         Assertions.assertNotNull(game, "Game \"" + id + "\" could not be loaded from test data source");
-        Set<Team> teams = game.getTeams();
+        Set<GameTeam> teams = game.getTeams();
 
         Assertions.assertTrue(teams.size() > 0, "there should be teams");
 
@@ -187,7 +182,7 @@ public class GameServiceTest {
 
         // TODO check adding team
         // quickly find an element to remove
-        List<Team> rl = teams.stream().collect(Collectors.toList());
+        List<GameTeam> rl = teams.stream().collect(Collectors.toList());
         teams.remove(rl.get(0));
 
         // NOTE need to explicitely setTeams
@@ -197,6 +192,6 @@ public class GameServiceTest {
         Game saveGame = gameService.loadGame(id);
         int teamSizeAfter = saveGame.getTeams().size();
 
-        Assertions.assertEquals(teamSizeBefore-1, teamSizeAfter, "Should be one less");
+        Assertions.assertEquals(teamSizeBefore - 1, teamSizeAfter, "Should be one less");
     }
 }

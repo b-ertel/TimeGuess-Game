@@ -1,4 +1,4 @@
-package at.timeguess.backend.ui.controllers.game;
+package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
 
@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.GameService;
 
 /**
@@ -14,9 +15,6 @@ import at.timeguess.backend.services.GameService;
 @Component
 public class GameDetailController implements Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -3429788166384535247L;
 
     @Autowired
@@ -28,10 +26,8 @@ public class GameDetailController implements Serializable {
     private Game game;
 
     /**
-     * Sets the currently displayed game and reloads it form db. This game is
-     * targeted by any further calls of {@link #doReloadGame()},
-     * {@link #doSaveGame()} and {@link #doDeleteGame()}.
-     *
+     * Sets the currently displayed game and reloads it form db.
+     * This game is targeted by any further calls of {@link #doReloadGame()}, {@link #doSaveGame()} and {@link #doDeleteGame()}.
      * @param game
      */
     public void setGame(Game game) {
@@ -41,7 +37,6 @@ public class GameDetailController implements Serializable {
 
     /**
      * Returns the currently displayed game.
-     *
      * @return
      */
     public Game getGame() {
@@ -72,4 +67,11 @@ public class GameDetailController implements Serializable {
         }
     }
 
+    /**
+     * Confirms given users participation in current game.
+     * @param user user whose participation in current game is confirmed.
+     */
+    public void confirm(User user) {
+        this.gameService.confirm(user, game);
+    }
 }

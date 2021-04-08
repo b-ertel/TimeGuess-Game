@@ -23,17 +23,14 @@ public class TopicService {
 
     /**
      * Returns a list of all topics.
-     *
      * @return list of all topics
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<Topic> getAllTopics() {
         return topicRepository.findAll();
     }
 
     /**
      * Loads a single Topic identified by it's name.
-     *
      * @param name the name of the topic to load
      * @return a single Topic
      */
@@ -44,7 +41,6 @@ public class TopicService {
 
     /**
      * Saves the Topic.
-     *
      * @param topic the topic to save
      * @return the new topic
      * @throws TopicAlreadyExistsException
@@ -58,7 +54,7 @@ public class TopicService {
             throw new TopicAlreadyExistsException();
         }
     }
-    
+
     @PreAuthorize("hasAuthority('MANAGER') ")
     public Topic loadTopicId(Long topicId) {
         return topicRepository.findById(topicId).get();

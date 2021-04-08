@@ -1,22 +1,20 @@
 package at.timeguess.backend.tests.game;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Game;
-import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.services.GameService;
-import at.timeguess.backend.ui.controllers.game.GameDetailController;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import at.timeguess.backend.ui.controllers.GameDetailController;
 
 @SpringBootTest
 @WebAppConfiguration
 public class GameDetailControllerTest {
+    
     @Autowired
     private GameDetailController gameDetailController;
 
@@ -29,7 +27,7 @@ public class GameDetailControllerTest {
         Game g1 = gameService.loadGame(1L);
         Game g2 = gameService.loadGame(2L);
 
-        //gameDetailController.setGame(null);
+        // gameDetailController.setGame(null);
         Assertions.assertNull(gameDetailController.getGame(), "GameDetailController holds a game");
         gameDetailController.setGame(g1);
         Assertions.assertNotNull(gameDetailController.getGame(), "GameDetailController doesn't hold a game");
@@ -37,5 +35,5 @@ public class GameDetailControllerTest {
         gameDetailController.setGame(g2);
         Assertions.assertNotNull(gameDetailController.getGame(), "GameDetailController doesn't hold a game");
         Assertions.assertEquals(gameDetailController.getGame(), g2, "Not game 2 in controller");
-        }
+    }
 }
