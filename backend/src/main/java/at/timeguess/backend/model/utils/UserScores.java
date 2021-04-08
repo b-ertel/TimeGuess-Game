@@ -20,10 +20,13 @@ public class UserScores {
 		this.gamesWon = gamesWon;
 		this.termsCorrect = termsCorrect;
 		this.termsWrong = termsWrong;
-		if((termsCorrect+termsWrong)==0){
+		if(termsCorrect==0 && termsWrong==0){
 			this.percentage = 0;
 		} else {
-			this.percentage = termsCorrect/(termsCorrect+termsWrong);
+			double percentage =  ((double)termsCorrect)/((double) (termsCorrect + termsWrong));
+			percentage = percentage*100;
+			percentage = Math.round(percentage);
+			this.percentage = percentage/100;
 		}
 		
 	}

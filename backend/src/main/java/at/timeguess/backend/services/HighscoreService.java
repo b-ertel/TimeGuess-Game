@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
+import at.timeguess.backend.model.utils.PlayerGamesComparator;
 import at.timeguess.backend.model.utils.UserScores;
 import at.timeguess.backend.repositories.RoundRepository;
 import at.timeguess.backend.repositories.UserRepository;
@@ -39,7 +40,8 @@ public class HighscoreService {
 	
 	public List<UserScores> getHighscoresByGamesWon() {
 		List<UserScores>  ls = getUserScores();
-		ls.sort(Comparator.comparing(UserScores::getGamesWon));
+		PlayerGamesComparator comp = new PlayerGamesComparator();
+		ls.sort(comp);
 		return ls;
 	}
 	

@@ -9,8 +9,11 @@
 	template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
         <h:form id="scoreForm">		    
-		   <p:dataTable id="scores" var="userScore" value="#{highscoreController.highscoresOnGamesWon}">
-	            <p:column headerText="Name">
+		   <p:dataTable id="scores" var="userScore" value="#{highscoreController.highscoresOnGamesWon}" rowIndexVar="index">
+		   		 <p:column headerText="Rank">
+			            <h:outputText value="#{index + 1}" />
+			    </p:column>
+	            <p:column headerText="Username">
 	                <h:outputText value="#{userScore.user.username}" />
 	            </p:column>
 	            <p:column headerText="Games Won">
@@ -21,6 +24,9 @@
 	            </p:column>
 	            <p:column headerText="Terms Wrong">
 	                <h:outputText value="#{userScore.termsWrong}" />
+	            </p:column>
+	            <p:column headerText="% terms correct">
+	                <h:outputText value="#{userScore.percentage}" />
 	            </p:column>
 	        </p:dataTable> 
         </h:form>
