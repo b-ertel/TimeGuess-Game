@@ -21,6 +21,8 @@ public class Configuration {
 	@ManyToOne
 	@JoinColumn(name = "cubeface_id")
 	private CubeFace cubeface;
+	
+	private Integer facet;
 		
 	public Configuration() {
 		
@@ -53,5 +55,13 @@ public class Configuration {
 
 	public void setCubeface(CubeFace cubeface) {
 		this.cubeface = cubeface;
+	}
+
+	public Integer getFacet() {
+		return facet;
+	}
+
+	public void setFacet(Integer facet) {
+		this.facet = facet;
 	}
 }
