@@ -54,8 +54,8 @@ public class GameService {
 
     /**
      * Saves the game.
-     * @param game the activity to save
-     * @return the updated activity
+     * @param game the game to save
+     * @return the updated game
      */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER') or hasAuthority('ADMIN')")
     public Game saveGame(Game game) {

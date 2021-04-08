@@ -28,6 +28,10 @@ body {
     background-color: #7d9aab;
 }
 
+form {
+    margin-bottom: 30px !important;
+}
+
 .login-block {
     width: 300px;
     position: absolute;
@@ -92,10 +96,6 @@ body {
 #content {
     padding: 15px 15px 15px 15px !important;
     z-index: 100 !important;
-}
-
-#activityForm {
-    margin-bottom: 30px !important;
 }
 
 .main-menu .ui-widget-content {

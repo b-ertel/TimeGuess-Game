@@ -15,7 +15,7 @@
 
         <h:form id="gameListForm">
             <ui:remove>create game</ui:remove>
-            <p:commandButton title="Create Game" icon="fa fa-user-plus" value="Create Game" style="margin-bottom:10px"
+            <p:commandButton title="Create Game" icon="fa fa-plus" value="Create Game" style="margin-bottom:10px"
                              oncomplete="PF('gameCreateDialog').show()" update=":gameCreateForm:gameCreateDialog"
                              rendered="#{not isAdminAccess}">
             </p:commandButton>
