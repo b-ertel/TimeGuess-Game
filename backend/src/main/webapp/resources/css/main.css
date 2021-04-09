@@ -103,7 +103,7 @@ body {
 }
 
 .ui-widget-content {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.85);
 }
 
 .ui-menu-child {
@@ -200,6 +200,16 @@ body {
 .truncate {
     text-overflow: ellipsis;
     white-space: nowrap;
-}  
+}
 
+.rightm10 {
+    float: right;  
+    text-align:right;
+    margin-right:10px;
+}
 
+.rightm20 {
+    float: right;  
+    text-align:right;
+    margin-right:20px;
+}
