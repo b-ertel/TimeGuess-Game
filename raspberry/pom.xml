@@ -33,6 +33,12 @@
 			<version>3.7.7</version>
 			<scope>test</scope>
 		</dependency>
+		<!--  Unirest -->
+		<dependency>
+			<groupId>com.konghq</groupId>
+			<artifactId>unirest-java</artifactId>
+			<version>3.11.09</version>
+		</dependency>
 	</dependencies>
 
 	<build>
