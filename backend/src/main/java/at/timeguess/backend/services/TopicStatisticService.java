@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Topic;
+import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.repositories.RoundRepository;
@@ -37,6 +38,9 @@ public class TopicStatisticService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private UserService userService;
 	
 	
 	public Integer nrOfGamesWithTopic(Topic topic) {
@@ -119,5 +123,18 @@ public class TopicStatisticService {
 	
 	public Integer getNrOfTermsPerTopic(Topic topic) {
 		return termRepository.nrOfTermPerTopic(topic);
+	}
+	
+	public User getMostSuccessfullUserOfTopic(Topic topic) {
+		List<User> users = userRepository.findAll();
+		User[] mostSuccessfullUser = {null};
+		Integer[] gamesWon = {0};
+		users.stream().forEach(user -> {
+				if(userService.getTotalGamesWonByTopic(user).get(topic.getName()) > gamesWon[0]) {
+					mostSuccessfullUser[0] = user;
+					gamesWon[0] = userService.getTotalGamesWonByTopic(user).get(topic.getName());
+				}
+		});
+		return mostSuccessfullUser[0];
 	}
 }
