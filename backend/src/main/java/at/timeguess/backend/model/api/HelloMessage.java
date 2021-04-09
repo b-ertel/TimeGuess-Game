@@ -1,13 +1,13 @@
 package at.timeguess.backend.model.api;
 
 /**
- * A class that represents the messages sent by a TimeFlip device
- * signaling a change of the connected property.
+ * A class that represents the messages sent by a Raspberry Pi
+ * signaling successful startup and connection with a TimeFlip device.
  */
-public class ConnectedMessage {
+public class HelloMessage {
 
     private String identifier; // MAC address of the TimeFlip device
-    private Boolean connected; // new value of the connected property
+    private Integer calibrationVersion; // current value of the calibration version characteristic 
 
     public String getIdentifier() {
         return identifier;
@@ -17,12 +17,12 @@ public class ConnectedMessage {
         this.identifier = identifier;
     }
 
-    public Boolean getConnected() {
-        return connected;
+    public Integer getCalibrationVersion() {
+        return calibrationVersion;
     }
 
-    public void setConnected(Boolean connected) {
-        this.connected = connected;
+    public void setCalibrationVersion(Integer calibrationVersion) {
+        this.calibrationVersion = calibrationVersion;
     }
 
 }
