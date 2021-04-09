@@ -17,8 +17,8 @@ import at.timeguess.backend.model.Cube;
 
 import at.timeguess.backend.model.api.BatteryLevelMessage;
 import at.timeguess.backend.model.api.BatteryLevelResponse;
-import at.timeguess.backend.model.api.ConnectedMessage;
-import at.timeguess.backend.model.api.ConnectedResponse;
+import at.timeguess.backend.model.api.HelloMessage;
+import at.timeguess.backend.model.api.HelloResponse;
 import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.model.api.FacetsResponse;
 import at.timeguess.backend.model.api.RSSIMessage;
@@ -53,16 +53,17 @@ public class CubeController {
     }
 
     /**
-     * Process messages from a TimeFlip device signaling
-     * a change of the connected property.
+     * Process messages from a Raspberry pi signaling
+     * a successful startup and connection with a TimeFlip device.
      * 
      * @param message the message
      * @return the response
      */
-    @PostMapping("/api/connected")
-    private ConnectedResponse processConnected(@RequestBody ConnectedMessage message) {
-        // do something ...
-        ConnectedResponse response = new ConnectedResponse();
+    @PostMapping("/api/hello")
+    private HelloResponse processHello(@RequestBody HelloMessage message) {
+        // just a placeholder for the moment
+        // "real" processing of the message and generation of response should happen in a service
+        HelloResponse response = new HelloResponse();
         response.setSuccess(true);
         return response;
     }
