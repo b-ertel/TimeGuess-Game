@@ -15,14 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.model.Cube;
 
-import at.timeguess.backend.model.api.BatteryLevelMessage;
-import at.timeguess.backend.model.api.BatteryLevelResponse;
 import at.timeguess.backend.model.api.OnboardingMessage;
 import at.timeguess.backend.model.api.OnboardingResponse;
+import at.timeguess.backend.model.api.HealthMessage;
+import at.timeguess.backend.model.api.HealthResponse;
 import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.model.api.FacetsResponse;
-import at.timeguess.backend.model.api.RSSIMessage;
-import at.timeguess.backend.model.api.RSSIResponse;
 
 /**
  *  api controller which handles httpRequests of new {@link Cube} entities 
@@ -36,21 +34,6 @@ public class CubeController {
 	private CubeService cubeService;
 	
 	private Cube cube;
-		
-    /**
-     * Process messages from a TimeFlip device signaling
-     * a change of the Battery level characteristic.
-     * 
-     * @param message the message
-     * @return the response
-     */
-    @PostMapping("/api/batterylevel")
-    private BatteryLevelResponse processBatteryLevel(@RequestBody BatteryLevelMessage message) {
-        // do something ...
-        BatteryLevelResponse response = new BatteryLevelResponse();
-        response.setSuccess(true);
-        return response;
-    }
 
     /**
      * Process messages from a Raspberry pi signaling
@@ -85,16 +68,18 @@ public class CubeController {
     }
 
     /**
-     * Process messages from a TimeFlip device signaling
-     * a change of the RSSI property.
+     * Process messages from a Raspberry Pi signaling
+     * general availability and containing information on battery
+     * level and signal strength of the TimeFlip device.
      * 
      * @param message the message
      * @return the response
      */
-    @PostMapping("/api/rssi")
-    private RSSIResponse processRSSI(@RequestBody RSSIMessage message) {
-        // do something ...
-        RSSIResponse response = new RSSIResponse();
+    @PostMapping("/api/health")
+    private HealthResponse processHealth(@RequestBody HealthMessage message) {
+        // just a placeholder for the moment
+        // "real" processing of the message and generation of response should happen in a service
+        HealthResponse response = new HealthResponse();
         response.setSuccess(true);
         return response;
     }

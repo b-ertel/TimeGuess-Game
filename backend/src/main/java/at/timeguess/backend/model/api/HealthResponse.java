@@ -1,10 +1,11 @@
 package at.timeguess.backend.model.api;
 
 /**
- * A class that represents the response sent to a TimeFlip device
- * to a message signaling a change of the Battery level characteristic.
+ * A class that represents the response to messages sent by a Raspberry Pi
+ * signaling general availability and containing information on battery
+ * level and signal strength of the TimeFlip device.
  */
-public class BatteryLevelResponse {
+public class HealthResponse {
 
     private Boolean success; // indicates if message could be successfully processed
 
