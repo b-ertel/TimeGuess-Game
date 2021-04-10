@@ -1,7 +1,7 @@
 package at.timeguess.backend.model.utils;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.persistence.Column;
@@ -92,8 +92,8 @@ public class GroupingHelper {
          * @return A number representing the summed up value of the intersecting instances Counts.
          */
         public Map<String, Integer> getSumForIdsGroupedByName(java.util.List<Long> ids) {
-            // create map with all names
-            Map<String, Integer> ret = new HashMap<>(list.size());
+            // create map with all names (sorted)
+            Map<String, Integer> ret = new TreeMap<>();
             list.stream().forEach(gh -> ret.putIfAbsent(gh.getName(), 0));
             // sum counts for intersecting ids by names
             list.stream().forEach(iwc -> {
