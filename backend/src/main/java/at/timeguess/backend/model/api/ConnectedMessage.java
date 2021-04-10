@@ -8,6 +8,7 @@ public class ConnectedMessage {
 
     private String identifier; // MAC address of the TimeFlip device
     private Boolean connected; // new value of the connected property
+    private Integer calibration;
 
     public String getIdentifier() {
         return identifier;
@@ -24,5 +25,13 @@ public class ConnectedMessage {
     public void setConnected(Boolean connected) {
         this.connected = connected;
     }
+
+	public Integer getCalibration() {
+		return calibration;
+	}
+
+	public void setCalibration(Integer calibration) {
+		this.calibration = calibration;
+	}
 
 }
