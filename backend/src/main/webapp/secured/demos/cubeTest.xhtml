@@ -9,34 +9,8 @@
 	xmlns:demo="http://java.sun.com/jsf/composite/demo"
 	template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
-    
-        <h:outputScript>			
-            pfContext=PF
-        </h:outputScript>
-		<h:form id="chatRoomForm">
-        <div class="chatRoomContent">
-        	
-        	<h1>Devices Online</h1>
-        	
-        	<p:panelGrid columns="2" style="width: 100%;"
-        			columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
-                <p:panel header="Cubes" style="border: none;">
-                    <h3>Which Cubes are online?</h3>
-                <p:scrollPanel id="onlineInfo"  styleClass="chatRoomPanelContent onlineInfoBox"
-                                widgetVar="onlineInfoWidget">
-                      <ui:repeat var="userStatusEntry"
-                           value="#{userStatusController.userStatusInfos}">
-                      	   <demo:userStatusOutput userStatusInfo="#{userStatusEntry}" />
-                      </ui:repeat>
-               </p:scrollPanel>
-               </p:panel>
-            </p:panelGrid>
-         </div>
-         
-            <p:separator />
-            <p:separator />         
-         
-         
+
+		<h:form id="chatRoomForm">         
             <p:dataTable id="cubeTable" style="width:800px" var="cube" value="#{cubeController.allCubes}">
                 <p:column headerText="CubeId">
                     <h:outputText value="#{cube.id}"/>
@@ -47,8 +21,8 @@
                 <p:column headerText="Name">
                     <h:outputText value="#{cube.name}"/>
                 </p:column>  
-                <p:column headerText="Configured">
-                    <h:outputText value="#{cube.isConfigured}"/>
+                <p:column headerText="Configuation">
+                    <h:outputText value="#{cube.configuration}"/>
                 </p:column>              
         <!--         <p:column>
                 <p:commandButton value="choose">
