@@ -2,6 +2,7 @@ package at.timeguess.raspberry;
 
 import java.util.Properties;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -17,9 +18,13 @@ import java.time.Duration;
 
 import tinyb.BluetoothDevice;
 import tinyb.BluetoothException;
+import tinyb.BluetoothGattCharacteristic;
+import tinyb.BluetoothGattService;
 import tinyb.BluetoothManager;
 
-import at.timeguess.raspberry.exceptions.NotificationRegisteringException;
+import kong.unirest.Unirest;
+
+import at.timeguess.raspberry.notifications.FacetsNotification;
 
 /**
  * Entry point for program to search for Bluetooth devices and communicate with them
@@ -29,10 +34,17 @@ public final class Main {
     private static final String LOG_FILE = "log.txt";
     private static final String CONFIG_FILE = "config.txt";
 
+    private static final Long DEVICE_DISCOVERY_TIMEOUT = 10L;
+    private static final Long SERVICE_DISCOVERY_TIMEOUT = 10L;
+    private static final Long CHARACTERISTIC_DISCOVERY_TIMEOUT = 10L;
+
+    // default password for TimeFlip device
+    private static final byte[] PASSWORD = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30};
+
+    private static final Long HEALTH_REPORTING_INTERVAL = 1L;
+
     private static String TIMEFLIP_MAC_ADDRESS;
     private static String BACKEND_URL;
-
-    private static final Long DEVICE_DISCOVERY_TIMEOUT = 10L;
 
     static boolean running = true;
 
@@ -135,19 +147,147 @@ public final class Main {
             System.exit(-1);
         }
 
-        // register for all kinds of notifications from TimeFlip device
-        NotificationRegisterer notificationRegisterer = new NotificationRegisterer(timeflip);
-        try {
-            // notificationRegisterer.registerConnectedNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
-            // notificationRegisterer.registerRSSINotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
-            // notificationRegisterer.registerBatteryLevelNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
-            notificationRegisterer.registerFacetsNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
+        logger.info("Searching for Battery Service ...");
+        BluetoothGattService batteryService = timeflip.find(UUIDs.BATTERY_SERVICE, Duration.ofSeconds(SERVICE_DISCOVERY_TIMEOUT));
+        if (batteryService != null) {
+            logger.info("Battery Service found.");
         }
-        catch (NotificationRegisteringException e) {
-            logger.severe("A problem occured while registering notifications.");
+        else {
+            logger.severe("Battery Service not found.");
             timeflip.disconnect();
             System.exit(-1);
         }
+
+        logger.info("Searching for Battery level characteristic ...");
+        BluetoothGattCharacteristic batteryLevelCharacteristic = batteryService.find(UUIDs.BATTERY_LEVEL_CHARACTERISTIC, Duration.ofSeconds(CHARACTERISTIC_DISCOVERY_TIMEOUT));
+        if (batteryLevelCharacteristic != null) {
+            logger.info("Battery level characteristic found.");
+        }
+        else {
+            logger.severe("Battery level characteristic not found.");
+            timeflip.disconnect();
+            System.exit(-1);
+        }
+
+        logger.info("Searching for TimeFlip service ...");
+        BluetoothGattService timeflipService = timeflip.find(UUIDs.TIMEFLIP_SERVICE, Duration.ofSeconds(SERVICE_DISCOVERY_TIMEOUT));
+        if (timeflipService != null) {
+            logger.info("TimeFlip service found.");
+        }
+        else {
+            logger.severe("TimeFlip service not found.");
+            timeflip.disconnect();
+            System.exit(-1);
+        }
+
+        logger.info("Searching for Password characteristic ...");
+        BluetoothGattCharacteristic passwordCharacteristic = timeflipService.find(UUIDs.PASSWORD_CHARACTERISTIC, Duration.ofSeconds(CHARACTERISTIC_DISCOVERY_TIMEOUT));
+        if (passwordCharacteristic != null) {
+            logger.info("Password characteristic found.");
+        }
+        else {
+            logger.severe("Password characteristic not found.");
+            timeflip.disconnect();
+            System.exit(-1);
+        }
+
+        logger.info("Writing password ...");
+        if (passwordCharacteristic.writeValue(PASSWORD)) {
+            logger.info("Password succesfully written.");
+        }
+        else {
+            logger.severe("Problem writing password.");
+            timeflip.disconnect();
+            System.exit(-1);
+        }
+
+        logger.info("Searching for Facets characteristic ...");
+        BluetoothGattCharacteristic facetsCharacteristic = timeflipService.find(UUIDs.FACETS_CHARACTERISTIC, Duration.ofSeconds(CHARACTERISTIC_DISCOVERY_TIMEOUT));
+        if (facetsCharacteristic != null) {
+            logger.info("Facets characteristic found.");
+        }
+        else {
+            logger.severe("Facets characteristic not found.");
+            timeflip.disconnect();
+            System.exit(-1);
+        }
+
+        logger.info("Searching for Calibration version characteristic ...");
+        BluetoothGattCharacteristic calibrationVersionCharacteristic = timeflipService.find(UUIDs.CALIBRATION_VERSION_CHARACTERISTIC, Duration.ofSeconds(CHARACTERISTIC_DISCOVERY_TIMEOUT));
+        if (calibrationVersionCharacteristic != null) {
+            logger.info("Calibration version characteristic found.");
+        }
+        else {
+            logger.severe("Calibration version characteristic not found.");
+            timeflip.disconnect();
+            System.exit(-1);
+        }
+
+        CalibrationVersionHelper calibrationVersionHelper = new CalibrationVersionHelper(calibrationVersionCharacteristic);
+
+        logger.info("Sending onboarding request to backend ...");
+        Unirest.post(BACKEND_URL + "/api/onboarding")
+                .header("Content-Type", "application/json")
+                .body(String.format("{\"identifier\": \"%s\", \"calibrationVersion\": %d}",
+                        TIMEFLIP_MAC_ADDRESS,
+                        calibrationVersionHelper.readCalibrationVersion()))
+                .asJson()
+                .ifSuccess(response -> {
+                    logger.info("Onboarding request successfully sent.");
+                    boolean success = response.getBody().getObject().getBoolean("success");
+                    if (success) {
+                        logger.info("Onboarding successful.");
+                    }
+                    else {
+                        logger.severe("Onboarding not successful.");
+                        timeflip.disconnect();
+                        System.exit(-1);
+                    }
+                })
+                .ifFailure(response -> {
+                    logger.severe("Onboarding request not successfully sent.");
+                    timeflip.disconnect();
+                    System.exit(-1);
+                });
+
+        logger.info("Registering for notifications from the facets characteristic ...");
+        facetsCharacteristic.enableValueNotifications(new FacetsNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, calibrationVersionHelper));
+
+        logger.info("Scheduling regular health requests ...");
+        new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    logger.info("Sending health request to backend ...");
+                    Unirest.post(BACKEND_URL + "/api/health")
+                            .header("Content-Type", "application/json")
+                            .body(String.format("{\"identifier\": \"%s\", \"batteryLevel\": %d, \"rssi\": %d}",
+                                    TIMEFLIP_MAC_ADDRESS,
+                                    batteryLevelCharacteristic.readValue(),
+                                    timeflip.getRSSI()))
+                            .asJson()
+                            .ifSuccess(response -> {
+                                logger.info("Health request successfully sent.");
+                                boolean success = response.getBody().getObject().getBoolean("success");
+                                if (success) {
+                                    logger.info("Health request successfully processed.");
+                                }
+                                else {
+                                    logger.warning("Health request not successfully processed.");
+                                }
+                            })
+                            .ifFailure(response -> {
+                                logger.warning("Health request not successfully sent.");
+                            });
+                    try {
+                        TimeUnit.SECONDS.sleep(HEALTH_REPORTING_INTERVAL);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
 
         Lock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
