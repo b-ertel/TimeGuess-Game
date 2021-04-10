@@ -263,7 +263,7 @@ public final class Main {
                             .header("Content-Type", "application/json")
                             .body(String.format("{\"identifier\": \"%s\", \"batteryLevel\": %d, \"rssi\": %d}",
                                     TIMEFLIP_MAC_ADDRESS,
-                                    batteryLevelCharacteristic.readValue(),
+                                    batteryLevelCharacteristic.readValue()[0],
                                     timeflip.getRSSI()))
                             .asJson()
                             .ifSuccess(response -> {
