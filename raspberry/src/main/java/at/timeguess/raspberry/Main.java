@@ -138,9 +138,9 @@ public final class Main {
         // register for all kinds of notifications from TimeFlip device
         NotificationRegisterer notificationRegisterer = new NotificationRegisterer(timeflip);
         try {
-            notificationRegisterer.registerConnectedNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
-            notificationRegisterer.registerRSSINotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
-            notificationRegisterer.registerBatteryLevelNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
+            // notificationRegisterer.registerConnectedNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
+            // notificationRegisterer.registerRSSINotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
+            // notificationRegisterer.registerBatteryLevelNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
             notificationRegisterer.registerFacetsNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
         }
         catch (NotificationRegisteringException e) {
