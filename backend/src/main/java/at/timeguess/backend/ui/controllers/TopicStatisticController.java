@@ -71,4 +71,10 @@ public class TopicStatisticController {
 	public User getMostSuccessfullUser() {
 		return statService.getMostSuccessfullUserOfTopic(topic);
 	}
+	
+	public Boolean getPlayedWithTopic() {
+		if (statService.nrGamePlayedPerTopic(topic)==0)
+			return false;
+		else return true;
+	}
 }

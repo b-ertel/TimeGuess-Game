@@ -47,6 +47,7 @@
                         <div class="p-col-7"><p:outputLabel value="#{topicStatisticController.topic.name}" disabled="true"/></div>
                     </div>
                     <p:separator style="margin-bottom:16px" />
+                    <ui:fragment rendered="#{topicStatisticController.playedWithTopic}">
                     <div class="p-grid">
                         <div class="p-col-7"><p:outputLabel value="Games played: "/></div>
                         <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.gamesPlayedWithTopic}"/></div>
@@ -59,10 +60,14 @@
                     </div>
                     <p:separator style="margin-bottom:16px" />
             		<div class="p-grid">
-                        <div class="p-col-7"><p:outputLabel value="User with most wins: "/></div>
-                        <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.mostSuccessfullUser.username}"/></div>
+                        <div class="p-col-7"><p:outputLabel value="User with most wins: " /></div>
+                        <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.mostSuccessfullUser.username}" /></div>
                     </div>
-                    
+                    </ui:fragment>
+                    <ui:fragment rendered="#{!topicStatisticController.playedWithTopic}">
+                        <div><p:outputLabel value="Topic has not been used in any game yet! Be the first to use it ;-)"/></div>
+                        
+                    </ui:fragment>
                 </p:outputPanel>
             </p:dialog>
         </h:form>
