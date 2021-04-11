@@ -18,7 +18,7 @@
                     <p:menuitem icon="fa fa-cube" url="/secured/statistics.xhtml" value="&nbsp;Virtual Lobby&nbsp;" rendered="#{isPlayer}"/>
 
                     <p:submenu label="Administration" rendered="#{isManager}">
-                        <p:menuitem icon="fa fa-globe" value="&nbsp;Topics and Terms"/>
+                        <p:menuitem icon="fa fa-globe" value="&nbsp;Terms and Topics" url="/manager/terms.xhtml" rendered="#{isManager}"/>
                         <p:menuitem icon="fa fa-cogs" value="&nbsp;Current Games"/>
                         <p:menuitem icon="fa fa-history" value="&nbsp;Past Games" rendered="#{isAdmin}"/>
                         <p:menuitem icon="fa fa-users" value="&nbsp;Users" url="/admin/users.xhtml" rendered="#{isAdmin}"/>
