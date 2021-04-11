@@ -1,0 +1,196 @@
+/* custom classes for colored table rows, returned by GameState enum */
+.SETUP {
+    background-color: rgba(245, 183, 177, 0.3) !important;
+    background-image: none !important;
+    color: #2E4053 !important;
+}
+
+.VALID_SETUP {
+    background-color: rgba(165, 208, 165, 0.8) !important;
+    background-image: none !important;
+    color: #2E4053 !important;
+}
+
+.PLAYED {
+    background-color: rgba(165, 208, 165, 0.3) !important;
+    background-image: none !important;
+    color: #2E4053 !important;
+}
+
+.HALTED {
+    background-color: rgba(245, 183, 177, 0.6) !important;
+    background-image: none !important;
+    color: #2E4053 !important;
+}
+
+.FINISHED {
+    background-color: rgba(245, 183, 177, 0.9) !important;
+    background-image: none !important;
+    color: #2E4053 !important;
+}
+
+/* custom classes from primefaces show cases */
+.game-badge {
+    border-radius: 2px;
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .3px;
+}
+
+.image-text {
+    vertical-align: middle;
+    margin-left: .5rem;
+}
+
+.p-column-filter {
+    width: 100%;
+}
+
+.game .game-name {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.game .game-info {
+    margin: 0 0 1rem 0;
+}
+
+.game .game-topic-icon {
+    vertical-align: middle;
+    margin-right: .5rem;
+}
+
+.game .game-topic {
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.game .game-list-item {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.game .game-list-item.border-1 {
+    border-bottom: 1px solid var(- -surface-d);
+}
+
+.game .game-list-item img {
+    width: 150px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    margin-right: 2rem;
+}
+
+.game .game-list-item .game-list-detail {
+    flex: 1 1 0;
+    -ms-flex: 1 1 0;
+}
+
+.game .game-list-item .ui-rating {
+    margin: 0 0 .5rem 0;
+}
+
+.game .game-list-item .game-points {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: .5rem;
+    align-self: flex-end;
+}
+
+.game .game-list-item .game-list-action {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+.game .game-list-item .ui-button {
+    margin-bottom: .5rem;
+}
+
+.game .game-grid-item.border-1 {
+    border: 1px solid var(- -surface-d);
+}
+
+.game .game-grid-item .game-grid-item-top, .game .game-grid-item .game-grid-item-bottom
+    {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+
+.game .game-grid-item img {
+    width: 75%;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    margin: 2rem 0;
+}
+
+.game .game-grid-item .ui-rating {
+    margin: 0 0 1rem 0;
+}
+
+.game .game-grid-item .game-grid-item-content {
+    text-align: center;
+}
+
+.game .game-grid-item .game-points {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+@media screen and (max-width: 576px) {
+    .game .game-list-item {
+        -ms-flex-direction: column;
+        flex-direction: column;
+        -ms-flex-align: center;
+        align-items: center;
+    }
+    .game .game-list-item img {
+        width: 75%;
+        margin: 2rem 0;
+    }
+    .game .game-list-item .game-list-detail {
+        text-align: center;
+    }
+    .game .game-list-item .game-points {
+        align-self: center;
+    }
+    .game .game-list-item .game-list-action {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: column;
+        flex-direction: column;
+    }
+    .game .game-list-item .game-list-action {
+        margin-top: 2rem;
+        -ms-flex-direction: row;
+        flex-direction: row;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        -ms-flex-align: center;
+        align-items: center;
+        width: 100%;
+    }
+}
+
+@media ( max-width : 640px) {
+    .games-table>.ui-datatable-tablewrapper>table>thead>tr>th:nth-child(2) .ui-column-title,
+        .games-table>.ui-datatable-tablewrapper>table>tbody>tr>td:nth-child(2) .ui-column-title
+        {
+        display: none !important;
+    }
+    .games-buttonbar {
+        -ms-flex-direction: column;
+        flex-direction: column;
+    }
+    .games-buttonbar>div:last-child {
+        margin-top: .5rem;
+    }
+}

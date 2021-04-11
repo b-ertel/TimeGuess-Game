@@ -1,0 +1,64 @@
+image: docker.uibk.ac.at:443/informatik/qe/sepsss21/group1/g1t1
+
+variables:
+  MAVEN_OPTS: "-Dhttp.proxyHost=proxy.uibk.ac.at  -Dhttp.proxyPort=3128  -Dhttps.proxyHost=proxy.uibk.ac.at -Dhttps.proxyPort=3128 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+
+cache:
+    paths:
+    - $CI_PROJECT_DIR/.m2/
+    - $CI_PROJECT_DIR/backend/target/
+
+
+stages:
+- Build
+# - Static Analysis
+- Test
+
+before_script:
+    - mvn -version
+    - java -version
+    - echo $JAVA_HOME
+    - echo $MAVEN_HOME
+    - python3 --version
+    - pip3 --version
+    - echo $CI_PROJECT_DIR
+
+# See: https://pmd.github.io/
+# pmd:
+#     stage: Static Analysis
+#     allow_failure: true
+#     script:
+#     - cd raspberry
+#     - /opt/pmd-bin-6.31.0/bin/run.sh pmd -d src/main/java/ -f text -R rulesets/java/quickstart.xml -cache pmd_cache.txt
+
+raspberry-test:
+    stage: Test
+    script:
+    - mkdir raspberry-test
+    - cd raspberry
+    - mvn clean install
+    - JACOCO_SCORE=$(awk -F, '{ instructions += $4 + $5; covered += $5 } END { printf "%.2f\n", 100*covered/instructions }' target/site/jacoco/jacoco.csv)
+    - anybadge --label=jacoco-coverage --file=target/site/jacoco/jacoco.svg --value=$JACOCO_SCORE coverage
+    - mvn dependency:tree -DoutputFile="$CI_PROJECT_DIR/raspberry-test/mvn_dependencies.txt"
+    - cp -r target/site/jacoco $CI_PROJECT_DIR/raspberry-test/jacoco
+    - cp -r target/apidocs $CI_PROJECT_DIR/raspberry-test/apidocs
+    artifacts:
+      paths:
+      - raspberry-test
+
+maven_build_backend:
+  stage: Build
+  script:
+    - cd backend/
+    - 'mvn $MAVEN_CLI_OPTS compile'
+
+
+maven_verify_backend:
+  stage: Test
+  script:
+    - cd backend/
+    - echo "Testing backend project with maven"
+    - 'mvn $MAVEN_CLI_OPTS verify'
+    - cat target/site/jacoco/index.html | grep -o 'Total[^%]*%' | sed 's/<.*>/ /; s/Total/Jacoco Coverage Total:/'
+  coverage: "/Total.*?([0-9]{1,3})%/"

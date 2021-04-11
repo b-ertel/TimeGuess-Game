@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <body>
+        <ui:composition>
+            <c:set var="isLoggedIn" value="#{sessionInfoBean.loggedIn}" scope="request" />
+            <c:set var="isPlayer" value="#{sessionInfoBean.hasRole('PLAYER')}" scope="request" />
+            <c:set var="isManager" value="#{sessionInfoBean.hasRole('MANAGER')}" scope="request" />
+            <c:set var="isAdmin" value="#{sessionInfoBean.hasRole('ADMIN')}" scope="request" />
+            <h:form>
+                <p:menubar>
+                    <p:menuitem icon="fa fa-users" value="&nbsp;User Profiles&nbsp;" url="/secured/users.xhtml" rendered="#{isPlayer}"/>
+
+                    <p:submenu icon="fa fa-cube" label="&nbsp;Virtual Lobby&nbsp;" rendered="#{isPlayer}">
+	                    <p:menuitem icon="fa fa-cubes" value="&nbsp;Current Games&nbsp;" url="/secured/games.xhtml" rendered="#{isPlayer}"/>
+                        <p:menuitem icon="fa fa-bar-chart-o" value="&nbsp;General Statistics&nbsp;" url="/secured/statistics.xhtml"/>
+                        <p:menuitem icon="fa fa-trophy" value="&nbsp;Highscores&nbsp;" url="/secured/highscores.xhtml"/>
+                    </p:submenu>
+
+                    <p:submenu icon="fa fa-cogs" label="&nbsp;Administration&nbsp;" rendered="#{isManager}">
+                        <p:menuitem icon="fa fa-globe" value="&nbsp;Terms and Topics&nbsp;" url="/manager/terms.xhtml" rendered="#{isManager}"/>
+                        <p:menuitem icon="fa fa-cubes" value="&nbsp;Games&nbsp;" url="/manager/games.xhtml" rendered="#{!isAdmin}"/>
+                        <p:menuitem icon="fa fa-history" value="&nbsp;Games&nbsp;" url="/admin/games.xhtml" rendered="#{isAdmin}"/>
+                        <p:menuitem icon="fa fa-users" value="&nbsp;Users&nbsp;" url="/admin/users.xhtml" rendered="#{isAdmin}"/>
+                        <p:menuitem icon="fa fa-cubes" value="&nbsp;Timeflip Cubes&nbsp;" rendered="#{isAdmin}"/>
+                    </p:submenu>
+                    
+                    <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login&nbsp;" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
+
+                    <p:submenu label="&nbsp;Other&nbsp;" rendered="#{isLoggedIn}">
+                        <p:menuitem icon="fa fa-info" value="&nbsp;Info&nbsp;" url="/secured/welcome.xhtml"/>
+                        <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout&nbsp;" url="/logout"/>
+                    </p:submenu>
+
+                    <p:submenu label="Debug Menu" rendered="#{isLoggedIn}">
+                        <p:menuitem value="Game" url="/debug/game.xhtml" rendered="#{sessionInfoBean.hasRole('PLAYER')}"/>
+                        <p:menuitem value="CubeTest" url="/secured/demos/cubeTest.xhtml"/>  
+                        <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
+                        <p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>
+                    </p:submenu>
+                </p:menubar>
+            </h:form>
+        </ui:composition>
+    </body>
+</html>
+

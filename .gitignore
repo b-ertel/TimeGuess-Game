@@ -1,0 +1,11 @@
+# Eclipse
+.project
+.classpath
+.settings/
+
+# Maven
+target/
+
+# Other
+*.bak
+.DS_Store
