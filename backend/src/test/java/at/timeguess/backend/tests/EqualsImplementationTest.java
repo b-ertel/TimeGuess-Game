@@ -4,6 +4,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
+import at.timeguess.backend.model.Activity;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
@@ -35,6 +36,11 @@ public class EqualsImplementationTest {
     @Test
     public void testUserRoleEqualsContract() {
         EqualsVerifier.forClass(UserRole.class).verify();
+    }
+
+    @Test
+    public void testActivityEqualsContract() {
+        EqualsVerifier.forClass(Activity.class).verify();
     }
 
     @Test
