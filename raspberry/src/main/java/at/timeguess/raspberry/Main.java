@@ -2,7 +2,6 @@ package at.timeguess.raspberry;
 
 import java.util.Properties;
 
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -252,40 +251,8 @@ public final class Main {
         facetsCharacteristic.enableValueNotifications(new FacetsNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, calibrationVersionHelper));
 
         logger.info("Scheduling regular health requests ...");
-        new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    logger.info("Sending health request to backend ...");
-                    Unirest.post(BACKEND_URL + "/api/health")
-                            .header("Content-Type", "application/json")
-                            .body(String.format("{\"identifier\": \"%s\", \"batteryLevel\": %d, \"rssi\": %d}",
-                                    TIMEFLIP_MAC_ADDRESS,
-                                    batteryLevelCharacteristic.readValue()[0],
-                                    timeflip.getRSSI()))
-                            .asJson()
-                            .ifSuccess(response -> {
-                                logger.info("Health request successfully sent.");
-                                boolean success = response.getBody().getObject().getBoolean("success");
-                                if (success) {
-                                    logger.info("Health request successfully processed.");
-                                }
-                                else {
-                                    logger.warning("Health request not successfully processed.");
-                                }
-                            })
-                            .ifFailure(response -> {
-                                logger.warning("Health request not successfully sent.");
-                            });
-                    try {
-                        TimeUnit.SECONDS.sleep(HEALTH_REPORTING_INTERVAL);
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }.start();
+        HealthThread healthThread = new HealthThread(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, timeflip, batteryLevelCharacteristic, HEALTH_REPORTING_INTERVAL);
+        healthThread.start();
 
         Lock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
