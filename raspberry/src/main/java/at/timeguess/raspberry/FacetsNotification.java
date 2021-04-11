@@ -1,12 +1,10 @@
-package at.timeguess.raspberry.notifications;
+package at.timeguess.raspberry;
 
 import java.util.logging.*;
 
 import kong.unirest.Unirest;
 
 import tinyb.BluetoothNotification;
-
-import at.timeguess.raspberry.CalibrationVersionHelper;
 
 /**
  * A BluetoothNotification for the facets characteristic.
@@ -15,7 +13,7 @@ public class FacetsNotification implements BluetoothNotification<byte[]> {
 
     private static final String API_PATH = "/api/facets";
 
-    private final Logger logger = Logger.getLogger("at.timeguess.raspberry.notifications");
+    private final Logger logger = Logger.getLogger("at.timeguess.raspberry");
 
     private final String timeflipMacAddress;
     private final String backendUrl;
