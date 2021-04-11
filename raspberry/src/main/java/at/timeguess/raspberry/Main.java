@@ -24,8 +24,6 @@ import tinyb.BluetoothManager;
 
 import kong.unirest.Unirest;
 
-import at.timeguess.raspberry.notifications.FacetsNotification;
-
 /**
  * Entry point for program to search for Bluetooth devices and communicate with them
  */
