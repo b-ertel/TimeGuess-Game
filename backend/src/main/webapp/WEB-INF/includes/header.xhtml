@@ -29,6 +29,11 @@
                         <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
                         <p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>
                     </p:submenu>
+                    
+                    <p:submenu label="Statistics" rendered="#{isLoggedIn}">
+                        <p:menuitem icon="fa fa-bar-chart-o" value="&nbsp;General&nbsp;" url="/secured/statistics.xhtml"/>
+                        <p:menuitem icon="fa fa-trophy" value="&nbsp;Highscores" url="/secured/highscores.xhtml"/>
+                    </p:submenu>
 
                     <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
 
