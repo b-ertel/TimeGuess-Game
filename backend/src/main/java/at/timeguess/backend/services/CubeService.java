@@ -102,7 +102,7 @@ public class CubeService {
      */
     public boolean isConfigured(Cube cube) {
     	
-    	if(cubeRepo.findById(cube.getId()).getConfiguration()!=0) {
+    	if(cubeRepo.findById(cube.getId()).get().getConfiguration()!=0) {
     		return true;
     	}
     	return false;

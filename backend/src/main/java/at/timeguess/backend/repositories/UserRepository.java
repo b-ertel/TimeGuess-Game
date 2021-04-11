@@ -12,7 +12,7 @@ import at.timeguess.backend.model.UserRole;
 /**
  * Repository for managing {@link User} entities.
  */
-public interface UserRepository extends AbstractRepository<User, String> {
+public interface UserRepository extends AbstractRepository<User, Long> {
 
     User findFirstByUsername(String username);
 

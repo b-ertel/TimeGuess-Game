@@ -17,14 +17,14 @@
     <ui:define name ="content">
         <h:form id="toolbarForm">
             <p:menubar id="toolbar">
-                <p:menuitem value="Add new Term" icon="ui-icon-plus"
+                <p:menuitem value="&nbsp;Add new Term&nbsp;" icon="fa fa-plus"
                             action="#{termListController.doCreateTerm}"
                             oncomplete="PF('newTermDialog').show()"
                             update=":termsForm:termsTable :toolbarForm:toolbar"/>
-                <p:menuitem value="Load new Terms from JSON file" icon="ui-icon-document"
+                <p:menuitem value="&nbsp;Load new Terms from JSON file&nbsp;" icon="fa fa-file-code-o"
                             oncomplete="PF('newTermsDialog').show()"
                             update=":termsForm:termsTable :toolbarForm:toolbar"/>
-                <p:menuitem value="Refresh" icon="ui-icon-arrowrefresh-1-e"
+                <p:menuitem value="&nbsp;Refresh&nbsp;" icon="fa fa-refresh"
                             action="#{termListController.reloadTerms()}"
                             update=":termsForm:termsTable :toolbarForm:toolbar"/>
             </p:menubar>

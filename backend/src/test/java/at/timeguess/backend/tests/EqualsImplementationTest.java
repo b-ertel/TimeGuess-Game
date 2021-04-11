@@ -5,6 +5,7 @@ import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
 import at.timeguess.backend.model.Activity;
+import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
@@ -12,13 +13,8 @@ import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
 
 /**
- * Tests to ensure that each entity's implementation of equals conforms to the
- * contract. See {@linkplain http://www.jqno.nl/equalsverifier/} for more
- * information.
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
+ * Tests to ensure that each entity's implementation of equals conforms to the contract.
+ * See {@linkplain http://www.jqno.nl/equalsverifier/} for more information.
  */
 public class EqualsImplementationTest {
 
@@ -30,7 +26,13 @@ public class EqualsImplementationTest {
         user2.setUsername("user2");
         Team team1 = new Team();
         Team team2 = new Team();
-        EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2).withPrefabValues(Team.class, team1, team2).suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
+        Game game1 = new Game();
+        game1.setName("game1");
+        Game game2 = new Game();
+        game2.setName("game2");
+        EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2)
+                .withPrefabValues(Team.class, team1, team2).withPrefabValues(Game.class, game1, game2)
+                .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test
@@ -53,13 +55,9 @@ public class EqualsImplementationTest {
         newTopic1.setName("Test Topic 1");
         Topic newTopic2 = new Topic();
         newTopic2.setName("Test Topic 2");
-        EqualsVerifier
-            .simple()
-            .forClass(Term.class)
-            .withPrefabValues(Term.class, newTerm1, newTerm2)
-            .withPrefabValues(Topic.class, newTopic1, newTopic2)
-            .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED)
-            .verify();
+        EqualsVerifier.simple().forClass(Term.class).withPrefabValues(Term.class, newTerm1, newTerm2)
+                .withPrefabValues(Topic.class, newTopic1, newTopic2)
+                .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test
@@ -68,11 +66,7 @@ public class EqualsImplementationTest {
         newTopic1.setName("Test Topic 1");
         Topic newTopic2 = new Topic();
         newTopic2.setName("Test Topic 2");
-        EqualsVerifier
-            .forClass(Topic.class)
-            .withPrefabValues(Topic.class, newTopic1, newTopic2)
-            .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED)
-            .verify();
+        EqualsVerifier.forClass(Topic.class).withPrefabValues(Topic.class, newTopic1, newTopic2)
+                .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
-
 }

@@ -135,7 +135,7 @@ public class UserService {
                 authUser.getUsername());
     }
 
-    private User getAuthenticatedUser() {
+    User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findFirstByUsername(auth.getName());
     }
