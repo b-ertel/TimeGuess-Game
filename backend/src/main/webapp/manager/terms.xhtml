@@ -6,6 +6,14 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
+<style type="text/css">
+    pre code {
+        background-color: #eee;
+        border: 1px solid #999;
+        display: block;
+        padding: 20px;
+    }
+</style>
     <ui:define name ="content">
         <h:form id="toolbarForm">
             <p:menubar id="toolbar">
@@ -14,7 +22,7 @@
                             oncomplete="PF('newTermDialog').show()"
                             update=":termsForm:termsTable :toolbarForm:toolbar"/>
                 <p:menuitem value="Load new Terms from JSON file" icon="ui-icon-document"
-                            action="#{termListController.doLoadTermsJSON}"
+                            oncomplete="PF('newTermsDialog').show()"
                             update=":termsForm:termsTable :toolbarForm:toolbar"/>
                 <p:menuitem value="Refresh" icon="ui-icon-arrowrefresh-1-e"
                             action="#{termListController.reloadTerms()}"
@@ -57,20 +65,25 @@
                 </p:outputPanel>
             </p:dialog>
 
-            <p:dialog header="New Term" id="newTermDialog" widgetVar="newTermDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                <p:outputPanel id="newTermData" rendered="#{not empty termDetailController.term}">
-                    <h:panelGrid columns="2">
-                        <p:outputLabel for="name" value="Name: " />
-                        <p:inputText id="name" value="#{termDetailController.term.name}"/>
-                        <p:outputLabel for="topic" value="Topic: " />
-                        <p:inputText id="topic" value="#{termDetailController.term.topic.name}" disabled="true"/>
-                    </h:panelGrid>
-                    <p:separator />
-                    <h:panelGrid columns="3">
-                        <p:commandButton value="Save" action="#{termDetailController.doUpdateTerm()}" oncomplete="PF('newTermDialog').hide();#{termListController.reloadTerms()}" update=":termsForm:termsTable"/>
-                        <p:commandButton value="Reload" action="#{termDetailController.doReloadTerm()}" update=":termsForm:termData"/>
-                        <p:commandButton value="Abort" onclick="PF('newTermDialog').hide()"/>
-                    </h:panelGrid>
+            <p:dialog header="Upload new Terms" id="newTermsDialog" widgetVar="newTermsDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="newPanel">
+                    Upload a JSON file in the following format:
+                    <pre><code>
+            "Topic 1": [
+                "Term 1",
+                "Term 2",
+                "Term 3"
+                ],
+            "Topic 2": [
+                "Term 4",
+                "Term 5",
+                "Term 6"
+                ]
+            
+                    </code></pre>
+                    <p:fileUpload value="#{termListController.file}" mode="simple" skinSimple="true" auto="true"
+                                process="@this" update="messages"
+                                listener="#{termListController.doLoadTermsJSON}"/>
                 </p:outputPanel>
             </p:dialog>
 

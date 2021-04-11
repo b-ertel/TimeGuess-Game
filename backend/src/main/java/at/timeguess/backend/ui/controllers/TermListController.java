@@ -5,9 +5,15 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.RequestScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.inject.Named;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,6 +27,8 @@ import at.timeguess.backend.services.TermService;
  * Controller for the term list view.
  */
 @Component
+@Named
+@RequestScoped
 @Scope("view")
 public class TermListController implements Serializable {
 
@@ -33,6 +41,11 @@ public class TermListController implements Serializable {
      * Internal terms cache.
      */
     private List<Term> terms;
+
+    /**
+     * Cache the uploaded file.
+     */
+    private UploadedFile file;
 
     @PostConstruct
     public void reloadTerms() {
@@ -55,9 +68,15 @@ public class TermListController implements Serializable {
         };
     }
 
-    public void doLoadTermsJSON(String filepath) throws Exception {
-        Object jsonFile = new JSONParser().parse(new FileReader(filepath));
-        JSONObject termsJSON = (JSONObject) jsonFile;
+    public void doLoadTermsJSON(FileUploadEvent event) throws Exception {
+
+        FacesMessage message = new FacesMessage("Successful", event.getFile().getFileName() + " is uploaded.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+
+        System.out.print(file);
+
+        // Object jsonFile = new JSONParser().parse(file);
+        // JSONObject termsJSON = (JSONObject) jsonFile;
 
     }
     
