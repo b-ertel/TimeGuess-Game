@@ -22,7 +22,7 @@ public class Cube {
 	
 	private Integer configuration = 0;
 	
-	private CubeStatus cubeStatus;
+	private CubeStatus cubeStatus = CubeStatus.OFFLINE;
 	
 	@OneToMany(mappedBy="cube")
 	private List<Configuration> configs = new ArrayList<>();
