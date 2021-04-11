@@ -1,10 +1,6 @@
 package at.timeguess.raspberry;
 
-import tinyb.BluetoothDevice;
-import tinyb.BluetoothException;
-import tinyb.BluetoothManager;
-import tinyb.BluetoothGattService;
-import tinyb.BluetoothGattCharacteristic;
+import java.util.Properties;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -12,47 +8,31 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import java.util.logging.*;
 
-import at.timeguess.raspberry.notifications.BatteryLevelNotification;
-import at.timeguess.raspberry.notifications.ConnectedNotification;
-import at.timeguess.raspberry.notifications.FacetsNotification;
-import at.timeguess.raspberry.notifications.RSSINotification;
-
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.time.Duration;
+
+import tinyb.BluetoothDevice;
+import tinyb.BluetoothException;
+import tinyb.BluetoothManager;
+
+import at.timeguess.raspberry.exceptions.NotificationRegisteringException;
 
 /**
  * Entry point for program to search for Bluetooth devices and communicate with them
  */
 public final class Main {
 
-    // write logs to file "log.txt" in the user's home directory
-    private static final String LOG_FILE = "%h/log.txt";
+    private static final String LOG_FILE = "log.txt";
+    private static final String CONFIG_FILE = "config.txt";
+
+    private static String TIMEFLIP_MAC_ADDRESS;
+    private static String BACKEND_URL;
 
     private static final Long DEVICE_DISCOVERY_TIMEOUT = 10L;
-    private static final Long SERVICE_DISCOVERY_TIMEOUT = 10L;
-    private static final Long CHARACTERISTIC_DISCOVERY_TIMEOUT = 10L;
-
-    // UUIDs Device Information Service
-    private static final String DEVICE_INFORMATION_SERVICE = "0000180a-0000-1000-8000-00805f9b34fb";
-    private static final String FIRMWARE_REVISION_STRING_CHARACTERISTIC = "00002a26-0000-1000-8000-00805f9b34fb";
-
-    // UUIDs Battery Service
-    private static final String BATTERY_SERVICE = "0000180f-0000-1000-8000-00805f9b34fb";
-    private static final String BATTERY_LEVEL_CHARACTERISTIC = "00002a19-0000-1000-8000-00805f9b34fb";
-
-    // UUIDs TimeFlip service
-    private static final String TIMEFLIP_SERVICE = "f1196f50-71a4-11e6-bdf4-0800200c9a66";
-    private static final String ACCELEROMETER_DATA_CHARACTERISTIC = "f1196f51-71a4-11e6-bdf4-0800200c9a66";
-    private static final String FACETS_CHARACTERISTIC = "f1196f52-71a4-11e6-bdf4-0800200c9a66";
-    private static final String COMMAND_RESULT_OUTPUT_CHARACTERISTIC = "f1196f53-71a4-11e6-bdf4-0800200c9a66";
-    private static final String COMMAND_CHARACTERISTIC = "f1196f54-71a4-11e6-bdf4-0800200c9a66";
-    private static final String DOUBLE_TAP_DEFINITION_CHARACTERISTIC = "f1196f55-71a4-11e6-bdf4-0800200c9a66";
-    private static final String CALIBRATION_VERSION_CHARACTERISTIC = "f1196f56-71a4-11e6-bdf4-0800200c9a66";
-    private static final String PASSWORD_CHARACTERISTIC = "f1196f57-71a4-11e6-bdf4-0800200c9a66";
-
-    // default password
-    private static final byte[] PASSWORD = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30};
 
     static boolean running = true;
 
@@ -63,35 +43,56 @@ public final class Main {
      * This program should connect to TimeFlip devices and read the facet characteristic exposed by the devices
      * over Bluetooth Low Energy.
      *
-     * @param args the program arguments
      * @throws InterruptedException
      * @see <a href="https://github.com/DI-GROUP/TimeFlip.Docs/blob/master/Hardware/BLE_device_commutication_protocol_v3.0_en.md" target="_top">BLE device communication protocol v3.0</a>
      */
     public static void main(String[] args) throws InterruptedException {
 
-        if (args.length < 1) {
-            System.err.println("Run with the MAC address of the TimeFlip device as parameter!");
-            System.exit(-1);
-        }
-
+        // set up logging
         Logger logger = Logger.getLogger("at.timeguess.raspberry");
-
         ConsoleHandler consoleHandler = new ConsoleHandler();
         logger.addHandler(consoleHandler);
-
         logger.setUseParentHandlers(false);
-
         try {
             FileHandler filehandler = new FileHandler(LOG_FILE);
             filehandler.setFormatter(new XMLFormatter());
             logger.addHandler(filehandler);
             System.out.println("***");
-            System.out.println("Logs will be written to standard error and to file \"log.txt\" in user's home directory.");
+            System.out.println("Logs will be written to standard error and to the file \"log.txt\" in this folder.");
             System.out.println("***");
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.out.println("***");
-            System.out.println("Logs will be written to standard error.");
+            System.out.println("Logs will be written to standard error only since the file \"log.txt\" in this folder could not be opened.");
             System.out.println("***");
+        }
+
+        // read from configuration file
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(CONFIG_FILE);
+        }
+        catch (FileNotFoundException e) {
+            logger.severe("Configuration file not found!");
+            System.exit(-1);
+        }
+        Properties properties = new Properties();
+        try {
+            properties.load(inputStream);
+        }
+        catch (IOException e) {
+            logger.severe("Error while reading from configuration file!");
+            System.exit(-1);
+        }
+        TIMEFLIP_MAC_ADDRESS = properties.getProperty("TIMEFLIP_MAC_ADDRESS");
+        if (TIMEFLIP_MAC_ADDRESS == null || TIMEFLIP_MAC_ADDRESS.isEmpty()) {
+            logger.severe("MAC address of TimeFlip device not given in configuration file!");
+            System.exit(-1);
+        }
+        BACKEND_URL = properties.getProperty("BACKEND_URL");
+        if (BACKEND_URL == null || BACKEND_URL.isEmpty()) {
+            logger.severe("URL of backend not given in configuration file!");
+            System.exit(-1);
         }
 
         BluetoothManager manager = BluetoothManager.getBluetoothManager();
@@ -111,13 +112,13 @@ public final class Main {
             System.exit(-1);
         }
 
-        logger.info("Searching for TimeFlip device with MAC address " + args[0] + " ...");
-        BluetoothDevice timeflip = manager.find(null, args[0], null, Duration.ofSeconds(DEVICE_DISCOVERY_TIMEOUT));
+        logger.info("Searching for TimeFlip device with MAC address " + TIMEFLIP_MAC_ADDRESS + " ...");
+        BluetoothDevice timeflip = manager.find(null, TIMEFLIP_MAC_ADDRESS, null, Duration.ofSeconds(DEVICE_DISCOVERY_TIMEOUT));
         if (timeflip != null) {
-            logger.info("TimeFlip device with MAC address " + args[0] + " found.");
+            logger.info("TimeFlip device with MAC address " + TIMEFLIP_MAC_ADDRESS + " found.");
         }
         else {
-            logger.severe("TimeFlip device with MAC address " + args[0] + " not found.");
+            logger.severe("TimeFlip device with MAC address " + TIMEFLIP_MAC_ADDRESS + " not found.");
             System.exit(-1);
         }
 
@@ -125,7 +126,7 @@ public final class Main {
             logger.warning("Device discovery is still on after the device has been found.");
         }
 
-        logger.info("Connecting to TimeFlip device with MAC address " + args[0] + " ...");
+        logger.info("Connecting to TimeFlip device with MAC address " + TIMEFLIP_MAC_ADDRESS + " ...");
         if (timeflip.connect()) {
             logger.info("Connection established.");
         }
@@ -134,82 +135,19 @@ public final class Main {
             System.exit(-1);
         }
 
-        logger.info("Registering callback for connection status notifications ...");
-        timeflip.enableConnectedNotifications(new ConnectedNotification());
-
-        logger.info("Registering callback for RSSI notifications ...");
-        timeflip.enableRSSINotifications(new RSSINotification());
-
-        logger.info("Searching for Battery Service ...");
-        BluetoothGattService batteryService = timeflip.find(BATTERY_SERVICE, Duration.ofSeconds(SERVICE_DISCOVERY_TIMEOUT));
-        if (batteryService != null) {
-            logger.info("Battery Service found.");
+        // register for all kinds of notifications from TimeFlip device
+        NotificationRegisterer notificationRegisterer = new NotificationRegisterer(timeflip);
+        try {
+            notificationRegisterer.registerConnectedNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
+            notificationRegisterer.registerRSSINotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
+            notificationRegisterer.registerBatteryLevelNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
+            notificationRegisterer.registerFacetsNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL);
         }
-        else {
-            logger.severe("Battery Service not found.");
+        catch (NotificationRegisteringException e) {
+            logger.severe("A problem occured while registering notifications.");
             timeflip.disconnect();
             System.exit(-1);
         }
-
-        logger.info("Searching for Battery level characteristic ...");
-        BluetoothGattCharacteristic batteryLevelCharacteristic = batteryService.find(BATTERY_LEVEL_CHARACTERISTIC, Duration.ofSeconds(CHARACTERISTIC_DISCOVERY_TIMEOUT));
-        if (batteryLevelCharacteristic != null) {
-            logger.info("Battery level characteristic found.");
-        }
-        else {
-            logger.severe("Battery level characteristic not found.");
-            timeflip.disconnect();
-            System.exit(-1);
-        }
-
-        logger.info("Registering for notifications from the battery level characteristic ...");
-        batteryLevelCharacteristic.enableValueNotifications(new BatteryLevelNotification());
-
-        logger.info("Searching for TimeFlip service ...");
-        BluetoothGattService timeflipService = timeflip.find(TIMEFLIP_SERVICE, Duration.ofSeconds(SERVICE_DISCOVERY_TIMEOUT));
-        if (timeflipService != null) {
-            logger.info("TimeFlip service found.");
-        }
-        else {
-            logger.severe("TimeFlip service not found.");
-            timeflip.disconnect();
-            System.exit(-1);
-        }
-
-        logger.info("Searching for Password characteristic ...");
-        BluetoothGattCharacteristic passwordCharacteristic = timeflipService.find(PASSWORD_CHARACTERISTIC, Duration.ofSeconds(CHARACTERISTIC_DISCOVERY_TIMEOUT));
-        if (passwordCharacteristic != null) {
-            logger.info("Password characteristic found.");
-        }
-        else {
-            logger.severe("Password characteristic not found.");
-            timeflip.disconnect();
-            System.exit(-1);
-        }
-
-        logger.info("Writing password ...");
-        if (passwordCharacteristic.writeValue(PASSWORD)) {
-            logger.info("Password succesfully written.");
-        }
-        else {
-            logger.severe("Problem writing password.");
-            timeflip.disconnect();
-            System.exit(-1);
-        }
-
-        logger.info("Searching for Facets characteristic ...");
-        BluetoothGattCharacteristic facetsCharacteristic = timeflipService.find(FACETS_CHARACTERISTIC, Duration.ofSeconds(CHARACTERISTIC_DISCOVERY_TIMEOUT));
-        if (facetsCharacteristic != null) {
-            logger.info("Facets characteristic found.");
-        }
-        else {
-            logger.severe("Facets characteristic not found.");
-            timeflip.disconnect();
-            System.exit(-1);
-        }
-
-        logger.info("Registering for notifications from the facets characteristic ...");
-        facetsCharacteristic.enableValueNotifications(new FacetsNotification());
 
         Lock lock = new ReentrantLock();
         Condition condition = lock.newCondition();

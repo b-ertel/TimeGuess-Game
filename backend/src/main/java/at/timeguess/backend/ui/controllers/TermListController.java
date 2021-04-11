@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.model.Exceptions.TermAlreadyExistsException;
+import at.timeguess.backend.model.exceptions.TermAlreadyExistsException;
 import at.timeguess.backend.services.TermService;
 
 /**

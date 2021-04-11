@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.model.Exceptions.TopicAlreadyExistsException;
+import at.timeguess.backend.model.exceptions.TopicAlreadyExistsException;
 import at.timeguess.backend.repositories.TopicRepository;
 
 /**
@@ -17,7 +17,7 @@ import at.timeguess.backend.repositories.TopicRepository;
 @Component
 @Scope("application")
 public class TopicService {
-    
+
     @Autowired
     private TopicRepository topicRepository;
 
@@ -43,7 +43,7 @@ public class TopicService {
     }
 
     /**
-     * Saves the Topic. 
+     * Saves the Topic.
      *
      * @param topic the topic to save
      * @return the new topic
@@ -58,5 +58,4 @@ public class TopicService {
             throw new TopicAlreadyExistsException();
         }
     }
-    
 }

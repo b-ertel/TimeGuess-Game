@@ -20,10 +20,17 @@ Following this, just clone this repo on the Raspberry Pi, `cd` into the
 
 (*with* tests and Javadoc).
 
-If a Timeflip device is within reach, you can run the program with the
+Within the `raspberry` folder, add a file `config.txt` with the following content:
+
+    TIMEFLIP_MAC_ADDRESS=<the MAC address of your TimeFlip device>
+    BACKEND_URL=<the URL of the backend>
+
+Note that the URL of the backend must start with `http://`.
+
+If your Timeflip device is within reach, you can run the program with the
 following command.
 
-    java -cp target/raspberry.jar:./lib/tinyb.jar:./target/dependencies/* at.timeguess.raspberry.Main 98:07:2D:EE:23:28
+    java -cp target/raspberry.jar:./lib/tinyb.jar:./target/dependencies/* at.timeguess.raspberry.Main
 
 Useful ressources:
 - [TimeFlip protocol](https://github.com/DI-GROUP/TimeFlip.Docs/blob/master/Hardware/BLE_device_commutication_protocol_v3.0_en.md)

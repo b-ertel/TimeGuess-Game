@@ -8,13 +8,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.model.Exceptions.TermAlreadyExistsException;
+import at.timeguess.backend.model.exceptions.TermAlreadyExistsException;
 import at.timeguess.backend.repositories.TermRepository;
 import at.timeguess.backend.repositories.TopicRepository;
 
@@ -24,7 +22,7 @@ import at.timeguess.backend.repositories.TopicRepository;
 @Component
 @Scope("application")
 public class TermService {
-    
+
     @Autowired
     private TermRepository termRepository;
 
@@ -75,7 +73,7 @@ public class TermService {
     }
 
     /**
-     * Saves the Term. 
+     * Saves the Term.
      *
      * @param term the term to save
      * @return the new term
