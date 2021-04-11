@@ -26,4 +26,5 @@ public class CubeFaceService {
 	public List<CubeFace> allCubeFaces(){
 		return cubeFaceRepo.findAll();
 	}
+	
 }
