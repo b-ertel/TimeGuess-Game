@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
@@ -11,15 +13,16 @@ import javax.persistence.OneToMany;
 public class Cube {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	private String macAddress;
 	
-	private boolean isConfigured = false;
-	
 	private String name;
 	
 	private Integer configuration = 0;
+	
+	private CubeStatus cubeStatus = CubeStatus.OFFLINE;
 	
 	@OneToMany(mappedBy="cube")
 	private List<Configuration> configs = new ArrayList<>();
@@ -38,14 +41,6 @@ public class Cube {
 
 	public void setMacAddress(String macAddress) {
 		this.macAddress = macAddress;
-	}
-
-	public boolean getIsConfigured() {
-		return isConfigured;
-	}
-
-	public void setConfigured() {
-		this.isConfigured = true;
 	}
 
 	public String getName() {
@@ -71,7 +66,14 @@ public class Cube {
 	public void setConfiguration(Integer configuration) {
 		this.configuration = configuration;
 	}
-	
-	
+
+	public CubeStatus getCubeStatus() {
+		return cubeStatus;
+	}
+
+	public void setCubeStatus(CubeStatus cubeStatus) {
+		this.cubeStatus = cubeStatus;
+	}
+
 	
 }

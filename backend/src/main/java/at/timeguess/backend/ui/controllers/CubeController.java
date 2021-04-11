@@ -53,7 +53,7 @@ public class CubeController {
     }
 
     public boolean isMacAddressKnown(Cube cube){
-        return cubeService.isMacAddressKnown(cube);
+        return cubeService.isMacAddressKnown(cube.getMacAddress());
     }
 
 }
