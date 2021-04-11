@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Topic;
+import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.TopicStatisticService;
 
 @Component
@@ -67,4 +68,13 @@ public class TopicStatisticController {
 		return statService.getNrOfTermsPerTopic(topic);
 	}
 	
+	public User getMostSuccessfullUser() {
+		return statService.getMostSuccessfullUserOfTopic(topic);
+	}
+	
+	public Boolean getPlayedWithTopic() {
+		if (statService.nrGamePlayedPerTopic(topic)==0)
+			return false;
+		else return true;
+	}
 }

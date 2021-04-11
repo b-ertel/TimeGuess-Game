@@ -15,10 +15,11 @@
 
         <h:form id="gameListForm">
             <ui:remove>create game</ui:remove>
-            <p:commandButton title="Create Game" icon="fa fa-plus" value="Create Game" style="margin-bottom:10px"
-                             oncomplete="PF('gameCreateDialog').show()" update=":gameCreateForm:gameCreateDialog"
-                             rendered="#{not isAdminAccess}">
-            </p:commandButton>
+            <p:menubar id="toolbar" rendered="#{not isAdminAccess}" style="margin-bottom:10px">
+	            <p:menuitem value="&nbsp;Create Game&nbsp;" icon="fa fa-plus"
+	                             oncomplete="PF('gameCreateDialog').show()" update=":gameCreateForm:gameCreateDialog">
+	            </p:menuitem>
+            </p:menubar>
 
             <ui:remove>show current games for player only</ui:remove>
             <p:dataView id="gameCurrent" widgetVar="gameCurrent" var="game" rendered="#{not isAdminAccess}"

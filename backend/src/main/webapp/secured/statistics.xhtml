@@ -5,6 +5,7 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
 	template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
@@ -39,24 +40,34 @@
 	            </p:panelGrid>
 		    </div>
 		    
-		    <p:dialog header="Topic Statistics" id="topicStatDialog" widgetVar="topicStatDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                <p:outputPanel id="topicStat" rendered="#{not empty topicStatisticController.topic}">
-				    <p:panelGrid columns="2">
-					    <f:facet name="header">
-				            <h:outputText value="#{topicStatisticController.topic.name}"/>
-				        </f:facet>
-				       <h:outputText value="Games:"/>
-				       <h:outputText value="#{topicStatisticController.gamesPlayedWithTopic}"/>
-				       
-				       <h:outputText value="Correct Answers:"/>
-				       <h:outputText value="#{topicStatisticController.correctRounds}"/>
-				       
-				       <h:outputText value="Incorrect Answers:"/>
-				       <h:outputText value="#{topicStatisticController.incorrectRounds}"/>
-				       
-				       <h:outputText value="Number Of Terms:"/>
-				       <h:outputText value="#{topicStatisticController.nrOfTermsPerTopic}"/>
-				    </p:panelGrid>
+            <p:dialog header="Topic Statistics" id="topicStatDialog" widgetVar="topicStatDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" responsive="true" width="330">
+                <p:outputPanel id="topicData" rendered="#{not empty topicStatisticController.topic}">
+                    <div class="p-grid">
+                        <div class="p-col-5"><p:outputLabel value="Name: " /></div>
+                        <div class="p-col-7"><p:outputLabel value="#{topicStatisticController.topic.name}" disabled="true"/></div>
+                    </div>
+                    <p:separator style="margin-bottom:16px" />
+                    <ui:fragment rendered="#{topicStatisticController.playedWithTopic}">
+                    <div class="p-grid">
+                        <div class="p-col-7"><p:outputLabel value="Games played: "/></div>
+                        <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.gamesPlayedWithTopic}"/></div>
+                        <div class="p-col-7"><p:outputLabel value="Correct Rounds: " /></div>
+                        <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.correctRounds}"/></div>
+                        <div class="p-col-7"><p:outputLabel value="Incorrect Rounds: " /></div>
+                        <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.incorrectRounds}"/></div>
+                        <div class="p-col-7"><p:outputLabel value="Number of terms: " /></div>
+                        <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.nrOfTermsPerTopic}"/></div>
+                    </div>
+                    <p:separator style="margin-bottom:16px" />
+            		<div class="p-grid">
+                        <div class="p-col-7"><p:outputLabel value="User with most wins: " /></div>
+                        <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.mostSuccessfullUser.username}" /></div>
+                    </div>
+                    </ui:fragment>
+                    <ui:fragment rendered="#{!topicStatisticController.playedWithTopic}">
+                        <div><p:outputLabel value="Topic has not been used in any game yet! Be the first to use it ;-)"/></div>
+                        
+                    </ui:fragment>
                 </p:outputPanel>
             </p:dialog>
         </h:form>

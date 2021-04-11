@@ -11,7 +11,7 @@ import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.utils.GroupingHelper;
 
 public interface GameRepository extends AbstractRepository<Game, Long> {
-    
+
     /**
      * to find open games (GameState.VALID_SETUP), active (GameState.PLAYED), finished (GameState.FINISHED)
      * @param status
@@ -21,7 +21,7 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     List<Game> findByStatus(@Param("status") GameState status);
 
     int countByTopicId(long topicid);
-    
+
     @Query("SELECT g.topic, COUNT(g.topic) AS occ FROM Game g GROUP BY g.topic ORDER BY occ DESC")
     List<Object[]> getTopicAndOccurency();
 
@@ -35,7 +35,8 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     List<Game> findByUserCurrent(User user);
 
     /**
-     * Checks if given user is in teams for given game + game is setup (and not started yet) + participation is not confirmed yet
+     * Checks if given user is in teams for given game + game is setup (and not started yet) + participation is not
+     * confirmed yet
      * @param user
      * @param game
      * @return

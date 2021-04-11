@@ -4,6 +4,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
+import at.timeguess.backend.model.Activity;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
@@ -30,14 +31,18 @@ public class EqualsImplementationTest {
         Game game2 = new Game();
         game2.setName("game2");
         EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2)
-                .withPrefabValues(Team.class, team1, team2)
-                .withPrefabValues(Game.class, game1, game2)
+                .withPrefabValues(Team.class, team1, team2).withPrefabValues(Game.class, game1, game2)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test
     public void testUserRoleEqualsContract() {
         EqualsVerifier.forClass(UserRole.class).verify();
+    }
+
+    @Test
+    public void testActivityEqualsContract() {
+        EqualsVerifier.forClass(Activity.class).verify();
     }
 
     @Test
@@ -50,8 +55,7 @@ public class EqualsImplementationTest {
         newTopic1.setName("Test Topic 1");
         Topic newTopic2 = new Topic();
         newTopic2.setName("Test Topic 2");
-        EqualsVerifier.simple().forClass(Term.class)
-                .withPrefabValues(Term.class, newTerm1, newTerm2)
+        EqualsVerifier.simple().forClass(Term.class).withPrefabValues(Term.class, newTerm1, newTerm2)
                 .withPrefabValues(Topic.class, newTopic1, newTopic2)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
@@ -62,8 +66,7 @@ public class EqualsImplementationTest {
         newTopic1.setName("Test Topic 1");
         Topic newTopic2 = new Topic();
         newTopic2.setName("Test Topic 2");
-        EqualsVerifier.forClass(Topic.class)
-                .withPrefabValues(Topic.class, newTopic1, newTopic2)
+        EqualsVerifier.forClass(Topic.class).withPrefabValues(Topic.class, newTopic1, newTopic2)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 }

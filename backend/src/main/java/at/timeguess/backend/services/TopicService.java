@@ -25,6 +25,7 @@ public class TopicService {
      * Returns a list of all topics.
      * @return list of all topics
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public List<Topic> getAllTopics() {
         return topicRepository.findAll();
     }
@@ -34,7 +35,7 @@ public class TopicService {
      * @param name the name of the topic to load
      * @return a single Topic
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public Topic loadTopic(String name) {
         return topicRepository.findByName(name);
     }
@@ -45,12 +46,13 @@ public class TopicService {
      * @return the new topic
      * @throws TopicAlreadyExistsException
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public Topic saveTopic(Topic topic) throws TopicAlreadyExistsException {
         if (topic.isNew()) {
             Topic newTopic = topicRepository.save(topic);
             return newTopic;
-        } else {
+        }
+        else {
             throw new TopicAlreadyExistsException();
         }
     }

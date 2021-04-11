@@ -49,7 +49,7 @@ public class GameListController {
      * Returns a list of all current games for the given user.
      */
     public Collection<Game> getGamesCurrent(User user) {
-        return gameService.getByUser(user, true);
+        return gameService.getAllGames();//TODO: use this for production: gameService.getByUser(user, true);
     }
 
     /**
