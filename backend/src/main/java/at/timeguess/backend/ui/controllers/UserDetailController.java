@@ -52,7 +52,7 @@ public class UserDetailController implements Serializable {
      * Action to force a reload of the currently displayed user.
      */
     public void doReloadUser() {
-        user = userService.loadUser(user.getUsername());
+        user = userService.loadUser(user.getId());
     }
 
     /**
