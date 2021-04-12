@@ -32,6 +32,10 @@ form {
     margin-bottom: 30px !important;
 }
 
+table {
+	opacity: 0.95;
+}
+
 .login-block {
     width: 300px;
     position: absolute;
@@ -75,11 +79,11 @@ form {
 .eye-button-profile {
     top: 48px;
     left: -1px;
-    z-index: 10;
+    z-index: auto;
 }
 
 #header {
-    z-index: 10000 !important;
+    z-index: auto;
 }
 
 #footer {
@@ -90,16 +94,16 @@ form {
     bottom: 0;
     width: 99%;
     padding: 10px 50px 10px 0;
-    z-index: 101 !important;
+    z-index: auto;
 }
 
 #content {
     padding: 15px 15px 15px 15px !important;
-    z-index: 100 !important;
+    z-index: auto;
 }
 
 .main-menu .ui-widget-content {
-    z-index: 100000 !important;
+    z-index: auto;
 }
 
 .ui-widget-content {
@@ -115,6 +119,7 @@ form {
     background-color: #306585;
     margin: 5px !important;
     opacity: 0.9;
+    z-index: 100;
 }
 
 .ui-datepicker-calendar .ui-state-default {
@@ -180,7 +185,6 @@ form {
 .fc-button {
     border-radius: 10px !important;
     background-color: #306585 !important;
-    /*z-index: 101 !important;*/
 }
 
 .user-data-block {
