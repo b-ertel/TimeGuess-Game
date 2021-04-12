@@ -31,7 +31,7 @@
 				                <h:outputText value="#{topic.name}" />
 				            </p:column>
 				            <p:column style="width:100px;text-align: center">
-			                    <p:commandButton update=":statForm:topicStatDialog" oncomplete="PF('topicStatDialog').show()" icon="ui-icon-info" title="Edit">
+                                <p:commandButton update=":statForm:topicStatDialog" oncomplete="PF('topicStatDialog').show()" icon="fa fa-edit" title="Edit">
 			                        <f:setPropertyActionListener value="#{topic}" target="#{topicStatisticController.topic}" />
 			                    </p:commandButton>
 			                </p:column>

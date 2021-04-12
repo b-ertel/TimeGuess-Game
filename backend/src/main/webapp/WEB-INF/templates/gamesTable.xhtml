@@ -120,7 +120,7 @@
                     <p:commandButton title="Delete" icon="fa fa-trash" disabled="#{not isAdmin}"
                                      action="#{gameDetailController.doDeleteGame}" onsuccess="PF('gameTable').filter()" update="gameListForm:gameTable">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
-                        <p:confirm header="Confirmation" icon="ui-icon-alert" message="Are you sure about deleting this game? This cannot be undone." />
+                        <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this game? This cannot be undone." />
                     </p:commandButton>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
