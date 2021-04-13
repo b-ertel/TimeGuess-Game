@@ -10,7 +10,7 @@
                 template="/WEB-INF/templates/main.xhtml">
 
     <ui:define name ="content">
-        <c:set target="#{gameListController}" property="admin" value="#{isAdminAccess and isAdmin}"/>
+        <c:set value="#{isAdminAccess and isAdmin}" target="#{gameListController}" property="admin"/>
         <c:set var="noEditRight" value="#{!(sessionInfoBean.currentUser.username eq game.creator.username or isAdmin)}" />
 
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
@@ -24,7 +24,9 @@
 
             <ui:remove>show current games for player only</ui:remove>
             <p:dataView id="gameCurrent" widgetVar="gameCurrent" var="game" rendered="#{not isAdminAccess}"
-                value="#{gameListController.getGamesCurrent(sessionInfoBean.currentUser)}" gridIcon="fa fa-th-large" listIcon="fa fa-bars" styleClass="game">
+                gridIcon="fa fa-th-large" listIcon="fa fa-bars" styleClass="game"
+                value="#{gameListController.getGamesCurrent(sessionInfoBean.currentUser)}"
+                selection="#{gameListController.selectedGame}" selectionMode="single">
 
                 <p:dataViewGridItem>
                     <div class="game-grid-item card border-1">
@@ -151,22 +153,23 @@
 
         <h:form id="gameDetailForm">
             <ui:remove>edit game</ui:remove>
-            <p:dialog header="Edit Game" id="gameEditDialog" widgetVar="gameEditDialog"
+            <p:dialog header="Edit Game" id="gameEditDialog" widgetVar="gameEditDialog" dynamic="true"
                 modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
                 <p:ajax event="close" update="gameData" process="@parent" resetValues="true" />
 
-                <c:set var="curr" value="#{gameDetailController.game}" scope="request"/>
+                <c:set var="curr" value="#{gameDetailController.game}" scope="request" />
+                <c:set var="topicMsg" value="Topic: Value is required" />
                 <p:outputPanel id="gameData" rendered="#{not empty curr}">
                     <p:panelGrid columns="2" layout="flex"
                         columnClasses="p-col-3 p-col-align-center, p-col-9"
                         contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top:5px">
                         <p:outputLabel for="name" value="Name: " />
-                        <p:inputText id="name" value="#{curr.name}" required="true" />
+                        <p:inputText id="name" value="#{curr.name}" required="true" maxlength="100" />
                         <p:outputLabel for="maxPoints" value="Maximum Points: " />
-                        <p:spinner id="maxPoints" value="#{curr.maxPoints}" min="1" required="true" />
+                        <p:spinner id="maxPoints" value="#{curr.maxPoints}" required="true" min="1" />
                         <h:outputLabel for="topic" value="Choose topic" />
                         <p:selectOneMenu id="topic" value="#{curr.topic}" converter="omnifaces.SelectItemsConverter"
-                            required="true" requiredMessage="Topic: Value is required">
+                            required="true" requiredMessage="#{topicMsg}">
                             <p:ajax event="change" process="@this" />
                             <f:selectItem itemLabel="Select" noSelectionOption="true" />
                             <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
@@ -200,8 +203,8 @@
 
         <h:form id="gameInfoForm">
             <ui:remove>show game info</ui:remove>
-            <p:dialog header="Game Info" id="gameInfoDialog" widgetVar="gameInfoDialog" modal="true"
-                dynamic="true" resizable="false" showEffect="fade" hideEffect="fade" closeOnEscape="true" width="330">
+            <p:dialog header="Game Info" id="gameInfoDialog" widgetVar="gameInfoDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" width="330">
 
                 <p:panel id="gameInfoData" rendered="#{not empty curr}">
                     <div class="p-grid">
@@ -258,19 +261,21 @@
 
         <h:form id="gameCreateForm">
             <ui:remove>create new game</ui:remove>            
-            <p:dialog header="Create Game" id="gameCreateDialog" widgetVar="gameCreateDialog"
-                modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true">
+            <p:dialog header="Create Game" id="gameCreateDialog" widgetVar="gameCreateDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
+                <p:ajax event="close" update="gameCreateData" process="@parent" resetValues="true" />
 
                 <p:outputPanel id="gameCreateData">
                     <p:panelGrid columns="2" layout="flex"
                         columnClasses="p-col-3 p-col-align-center, p-col-9"
                         contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top: 5px ">
                         <p:outputLabel for="nameCreate" value="Name: "/>
-                        <p:inputText id="nameCreate" value="#{newGameBean.gameName}" required="true"/>
+                        <p:inputText id="nameCreate" value="#{newGameBean.gameName}" required="true" maxlength="100" />
                         <p:outputLabel for="maxPointsCreate" value="Maximum Points: "/>
-                        <p:spinner id="maxPointsCreate" value="#{newGameBean.maxPoints}" min="1" />
+                        <p:spinner id="maxPointsCreate" value="#{newGameBean.maxPoints}" required="true" min="1" />
                         <h:outputLabel for="topicCreate" value="Choose topic" />
-                        <p:selectOneMenu id="topicCreate" value="#{newGameBean.topic}" converter="omnifaces.SelectItemsConverter">
+                        <p:selectOneMenu id="topicCreate" value="#{newGameBean.topic}" converter="omnifaces.SelectItemsConverter"
+                            required="true" requiredMessage="#{topicMsg}">
                             <p:ajax event="change" process="@this" />
                             <f:selectItem itemLabel="Select" noSelectionOption="true" />
                             <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
@@ -280,8 +285,9 @@
 
                     <h:panelGrid columns="3">
                         <p:commandButton value="Save" action="#{newGameBean.createGame()}"
-                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); PF('gameTable').filter(); }"
-                            update=":gameListForm:gameTable :gameListForm:gameCurrent gameCreateData :msg"/>
+                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); }"
+                            update=":gameListForm :gameInfoForm:gameInfoData gameCreateData :msg">
+                        </p:commandButton>
                         <p:commandButton value="Reload" action="#{newGameBean.clearFields()}"
                             process="@parent" update=":gameCreateForm:gameCreateData :msg" resetValues="true"/>
                         <p:commandButton value="Abort" onclick="PF('gameCreateDialog').hide()"/>

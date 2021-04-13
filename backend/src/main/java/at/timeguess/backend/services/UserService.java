@@ -163,7 +163,7 @@ public class UserService {
 
             User auth = getAuthenticatedUser();
             LOGGER.info("User '{}' (id={}) was deleted by User '{}' (id={})", user.getUsername(), user.getId(),
-                    auth.getUsername(), auth.getId());            
+                    auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
             messageBean.alertError(user.getUsername(), "Deleting user failed");

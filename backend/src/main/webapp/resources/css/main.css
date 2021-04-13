@@ -33,7 +33,7 @@ form {
 }
 
 table {
-	opacity: 0.95;
+    opacity: 0.95;
 }
 
 .login-block {
@@ -150,6 +150,10 @@ table {
     -webkit-box-shadow: 0 0 15px 5px #195478 !important;
     box-shadow: 0 0 15px 5px #195478 !important;
     max-width: 600px !important;
+}
+
+.ui-dialog-titlebar {
+    background: rgba(91, 125, 122, 0.6) !important;
 }
 
 .ui-tabs-panel, .ui-tabs-panels {
