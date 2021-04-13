@@ -1,12 +1,21 @@
 package at.timeguess.backend.model;
 
+import java.io.Serializable;
+
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 
+import org.springframework.data.domain.Persistable;
+
 @Entity
-public class GameTeam {
+public class GameTeam implements Serializable, Persistable<GameTeamId>{
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6862225865089517788L;
 
     @EmbeddedId
     private GameTeamId id;
@@ -31,6 +40,7 @@ public class GameTeam {
 
     private int points;
 
+
     public Team getTeam() {
         return team;
     }
@@ -41,5 +51,15 @@ public class GameTeam {
 
     public int getPoints() {
         return points;
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.id == null ;
+    }
+
+    @Override
+    public GameTeamId getId() {
+        return id;
     }
 }

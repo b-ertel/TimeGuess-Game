@@ -37,6 +37,7 @@
 
 <p:separator />
 
+
 <h:panelGrid columns="2">
 <h:outputLabel for="#{dialogName}state" value="Game Status" />
 <h:selectOneMenu id="#{dialogName}state" value="#{gdc.game.status}">
@@ -57,6 +58,24 @@
 </h:panelGrid>
 
 <p:separator />
+<!--Teams go here-->
+      <h5>Multiple</h5>
+        <p:selectCheckboxMenu id="multiple" 
+                              value="#{gdc.game.teams}" 
+                              converter="#{teamConverter}"
+                              label="Teams" 
+                              style="min-width: 15rem"
+                              multiple="true" 
+                              filter="true" filterMatchMode="startsWith" 
+                              panelStyle="width: 30rem" scrollHeight="250">
+                <!--<p:ajax event="itemUnselect" listener="#{checkboxView.onItemUnselect}"/>-->
+                <f:selectItems value="#{teamService.availableTeams}"
+                               var="gteam"
+                               itemLabel="#{gteam.name}"
+                               />
+            </p:selectCheckboxMenu>
+<p:separator />
+
 <h:panelGrid columns="3">
 <p:commandButton value="Save" action="#{gdc.doSaveGame()}" oncomplete="PF('gameEditDialog2').hide()" update="#{parentTable}"/>
 <p:commandButton value="Delete" action="#{gdc.doDeleteGame()}" oncomplete="PF('gameEditDialog2').hide()" update="#{parentTable}"/>

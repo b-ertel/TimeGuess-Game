@@ -2,8 +2,10 @@ package at.timeguess.backend.model;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.*;
 
@@ -111,15 +113,26 @@ public class Game implements Serializable, Persistable<Long> {
         this.rounds = rounds;
     }
 
-    /**
-     * NOTE the set can not be directly updated - changes need to be saved via setTeams
-     */
-    public Set<GameTeam> getTeams() {
+    public Set<GameTeam> getGameTeams() {
         return teams;
     }
 
-    public void setTeams(Set<GameTeam> teams) {
+    public void setGameTeams(Set<GameTeam> teams) {
         this.teams = teams;
+    }
+
+    // NOTE for the editing its convenient to have the Teams directly
+    public List<Team> getTeams(){
+        return teams.stream().map(gt -> gt.getTeam()).collect(Collectors.toList());
+    }
+
+    public void setTeams(List<Team> newTeams){
+        teams = teams.stream().filter(t -> newTeams.contains(t.getTeam())).collect(Collectors.toSet());
+        
+        newTeams.removeAll(getTeams());
+        // from here newTeams only contains teams not already joined
+        List<GameTeam> newGameTeams = newTeams.stream().map(t -> new GameTeam(this, t)).collect(Collectors.toList());
+        teams.addAll(newGameTeams);
     }
 
     public Topic getTopic() {

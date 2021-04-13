@@ -26,6 +26,8 @@ public class Team {
     @ManyToMany(mappedBy = "teams")
     private Set<User> teamMembers;
 
+    private TeamState state;
+
     public Long getId() {
         return id;
     }
@@ -48,5 +50,13 @@ public class Team {
 
     public void setGames(Set<GameTeam> games) {
         this.games = games;
+    }
+
+    public TeamState getState() {
+        return state;
+    }
+
+    public void setState(TeamState state) {
+        this.state = state;
     }
 }

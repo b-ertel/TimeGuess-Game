@@ -174,7 +174,7 @@ public class GameServiceTest {
         long id = 4;
         Game game = gameService.loadGame(id);
         Assertions.assertNotNull(game, "Game \"" + id + "\" could not be loaded from test data source");
-        Set<GameTeam> teams = game.getTeams();
+        Set<GameTeam> teams = game.getGameTeams();
 
         Assertions.assertTrue(teams.size() > 0, "there should be teams");
 
@@ -186,11 +186,11 @@ public class GameServiceTest {
         teams.remove(rl.get(0));
 
         // NOTE need to explicitely setTeams
-        game.setTeams(teams);
+        game.setGameTeams(teams);
         gameService.saveGame(game);
 
         Game saveGame = gameService.loadGame(id);
-        int teamSizeAfter = saveGame.getTeams().size();
+        int teamSizeAfter = saveGame.getGameTeams().size();
 
         Assertions.assertEquals(teamSizeBefore - 1, teamSizeAfter, "Should be one less");
     }
