@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import at.timeguess.backend.model.Cube;
+import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.demo.LogEntry;
 import at.timeguess.backend.model.demo.LogEntryType;
@@ -58,6 +59,12 @@ public class CubeStatusController {
     public void setupCubeStatus() {
         this.cubeRepository.findAll()
                 .forEach(cube -> this.cubeStatus.put(cube.getMacAddress(), cube));
+    }
+    
+    public void statusChange(String macAddress, CubeStatus newStatus) {
+        this.cubeStatus.get(macAddress).setCubeStatus(newStatus);
+    	System.out.println(this.websocketManager.getCubeChannel().send("connectionCubeUpdate"));
+
     }
 
 

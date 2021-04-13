@@ -77,6 +77,11 @@ public class CubeService {
 	 * @return a list of all cubes 
 	 */
 	public List<Cube> getAllCubes() {
+		
+		for(Cube c : cubeRepo.findAll()) {
+			System.out.println(c);
+		}
+		
 		return cubeRepo.findAll();
 	}
 
@@ -86,7 +91,7 @@ public class CubeService {
 	 */
     @PreAuthorize("hasAuthority('ADMIN')")
 	public boolean isMacAddressKnown(String macAddress) {
-		if(cubeRepo.findByMacAddress(macAddress).getMacAddress()==null){
+		if(cubeRepo.findByMacAddress(macAddress)==null){
 			return false;
 		}
 		else {

@@ -1,7 +1,7 @@
 package at.timeguess.backend.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.timeguess.backend.services.CubeService;
-
+import at.timeguess.backend.ui.controllers.demo.CubeStatusController;
 import at.timeguess.backend.model.api.OnboardingMessage;
 import at.timeguess.backend.model.api.OnboardingResponse;
 import at.timeguess.backend.model.api.HealthMessage;
 import at.timeguess.backend.model.api.HealthResponse;
+import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.model.api.FacetsResponse;
 
@@ -22,10 +23,13 @@ import at.timeguess.backend.model.api.FacetsResponse;
  * REST Controller for communication with Raspberry Pi.
  */
 @RestController
+@Scope("application")
 public class Controller {
 	
 	@Autowired
 	private CubeService cubeService;
+	@Autowired
+	private CubeStatusController cubeStatusController;
 
     /**
      * Process messages from a Raspberry pi signaling
@@ -38,7 +42,17 @@ public class Controller {
     private OnboardingResponse processOnboarding(@RequestBody OnboardingMessage message) {
         // just a placeholder for the moment
         // "real" processing of the message and generation of response should happen in a service
-        OnboardingResponse response = new OnboardingResponse();
+        
+    	Cube newCube = cubeService.updateCube(message);
+    	System.out.println(newCube.getCubeStatus());
+    	
+    	cubeStatusController.statusChange(newCube.getMacAddress(), newCube.getCubeStatus());
+    	
+    	//cubeStatusController.setupCubeStatus();
+    	
+    	
+    	System.out.println(newCube.getMacAddress() + ", " + newCube.getConfiguration() + ", " + newCube.getCubeStatus());
+    	OnboardingResponse response = new OnboardingResponse();
         response.setSuccess(true);
         return response;
     }

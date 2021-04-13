@@ -15,15 +15,15 @@
         </h:outputScript>
 
         <h:form id="ChatRoomForm">
-            <div class="cubeFormContent">
-                <h1>CubeFace</h1>
+            <div class="chatRoomContent">
+                <h1>Cube Management</h1>
 
                 <p:panelGrid columns="3" style="width: 100%;"
                         columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
                    
-                  <p:panel header="Cubes" style=" border: none;">
+                  <p:panel header="Cubes" style=" border: none; width: 500px;">
                             <h3>Cubes online</h3>
-                     <p:scrollPanel id="onlineInfo"
+                     <p:scrollPanel id="onlineCubeInfo"
                                 styleClass="chatRoomPanelContent onlineInfoBox"
                                 widgetVar="onlineInfoWidget">
                          <ui:repeat var="cubeStatus"
@@ -32,6 +32,17 @@
                          </ui:repeat>
                      </p:scrollPanel>
         		  </p:panel>
+                  <p:panel header="CubeFace" style=" border: none; width: 500px;">
+                            <h3>Actual CubesFace</h3>
+                     <p:scrollPanel id="onlineInfoCubeFace"
+                                styleClass="chatRoomPanelContent onlineInfoBox"
+                                widgetVar="onlineInfoWidget">
+                         <ui:repeat var="cubeStatus"
+                                value="#{cubeStatusController.cubeStatusInfos}">
+                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatus}" />
+                         </ui:repeat>
+                     </p:scrollPanel>
+        		  </p:panel>        		  
           		</p:panelGrid>
             
             <p:separator />
@@ -82,8 +93,9 @@
                         <p:confirm header="Confirmation" message="Are you sure that you want to delete this user? You cannot undo this operation." icon="ui-icon-alert" />
                     </p:commandButton>  
                 </p:column> -->
-            </p:dataTable>
+              </p:dataTable>
        
+             
             <p:dialog header="Edit CubeFace" id="cubeEditDialog" widgetVar="cubeEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="cubeData" rendered="#{not empty cubeFaceController.cubeFace}">
                     <h:panelGrid columns="2">
@@ -113,11 +125,12 @@
             
            <o:socket channel="cubeChannel" scope="application"
                 onmessage="function(m){console.log(m);}">
-                <f:ajax event="connectionUpdate"
-                    render="onlineInfo recipientsSelection actionLog sendBtn"
+                <f:ajax event="connectionCubeUpdate"
+                    render="onlineCubeInfo recipientsSelection actionLog sendBtn"
                     listener="#{userChatController.synchronizeRecipients()}"
                     onevent="scrollToEventLogAndOnlineInfoBottom" />
             </o:socket>
+            
 		</h:form>	
     </ui:define>
 </ui:composition>

@@ -15,11 +15,15 @@
 	</cc:interface>
 	<cc:implementation>
 		<ui:param name="styleClassName"
-			value="#{cc.attrs.cubeStatusInfo.cubeStatus eq 'OFFLINE' ? 'loggedOut' : 'loggedIn'}" />
-		<h:panelGrid columns="2">
+			value="#{cc.attrs.cubeStatusInfo.cubeStatus eq 'READY' ? 'loggedIn' : 'loggedOut'}" />
+		<h:panelGrid columns="4">
 			<h:outputText value="#{cc.attrs.cubeStatusInfo.name}"
+					styleClass="#{styleClassName}" />
+			<h:outputText value="#{cc.attrs.cubeStatusInfo.id}"
 				styleClass="#{styleClassName}" />
 			<h:outputText value="#{cc.attrs.cubeStatusInfo.cubeStatus}"
+				styleClass="#{styleClassName}" />
+			<h:outputText value="#{cc.attrs.cubeStatusInfo.cubeStatus.message}"
 				styleClass="#{styleClassName}" />
 		</h:panelGrid>
 	</cc:implementation>
