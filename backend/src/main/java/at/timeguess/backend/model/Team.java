@@ -11,7 +11,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 @Entity
-public class Team {
+public class Team implements  Comparable<Team> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,5 +58,10 @@ public class Team {
 
     public void setState(TeamState state) {
         this.state = state;
+    }
+
+    @Override
+    public int compareTo(Team o) {
+        return name.compareTo(o.getName());
     }
 }

@@ -72,13 +72,13 @@ public class GameService {
         // maybe a bit messy to replace gameteams this way
         Optional<Game> dbGame = gameRepo.findById(game.getId());
         if (!dbGame.isEmpty()) {
-            Set<GameTeam> origTeams = dbGame.get().getGameTeams();
-            origTeams.removeAll(game.getGameTeams());
+            Set<GameTeam> origTeams = dbGame.get().getTeams();
+            origTeams.removeAll(game.getTeams());
             origTeams.stream().forEach(t -> gameTeamService.delete(t));
         }
 
         // save all the new gameteams
-        game.getGameTeams().stream().forEach(t -> gameTeamService.save(t));
+        game.getTeams().stream().forEach(t -> gameTeamService.save(t));
 
         Game ret = gameRepo.save(game);
 

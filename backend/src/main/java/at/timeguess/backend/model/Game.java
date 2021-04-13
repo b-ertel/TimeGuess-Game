@@ -113,23 +113,23 @@ public class Game implements Serializable, Persistable<Long> {
         this.rounds = rounds;
     }
 
-    public Set<GameTeam> getGameTeams() {
+    public Set<GameTeam> getTeams() {
         return teams;
     }
 
-    public void setGameTeams(Set<GameTeam> teams) {
+    public void setTeams(Set<GameTeam> teams) {
         this.teams = teams;
     }
 
     // NOTE for the editing its convenient to have the Teams directly
-    public List<Team> getTeams(){
+    public List<Team> getActualTeams(){
         return teams.stream().map(gt -> gt.getTeam()).collect(Collectors.toList());
     }
 
-    public void setTeams(List<Team> newTeams){
+    public void setActualTeams(List<Team> newTeams){
         teams = teams.stream().filter(t -> newTeams.contains(t.getTeam())).collect(Collectors.toSet());
         
-        newTeams.removeAll(getTeams());
+        newTeams.removeAll(getActualTeams());
         // from here newTeams only contains teams not already joined
         List<GameTeam> newGameTeams = newTeams.stream().map(t -> new GameTeam(this, t)).collect(Collectors.toList());
         teams.addAll(newGameTeams);

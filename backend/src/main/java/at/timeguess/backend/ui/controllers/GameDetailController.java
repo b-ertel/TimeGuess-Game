@@ -1,13 +1,20 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.GameService;
+import at.timeguess.backend.services.TeamService;
 
 /**
  * Controller for the game detail view.
@@ -20,14 +27,18 @@ public class GameDetailController implements Serializable {
     @Autowired
     private GameService gameService;
 
+    @Autowired
+    private TeamService teamService;
     /**
      * Attribute to cache the currently displayed game
      */
     private Game game;
 
     /**
-     * Sets the currently displayed game and reloads it form db.
-     * This game is targeted by any further calls of {@link #doReloadGame()}, {@link #doSaveGame()} and {@link #doDeleteGame()}.
+     * Sets the currently displayed game and reloads it form db. This game is
+     * targeted by any further calls of {@link #doReloadGame()},
+     * {@link #doSaveGame()} and {@link #doDeleteGame()}.
+     *
      * @param game
      */
     public void setGame(Game game) {
@@ -37,6 +48,7 @@ public class GameDetailController implements Serializable {
 
     /**
      * Returns the currently displayed game.
+     *
      * @return
      */
     public Game getGame() {
@@ -69,9 +81,17 @@ public class GameDetailController implements Serializable {
 
     /**
      * Confirms given users participation in current game.
+     *
      * @param user user whose participation in current game is confirmed.
      */
     public void confirm(User user) {
         this.gameService.confirm(user, game);
+    }
+
+    public Set<Team> getPossibleTeams() {
+        Set<Team> poss = new TreeSet<>(teamService.getAvailableTeams());
+        // NOTE once availTeams is implemented correctly there is no more duplication with actualTeams
+        poss.addAll(game.getActualTeams());
+        return poss;
     }
 }

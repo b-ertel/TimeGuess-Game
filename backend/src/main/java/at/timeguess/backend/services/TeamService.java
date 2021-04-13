@@ -23,6 +23,8 @@ public class TeamService {
         return teamRepository.findAll();
     }
     public List<Team> getAvailableTeams() {
+		// TODO
+		// should be teamRepository.findByStatus(AVAILABLE);
         return teamRepository.findAll();
     }
     public Optional<Team> findById(Long id) {
