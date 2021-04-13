@@ -54,9 +54,10 @@
   - somehow gameDetailController gets stuck at the problematic game
   - games with Topic/teams/rounds can not get deleted (although the controller tests show the controller can delete)
 -->
-<p:commandButton update=":gameForm:gameEditDialog" oncomplete="PF('gameEditDialog').show()" icon="ui-icon-note" title="Edit">
+<p:commandButton update=":gameForm:gameEditDialog2" oncomplete="PF('gameEditDialog2').show()" icon="ui-icon-note" title="Edit">
 <f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />
 </p:commandButton>
+
 
 <p:commandButton action="#{gameDetailController.doDeleteGame}" icon="fa fa-trash" title="Delete" update=":gameForm:gamesTable">
 <f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />
@@ -66,61 +67,16 @@
 </p:column>
 </p:dataTable>
 
-<p:dialog header="Edit Game" id="gameEditDialog" widgetVar="gameEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-<p:outputPanel id="gameData" rendered="#{not empty gameDetailController.game}">
-<h:panelGrid columns="2">
-<p:outputLabel for="name" value="Name of game: " />
-<p:inputText id="name" value="#{gameDetailController.game.name}" />
 
-<p:outputLabel for="creator" value="Managed by: " />
-<p:outputLabel id="creator" value="#{gameDetailController.game.creator.username}" />
-</h:panelGrid>
-<p:separator />
-
-<h:panelGrid columns="2">
-<p:outputLabel for="maxPoints" value="Maximum of points" />
-<p:inputNumber id="maxPoints" value="#{gameDetailController.game.maxPoints}"
-                              minValue = "1" maxValue="999"/>
-
-<p:outputLabel for="roundEd" value="Game round" />
-<p:inputNumber id="roundEd" value="#{gameDetailController.game.roundNr}"
-                              minValue = "0" maxValue="999"/>
-</h:panelGrid>
-<p:separator />
-
-<h:panelGrid columns="2">
-
-<h:outputLabel for="state" value="state" />
-<h:selectOneMenu id="state" value="#{gameDetailController.game.status}">
-<f:selectItems value="#{dataBean.states}" />
-</h:selectOneMenu>
-
-</h:panelGrid>
-
-<h:panelGrid columns="2">
-
-<h:outputLabel for="topic" value="Choose topic" />
-<h:selectOneMenu id="topic" value="#{gameDetailController.game.topic}" converter="omnifaces.SelectItemsConverter">
-<p:ajax event="change" process="@this" />
-<f:selectItem itemLabel="Select" noSelectionOption="true" />
-<f:selectItems value="#{topicListController.topics}" 
-               var="topval"
-               itemLabel="#{topval.name}"/>
-</h:selectOneMenu>
-</h:panelGrid>
-
-<p:separator />
-<h:panelGrid columns="3">
-<p:commandButton value="Save" action="#{gameDetailController.doSaveGame()}" oncomplete="PF('gameEditDialog').hide()" update=":gameForm:gamesTable"/>
-<p:commandButton value="Delete" action="#{gameDetailController.doDeleteGame()}" oncomplete="PF('gameEditDialog').hide()" update=":gameForm:gamesTable"/>
-<p:commandButton value="Reload" action="#{gameDetailController.doReloadGame()}" update=":gameForm:gameData"/>
-<p:commandButton value="Abort" onclick="PF('gameEditDialog').hide()"/>
-</h:panelGrid>
-</p:outputPanel>
-</p:dialog>
+<ui:include src="/WEB-INF/includes/game_editor.xhtml" >
+        <ui:param name="dialogName" value="gameEditDialog2" />
+<ui:param name="gdc" value="#{gameDetailController}" />
+<ui:param name="parentTable" value=":gameForm:gamesTable"/>
+</ui:include >
 </h:form>
 
 <p:separator />
+
 
 </ui:define>
 </ui:composition>
