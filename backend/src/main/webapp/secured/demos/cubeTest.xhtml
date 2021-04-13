@@ -8,9 +8,35 @@
 	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
 	xmlns:demo="http://java.sun.com/jsf/composite/demo"
 	template="/WEB-INF/templates/main.xhtml">
-    <ui:define name ="content">
+    <ui:define name="content">
+        <!-- see chat.js -->
+        <h:outputScript>			
+            pfContext=PF
+        </h:outputScript>
 
-		<h:form id="chatRoomForm">         
+        <h:form id="ChatRoomForm">
+            <div class="cubeFormContent">
+                <h1>CubeFace</h1>
+
+                <p:panelGrid columns="3" style="width: 100%;"
+                        columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
+                   
+                  <p:panel header="Cubes" style=" border: none;">
+                            <h3>Cubes online</h3>
+                     <p:scrollPanel id="onlineInfo"
+                                styleClass="chatRoomPanelContent onlineInfoBox"
+                                widgetVar="onlineInfoWidget">
+                         <ui:repeat var="cubeStatus"
+                                value="#{cubeStatusController.cubeStatusInfos}">
+                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatus}" />
+                         </ui:repeat>
+                     </p:scrollPanel>
+        		  </p:panel>
+          		</p:panelGrid>
+            
+            <p:separator />
+            <p:separator />       
+            
             <p:dataTable id="cubeTable" style="width:800px" var="cube" value="#{cubeController.allCubes}">
                 <p:column headerText="CubeId">
                     <h:outputText value="#{cube.id}"/>
@@ -82,6 +108,16 @@
                 <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
             </p:confirmDialog>
+            
+             </div>
+            
+           <o:socket channel="cubeChannel" scope="application"
+                onmessage="function(m){console.log(m);}">
+                <f:ajax event="connectionUpdate"
+                    render="onlineInfo recipientsSelection actionLog sendBtn"
+                    listener="#{userChatController.synchronizeRecipients()}"
+                    onevent="scrollToEventLogAndOnlineInfoBottom" />
+            </o:socket>
 		</h:form>	
     </ui:define>
 </ui:composition>
