@@ -7,94 +7,95 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://java.sun.com/jsp/jstl/core"
       >
-    <body>
+      <body>
         <ui:composition>
         <ui:param name="dialogName" value="gameEditDialog2" />
         <ui:param name="gdc" value="#{gameDetailController}" />
         <ui:param name="parentTable" value=":gameForm:gamesTable"/>
-        <h2>hello world</h2>
 
         <p:dialog header="Edit Game" id="#{dialogName}" widgetVar="#{dialogName}" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-<p:outputPanel id="gameData2" rendered="#{not empty gdc.game}" > 
-<h:panelGrid columns="2">
-<p:outputLabel for="#{dialogName}name" value="Name of game: " />
-<p:inputText id="#{dialogName}name" value="#{gdc.game.name}" />
+        <p:outputPanel id="#{dialogName}Panel" rendered="#{not empty gdc.game}" > 
+        <h:panelGrid columns="2">
+        <p:outputLabel for="#{dialogName}name" value="Name of game: " />
+        <p:inputText id="#{dialogName}name" value="#{gdc.game.name}" />
 
-<p:outputLabel for="#{dialogName}creator" value="Managed by: " />
-<p:outputLabel id="#{dialogName}creator" value="#{gdc.game.creator.username}" />
-</h:panelGrid>
-<p:separator />
+        <p:outputLabel for="#{dialogName}creator" value="Managed by: " />
+        <p:outputLabel id="#{dialogName}creator" value="#{gdc.game.creator.username}" />
+        </h:panelGrid>
+        <p:separator />
 
-<h:panelGrid columns="2">
-<p:outputLabel for="#{dialogName}maxPoints" value="Maximum of points" />
-<p:inputNumber id="#{dialogName}maxPoints" value="#{gdc.game.maxPoints}"
-                                           disabled="#{gdc.lockedMaxPoints}"
-                              minValue = "1" maxValue="999"/>
+        <h:panelGrid columns="2">
+        <p:outputLabel for="#{dialogName}maxPoints" value="Maximum of points" />
+        <p:inputNumber id="#{dialogName}maxPoints" value="#{gdc.game.maxPoints}"
+                                                   disabled="#{gdc.lockedMaxPoints}"
+                                                   minValue = "1" maxValue="999"/>
 
-<p:outputLabel for="#{dialogName}roundEd" value="Game round" />
-<p:inputNumber id="#{dialogName}roundEd" value="#{gdc.game.roundNr}"
-                              minValue = "0" maxValue="999"/>
-</h:panelGrid>
+        <p:outputLabel for="#{dialogName}roundEd" value="Game round" />
+        <p:inputNumber id="#{dialogName}roundEd" value="#{gdc.game.roundNr}"
+                                                 minValue = "0" maxValue="999"/>
+        </h:panelGrid>
 
-<p:separator />
+  <p:separator />
 
 
-<h:panelGrid columns="2">
-<h:outputLabel for="#{dialogName}state" value="Game Status" />
-<h:selectOneMenu id="#{dialogName}state" value="#{gdc.game.status}">
-<f:selectItems value="#{dataBean.states}" 
-               var="state"
-               itemDisabled="#{not( gdc.canTraverse(state) )}"
-               />
-</h:selectOneMenu>
-</h:panelGrid>
+  <h:panelGrid columns="2">
+  <h:outputLabel for="#{dialogName}state" value="Game Status" />
+  <h:selectOneMenu id="#{dialogName}state" value="#{gdc.game.status}">
+  <f:selectItems value="#{dataBean.states}" 
+                 var="state"
+                 itemDisabled="#{not( gdc.canTraverse(state) )}"
+                 />
+  </h:selectOneMenu>
+  </h:panelGrid>
 
-<h:panelGrid columns="2">
+  <h:panelGrid columns="2">
 
-<h:outputLabel for="#{dialogName}topic" value="Choose topic" />
-<h:selectOneMenu id="#{dialogName}topic" value="#{gameDetailController.game.topic}" 
-                                         disabled="#{gdc.lockedTopic}"
-                                         converter="omnifaces.SelectItemsConverter">
-<p:ajax event="change" process="@this" />
-<f:selectItem itemLabel="Select" noSelectionOption="true" />
-<f:selectItems value="#{topicListController.topics}" 
-               var="topval"
-               itemLabel="#{topval.name}"/>
-</h:selectOneMenu>
-</h:panelGrid>
+  <h:outputLabel for="#{dialogName}topic" value="Choose topic" />
+  <h:selectOneMenu id="#{dialogName}topic" value="#{gameDetailController.game.topic}" 
+                                           disabled="#{gdc.lockedTopic}"
+                                           converter="omnifaces.SelectItemsConverter">
+  <p:ajax event="change" process="@this" />
+  <f:selectItem itemLabel="Select" noSelectionOption="true" />
+  <f:selectItems value="#{topicListController.topics}" 
+                 var="topval"
+                 itemLabel="#{topval.name}"/>
+  </h:selectOneMenu>
+  </h:panelGrid>
 
-<p:separator />
-<!--Teams go here-->
-<p:selectCheckboxMenu id="multiple" 
-                      value="#{gdc.game.actualTeams}" 
-                      converter="#{teamConverter}"
-                      disabled="#{gdc.lockedTeam}"
-                      label="Teams" 
-                      style="min-width: 15rem"
-                      multiple="true" 
-                      filter="true" filterMatchMode="startsWith" 
-                                    panelStyle="width: 30rem" scrollHeight="250">
-<!--<p:ajax event="itemUnselect" listener="#{checkboxView.onItemUnselect}"/>-->
-<f:selectItems value="#{gdc.possibleTeams}"
-               var="gteam"
-               itemLabel="#{gteam.name}"
-               />
-</p:selectCheckboxMenu>
-<p:separator />
+  <p:separator />
+  <!--Teams go here-->
+  <p:selectCheckboxMenu id="multiple" 
+                        value="#{gdc.game.actualTeams}" 
+                        converter="#{teamConverter}"
+                        disabled="#{gdc.lockedTeam}"
+                        label="Teams" 
+                        style="min-width: 15rem"
+                        multiple="true" 
+                        filter="true" 
+                        filterMatchMode="startsWith" 
+                        panelStyle="width: 30rem" scrollHeight="250">
+  <!--<p:ajax event="itemUnselect" listener="#{checkboxView.onItemUnselect}"/>-->
+  <f:selectItems value="#{gdc.possibleTeams}"
+                 var="gteam"
+                 itemLabel="#{gteam.name}"
+                 />
+  </p:selectCheckboxMenu>
+  <p:separator />
 
-<h:panelGrid columns="3">
-<p:commandButton value="Save" action="#{gdc.doSaveGame()}" oncomplete="PF('gameEditDialog2').hide()" update="#{parentTable}"/>
+  <h3>note: at the moment save fails if game has no topic</h3>
+  <h:panelGrid columns="3">
+  <p:commandButton value="Save" action="#{gdc.doSaveGame()}" oncomplete="PF('gameEditDialog2').hide()" update="#{parentTable}"/>
 
-<p:commandButton value="Delete" action="#{gdc.doDeleteGame()}" 
-                                disabled="#{gdc.lockedDelete}"
-                                oncomplete="PF('gameEditDialog2').hide()" 
-                                update="#{parentTable}"/>
-<p:commandButton value="Abort" onclick="PF('gameEditDialog2').hide()"/>
-</h:panelGrid>
-</p:outputPanel>
-</p:dialog>
+  <p:commandButton value="Delete" action="#{gdc.doDeleteGame()}" 
+                                  disabled="#{gdc.lockedDelete}"
+                                  oncomplete="PF('gameEditDialog2').hide()" 
+                                  update="#{parentTable}"/>
+  <p:commandButton value="Abort" onclick="PF('gameEditDialog2').hide()"/>
+  </h:panelGrid>
+  </p:outputPanel>
+  </p:dialog>
 
         </ui:composition>
-    </body>
+      </body>
 </html>
 

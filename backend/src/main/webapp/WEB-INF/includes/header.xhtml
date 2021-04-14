@@ -13,6 +13,8 @@
             <c:set var="isAdmin" value="#{sessionInfoBean.hasRole('ADMIN')}" scope="request" />
             <h:form>
                 <p:menubar>
+                    <p:menuitem icon="fa fa-home" url="/secured/welcome.xhtml" rendered="#{isLoggedIn}" />
+
                     <p:menuitem icon="fa fa-users" value="&nbsp;User Profiles&nbsp;" url="/secured/users.xhtml" rendered="#{isPlayer}"/>
 
                     <p:submenu icon="fa fa-cube" label="&nbsp;Virtual Lobby&nbsp;" rendered="#{isPlayer}">
@@ -30,14 +32,10 @@
                     </p:submenu>
                     
                     <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login&nbsp;" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
+                    <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout&nbsp;" url="/logout" rendered="#{isLoggedIn}"/>
 
-                    <p:submenu label="&nbsp;Other&nbsp;" rendered="#{isLoggedIn}">
-                        <p:menuitem icon="fa fa-info" value="&nbsp;Info&nbsp;" url="/secured/welcome.xhtml"/>
-                        <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout&nbsp;" url="/logout"/>
-                    </p:submenu>
-
-                    <p:submenu label="Debug Menu" rendered="#{isLoggedIn}">
-                        <p:menuitem value="Game" url="/debug/game.xhtml" />
+                    <p:submenu label="Development" rendered="#{isLoggedIn}">
+                        <p:menuitem value="Game" url="/debug/game.xhtml" rendered="#{sessionInfoBean.hasRole('PLAYER')}"/>
                         <p:menuitem value="Team" url="/debug/team.xhtml" />
                         <p:menuitem value="CubeTest" url="/secured/demos/cubeTest.xhtml"/>  
                         <p:menuitem value="Security Test" url="/secured/test.xhtml"/>

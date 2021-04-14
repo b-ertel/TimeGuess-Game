@@ -154,7 +154,6 @@ public class UserServiceTest {
         String fName = "New";
         String lName = "User";
         String email = "new-email@whatever.wherever";
-        String phone = "+12 345 67890";
         User toBeCreatedUser = new User();
         toBeCreatedUser.setUsername(username);
         toBeCreatedUser.setPassword(password);
@@ -162,7 +161,6 @@ public class UserServiceTest {
         toBeCreatedUser.setFirstName(fName);
         toBeCreatedUser.setLastName(lName);
         toBeCreatedUser.setEmail(email);
-        toBeCreatedUser.setPhone(phone);
         toBeCreatedUser.setRoles(Sets.newSet(UserRole.PLAYER, UserRole.MANAGER));
         userService.saveUser(toBeCreatedUser);
 
@@ -173,7 +171,6 @@ public class UserServiceTest {
         Assertions.assertEquals(fName, freshlyCreatedUser.getFirstName(), "User \"" + username + "\" does not have a the correct firstName attribute stored being saved");
         Assertions.assertEquals(lName, freshlyCreatedUser.getLastName(), "User \"" + username + "\" does not have a the correct lastName attribute stored being saved");
         Assertions.assertEquals(email, freshlyCreatedUser.getEmail(), "User \"" + username + "\" does not have a the correct email attribute stored being saved");
-        Assertions.assertEquals(phone, freshlyCreatedUser.getPhone(), "User \"" + username + "\" does not have a the correct phone attribute stored being saved");
         Assertions.assertTrue(freshlyCreatedUser.getRoles().contains(UserRole.MANAGER), "User \"" + username + "\" does not have role MANAGER");
         Assertions.assertTrue(freshlyCreatedUser.getRoles().contains(UserRole.PLAYER), "User \"" + username + "\" does not have role PLAYER");
         Assertions.assertNotNull(freshlyCreatedUser.getCreateUser(), "User \"" + username + "\" does not have a createUser defined after being saved");
