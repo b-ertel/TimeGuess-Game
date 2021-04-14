@@ -9,6 +9,7 @@ import at.timeguess.backend.model.demo.UserStatusInfo;
 import at.timeguess.backend.repositories.UserRepository;
 import at.timeguess.backend.services.TermService;
 import at.timeguess.backend.spring.UserStatusInitializationHandler;
+import at.timeguess.backend.ui.controllers.TermListController;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -25,13 +26,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * This controller holds and manages all user's status-information (i.e. their
- * online-status)
+ * This controller is responsible for showing a term in the game window with websockets
+ *
  *
  * This class is part of the skeleton project provided for students of the
  * courses "Software Architecture" and "Software Engineering" offered by the
  * University of Innsbruck.
  */
+
 @Controller
 @Scope("application")
 @CDIContextRelated
@@ -39,37 +41,28 @@ public class termController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
     private TermService termService;
     @CDIAutowired
     private WebSocketManager websocketManager;
-    private List<Term> terms = new CopyOnWriteArrayList<Term>();
 
-    private Term currentTerm = new Term();
-
-    private List<Term> allTerms = new CopyOnWriteArrayList<Term>();;
+    private Term currentTerm;
 
 
-    public void reloadTerms() {
-        this.allTerms = this.termService.getAllTerms();
+    @PostConstruct
+    public void setup() {
+        this.currentTerm = this.termService.getAllTerms().get((int) (Math.random()*20)) ;
     }
 
 
-    public void setTerm() {
-        this.currentTerm = this.allTerms.get((int) (Math.random()*20) );
-        this.terms.add(currentTerm);
-        //this.termChange();
-        //this.termController.deliver();
-    }
 
 
     public Term getCurrentTerm() {
-       //currentTerm = new Term();
-       //currentTerm.setName(""+(Math.random()*20));
        return this.currentTerm;
     }
 
     public void termChange() {
-        this.currentTerm.setName(""+(Math.random()*20));
+        this.currentTerm = this.termService.getAllTerms().get((int) (Math.random()*20));
         this.websocketManager.getTermChannel().send("termUpdate");
     }
 
