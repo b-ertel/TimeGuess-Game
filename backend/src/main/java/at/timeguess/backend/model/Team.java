@@ -52,6 +52,20 @@ public class Team implements  Comparable<Team> {
         this.games = games;
     }
 
+    /**
+     * @return the teamMembers
+     */
+    public Set<User> getTeamMembers() {
+        return teamMembers;
+    }
+
+    /**
+     * @param teamMembers the teamMembers to set
+     */
+    public void setTeamMembers(Set<User> teamMembers) {
+        this.teamMembers = teamMembers;
+    }
+
     public TeamState getState() {
         return state;
     }

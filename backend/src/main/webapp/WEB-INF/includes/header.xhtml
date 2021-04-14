@@ -37,7 +37,8 @@
                     </p:submenu>
 
                     <p:submenu label="Debug Menu" rendered="#{isLoggedIn}">
-                        <p:menuitem value="Game" url="/debug/game.xhtml" rendered="#{sessionInfoBean.hasRole('PLAYER')}"/>
+                        <p:menuitem value="Game" url="/debug/game.xhtml" />
+                        <p:menuitem value="Team" url="/debug/team.xhtml" />
                         <p:menuitem value="CubeTest" url="/secured/demos/cubeTest.xhtml"/>  
                         <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
                         <p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>
