@@ -18,73 +18,38 @@
             <div class="chatRoomContent">
                 <h1>Chatroom</h1>
 
-                <p:panelGrid columns="2" style="width: 100%;"
+                <p:panelGrid columns="1" style="width: 100%;"
                         columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
 
-             <!--   <p:panel header="Topics" style="border: none;">
-                            <p>Hier kommen allgemeine Statistiken</p>
-                    </p:panel>  -->
-                    
-                    <p:panel header="Tutorial" style="border: none;">
-                            <ui:include src="/resources/includes/websocketsDescription.xhtml" />
-                    </p:panel>
-                    
 
-                    <p:panel header="Chat" style=" border: none;">
-                        <h3>Term</h3>
-                        <p:scrollPanel id="termInfo">
-                            <ui:repeat var="term"
-                                       value="#{termController.currentTerm}">
-                                <demo:termOutput term="#{term}" />
-                            </ui:repeat>
-                        </p:scrollPanel>
-                        <h:commandButton id="termBtn" value="newTerm"
-                                         action="#{termController.termChange}">
-                        </h:commandButton>
-                            <h3>Who's online?</h3>
-                        <p:scrollPanel id="onlineInfo"
-                                styleClass="chatRoomPanelContent onlineInfoBox"
-                                widgetVar="onlineInfoWidget">
-                            <ui:repeat var="userStatusEntry"
-                                value="#{userStatusController.userStatusInfos}">
-                                <demo:userStatusOutput userStatusInfo="#{userStatusEntry}" />
-                            </ui:repeat>
-                        </p:scrollPanel>
-                        <h3>What's going on?</h3>
-                        <p:scrollPanel id="actionLog"
-                                styleClass="chatRoomPanelContent actionLogBox"
-                                widgetVar="eventLogwWidget">
-                            <ui:repeat var="logEntry"
-                                value="#{userStatusController.actionLogs}">
-                                <demo:logOutput logEntry="#{logEntry}" />
-                            </ui:repeat>
-                        </p:scrollPanel>
-                        <h3>Messages</h3>
-                        <p:scrollPanel id="chatContentWindow"
-                                styleClass="chatRoomPanelContent chatBox"
-                                widgetVar="chatWindowWidget">
-                            <ui:repeat var="msg" value="#{userChatController.chatContent}">
-                                <demo:msgOutput message="#{msg}" />
-                            </ui:repeat>
-                        </p:scrollPanel>
-                        <h:panelGrid id="recipientsSelection" columns="2"
-                                style="height: 50px;">
-                            <h:outputText value="Send to" />
-                            <p:selectManyButton
-                                value="#{userChatController.currentMessage.to}">
-                                <f:selectItems value="#{userChatController.possibleRecipients}" />
-                                <f:ajax execute="@this" render="sendBtn" />
-                            </p:selectManyButton>
-                        </h:panelGrid>
-                        <p:inputTextarea id="msgBox" rows="3"
-                                value="#{userChatController.currentMessage.text}"
-                                style="padding: 0px;" styleClass="chatRoomPanelContent" />
-                        <h:commandButton id="sendBtn" value="Send"
-                                action="#{userChatController.sendMessage()}"
-                                disabled="#{empty userChatController.currentMessage.to}">
-                            <f:ajax execute="@form" render="msgBox" />
-                        </h:commandButton>
+
+                    <h3>Term</h3>
+                    <p:scrollPanel id="termInfo">
+                        <ui:repeat var="term"
+                                   value="#{webSocketTermController.currentTerm}">
+                            <demo:termOutput term="#{term}" />
+                        </ui:repeat>
+                    </p:scrollPanel>
+                    <h:commandButton id="termBtn" value="newTerm"
+                                     action="#{webSocketTermController.termChange}">
+                    </h:commandButton>
+
+                    <h3>CubeFace</h3>
+                    <p:panel id="cubeFace">
+                        <ui:repeat var="cubeFace"
+                                   value="#{webSocketCubeFace.currentFace}">
+                            <p style="font-weight: bold;"> time </p>
+                            <h:outputText value="#{cubeFace.time}" style="font-weight: bold;"/>
+                            <p style="font-weight: bold;"> points: </p>
+                            <h:outputText value="#{cubeFace.points}" style="font-weight: bold;"/>
+                            <p style="font-weight: bold;"> id </p>
+                            <h:outputText value="#{cubeFace.id}" style="font-weight: bold;"/>
+                        </ui:repeat>
                     </p:panel>
+                    <h:commandButton id="faceBtn" value="roooollTheeeDiiiiceee"
+                                     action="#{webSocketCubeFace.cubeChange}">
+                    </h:commandButton>
+
                 </p:panelGrid>
             </div>
 
@@ -93,25 +58,19 @@
                       onmessage="function(m){console.log(m);}">
                 <f:ajax event="termUpdate"
                         render="termInfo"
-                        listener="#{userChatController.synchronizeRecipients()}" />
+                        listener="#{userChatController.synchronizeRecipients()}" />              <!-- TODO: listener auf gegnerisches Team ändern...  -->
+            </o:socket>
+
+            <o:socket channel="cubeChannel" scope="application"
+                      onmessage="function(m){console.log(m);}">
+                <f:ajax event="cubeChange"
+                        render="cubeFace"
+                        listener="#{userChatController.synchronizeRecipients()}" />              <!-- TODO: listener auf alle im Spiel ändern...  -->
             </o:socket>
 
 
 
-            <o:socket channel="userRegistrationChannel" scope="application"
-                onmessage="function(m){console.log(m);}">
-                <f:ajax event="connectionUpdate"
-                    render="onlineInfo recipientsSelection actionLog sendBtn"
-                    listener="#{userChatController.synchronizeRecipients()}"
-                    onevent="scrollToEventLogAndOnlineInfoBottom" />
-            </o:socket>
 
-            <o:socket channel="messageChannel" scope="session"
-                user="#{sessionInfoBean.currentUserName}"
-                onmessage="function(m){console.log(m);}">
-                <f:ajax event="msgRecieved" execute="@all"
-                    render="chatContentWindow" onevent="scrollToChatBottom" />
-            </o:socket>
         </h:form>
     </ui:define>
 </ui:composition>
