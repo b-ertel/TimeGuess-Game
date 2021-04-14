@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.GameService;
@@ -90,8 +91,84 @@ public class GameDetailController implements Serializable {
 
     public Set<Team> getPossibleTeams() {
         Set<Team> poss = new TreeSet<>(teamService.getAvailableTeams());
-        // NOTE once availTeams is implemented correctly there is no more duplication with actualTeams
+        // NOTE once availTeams is implemented correctly there is no more duplication
+        // with actualTeams
         poss.addAll(game.getActualTeams());
         return poss;
+    }
+
+    public Set<GameState> getPossNextStates() {
+        Set<GameState> poss = new TreeSet<>();
+        // always include current state in list of options
+        // always allow cancellation
+        poss.add(game.getStatus());
+        poss.add(GameState.CANCELED);
+        switch (game.getStatus()) {
+        case SETUP:
+            poss.add(GameState.VALID_SETUP);
+            break;
+        case VALID_SETUP:
+            poss.add(GameState.PLAYED);
+            poss.add(GameState.HALTED);
+            break;
+        case PLAYED:
+            poss.add(GameState.HALTED);
+            poss.add(GameState.FINISHED);
+            break;
+        case HALTED:
+            poss.add(GameState.PLAYED);
+            break;
+        default:
+            break;
+        }
+        return poss;
+    }
+
+    public boolean canTraverse(GameState next) {
+        return getPossNextStates().contains(next);
+    }
+
+    public boolean isLockedMaxPoints() {
+        switch (game.getStatus()) {
+        case PLAYED:
+        case FINISHED:
+        case CANCELED:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    public boolean isLockedTopic() {
+        switch (game.getStatus()) {
+        case PLAYED:
+        case HALTED:
+        case FINISHED:
+        case CANCELED:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    public boolean isLockedTeam() {
+        switch (game.getStatus()) {
+        case PLAYED:
+        case HALTED:
+        case FINISHED:
+        case CANCELED:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    public boolean isLockedDelete() {
+        switch (game.getStatus()) {
+        case PLAYED:
+            return true;
+        default:
+            return false;
+        }
     }
 }
