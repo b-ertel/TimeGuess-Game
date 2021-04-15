@@ -209,25 +209,25 @@
                 <p:panel id="gameInfoData" rendered="#{not empty curr}">
                     <div class="p-grid">
                         <div class="p-col-7"><p:outputLabel for="nameInfo" value="Name: "/></div>
-                        <div class="p-col-5"><h:outputLabel id="nameInfo" value="#{curr.name}" styleClass="rightm20"/></div>
+                        <div class="p-col-5"><h:outputLabel id="nameInfo" value="#{curr.name}" styleClass="rightm10"/></div>
                         <div class="p-col-6"><p:outputLabel for="topicInfo" value="Topic: "/></div>
-                        <div class="p-col-6"><h:outputText id="topicInfo" value="#{curr.topic.name}" styleClass="rightm20"/></div>
+                        <div class="p-col-6"><h:outputText id="topicInfo" value="#{curr.topic.name}" styleClass="rightm10"/></div>
                         <div class="p-col-9"><p:outputLabel for="maxPointsInfo" value="Maximum Points: "/></div>
-                        <div class="p-col-3"><h:outputLabel id="maxPointsInfo" value="#{curr.maxPoints}" styleClass="rightm20"/></div>
+                        <div class="p-col-3"><h:outputLabel id="maxPointsInfo" value="#{curr.maxPoints}" styleClass="rightm10"/></div>
                     </div>
                     <p:separator style="margin-bottom:16px" />
 
                     <div class="p-grid">
                         <div class="p-col-7"><p:outputLabel for="statusInfo" value="Status: "/></div>
-                        <div class="p-col-5"><h:outputText id="statusInfo" value="#{curr.status}" styleClass="rightm20"/></div>
+                        <div class="p-col-5"><h:outputText id="statusInfo" value="#{curr.status}" styleClass="rightm10"/></div>
                         <div class="p-col-9"><p:outputLabel for="roundInfo" value="Number of Rounds played: "/></div>
-                        <div class="p-col-3"><h:outputText id="roundInfo" value="#{curr.rounds.size()}" styleClass="rightm20"/></div>
+                        <div class="p-col-3"><h:outputText id="roundInfo" value="#{curr.rounds.size()}" styleClass="rightm10"/></div>
                     </div>
                     <p:separator style="margin-bottom:16px" />
 
                     <div class="p-grid">
                         <div class="p-col-8"><p:outputLabel for="createUserInfo" value="Game creator: "/></div>
-                        <div class="p-col-4"><h:outputText id="createUserInfo" value="#{curr.creator.username}" styleClass="rightm20"/></div>
+                        <div class="p-col-4"><h:outputText id="createUserInfo" value="#{curr.creator.username}" styleClass="rightm10"/></div>
                     </div>
 
                     <!-- 
@@ -268,7 +268,7 @@
                 <p:outputPanel id="gameCreateData">
                     <p:panelGrid columns="2" layout="flex"
                         columnClasses="p-col-3 p-col-align-center, p-col-9"
-                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top: 5px ">
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top: 5px">
                         <p:outputLabel for="nameCreate" value="Name: "/>
                         <p:inputText id="nameCreate" value="#{newGameBean.gameName}" required="true" maxlength="100" />
                         <p:outputLabel for="maxPointsCreate" value="Maximum Points: "/>

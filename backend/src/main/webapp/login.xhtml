@@ -1,53 +1,110 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:c="http://java.sun.com/jsp/jstl/core"
-                template="/WEB-INF/templates/main.xhtml">
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    template="/WEB-INF/templates/main.xhtml">
 
     <ui:define name="content">
+        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true" />
+
         <div class="login-block">
             <div style="background-color: transparent; border-radius: 10px;">
-                <img src="resources/images/logo.jpg" class="login-logo" alt="logo"/>
+                <img src="resources/images/logo.jpg" class="login-logo" alt="logo" />
             </div>
-            <form id="login_form" action="#{request.contextPath}/login" method="post">
-                <div class="login-input">
-                    <p:inputText id="username" style="width: 250px; height: 21px"
-                                 type="text" required="true" placeholder="Username"/>
+            <form id="login_form" action="#{request.contextPath}/login"
+                method="post">
+                <div class="login-box">
+                    <p:inputText id="username" type="text" placeholder="Username"
+                        required="true" styleClass="login-input" />
                 </div>
-                <div class="login-input" style="text-align: center !important;">
-                    <p:inputText id="password" styleClass="pw" style="width: 250px; height: 21px"
-                                 type="password" required="true" placeholder="Password"/>
-                    <button id="eyeButton"
-                            type="button"
-                            class="eye-button eye-button-login ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"
-                            onclick="showPassword()">
-                        <span id="eyeIcon" class="fa fa-eye eye-Icon ui-button-text"/>
+                <div class="login-box" style="text-align: center !important;">
+                    <p:inputText id="password" type="password" placeholder="Password"
+                        required="true" styleClass="login-input pw" />
+                    <button type="button" onclick="showPassword(this, 0)"
+                        class="eye-button eye-button-login ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                        <span class="fa fa-eye eye-Icon ui-button-text" />
                     </button>
-
                 </div>
-                <div class="login-input" style="margin-left: 15px">
-                    <button type="submit"
-                            class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
-                        <span class="ui-button-text">Login</span>
+                <div class="login-box" style="margin-left: 10px">
+                    <button type="submit" class="ui-button ui-state-default ui-corner-all ui-button-text-only">
+                        <span class="ui-button-text fa fa-sign-in">
+                            <span class="buttonfont">Login</span>
+                        </span>
                     </button>
-
-                    <button type="button" id="registerButton"
-                            class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"
-                            onclick="PF('registerUserDialog').show()">
+                    <button type="button" onclick="PF('userCreateDialog').show()"
+                        class="ui-button ui-state-default ui-corner-all ui-button-text-only" style="left: 43px">
                         <span class="ui-button-text fa fa-user-plus">
-                            <span style="font-family: Arial, sans-serif; font-weight: bold;">Register</span>
+                            <span class="buttonfont">Register</span>
                         </span>
                     </button>
                 </div>
             </form>
         </div>
-        <div class="login-input">
+        <div class="login-box">
             <c:if test="${param.error ne null}">
                 <p:outputLabel id="error_msg">Login failed! Enter valid credentials and try again</p:outputLabel>
             </c:if>
         </div>
+
+        <h:form id="userCreateForm" prependId="false">
+            <ui:remove>user registration</ui:remove>
+            <p:dialog header="Register new user" id="userCreateDialog" widgetVar="userCreateDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" my="left" width="350">
+                <p:ajax event="close" update="userCreateData" process="@parent" resetValues="true" />
+
+                <p:outputPanel id="userCreateData">
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:20px"
+                        columnClasses="p-col-5, p-col-7" contentStyleClass="ui-fluid">
+
+                        <p:outputLabel for="usernameCreate" value="Username: " />
+                        <p:inputText id="usernameCreate" value="#{newUserBean.username}" required="true" maxlength="100" />
+
+                        <p:outputLabel for="passwordCreate" value="Password: " styleClass="pw-label" />
+                        <div class="pw-input-box">
+                            <p:inputText id="passwordCreate" value="#{newUserBean.password}"
+                                type="password" placeholder="Password" required="true" styleClass="pw-input pw" />
+                            <button type="button" onclick="showPassword(this, 1)"
+                                class="eye-button eye-button-dialog ui-state-default ui-corner-all">
+                                <span class="fa fa-eye eye-Icon" />
+                            </button>
+                        </div>
+
+                        <p:outputLabel for="repeatCreate" value="Repeat: " styleClass="pw-label" />
+                        <div class="pw-input-box">
+                            <p:inputText id="repeatCreate" value="#{newUserBean.repeated}"
+                                type="password" placeholder="Repeat" required="true" styleClass="pw-input pw" />
+                            <button type="button" onclick="showPassword(this, 2)"
+                                class="eye-button eye-button-dialog ui-state-default ui-corner-all">
+                                <span class="fa fa-eye eye-Icon" />
+                            </button>
+                        </div>
+                    </p:panelGrid>
+                    <p:separator style="margin:15px 0px 20px" />
+
+                    <p:panelGrid columns="2" layout="flex" columnClasses="p-col-5 p-col-align-center, p-col-7"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank">
+                        <p:outputLabel for="firstName" value="First Name: " />
+                        <p:inputText id="firstName" value="#{newUserBean.firstName}" />
+                        <p:outputLabel for="firstName" value="Last Name: " />
+                        <p:inputText id="lastName" value="#{newUserBean.lastName}" />
+                        <p:outputLabel for="email" value="E-Mail: " />
+                        <p:inputText id="email" value="#{newUserBean.email}" />
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:separator style="margin:9px 0px 15px" />
+
+                <h:panelGrid columns="3">
+                    <p:commandButton value="Save" action="#{newUserBean.createUser}"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userCreateDialog').hide(); }"
+                        update="userCreateData :msg" />
+                    <p:commandButton value="Reload" action="#{newUserBean.clearFields}"
+                        process="@parent" update="userCreateData :msg" resetValues="true" styleClass="left35" />
+                    <p:commandButton value="Abort" onclick="PF('userCreateDialog').hide()" styleClass="left35" />
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
     </ui:define>
 </ui:composition>

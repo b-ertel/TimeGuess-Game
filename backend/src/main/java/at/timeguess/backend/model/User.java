@@ -20,7 +20,7 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     private String username;
 
     @ManyToOne(optional = false)
@@ -33,7 +33,7 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateDate;
 
-    @Column(length = 50, nullable = false)
+    @Column(nullable = false)
     private String password;
 
     private String firstName;
@@ -61,7 +61,7 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
             foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
             inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<Game> confirmedGames;
-    
+
     @Override
     public Long getId() {
         return id;

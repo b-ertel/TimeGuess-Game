@@ -2,12 +2,15 @@ package at.timeguess.backend.services;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+import org.hibernate.annotations.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +22,7 @@ import at.timeguess.backend.model.utils.GroupingHelper;
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.repositories.UserRepository;
 import at.timeguess.backend.ui.beans.MessageBean;
+import at.timeguess.backend.ui.beans.NewUserBean;
 
 /**
  * Service for accessing and manipulating user data.
@@ -98,6 +102,16 @@ public class UserService {
     }
 
     /**
+     * Checks if a user with the given username already exists.
+     * @param username
+     * @return true if the given username is already saved in the database, false otherwise.
+     */
+    @Target(NewUserBean.class)
+    public boolean hasUser(String username) {
+        return userRepository.getTotalByUsername(username) > 0;
+    }
+
+    /**
      * Loads a single user identified by its id.
      * @param id the id to search for
      * @return the user with the given id
@@ -124,10 +138,14 @@ public class UserService {
      * @param user the user to save
      * @return the saved user
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @Target(NewUserBean.class)
+    @PostAuthorize("hasAuthority('ADMIN') OR #user.id == null")
     public User saveUser(User user) {
+        // for self registration get any admin user as creator
+        // null would work also (setting the property to optional in User class)
+        // but demo.UserStatusController.afterStatusChange throws an exception then
         User auth = getAuthenticatedUser();
-        if (auth == null) auth = user;
+        if (auth == null) auth = this.getAdminUser();
 
         boolean isNew = user.isNew();
         if (isNew) {
@@ -143,6 +161,7 @@ public class UserService {
         // show ui message and log
         messageBean.alertInformation(ret.getUsername(), isNew ? "New user created" : "User updated");
 
+        if (auth == null) auth = ret;
         LOGGER.info("User '{}' (id={}) was {} by User '{}' (id={})", ret.getUsername(), ret.getId(),
                 isNew ? "created" : "updated", auth.getUsername(), auth.getId());
 
@@ -175,5 +194,10 @@ public class UserService {
     User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findFirstByUsername(auth.getName());
+    }
+    
+    private User getAdminUser() {
+        List<User> admins = userRepository.findByRole(UserRole.ADMIN);
+        return admins.size() > 0 ? admins.get(0) : null;
     }
 }
