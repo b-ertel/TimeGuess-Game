@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
+import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
 
 public interface RoundRepository extends AbstractRepository<Round, Long> {
@@ -24,4 +26,7 @@ public interface RoundRepository extends AbstractRepository<Round, Long> {
 	
 	@Query("SELECT COUNT(guessingUser) FROM Round r WHERE r.correctAnswer=false AND guessingUser=:user")
 	int getNrOfIncorrectAnswerByUser(@Param("user") User user);
+	
+	@Query("SELECT r FROM Round r WHERE r.game=:game ORDER BY r.id DESC")
+	List<Round> getTeamOfLastRound(@Param("game") Game game);
 }

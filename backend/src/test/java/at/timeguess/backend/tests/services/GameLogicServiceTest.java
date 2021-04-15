@@ -1,13 +1,12 @@
-package at.timeguess.backend.tests.game;
+package at.timeguess.backend.tests.services;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,35 +36,37 @@ import at.timeguess.backend.services.UserService;
 public class GameLogicServiceTest {
 
     @Autowired
-    GameRepository gameRepo;
+    GameLogicService gameLogicService;
 
     @Autowired
-    GameLogicService gameLogic;
+    GameService gameService;
 
+
+    @DirtiesContext
+    @Test
+    public void getNextTeamRightForGameWithRounds() {
+    	for(int i = 1; i<6; i++) {
+    		long id = (long) i;
+    		Game game = gameService.loadGame(id);
+            Set<GameTeam> gteam = game.getTeams();
+            Team result = gteam.iterator().next().getTeam();
+            Assertions.assertEquals(result, gameLogicService.getNextTeam(game));
+    	}    
+    }
     
     @DirtiesContext
     @Test
-    public void randomOrderValidation() {
-        long id = 1;
-        long id2 = 2;
-        Set<GameTeam> teams = new HashSet<>();
-        teams.addAll(gameRepo.findById(id).get().getTeams());
-        teams.addAll(gameRepo.findById(id2).get().getTeams());
-        Map<Integer, Team> result = gameLogic.getRandomTeamOrder(teams);
-        Assertions.assertEquals(4, result.size());
-        for(int i = 1; i<5; i++) {
-        	Assertions.assertTrue(result.containsKey(i));
-        }
-        Assertions.assertFalse(result.containsKey(0));
-        Assertions.assertFalse(result.containsKey(5));
-        Assertions.assertNotNull(result.get(1));
-        for(int i=1; i<4; i++) {
-        	for(int j=i+1; j<5; j++) {
-        		Assertions.assertNotEquals(result.get(i), result.get(j));
-        	}
-        }
-        
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
+    public void getNextTeamRightForNewGame() {
+    	Game game = new Game();
+    	game.setTeams(gameService.loadGame((long) 5).getTeams());
+    	gameService.saveGame(game);
+    	List<Team> teams = new ArrayList<>();
+    	Iterator<GameTeam> ite = game.getTeams().iterator();
+    	while(ite.hasNext()) {
+    		teams.add(ite.next().getTeam());
+    	}
+    	Assertions.assertTrue(teams.contains(gameLogicService.getNextTeam(game)));
+    	
     }
-
-   
 }
