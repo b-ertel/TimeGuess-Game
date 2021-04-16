@@ -7,10 +7,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import at.timeguess.backend.events.OnboardingEventPublisher;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.User;
@@ -20,6 +23,7 @@ import at.timeguess.backend.model.demo.UserStatus;
 import at.timeguess.backend.model.demo.UserStatusInfo;
 import at.timeguess.backend.repositories.CubeRepository;
 import at.timeguess.backend.repositories.UserRepository;
+import at.timeguess.backend.services.OnboardingService;
 import at.timeguess.backend.spring.UserStatusInitializationHandler;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
@@ -38,11 +42,18 @@ import at.timeguess.backend.utils.CDIContextRelated;
 @CDIContextRelated
 public class CubeStatusController {
 
+	@Autowired
+	private OnboardingService onboardingService;
     @Autowired
     private CubeRepository cubeRepository;
     @CDIAutowired
     private WebSocketManager websocketManager;
+    
+    
     private Map<String, Cube> cubeStatus = new ConcurrentHashMap<>();
+    private Map<String, Cube> cubeStatusTwo = new ConcurrentHashMap<>();
+    
+    
 //    private List<LogEntry> actionLogs = new CopyOnWriteArrayList<>();
 
     /**
@@ -56,15 +67,21 @@ public class CubeStatusController {
      * (feasible in development-mode, really bad behavior in production) or call
      * this setup.method again to refresh the mentioned collection
      */
+    @PostConstruct
     public void setupCubeStatus() {
         this.cubeRepository.findAll()
                 .forEach(cube -> this.cubeStatus.put(cube.getMacAddress(), cube));
     }
     
-    public void statusChange(String macAddress, CubeStatus newStatus) {
-        this.cubeStatus.get(macAddress).setCubeStatus(newStatus);
-    	System.out.println(this.websocketManager.getCubeChannel().send("connectionCubeUpdate"));
-
+    public void statusChange() {
+   /*     setupCubeStatus();
+        Cube cubeChanged = onboardingService.getCube();
+        this.cubeStatus.put(cubeChanged.getMacAddress(), cubeChanged);
+        System.out.println(cubeChanged.getCubeStatus());
+     */ 
+    	this.cubeStatus=onboardingService.getCubeStatus();
+    	
+    	this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
     }
 
 

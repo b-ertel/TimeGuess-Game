@@ -2,10 +2,13 @@ package at.timeguess.backend.services;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import at.timeguess.backend.events.OnboardingEventPublisher;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.api.OnboardingMessage;
@@ -18,6 +21,11 @@ import at.timeguess.backend.repositories.CubeRepository;
 @Service
 public class CubeService {
 
+	@Autowired
+	OnboardingEventPublisher onboardingEventPuplisher;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(CubeService.class);
+	
 	@Autowired
 	private CubeRepository cubeRepo;
 
@@ -38,6 +46,8 @@ public class CubeService {
 		Cube newCube = new Cube();
 		newCube.setMacAddress(message.getIdentifier());
 		newCube.setConfiguration(message.getCalibrationVersion());  
+		
+		LOGGER.info("new Cube createt with mac {}", newCube.getMacAddress());
 		
 		return newCube;
 	}
@@ -69,6 +79,10 @@ public class CubeService {
 		}
 		
 		saveCube(updatedCube);
+		
+		LOGGER.info("cube {} was updated and set status to {}", updatedCube.getId(), updatedCube.getCubeStatus());
+		
+	//	onboardingEventPuplisher.publishOnboardingEvent();
 		return updatedCube;
 	}
 

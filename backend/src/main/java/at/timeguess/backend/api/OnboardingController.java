@@ -1,11 +1,13 @@
 package at.timeguess.backend.api;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.timeguess.backend.model.api.OnboardingMessage;
 import at.timeguess.backend.model.api.OnboardingResponse;
+import at.timeguess.backend.services.OnboardingService;
 
 /**
  * REST Controller for communication with Raspberry Pi.
@@ -13,6 +15,9 @@ import at.timeguess.backend.model.api.OnboardingResponse;
 @RestController
 public class OnboardingController {
 
+	@Autowired
+	OnboardingService onboardingService;
+	
     /**
      * Process messages from a Raspberry pi signaling
      * successful startup and connection with a TimeFlip device.
@@ -22,11 +27,7 @@ public class OnboardingController {
      */
     @PostMapping("/api/onboarding")
     private OnboardingResponse processOnboarding(@RequestBody OnboardingMessage message) {
-        // just a placeholder for the moment
-        // "real" processing of the message and generation of response should happen in a service
-        OnboardingResponse response = new OnboardingResponse();
-        response.setSuccess(true);
-        return response;
+    	return onboardingService.processOnboarding(message);
     }
 
 }
