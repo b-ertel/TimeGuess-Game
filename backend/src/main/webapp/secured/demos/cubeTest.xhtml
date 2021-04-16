@@ -14,25 +14,40 @@
             pfContext=PF
         </h:outputScript>
 
-        <h:form id="chatRoomForm">
+        <h:form id="ChatRoomForm">
             <div class="chatRoomContent">
-                <h1>Chatroom</h1>
+                <h1>Cube Management</h1>
 
-                <p:panelGrid columns="1" style="width: 100%;"
+                <p:panelGrid columns="3" style="width: 100%;"
                         columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
-                
-                
-                <h3>Online Cubes</h3>
-                    <p:scrollPanel id="Cube">
-                        <ui:repeat var="Cube"
-                                   value="#{ontroller.currentTerm}">
-                            <demo:termOutput term="#{term}" />
-                        </ui:repeat>
-                    </p:scrollPanel>
+                   
+                  <p:panel header="Cubes" style=" border: none; width: 500px;">
+                            <h3>Cubes online</h3>
+                     <p:scrollPanel id="onlineCubeInfo"
+                                styleClass="chatRoomPanelContent onlineInfoBox"
+                                widgetVar="onlineInfoWidget">
+                         <ui:repeat var="cubeStatus"
+                                value="#{cubeStatusController.cubeStatusInfos}">
+                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatus}" />
+                         </ui:repeat>
+                     </p:scrollPanel>
+        		  </p:panel>
+                  <p:panel header="CubeFace" style=" border: none; width: 500px;">
+                            <h3>Actual CubesFace</h3>
+                     <p:scrollPanel id="onlineInfoCubeFace"
+                                styleClass="chatRoomPanelContent onlineInfoBox"
+                                widgetVar="onlineInfoWidget">
+                         <ui:repeat var="cubeStatus"
+                                value="#{cubeStatusController.cubeStatusInfos}">
+                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatus}" />
+                         </ui:repeat>
+                     </p:scrollPanel>
+        		  </p:panel>        		  
+          		</p:panelGrid>
             
-                </p:panelGrid>
-            </div>
-        
+            <p:separator />
+            <p:separator />       
+            
             <p:dataTable id="cubeTable" style="width:800px" var="cube" value="#{cubeController.allCubes}">
                 <p:column headerText="CubeId">
                     <h:outputText value="#{cube.id}"/>
@@ -78,8 +93,9 @@
                         <p:confirm header="Confirmation" message="Are you sure that you want to delete this user? You cannot undo this operation." icon="ui-icon-alert" />
                     </p:commandButton>  
                 </p:column> -->
-            </p:dataTable>
+              </p:dataTable>
        
+             
             <p:dialog header="Edit CubeFace" id="cubeEditDialog" widgetVar="cubeEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="cubeData" rendered="#{not empty cubeFaceController.cubeFace}">
                     <h:panelGrid columns="2">
@@ -105,14 +121,16 @@
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
             </p:confirmDialog>
             
+             </div>
+            
            <o:socket channel="cubeChannel" scope="application"
-                      onmessage="function(m){console.log(m);}">
-                <f:ajax event="cubeChange"
-                        render="cubeFace"
-                        listener="#{userChatController.synchronizeRecipients()}" />              <!-- TODO: listener auf alle im Spiel ändern...  -->
+                onmessage="function(m){console.log(m);}">
+                <f:ajax event="connectionCubeUpdate"
+                    render="onlineCubeInfo recipientsSelection actionLog sendBtn"
+                    listener="#{userChatController.synchronizeRecipients()}"
+                    onevent="scrollToEventLogAndOnlineInfoBottom" />
             </o:socket>
-            
-            
+
 		</h:form>	
     </ui:define>
 </ui:composition>
