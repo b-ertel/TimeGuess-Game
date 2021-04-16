@@ -16,8 +16,10 @@ import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameTeam;
+import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
+import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
 import at.timeguess.backend.repositories.RoundRepository;
 import at.timeguess.backend.repositories.TermRepository;
@@ -86,16 +88,31 @@ public class GameLogicService {
 	 * @return term to guess
 	 * @throws AllTermsUsedInGameException, if every term has been played
 	 */
-	public Term nextTerm(Game game) throws AllTermsUsedInGameException {
-		if (stillTermsAvailable(game)) {
+	public Term nextTerm(Game game) /*throws AllTermsUsedInGameException*/ {
+		/*if (stillTermsAvailable(game)) {*/
 			List<Term> terms = termRepo.findByTopic(game.getTopic());
 			Set<Term> usedTerms = usedTerms(game);
 			usedTerms.stream().forEach(term -> terms.remove(term));
 			Random rand = new Random();
 			return terms.get(rand.nextInt(terms.size()));
-		} else {
+		/*} else {
 			throw new AllTermsUsedInGameException();
-		}
-		
+		}*/
+	}
+	
+	public User nextUser(Game game) {
+		Team team = getNextTeam(game);
+		return team.getTeamMembers().iterator().next();
+	}
+	
+	
+	public void startNewRound(Game game) {
+		Round nextRound = new Round();
+		nextRound.setNr(game.getRoundNr()+1);
+		nextRound.setGuessingUser(nextUser(game));
+		nextRound.setGuessingTeam(getNextTeam(game));
+		nextRound.setTermToGuess(nextTerm(game));
+		game.getRounds().add(nextRound);
+		game.setRoundNr(game.getRoundNr()+1);
 	}
 }
