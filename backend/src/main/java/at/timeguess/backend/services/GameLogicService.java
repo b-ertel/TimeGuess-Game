@@ -76,7 +76,7 @@ public class GameLogicService {
 	 * @param game, current game
 	 * @return set with all terms, that have been used in the current game
 	 */
-	private Set<Term> usedTerms(Game game) {
+	public Set<Term> usedTerms(Game game) {
 		Set<Term> usedTerms = new HashSet<>();
 		game.getRounds().stream().forEach(round -> usedTerms.add(round.getTermToGuess()));
 		return usedTerms;

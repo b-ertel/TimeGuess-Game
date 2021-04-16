@@ -20,13 +20,17 @@ import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.GameTeam;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
+import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.repositories.GameRepository;
+import at.timeguess.backend.repositories.TermRepository;
+import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TopicService;
 import at.timeguess.backend.services.UserService;
+import at.timeguess.backend.ui.beans.NewGameBean;
 
 /**
  * Some very basic tests for {@link GameService}.
@@ -40,33 +44,89 @@ public class GameLogicServiceTest {
 
     @Autowired
     GameService gameService;
+   
+	@Autowired
+	TopicRepository topicRepo;
+	
+	@Autowired
+	TermRepository termRepo;
 
 
     @DirtiesContext
     @Test
     public void getNextTeamRightForGameWithRounds() {
-    	for(int i = 1; i<6; i++) {
+    	for(int i = 1; i<5; i++) {
     		long id = (long) i;
     		Game game = gameService.loadGame(id);
             Set<GameTeam> gteam = game.getTeams();
             Team result = gteam.iterator().next().getTeam();
             Assertions.assertEquals(result, gameLogicService.getNextTeam(game));
-    	}    
+    	}   
+    	long id = (long) 5;
+    	Game game = gameService.loadGame(id);
+        Set<GameTeam> gteam = game.getTeams();
+        Iterator<GameTeam> ite = gteam.iterator();
+        Team result = null;
+        result = ite.next().getTeam();
+     
+        Assertions.assertEquals(result.getName(), gameLogicService.getNextTeam(game).getName());
+    	
     }
+    
     
     @DirtiesContext
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void getNextTeamRightForNewGame() {
     	Game game = new Game();
-    	game.setTeams(gameService.loadGame((long) 5).getTeams());
-    	gameService.saveGame(game);
-    	List<Team> teams = new ArrayList<>();
-    	Iterator<GameTeam> ite = game.getTeams().iterator();
-    	while(ite.hasNext()) {
-    		teams.add(ite.next().getTeam());
-    	}
-    	Assertions.assertTrue(teams.contains(gameLogicService.getNextTeam(game)));
-    	
+
+        game.setName("TestGame");
+        game.setMaxPoints(10);
+        game.setTopic(topicRepo.findById((long) 1).get());
+        game.setStatus(GameState.SETUP);
+        gameService.saveGame(game);
+        game.setTeams(gameService.loadGame((long) 1).getTeams());
+        
+		List<Team> teamlist = new ArrayList<>();
+		for(GameTeam gteam : game.getTeams()) {
+			teamlist.add(gteam.getTeam());
+		}
+		Assertions.assertTrue(teamlist.contains(gameLogicService.getNextTeam(game)));
+		
+		//Check if method chooses startteam randomly or if its the same every time
+		Team currentTeam = null;
+		int nrDifferentStartTeams = 0;
+		for(int i = 0; i < 10; i++) {
+			Team nextTeam = gameLogicService.getNextTeam(game);
+			if(nextTeam != currentTeam) {
+				nrDifferentStartTeams++;
+				currentTeam = nextTeam;
+			} 
+		}
+		Assertions.assertTrue(nrDifferentStartTeams>1);
     }
+    
+    @DirtiesContext
+    @Test
+    public void checkTermsUsed() {
+    	Game game = gameService.loadGame((long) 1);
+    	Term termNotUsed = termRepo.findById((long) 5).get();
+    	Assertions.assertFalse(gameLogicService.usedTerms(game).contains(termNotUsed));
+    	
+    	for(int i = 1; i<=4; i++) {
+    		Term termUsed = termRepo.findById((long) i).get();
+    		Assertions.assertTrue(gameLogicService.usedTerms(game).contains(termUsed));
+    	}
+    }
+    
+    
+    @DirtiesContext
+    @Test
+    public void checkNextTerm() {
+    	Game game = gameService.loadGame((long) 1);
+    	Term termNotUsed = termRepo.findById((long) 5).get();
+    	Assertions.assertEquals(termNotUsed.getName(), gameLogicService.nextTerm(game).getName());
+    }
+    
+    
 }
