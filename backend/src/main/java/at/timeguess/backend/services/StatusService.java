@@ -6,20 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import at.timeguess.backend.events.OnboardingEventPublisher;
-import at.timeguess.backend.model.api.OnboardingMessage;
-import at.timeguess.backend.model.api.OnboardingResponse;
+import at.timeguess.backend.model.api.StatusMessage;
+import at.timeguess.backend.model.api.StatusResponse;
 
 @Service
-public class OnboardingService {
+public class StatusService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OnboardingService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatusService.class);
     
     @Autowired
     OnboardingEventPublisher onboardingEventPublisher;
     @Autowired
     CubeService cubeService;
 
-    public OnboardingResponse processOnboarding(OnboardingMessage message) {
+    public StatusResponse processStatus(StatusMessage message) {
 
     	LOGGER.info("new Cube is onboarding.....");
     	
@@ -27,8 +27,8 @@ public class OnboardingService {
         
         onboardingEventPublisher.publishOnboardingEvent();
 
-        OnboardingResponse response = new OnboardingResponse();
-        response.setSuccess(true);
+        StatusResponse response = new StatusResponse();
+        response.setReportingInterval(10);
         return response;
     }
     

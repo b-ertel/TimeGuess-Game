@@ -17,7 +17,7 @@ public class FacetsService {
 
     public FacetsResponse processFacets(FacetsMessage message) {
         String identifier = message.getIdentifier();
-        Integer configuration = message.getConfiguration();
+        Integer configuration = message.getCalibrationVersion();
         Integer facet = message.getFacet();
 
         // update `dummyCubeFace` and notify event listeners of changed value
@@ -25,8 +25,7 @@ public class FacetsService {
         facetsEventPublisher.publishFacetsEvent();
 
         FacetsResponse response = new FacetsResponse();
-        response.setSuccess(true);
-        response.setConfiguration(0);
+        response.setCalibrationVersion(0);
         return response;
     }
 
