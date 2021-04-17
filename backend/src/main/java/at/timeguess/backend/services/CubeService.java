@@ -39,7 +39,7 @@ public class CubeService {
 	/**
 	 * method to create a new entry for a cube device in the database
 	 * 
-	 * @param message from the new Cube which contains attribtus for the new Cube
+	 * @param message from the new Cube which contains attributes for the new Cube
 	 * @return new Cube
 	 */
 	public Cube createCube(OnboardingMessage message) {
@@ -97,7 +97,6 @@ public class CubeService {
 	 * @param cube to find out if mac address is already known
 	 * @return true if mac address is known, false otherwise
 	 */
-    @PreAuthorize("hasAuthority('ADMIN')")
 	public boolean isMacAddressKnown(String macAddress) {
 		if(cubeRepo.findByMacAddress(macAddress)==null){
 			return false;
@@ -114,7 +113,6 @@ public class CubeService {
      * @return true if is configured, otherwise false
      */
     public boolean isConfigured(Cube cube) {
-    	
     	if(cubeRepo.findById(cube.getId()).get().getConfiguration()!=0) {
     		return true;
     	}

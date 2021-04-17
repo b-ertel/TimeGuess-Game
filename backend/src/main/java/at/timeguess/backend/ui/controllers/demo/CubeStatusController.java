@@ -55,18 +55,19 @@ public class CubeStatusController {
     public void setupCubeStatus() {
         this.cubeRepository.findAll()
                 .forEach(cube -> this.cubeStatus.put(cube.getMacAddress(), cube));
-   //     setReadyCubes();
+        setReadyCubes();
     }
     
-/*    public void setReadyCubes() {
+    public void setReadyCubes() {
     	for(Map.Entry<String, Cube> m : cubeStatus.entrySet()) {
     		if(m.getValue().getCubeStatus().equals(CubeStatus.READY))
     			readyCubes.add(m.getValue());
     	}
     	for(Cube c: this.readyCubes) {
-    		System.out.println(c.getId());
+    		System.out.println(c);
     	}
-    }*/
+    	System.out.println("end");
+    }
     
     /**
      * method which is invoked by the {@link OnboardingEventListener} when a 
