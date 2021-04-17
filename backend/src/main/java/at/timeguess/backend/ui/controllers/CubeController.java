@@ -49,7 +49,7 @@ public class CubeController {
     }
 
     public List<Cube> getAllCubes() {
-        return cubeService.getAllCubes();
+        return cubeService.allCubes();
     }
 
     public boolean isMacAddressKnown(Cube cube){

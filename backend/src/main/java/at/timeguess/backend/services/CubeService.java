@@ -62,11 +62,11 @@ public class CubeService {
 		
 		Cube updatedCube = new Cube();
 		
-		if(isMacAddressKnown(message.getIdentifier())) {						// Cube is already in database
+		if(isMacAddressKnown(message.getIdentifier())) {								// Cube is already in database
 			updatedCube = cubeRepo.findByMacAddress(message.getIdentifier());
 		}
 		else {
-			updatedCube = createCube(message);									// Cube is new and has to be created
+			updatedCube = createCube(message);											// Cube is new and has to be created
 		}
 		
 		if(updatedCube.getConfiguration() == message.getCalibrationVersion()
@@ -74,7 +74,7 @@ public class CubeService {
 			updatedCube.setCubeStatus(CubeStatus.READY);
 		}
 		else { 
-			updatedCube.setCubeStatus(CubeStatus.LIVE);							// Cube lost his configuration or has not been configured yet
+			updatedCube.setCubeStatus(CubeStatus.LIVE);									// Cube lost his configuration or has not been configured yet
 			updatedCube.setConfiguration(0);
 		}
 		
@@ -82,7 +82,6 @@ public class CubeService {
 		
 		LOGGER.info("cube {} was updated and set status to {}", updatedCube.getId(), updatedCube.getCubeStatus());
 		
-	//	onboardingEventPuplisher.publishOnboardingEvent();
 		return updatedCube;
 	}
 
@@ -90,12 +89,7 @@ public class CubeService {
 	/**
 	 * @return a list of all cubes 
 	 */
-	public List<Cube> getAllCubes() {
-		
-		for(Cube c : cubeRepo.findAll()) {
-			System.out.println(c);
-		}
-		
+	public List<Cube> allCubes(){		
 		return cubeRepo.findAll();
 	}
 

@@ -1,13 +1,10 @@
 package at.timeguess.backend.spring;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.ui.controllers.demo.CubeStatusController;
 import at.timeguess.backend.ui.controllers.demo.UserStatusController;
 
@@ -33,11 +30,6 @@ public class UserStatusInitializationHandler implements ApplicationListener<Cont
         // init
         this.userStatusController.setupUserStatus();
         this.cubeStatusController.setupCubeStatus();
-        
-        for(Cube c : this.cubeStatusController.getCubeStatusInfos()) {
-        	System.out.println(c.getMacAddress() + ", " + c.getName() + ", " + c.getCubeStatus() + c.getCubeStatus().getMessage());
-        }
-
     }
 
 }
