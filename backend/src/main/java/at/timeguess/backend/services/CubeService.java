@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import at.timeguess.backend.events.OnboardingEventPublisher;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeStatus;
-import at.timeguess.backend.model.api.OnboardingMessage;
+import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.repositories.CubeRepository;
 
 /**
@@ -42,7 +42,7 @@ public class CubeService {
 	 * @param message from the new Cube which contains attributes for the new Cube
 	 * @return new Cube
 	 */
-	public Cube createCube(OnboardingMessage message) {
+	public Cube createCube(StatusMessage message) {
 		Cube newCube = new Cube();
 		newCube.setMacAddress(message.getIdentifier());
 		newCube.setConfiguration(message.getCalibrationVersion());  
@@ -58,7 +58,7 @@ public class CubeService {
 	 * @param message from the timeflip device from online cube
 	 * @return updated cube
 	 */
-	public Cube updateCube(OnboardingMessage message) {
+	public Cube updateCube(StatusMessage message) {
 		
 		Cube updatedCube = new Cube();
 		
