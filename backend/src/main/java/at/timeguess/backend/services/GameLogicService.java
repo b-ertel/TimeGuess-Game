@@ -30,10 +30,7 @@ public class GameLogicService {
 
 	@Autowired
 	TermService termService;
-	
-	@Autowired
-	RoundRepository roundRepo;
-	
+
 	@Autowired
 	RoundService roundService;
 	
@@ -49,8 +46,8 @@ public class GameLogicService {
 		while(ite.hasNext()) {
 			teams.add(ite.next().getTeam());
 		}
-		if(roundRepo.getTeamOfLastRound(game).size()!=0) {
-			Team teamOfLastRound = roundRepo.getTeamOfLastRound(game).get(0).getGuessingTeam();
+		if(roundService.roundsPlayedInGame(game)) {
+			Team teamOfLastRound = roundService.getLastRound(game).getGuessingTeam();
 			if(teams.indexOf(teamOfLastRound)==(teams.size()-1)) {
 				return teams.get(0);
 			} else {
@@ -103,17 +100,32 @@ public class GameLogicService {
 		}*/
 	}
 	
-	public User nextUser(Game game) {
-		Team team = getNextTeam(game);
-		return team.getTeamMembers().iterator().next();
+	public User nextUser(Game game, Team team) {
+		List<User> users = new ArrayList<>();
+		Iterator<User> ite = team.getTeamMembers().iterator();
+		while(ite.hasNext()) {
+			users.add(ite.next());
+		}
+		if(roundService.teamPlayedRoundsInGame(game, team)) {
+			User lastUser = roundService.getLastRoundOfTeam(game, team).getGuessingUser();
+			if((users.size()-1)==users.indexOf(lastUser)){
+				return users.get(0);
+			} else {
+				return users.get(users.indexOf(lastUser)+1);
+			}
+		} else {
+			Random rand = new Random();
+			return users.get(rand.nextInt(users.size()));	
+		}	
 	}
 	
 	
 	public void startNewRound(Game game) {
 		Round nextRound = new Round();
 		nextRound.setNr(game.getRoundNr()+1);
-		nextRound.setGuessingUser(nextUser(game));
-		nextRound.setGuessingTeam(getNextTeam(game));
+		Team nextTeam = getNextTeam(game);
+		nextRound.setGuessingUser(nextUser(game, nextTeam));
+		nextRound.setGuessingTeam(nextTeam);
 		nextRound.setTermToGuess(nextTerm(game));
 		nextRound.setGame(game);
 		game.getRounds().add(nextRound);
