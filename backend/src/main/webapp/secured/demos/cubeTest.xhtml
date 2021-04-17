@@ -21,14 +21,14 @@
                 <p:panelGrid columns="3" style="width: 100%;"
                         columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
                    
-                  <p:panel id= "onlineCube" header="Cubes" style=" border: none; width: 500px;">
+                  <p:panel id= "onlineCube" header="Cubes" style=" border: none; width: 700px;">
                   <h3>Cubes online</h3>
                      <p:scrollPanel id="onlineCubeInfo"
                                 styleClass="chatRoomPanelContent onlineInfoBox"
                                 widgetVar="onlineInfoWidget">
                          
                          <ui:repeat var="cubeStatusInfo"
-                                value="#{cubeStatusController.cubeStatusInfos}">
+                                value="#{statusController.cubeStatusInfos}">
                             <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
                          </ui:repeat>
                      </p:scrollPanel>
@@ -46,55 +46,7 @@
             
             <p:separator/>
             <p:separator/>
-            
-            <p:dataTable id="cubeTable" style="width:1000px" var="cube" value="#{cubeController.allCubes}">
-               <p:column headerText="CubeId">
-                        <h:outputText value="#{cube.id}"/>
-                </p:column>
-               <p:column headerText="Mac">
-                    <h:outputText value="#{cube.macAddress}"/>
-                </p:column>
-               <p:column headerText="Name">
-                    <h:outputText value="#{cube.name}"/>
-                </p:column>          
-              <p:column headerText="Configuration">
-                    <h:outputText value="#{cube.configuration}"/>
-                </p:column>      
-              <p:column headerText="CubeStatus">
-                    <h:outputText value="#{cube.cubeStatus}"/>
-                </p:column> 
-            </p:dataTable>
-            
-            <p:separator/>
-            <p:separator/>
-            
-            <p:dataTable id="cubeFaceTable" style="width:1000px" var="cubeFace" value="#{cubeFaceController.allCubeFaces}">
-                <p:column headerText="CubeFaceId">
-                    <h:outputText value="#{cubeFace.id}"/>
-                </p:column>
-                <p:column headerText="Activity">
-                    <h:outputText value="#{cubeFace.activity}"/>
-                </p:column>
-                <p:column headerText="Points">
-                    <h:outputText value="#{cubeFace.points}"/>
-                </p:column>                
-                <p:column headerText="Time">
-                    <h:outputText value="#{cubeFace.time}"/>
-                </p:column>
-       <!--          <p:column style="width:100px;text-align: center">
-                    <p:commandButton update=":cubeForm:cubeEditDialog" oncomplete="PF('cubeEditDialog').show()" icon="ui-icon-note" title="Edit">
-                        <f:setPropertyActionListener value="#{cubeFace}" target="#{cubeFaceController.cubeFace}" />
-                    </p:commandButton>
-                     <p:commandButton action="#{userDetailController.doDeleteUser}" icon="ui-icon-trash" title="Delete" update=":userForm:usersTable">
-                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
-                        <p:confirm header="Confirmation" message="Are you sure that you want to delete this user? You cannot undo this operation." icon="ui-icon-alert" />
-                    </p:commandButton>  
-                </p:column> -->
-              </p:dataTable>
-            
-            
-            
-            
+           
             </div>
             
            <o:socket channel="cubeChannel" scope="application"

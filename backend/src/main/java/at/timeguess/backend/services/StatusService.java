@@ -29,6 +29,12 @@ public class StatusService {
     
     private Map<Long, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
     
+    @PostConstruct
+    public void setupCubeStatus() {   	
+        this.cubeService.allCubes()
+                .forEach(cube -> this.cubeStatus.put(cube.getId(), new CubeStatusInfo(cube)));
+    }
+    
     /**
 	 * method to check whether Cube is known and create an entry if it is not
 	 * 
@@ -69,13 +75,7 @@ public class StatusService {
         response.setReportingInterval(10);
         return response;
     }
-    
-    @PostConstruct
-    public void setupCubeStatus() {   	
-        this.cubeService.allCubes()
-                .forEach(cube -> this.cubeStatus.put(cube.getId(), new CubeStatusInfo(cube)));
-    }
-    
+        
     /**
      * method which is invoked by the {@link OnboardingEventListener} when a 
      * new or already known cube is online and connected throw the {@link OnboardingController}
