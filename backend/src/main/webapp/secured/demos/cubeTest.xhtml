@@ -27,30 +27,20 @@
                                 styleClass="chatRoomPanelContent onlineInfoBox"
                                 widgetVar="onlineInfoWidget">
                          
-                         <ui:repeat var="cubeStatus"
+                         <ui:repeat var="cubeStatusInfo"
                                 value="#{cubeStatusController.cubeStatusInfos}">
-                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatus}" />
+                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
                          </ui:repeat>
                      </p:scrollPanel>
                      <h:panelGrid id="cubesSelection" columns="2"
                                 style="height: 50px;">
                             <h:outputText value="Choose:" />
-                              <p:selectOneButton value="#{cubeStatusController.readyCubes.id}">
-                               
-                            </p:selectOneButton> 
+                    <!--         <p:selectOneButton value="#{cubeStatusController.readyCubes.id}">
+                              
+                            </p:selectOneButton> --> 
                       </h:panelGrid>
         		  </p:panel>
-                  <p:panel header="CubeFace" style=" border: none; width: 500px;">
-                            <h3>Actual CubesFace</h3>
-                     <p:scrollPanel id="onlineInfoCubeFace"
-                                styleClass="chatRoomPanelContent onlineInfoBox"
-                                widgetVar="onlineInfoWidget">
-                         <ui:repeat var="cubeStatus"
-                                value="#{cubeStatusController.cubeStatusInfos}">
-                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatus}" />
-                         </ui:repeat>
-                     </p:scrollPanel>
-        		  </p:panel>        		  
+		  
           		</p:panelGrid>
             
             

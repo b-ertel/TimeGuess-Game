@@ -3,6 +3,7 @@ package at.timeguess.backend.model;
 public enum CubeStatus {
 	LIVE(" and has to be configured"), 
 	READY(" to play"),
+	IN_CONFIGURATION(""),
 	OFFLINE("");
 	
 	private CubeStatus(String message) {

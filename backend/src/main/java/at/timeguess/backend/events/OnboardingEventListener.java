@@ -17,7 +17,7 @@ public class OnboardingEventListener implements ApplicationListener<OnboardingEv
 
     @Override
     public void onApplicationEvent(OnboardingEvent onboardingEvent) {
-        cubeController.statusChange();
+        cubeController.update();
     }
 
 }

@@ -21,10 +21,6 @@ public class Cube implements Comparable<Cube>{
 	
 	private String name;
 	
-	private Integer configuration = 0;
-	
-	private CubeStatus cubeStatus = CubeStatus.OFFLINE;
-	
 	@OneToMany(mappedBy="cube")
 	private List<Configuration> configs = new ArrayList<>();
 
@@ -58,22 +54,6 @@ public class Cube implements Comparable<Cube>{
 
 	public void addConfigs(Configuration config) {
 		this.configs.add(config);
-	}
-
-	public Integer getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Integer configuration) {
-		this.configuration = configuration;
-	}
-
-	public CubeStatus getCubeStatus() {
-		return cubeStatus;
-	}
-
-	public void setCubeStatus(CubeStatus cubeStatus) {
-		this.cubeStatus = cubeStatus;
 	}
 	
 	@Override

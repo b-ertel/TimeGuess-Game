@@ -5,13 +5,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import at.timeguess.backend.events.OnboardingEventPublisher;
 import at.timeguess.backend.model.Cube;
-import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.api.StatusMessage;
+import at.timeguess.backend.repositories.ConfigurationRepository;
 import at.timeguess.backend.repositories.CubeRepository;
 
 /**
@@ -28,12 +27,14 @@ public class CubeService {
 	
 	@Autowired
 	private CubeRepository cubeRepo;
+	@Autowired
+	private ConfigurationRepository configRepo;
 
 	/**
 	 * @param cube: the cube to save
 	 */
-	public void saveCube(Cube cube) {
-		cubeRepo.save(cube);
+	public Cube saveCube(Cube cube) {
+		return cubeRepo.save(cube);
 	}
 	
 	/**
@@ -45,47 +46,13 @@ public class CubeService {
 	public Cube createCube(StatusMessage message) {
 		Cube newCube = new Cube();
 		newCube.setMacAddress(message.getIdentifier());
-		newCube.setConfiguration(message.getCalibrationVersion());  
+		newCube = saveCube(newCube);
 		
 		LOGGER.info("new Cube createt with mac {}", newCube.getMacAddress());
 		
 		return newCube;
 	}
 	
-	/**
-	 * method to check whether Cube is known and if it's configured and sets corresponding CubeStatus
-	 * 
-	 * @param message from the timeflip device from online cube
-	 * @return updated cube
-	 */
-	public Cube updateCube(StatusMessage message) {
-		
-		Cube updatedCube = new Cube();
-		
-		if(isMacAddressKnown(message.getIdentifier())) {								// Cube is already in database
-			updatedCube = cubeRepo.findByMacAddress(message.getIdentifier());
-		}
-		else {
-			updatedCube = createCube(message);											// Cube is new and has to be created
-		}
-		
-		if(updatedCube.getConfiguration() == message.getCalibrationVersion()
-				&& message.getCalibrationVersion() != 0){								// Cube is configured and ready
-			updatedCube.setCubeStatus(CubeStatus.READY);
-		}
-		else { 
-			updatedCube.setCubeStatus(CubeStatus.LIVE);									// Cube lost his configuration or has not been configured yet
-			updatedCube.setConfiguration(0);
-		}
-		
-		saveCube(updatedCube);
-		
-		LOGGER.info("cube {} was updated and set status to {}", updatedCube.getId(), updatedCube.getCubeStatus());
-		
-		return updatedCube;
-	}
-
-
 	/**
 	 * @return a list of all cubes 
 	 */
@@ -107,17 +74,21 @@ public class CubeService {
 	}
     
     /**
-     * to find out if cube there exists a configuration for the given Cube
+     * to find out if there exists a configuration for the given Cube
      * 
      * @param cube the cube to find out if it is configured
      * @return true if is configured, otherwise false
      */
     public boolean isConfigured(Cube cube) {
-    	if(cubeRepo.findById(cube.getId()).get().getConfiguration()!=0) {
+    	if(configRepo.findByCube(cube)!=null) {
     		return true;
     	}
     	return false;
     }
+
+	public Cube getByMacAddress(String identifier) {
+		return cubeRepo.findByMacAddress(identifier);
+	}
     
 	
 }

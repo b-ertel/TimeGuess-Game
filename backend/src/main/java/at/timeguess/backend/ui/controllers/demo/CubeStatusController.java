@@ -3,11 +3,9 @@ package at.timeguess.backend.ui.controllers.demo;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PostConstruct;
 
@@ -17,7 +15,9 @@ import org.springframework.stereotype.Controller;
 
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeStatus;
+import at.timeguess.backend.model.CubeStatusInfo;
 import at.timeguess.backend.repositories.CubeRepository;
+import at.timeguess.backend.services.StatusService;
 import at.timeguess.backend.spring.UserStatusInitializationHandler;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
@@ -38,10 +38,12 @@ public class CubeStatusController {
 
     @Autowired
     private CubeRepository cubeRepository;
+    @Autowired
+    private StatusService statusService;
     @CDIAutowired
     private WebSocketManager websocketManager;
     
-    private Map<String, Cube> cubeStatus = new ConcurrentHashMap<>();
+    private Map<Long, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
     private Set<Cube> readyCubes = new HashSet<>();
     
 //    private List<LogEntry> actionLogs = new CopyOnWriteArrayList<>();
@@ -52,36 +54,35 @@ public class CubeStatusController {
      * collection holding the cube-status can be setup.
      */
     @PostConstruct
-    public void setupCubeStatus() {
+    public void setupCubeStatus() {   	
         this.cubeRepository.findAll()
-                .forEach(cube -> this.cubeStatus.put(cube.getMacAddress(), cube));
-        setReadyCubes();
+                .forEach(cube -> this.cubeStatus.put(cube.getId(), new CubeStatusInfo(cube)));
     }
     
     public void setReadyCubes() {
-    	for(Map.Entry<String, Cube> m : cubeStatus.entrySet()) {
-    		if(m.getValue().getCubeStatus().equals(CubeStatus.READY))
-    			readyCubes.add(m.getValue());
+    	for(Map.Entry<Long, CubeStatusInfo> s : this.cubeStatus.entrySet()) {
+    		if(s.getValue().getStatus().equals(CubeStatus.READY))
+    			readyCubes.add(s.getValue().getCube());
     	}
-    	for(Cube c: this.readyCubes) {
-    		System.out.println(c);
-    	}
-    	System.out.println("end");
     }
     
-    /**
-     * method which is invoked by the {@link OnboardingEventListener} when a 
-     * new or already known cube is online and connected throw the {@link OnboardingController}
-     */
-    public void statusChange() {
-        setupCubeStatus();
+    
+    public void update() {
+    	setCubeStatus(statusService.getCubeStatus());
+    	setReadyCubes();
     	this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
     }
+    
 
-    /**
+    public void setCubeStatus(Map<Long, CubeStatusInfo> cubeStatus) {
+		this.cubeStatus = cubeStatus;
+	}
+
+	/**
      * @return collection of cube-status
      */
-    public Collection<Cube> getCubeStatusInfos() {
+    public Collection<CubeStatusInfo> getCubeStatusInfos() {
+ 
         return Collections.unmodifiableCollection(this.cubeStatus.values());
     }
     
