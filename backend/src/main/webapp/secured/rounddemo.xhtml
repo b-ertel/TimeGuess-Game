@@ -10,12 +10,14 @@
 	template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
         <h:form id="statForm">
-          <div>
-          <p:commandButton value="New Game" actionListener="#{startRoundController.createGame()}" update="statForm:newGame"/>
-          <p:commandButton value="New Round" actionListener="#{startRoundController.nextRound()}" update="statForm:newGame"/>
-          	
-          </div>
+        <p:panel id="buttons">
+        	  <div>
+	          <p:commandButton value="New Game" actionListener="#{startRoundController.createGame()}" update="statForm:newGame"/>
+	          <p:commandButton value="New Round" actionListener="#{startRoundController.nextRound()}" update="statForm:newGame statForm:buttons"/>
+	          <p:commandButton value="Save Round" actionListener="#{startRoundController.saveLastRound()}" update="statForm:newGame" rendered="#{!startRoundController.hasNoRounds()}"/>
+	          </div>
           
+        </p:panel>
         <p:panel id="newGame" header="Header">
 	        <p:outputLabel value="Game: #{startRoundController.game.name}"/>
 	          <br />  

@@ -80,4 +80,8 @@ public class StartRoundController {
 			return game.getRounds().isEmpty();
 	}
 	
+	public void saveLastRound() {
+		gameLogic.saveLastRound(game);
+	}
+	
 }

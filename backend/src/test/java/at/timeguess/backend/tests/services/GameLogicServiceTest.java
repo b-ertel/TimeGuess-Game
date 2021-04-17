@@ -122,6 +122,7 @@ public class GameLogicServiceTest {
     
     @DirtiesContext
     @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void checkNextTerm() {
     	Game game = gameService.loadGame((long) 1);
     	Term termNotUsed = termRepo.findById((long) 5).get();

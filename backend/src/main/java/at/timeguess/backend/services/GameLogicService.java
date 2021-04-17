@@ -29,10 +29,13 @@ import at.timeguess.backend.repositories.TermRepository;
 public class GameLogicService {
 
 	@Autowired
-	TermRepository termRepo;
+	TermService termService;
 	
 	@Autowired
 	RoundRepository roundRepo;
+	
+	@Autowired
+	RoundService roundService;
 	
 	/**
 	 * A method that generates a random order of the teams. It generates to every team in the set a random integer, that represents the place of the team.
@@ -65,7 +68,7 @@ public class GameLogicService {
 	 * @return boolean wether there a still terms available or not
 	 */
 	private boolean stillTermsAvailable(Game game) {
-		if(usedTerms(game).size() == termRepo.findByTopic(game.getTopic()).size())
+		if(usedTerms(game).size() == termService.getAllTermsOfTopic(game.getTopic()).size())
 				return false;
 		else
 			return true;
@@ -90,7 +93,7 @@ public class GameLogicService {
 	 */
 	public Term nextTerm(Game game) /*throws AllTermsUsedInGameException*/ {
 		/*if (stillTermsAvailable(game)) {*/
-			List<Term> terms = termRepo.findByTopic(game.getTopic());
+			List<Term> terms = termService.getAllTermsOfTopic(game.getTopic());
 			Set<Term> usedTerms = usedTerms(game);
 			usedTerms.stream().forEach(term -> terms.remove(term));
 			Random rand = new Random();
@@ -112,7 +115,21 @@ public class GameLogicService {
 		nextRound.setGuessingUser(nextUser(game));
 		nextRound.setGuessingTeam(getNextTeam(game));
 		nextRound.setTermToGuess(nextTerm(game));
+		nextRound.setGame(game);
 		game.getRounds().add(nextRound);
 		game.setRoundNr(game.getRoundNr()+1);
+	}
+	
+	
+	public void saveLastRound(Game game) {
+		Set<Round> rounds = game.getRounds();
+		Round lastRound = null;
+		Iterator<Round> ite = rounds.iterator();
+		while(ite.hasNext()) {
+			lastRound = ite.next();
+		}
+		if(lastRound != null) {
+			roundService.saveRound(lastRound);
+		}
 	}
 }

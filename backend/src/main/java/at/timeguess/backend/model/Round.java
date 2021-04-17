@@ -109,6 +109,13 @@ public class Round implements Persistable<Long> {
 		this.verifyingTeams = verifyingTeams;
 	}
 
+	public Game getGame() {
+		return game;
+	}
+
+	public void setGame(Game game) {
+		this.game = game;
+	}
 
 	@Override
 	public Long getId() {
