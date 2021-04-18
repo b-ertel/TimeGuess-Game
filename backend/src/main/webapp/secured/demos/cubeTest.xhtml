@@ -18,11 +18,13 @@
             <div class="chatRoomContent">
                 <h1>Cube Management</h1>
 
-                <p:panelGrid columns="3" style="width: 100%;"
+                <p:panelGrid columns="1" style="width: 35%;"
                         columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
-                   
+                                    
+                  
                   <p:panel id= "onlineCube" header="Cubes" style=" border: none; width: 700px;">
-                  <h3>Cubes online</h3>
+
+                  <h3>Cubes Status</h3>
                      <p:scrollPanel id="onlineCubeInfo"
                                 styleClass="chatRoomPanelContent onlineInfoBox"
                                 widgetVar="onlineInfoWidget">
@@ -32,27 +34,82 @@
                             <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
                          </ui:repeat>
                      </p:scrollPanel>
-                     <h:panelGrid id="cubesSelection" columns="2"
-                                style="height: 50px;">
-                            <h:outputText value="Choose:" />
-                    <!--         <p:selectOneButton value="#{cubeStatusController.readyCubes.id}">
-                              
-                            </p:selectOneButton> --> 
-                      </h:panelGrid>
-        		  </p:panel>
-		  
-          		</p:panelGrid>
+            	     <p:separator/>
+
+        			<h3>Choose a Cube:</h3>
+ <!--        			<p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true"/> --> 
+			
+	     			<h:panelGrid columns="2">    
+           				<h:outputLabel for="cubeselect" value="Cube: "/> 
+               			<p:selectOneMenu id="cubeselect" value="#{cubeController.cube}" converter="omnifaces.SelectItemsConverter"> 
+          <!--     				<p:ajax event="change" process="@this" /> -->
+               				<f:selectItem itemLabel="Select" itemValue="" noSelectionOption="true"/>
+               				<f:selectItems value="#{cubeController.allCubes}" var="cube" itemLabel="#{cube.id}"/>
+               			</p:selectOneMenu>
+              			<p:commandButton value="OK" oncomplete="PF('cubeUseDialog').show()">
+          <!--     				<f:setPropertyActionListener value="#{cube}" target="#{cubeController.cube}" />   -->  
+              			</p:commandButton>
+	   				</h:panelGrid> 
+
+             	</p:panel>
+            	</p:panelGrid>
+                  
+	 			    
+				
+            	<p:separator/>
+            	
+            	<p:dataTable id="cubeTable" style="width:800px" var="cube" value="#{cubeController.allCubes}">
+                <p:column headerText="CubeId">
+                    <h:outputText value="#{cube.id}"/>
+                </p:column>
+                <p:column headerText="MacAddress">
+                    <h:outputText value="#{cube.macAddress}"/>
+                </p:column>
+                <p:column headerText="Name">
+                    <h:outputText value="#{cube.name}"/>
+                </p:column>    
+                <p:column>
+                	<p:commandButton value="choose" action="#{cubeController.setCube(cube)}" oncomplete="PF('cubeUseDialog').show()"/>
+                </p:column>           
+        <!--     <p:column>
+                <p:commandButton value="choose">
+                        <f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />
+                </p:commandButton>
+                </p:column>    -->
+            	
+            	</p:dataTable>
+ 
+          <p:dialog header="Use Cube" id="cubeUseDialog" widgetVar="useCubeDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false"> 
+                <p:outputPanel id="cubeData" rendered="#{not empty cubeController.cube}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="id" value="Id: " />
+                        <p:inputText id="id" value="#{cubeController.cube.id}" disabled="true"/>
+                        <p:outputLabel for="macAddress" value="MacAddress: " />
+                        <p:inputText id="macAddress" value="#{cubeController.cube.macAddress}" disabled="true"/>
+                        <p:outputLabel for="name" value="Name: " />
+                        <p:inputText id="name" value="#{cubeController.cube.name}"/>
+                    </h:panelGrid>
+                    <p:separator />
+     <!--                 <h:panelGrid columns="4">
+                        <p:commandButton value="Save" action="#{cubeController.saveCube()}" oncomplete="PF('useCubeDialog').hide()" update=":cubeTable" />
+                        <p:commandButton value="Configure" action="#{cubeController.saveCube()}" oncomplete="PF('useCubeDialog').hide()" update=":onlineCubeInfo :cubeTable">
+                       		<f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />   // listener for ConfigurationController  
+                        </p:commandButton> 
+                        <p:commandButton value="Delete" action="#{cubeController.deleteCube()}" oncomplete="PF('cubeUseDialog').hide()" update=":cubeTable"/>
+                        <p:commandButton value="Abort" onclick="PF('cubeUseDialog').hide()"> 
+                        
+                        </p:commandButton> 
+                    </h:panelGrid> -->
+                </p:outputPanel> 
+             </p:dialog>   
+             
             
-            
-            <p:separator/>
-            <p:separator/>
-           
             </div>
-            
+
            <o:socket channel="cubeChannel" scope="application"
                 onmessage="function(m){console.log(m);}">
                 <f:ajax event="connectionCubeUpdate"
-                    render="onlineCubeInfo onlineInfoCubeFace" />
+                    render="onlineCubeInfo onlineCube" />
             </o:socket>
 
 		</h:form>	

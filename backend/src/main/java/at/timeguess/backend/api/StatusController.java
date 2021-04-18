@@ -41,10 +41,12 @@ public class StatusController {
     
     private Map<Long, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
     private Set<Cube> readyCubes = new HashSet<>();
-
+    private Cube cube;
+    
     @PostConstruct
     public void setupCubeStatus() {   	
         setCubeStatus(statusService.getCubeStatus());
+    	setReadyCubes();
     }
     
     /**
@@ -88,6 +90,18 @@ public class StatusController {
     
     public Set<Cube> getReadyCubes() {
  		return this.readyCubes;
- 	}  
+ 	}
+
+	public Cube getCube() {
+		return cube;
+	}
+
+	public void setCube(Cube cube) {
+		this.cube = cube;
+	}  
+	
+	public void print() {
+		System.out.println(this.cube);
+	}
 
 }

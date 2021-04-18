@@ -37,5 +37,5 @@ public class CubeFaceController {
 	public void setCubeFace(CubeFace cubeface) {
 		this.cubeFace = cubeface;
 	}
-
+	
 }

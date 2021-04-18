@@ -3,7 +3,9 @@ package at.timeguess.backend.ui.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.model.Cube;
@@ -12,6 +14,8 @@ import at.timeguess.backend.model.Cube;
  *  Controller for displaying {@link Cube} entities.
  *
  */
+@Component
+@Scope("view")
 public class CubeController {
 
     @Autowired
@@ -45,7 +49,7 @@ public class CubeController {
     }
 
     public void saveCube() {
-        cubeService.saveCube(this.cube);
+        this.cube=cubeService.saveCube(this.cube);
     }
 
     public List<Cube> getAllCubes() {
@@ -54,6 +58,14 @@ public class CubeController {
 
     public boolean isMacAddressKnown(Cube cube){
         return cubeService.isMacAddressKnown(cube.getMacAddress());
+    }
+    
+    public void print() {
+    	System.out.println("this cube: " + this.cube);
+    }
+    
+    public void deleteCube() {
+    	cubeService.deleteCube(this.cube);
     }
 
 }

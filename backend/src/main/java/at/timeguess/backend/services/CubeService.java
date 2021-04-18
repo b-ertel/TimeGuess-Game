@@ -89,6 +89,11 @@ public class CubeService {
 	public Cube getByMacAddress(String identifier) {
 		return cubeRepo.findByMacAddress(identifier);
 	}
+
+	public void deleteCube(Cube cube) {
+		cubeRepo.delete(cube);
+		
+	}
     
 	
 }
