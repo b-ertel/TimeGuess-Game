@@ -49,30 +49,7 @@ public class GameLogicServiceTest {
 	TopicRepository topicRepo;
 	
 	@Autowired
-	TermRepository termRepo;
-
-
-    @DirtiesContext
-    @Test
-    public void getNextTeamRightForGameWithRounds() {
-    	for(int i = 1; i<5; i++) {
-    		long id = (long) i;
-    		Game game = gameService.loadGame(id);
-            Set<GameTeam> gteam = game.getTeams();
-            Team result = gteam.iterator().next().getTeam();
-            Assertions.assertEquals(result, gameLogicService.getNextTeam(game));
-    	}   
-    	long id = (long) 5;
-    	Game game = gameService.loadGame(id);
-        Set<GameTeam> gteam = game.getTeams();
-        Iterator<GameTeam> ite = gteam.iterator();
-        Team result = null;
-        result = ite.next().getTeam();
-     
-        Assertions.assertEquals(result.getName(), gameLogicService.getNextTeam(game).getName());
-    	
-    }
-    
+	TermRepository termRepo;   
     
     @DirtiesContext
     @Test

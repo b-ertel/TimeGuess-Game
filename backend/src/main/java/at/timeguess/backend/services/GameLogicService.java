@@ -38,30 +38,7 @@ public class GameLogicService {
 	@Autowired
 	RoundService roundService;
 	
-	/**
-	 * A method that generates a random order of the teams. It generates to every team in the set a random integer, that represents the place of the team.
-	 * @param teams: the GameTeams that should be ordered
-	 * @return a map with the place of the team as key and the team as value
-	 */
-	public Team getNextTeam(Game game){
-		List<Team> teams = new ArrayList<>();
-		Set<GameTeam> gteams = game.getTeams();
-		Iterator<GameTeam> ite = gteams.iterator();
-		while(ite.hasNext()) {
-			teams.add(ite.next().getTeam());
-		}
-		if(roundService.roundsPlayedInGame(game)) {
-			Team teamOfLastRound = roundService.getLastRound(game).getGuessingTeam();
-			if(teams.indexOf(teamOfLastRound)==(teams.size()-1)) {
-				return teams.get(0);
-			} else {
-				return teams.get(teams.indexOf(teamOfLastRound)+1);
-			}
-		} else {
-			Random rand = new Random();
-			return teams.get(rand.nextInt(teams.size()));
-		}
-	}
+	
 	
 	/**
 	 * method to check whether all terms of a topic have been used or not
@@ -104,6 +81,33 @@ public class GameLogicService {
 		}*/
 	}
 	
+	public Team getNextTeam(Game game){
+		List<Team> teams = new ArrayList<>();
+		Set<GameTeam> gteams = game.getTeams();
+		Iterator<GameTeam> ite = gteams.iterator();
+		while(ite.hasNext()) {
+			teams.add(ite.next().getTeam());
+		}
+		if(roundService.roundsPlayedInGame(game)) {
+			Team teamOfLastRound = roundService.getLastRound(game).getGuessingTeam();
+			int index = 0;
+			for(Team t: teams) {
+				if (t.getName() == teamOfLastRound.getName()) {
+					index = teams.indexOf(t);
+				}
+			}
+			if(index == (teams.size()-1)) {
+				return teams.get(0);
+			} else {
+				return teams.get(index+1);
+			}
+		} else {
+			Random rand = new Random();
+			return teams.get(rand.nextInt(teams.size()));
+		}
+	}
+	
+	
 	public User nextUser(Game game, Team team) {
 		List<User> users = new ArrayList<>();
 		Iterator<User> ite = team.getTeamMembers().iterator();
@@ -112,19 +116,25 @@ public class GameLogicService {
 		}
 		if(roundService.teamPlayedRoundsInGame(game, team)) {
 			User lastUser = roundService.getLastRoundOfTeam(game, team).getGuessingUser();
-			if((users.size()-1)==users.indexOf(lastUser)){
+			int index = 0;
+			for(User u: users) {
+				if (u.getUsername() == lastUser.getUsername()) {
+					index = users.indexOf(u);
+				}
+			}
+			if(index == (users.size()-1)) {
 				return users.get(0);
 			} else {
-				return users.get(users.indexOf(lastUser)+1);
+				return users.get(index+1);
 			}
 		} else {
 			Random rand = new Random();
-			return users.get(rand.nextInt(users.size()));	
-		}	
+			return users.get(rand.nextInt(users.size()));
+		}
 	}
 	
 	
-	public void startNewRound(Game game) {
+	public Game startNewRound(Game game) {
 		Round nextRound = new Round();
 		nextRound.setNr(game.getRounds().size()+1);
 		Team nextTeam = getNextTeam(game);
@@ -135,16 +145,22 @@ public class GameLogicService {
 		game.getRounds().add(nextRound);
 		game.setRoundNr(game.getRounds().size());
 		
-		LOGGER.info("New Round nr '{}', with team '{}' was created, gamerounds '{}'", nextRound.getNr(), nextRound.getGuessingTeam().getName(), game.getRounds().size());
+		LOGGER.info("New Round nr '{}', with team '{}' and user '{}' was created, gamerounds '{}'", nextRound.getNr(), nextRound.getGuessingTeam().getName(), nextRound.getGuessingUser().getUsername(), game.getRounds().size());
+		return game;
 	}
 	
 	
 	public void saveLastRound(Game game) {
 		Set<Round> rounds = game.getRounds();
+		System.out.println(rounds.size());
 		Round lastRound = null;
 		Iterator<Round> ite = rounds.iterator();
+		int highestNr = 0;
 		while(ite.hasNext()) {
-			lastRound = ite.next();
+			Round aRound = ite.next();
+			if(aRound.getNr() > highestNr) {
+				lastRound = aRound;
+			}
 		}
 		if(lastRound != null) {
 			roundService.saveRound(lastRound);

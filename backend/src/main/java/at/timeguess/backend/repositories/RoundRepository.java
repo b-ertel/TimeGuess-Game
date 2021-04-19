@@ -27,9 +27,9 @@ public interface RoundRepository extends AbstractRepository<Round, Long> {
 	@Query("SELECT COUNT(guessingUser) FROM Round r WHERE r.correctAnswer=false AND guessingUser=:user")
 	int getNrOfIncorrectAnswerByUser(@Param("user") User user);
 	
-	@Query("SELECT r FROM Round r WHERE r.game=:game ORDER BY r.id DESC")
-	List<Round> getLastRound(@Param("game") Game game);
+	@Query("SELECT r FROM Round r WHERE r.game=:game")
+	List<Round> getRoundOfGame(@Param("game") Game game);
 	
-	@Query("SELECT r FROM Round r WHERE r.game=:game AND r.guessingTeam=:team ORDER BY r.id DESC")
-	List<Round> getLastRoundWithTeam(@Param("game") Game game, @Param("team") Team team);
+	@Query("SELECT r FROM Round r WHERE r.game=:game AND r.guessingTeam=:team")
+	List<Round> getRoundOfGameWithTeam(@Param("game") Game game, @Param("team") Team team);
 }

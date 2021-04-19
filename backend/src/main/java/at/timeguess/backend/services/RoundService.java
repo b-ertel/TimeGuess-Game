@@ -41,18 +41,24 @@ public class RoundService {
     }
     
     public Round getLastRound(Game game) {
-    	return roundRepository.getLastRound(game).get(0);
+    	if(roundRepository.getRoundOfGame(game).isEmpty()) {
+    		return null;
+    	}
+    	return roundRepository.getRoundOfGame(game).get(roundRepository.getRoundOfGame(game).size()-1);
     }
     
     public boolean roundsPlayedInGame(Game game) {
-    	return (roundRepository.getLastRound(game).size()!=0);
+    	return (roundRepository.getRoundOfGame(game).size()!=0);
     }
     
     public Round getLastRoundOfTeam(Game game, Team team) {
-    	return roundRepository.getLastRoundWithTeam(game, team).get(0);
+    	if(roundRepository.getRoundOfGameWithTeam(game, team).isEmpty()) {
+    		return null;
+    	}
+    	return roundRepository.getRoundOfGameWithTeam(game, team).get(roundRepository.getRoundOfGameWithTeam(game, team).size()-1);
     }
     
     public boolean teamPlayedRoundsInGame(Game game, Team team) {
-    	return (roundRepository.getLastRoundWithTeam(game, team).size()!=0);
+    	return (roundRepository.getRoundOfGameWithTeam(game, team).size()!=0);
     }
 }
