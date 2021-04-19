@@ -60,10 +60,6 @@ public class CubeController {
         return cubeService.isMacAddressKnown(cube.getMacAddress());
     }
     
-    public void print() {
-    	System.out.println("this cube: " + this.cube);
-    }
-    
     public void deleteCube() {
     	cubeService.deleteCube(this.cube);
     }

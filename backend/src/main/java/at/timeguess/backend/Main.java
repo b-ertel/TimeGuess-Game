@@ -9,6 +9,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
@@ -22,6 +23,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
  */
 @SpringBootApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableScheduling
 /*
  * Prevent spring from trying to autowire the websocket-infrastructure: Exclude
  * the at.timeguess.backend.ui.websockets package from component scan.

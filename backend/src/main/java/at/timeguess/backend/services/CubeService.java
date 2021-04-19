@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import at.timeguess.backend.events.OnboardingEventPublisher;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.repositories.ConfigurationRepository;
@@ -19,9 +18,6 @@ import at.timeguess.backend.repositories.CubeRepository;
  */
 @Service
 public class CubeService {
-
-	@Autowired
-	OnboardingEventPublisher onboardingEventPuplisher;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(CubeService.class);
 	
@@ -86,10 +82,19 @@ public class CubeService {
     	return false;
     }
 
+	/**
+	 * find a cube by its mac address
+	 * 
+	 * @param identifier of cube
+	 * @return cube
+	 */
 	public Cube getByMacAddress(String identifier) {
 		return cubeRepo.findByMacAddress(identifier);
 	}
 
+	/** deletes a cube
+	 * @param cube to delete
+	 */
 	public void deleteCube(Cube cube) {
 		cubeRepo.delete(cube);
 		
