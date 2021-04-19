@@ -12,6 +12,12 @@
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
 
         <h:form id="userListForm">
+            <ui:remove>create user command</ui:remove>
+            <p:menubar id="toolbar" style="margin-bottom:10px">
+                <p:menuitem value="&nbsp;Create User&nbsp;" icon="fa fa-user-plus"
+                    oncomplete="PF('userCreateDialog').show()" update=":userCreateForm:userCreateDialog" />
+            </p:menubar>
+
            <ui:remove>show all users</ui:remove>
            <p:dataTable id="userTable" widgetVar="userTable" var="user" value="#{userListController.users}">
                 <p:column headerText="Username">
@@ -81,7 +87,7 @@
                     </p:panelGrid>
                     <p:separator />
 
-                   <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
                         <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}"
                             oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userEditDialog').hide(); PF('userTable').filter(); }"
                             update=":userListForm:userTable userData :msg"/>
@@ -90,6 +96,69 @@
                         <p:commandButton value="Abort" onclick="PF('userEditDialog').hide()"/>
                     </p:panelGrid>
                 </p:outputPanel>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="userCreateForm" prependId="false">
+            <ui:remove>create new user</ui:remove>
+            <p:dialog header="Create User" id="userCreateDialog" widgetVar="userCreateDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" my="left" width="350">
+                <p:ajax event="close" update="userCreateData" process="@parent" resetValues="true" />
+
+                <p:outputPanel id="userCreateData">
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:20px"
+                        columnClasses="p-col-5, p-col-7" contentStyleClass="ui-fluid">
+
+                        <p:outputLabel for="usernameCreate" value="Username: " />
+                        <p:inputText id="usernameCreate" value="#{newUserBean.username}" required="true" maxlength="100" />
+
+                        <p:outputLabel for="passwordCreate" value="Password: " styleClass="pw-label" />
+                        <div class="pw-input-box">
+                            <p:inputText id="passwordCreate" value="#{newUserBean.password}"
+                                type="password" placeholder="Password" required="true" styleClass="pw-input pw" />
+                            <button type="button" onclick="showPassword(this, 0)"
+                                class="eye-button eye-button-dialog ui-state-default ui-corner-all">
+                                <span class="fa fa-eye eye-Icon" />
+                            </button>
+                        </div>
+                    </p:panelGrid>
+                    <p:separator style="margin:15px 0px 20px" />
+
+                    <p:panelGrid columns="2" layout="flex" columnClasses="p-col-5 p-col-align-center, p-col-7"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank">
+                        <p:outputLabel for="firstNameCreate" value="First Name: " />
+                        <p:inputText id="firstNameCreate" value="#{newUserBean.firstName}" required="true" />
+                        <p:outputLabel for="lastNameCreate" value="Last Name: " />
+                        <p:inputText id="lastNameCreate" value="#{newUserBean.lastName}" required="true" />
+                        <p:outputLabel for="emailCreate" value="E-Mail: " />
+                        <p:inputText id="emailCreate" value="#{newUserBean.email}" required="true" />
+                    </p:panelGrid>
+                    <p:separator style="margin:15px 0px 20px" />
+
+                    <p:panelGrid columns="2" layout="flex" columnClasses="p-col-5 p-col-align-center, p-col-7"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank">
+                        <h:outputLabel for="roleCreate" value="Choose role(s)" />
+                        <p:selectOneMenu id="roleCreate" value="#{newUserBean.userRole}" converter="omnifaces.SelectItemsConverter"
+                            required="true" requiredMessage="UserRoles: Value is required">
+                            <p:ajax event="change" process="@this" />
+                            <f:selectItem itemLabel="Select" noSelectionOption="true" />
+                            <f:selectItems value="#{newUserBean.userRoles}" var="role" itemLabel="#{role}" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="enabledCreate" value="Enabled: " />
+                        <p:selectBooleanButton id="enabledCreate" value="#{newUserBean.enabled}"
+                            onLabel="Yes" offLabel="No" onIcon="fa fa-check" offIcon="fa fa-times" styleClass="rightm10" style="width:6rem" />
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:separator style="margin:9px 0px 15px" />
+
+                <h:panelGrid columns="3">
+                    <p:commandButton value="Save" action="#{newUserBean.createUserAdmin}"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userCreateDialog').hide(); }"
+                        update=":userListForm :userCreateForm:userCreateData :msg" />
+                    <p:commandButton value="Reload" action="#{newUserBean.clearFields}"
+                        process="@parent" update=":userCreateForm:userCreateData :msg" resetValues="true" styleClass="left35" />
+                    <p:commandButton value="Abort" onclick="PF('userCreateDialog').hide()" styleClass="left35" />
+                </h:panelGrid>
             </p:dialog>
         </h:form>
 

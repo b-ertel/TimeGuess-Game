@@ -51,7 +51,7 @@
 
         <h:form id="userCreateForm" prependId="false">
             <ui:remove>user registration</ui:remove>
-            <p:dialog header="Register new user" id="userCreateDialog" widgetVar="userCreateDialog" dynamic="true"
+            <p:dialog header="Register new User" id="userCreateDialog" widgetVar="userCreateDialog" dynamic="true"
                 modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" my="left" width="350">
                 <p:ajax event="close" update="userCreateData" process="@parent" resetValues="true" />
 
@@ -86,12 +86,12 @@
 
                     <p:panelGrid columns="2" layout="flex" columnClasses="p-col-5 p-col-align-center, p-col-7"
                         contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank">
-                        <p:outputLabel for="firstName" value="First Name: " />
-                        <p:inputText id="firstName" value="#{newUserBean.firstName}" />
-                        <p:outputLabel for="firstName" value="Last Name: " />
-                        <p:inputText id="lastName" value="#{newUserBean.lastName}" />
-                        <p:outputLabel for="email" value="E-Mail: " />
-                        <p:inputText id="email" value="#{newUserBean.email}" />
+                        <p:outputLabel for="firstNameCreate" value="First Name: " />
+                        <p:inputText id="firstNameCreate" value="#{newUserBean.firstName}" />
+                        <p:outputLabel for="lastNameCreate" value="Last Name: " />
+                        <p:inputText id="lastNameCreate" value="#{newUserBean.lastName}" />
+                        <p:outputLabel for="emailCreate" value="E-Mail: " />
+                        <p:inputText id="emailCreate" value="#{newUserBean.email}" />
                     </p:panelGrid>
                 </p:outputPanel>
                 <p:separator style="margin:9px 0px 15px" />
@@ -101,7 +101,7 @@
                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userCreateDialog').hide(); }"
                         update="userCreateData :msg" />
                     <p:commandButton value="Reload" action="#{newUserBean.clearFields}"
-                        process="@parent" update="userCreateData :msg" resetValues="true" styleClass="left35" />
+                        process="@parent" update=":userCreateForm:userCreateData :msg" resetValues="true" styleClass="left35" />
                     <p:commandButton value="Abort" onclick="PF('userCreateDialog').hide()" styleClass="left35" />
                 </h:panelGrid>
             </p:dialog>

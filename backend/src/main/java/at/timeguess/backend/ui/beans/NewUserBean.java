@@ -1,6 +1,7 @@
 package at.timeguess.backend.ui.beans;
 
 import java.io.Serializable;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -39,8 +40,10 @@ public class NewUserBean implements Serializable {
     private String firstName;
     private String lastName;
     private String email;
-    private boolean enabled;
+    private boolean enabled = true;
     private UserRole userRole;
+
+    private static EnumSet<UserRole> userRoles = EnumSet.allOf(UserRole.class);
 
     public String getUsername() {
         return username;
@@ -106,6 +109,10 @@ public class NewUserBean implements Serializable {
         this.enabled = enabled;
     }
 
+    public EnumSet<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
     /**
      * Clears all fields.
      */
@@ -116,7 +123,7 @@ public class NewUserBean implements Serializable {
         this.setLastName(null);
         this.setEmail(null);
         this.setUserRole(null);
-        this.setEnabled(false);
+        this.setEnabled(true);
     }
 
     /**
@@ -180,11 +187,12 @@ public class NewUserBean implements Serializable {
             user.setFirstName(getFirstName());
             user.setLastName(getLastName());
             user.setEmail(getEmail());
-            user.setEnabled(true);
+            user.setEnabled(isAdmin ? isEnabled() : true);
             user.setPassword(passwordEncoder.encode(getPassword()));
             consumer.accept(user);
 
             this.userService.saveUser(user);
+            this.clearFields();
         }
         else {
             messageBean.alertErrorFailValidation("User creation failed", "Input fields are invalid");
