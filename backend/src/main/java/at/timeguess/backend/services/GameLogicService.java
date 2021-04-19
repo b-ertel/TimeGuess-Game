@@ -152,13 +152,13 @@ public class GameLogicService {
 	
 	public void saveLastRound(Game game) {
 		Set<Round> rounds = game.getRounds();
-		System.out.println(rounds.size());
 		Round lastRound = null;
 		Iterator<Round> ite = rounds.iterator();
 		int highestNr = 0;
 		while(ite.hasNext()) {
 			Round aRound = ite.next();
 			if(aRound.getNr() > highestNr) {
+				highestNr = aRound.getNr();
 				lastRound = aRound;
 			}
 		}
