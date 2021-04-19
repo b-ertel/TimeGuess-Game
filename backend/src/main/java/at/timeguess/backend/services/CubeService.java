@@ -1,6 +1,7 @@
 package at.timeguess.backend.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +98,6 @@ public class CubeService {
 	 * @param cube to find out if mac address is already known
 	 * @return true if mac address is known, false otherwise
 	 */
-    @PreAuthorize("hasAuthority('ADMIN')")
 	public boolean isMacAddressKnown(String macAddress) {
 		if(cubeRepo.findByMacAddress(macAddress)==null){
 			return false;
@@ -121,5 +121,12 @@ public class CubeService {
     	return false;
     }
     
-	
+    public Cube findByMacAddress(String macAddress) {
+        return cubeRepo.findByMacAddress(macAddress);
+    }
+
+    public Optional<Cube> findById(Long cubeId) {
+        return cubeRepo.findById(cubeId);
+    }
+
 }

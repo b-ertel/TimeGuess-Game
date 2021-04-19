@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:demo="http://java.sun.com/jsf/composite/demo"
+	template="/WEB-INF/templates/main.xhtml">
+
+	<f:metadata>
+		<f:viewParam name="cubeId" value="#{cubeConfigurationController.cube}"
+			converter="#{cubeConverter}" converterMessage="Bad request!"
+			required="true" requiredMessage="Bad request!" />
+	</f:metadata>
+
+	<ui:define name="content">
+		<h:form id="cubeConfigurationForm">
+			<p:panel style="margin-bottom: 10px;">
+				<h:outputText
+					value="You are currently configuring the cube with MAC address #{cubeConfigurationController.cube.macAddress}!" />
+			</p:panel>
+
+			<!-- Instructions for the user go here -->
+			<p:panel style="margin-bottom: 10px;">
+				<h:outputText value="#{cubeConfigurationController.instruction}" />
+			</p:panel>
+
+			<!-- This is the list of cube faces to be assigned by the user -->
+			<p:dataTable var="cubeFace"
+				value="#{cubeConfigurationController.cubeFaces}"
+				style="margin-bottom: 10px;">
+				<p:column headerText="Cube Face Description">
+					<h:outputText
+						value="#{cubeFace.activity} / #{cubeFace.time} / #{cubeFace.points}" />
+				</p:column>
+				<p:column headerText="Assigned Facet Number">
+					<h:outputText
+						value="#{cubeConfigurationController.getAssignedFacetNumber(cubeFace)}" />
+				</p:column>
+				<p:column>
+					<p:commandButton title="Assign"
+						action="#{cubeConfigurationController.assign(cubeFace)}"
+						disabled="#{empty cubeConfigurationController.facet}"
+						update=":cubeConfigurationForm" />
+				</p:column>
+			</p:dataTable>
+
+			<!-- After all cube faces have been assigned the user should click this button -->
+			<p:panel>
+				<p:commandButton title="Submit"
+					action="#{cubeConfigurationController.submit()}"
+					disabled="#{!cubeConfigurationController.isConfigured()}" />
+			</p:panel>
+
+			<o:socket channel="configurationChannel"
+				user="#{sessionInfoBean.currentUserName}"
+				onmessage="function(m){console.log(m);}">
+				<f:ajax event="facetChange" render=":cubeConfigurationForm" />
+			</o:socket>
+
+		</h:form>
+	</ui:define>
+</ui:composition>
