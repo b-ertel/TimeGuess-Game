@@ -32,7 +32,7 @@ public class TeamConverter implements Converter<Team> {
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Team value) {
+        if (value == null) return "";
         return Long.toString(value.getId());
-
     }
 }
