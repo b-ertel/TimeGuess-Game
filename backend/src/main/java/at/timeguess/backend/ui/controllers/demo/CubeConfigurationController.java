@@ -78,6 +78,7 @@ public class CubeConfigurationController implements Consumer<FacetsEvent> {
         if (cube.equals(eventCube)) {
             facet = eventFacet;
             instruction = CLICK_INSTRUCTION;
+            System.out.println("sending ...");
             websocketManager.getConfigurationChannel().send("facetChange", sessionInfoBean.getCurrentUserName());
         }
     }
