@@ -26,8 +26,8 @@ public class ScheduledTasks {
 	@Autowired
 	private StatusController statusController;
 	
-	@Scheduled(fixedRate = 5000) // means every 5 sec
-//	@Scheduled(cron="0 0 22 * * * ") // catalog is updated every day at 22:00 
+//	@Scheduled(fixedRate = 5000) // means every 5 sec
+	@Scheduled(cron="0 0 22 * * * ") // catalog is updated every day at 22:00 
 	public void updateHealthStatus() {
 		
 		this.healthStatus = statusController.getHealthStatus();

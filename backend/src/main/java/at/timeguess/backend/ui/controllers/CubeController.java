@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.services.CubeService;
+import at.timeguess.backend.api.StatusController;
 import at.timeguess.backend.model.Cube;
 
 /**
@@ -20,6 +21,8 @@ public class CubeController {
 
     @Autowired
     private CubeService cubeService;
+    @Autowired
+    private StatusController statusController;
 
     private Cube cube;
 
@@ -40,6 +43,38 @@ public class CubeController {
 
     }
 
+    /**
+     * saves cube into the database
+     */
+    public void saveCube() {
+        this.cube=cubeService.saveCube(this.cube);
+    }
+
+    /**
+     * @return all cubes in the databes
+     */
+    public List<Cube> getAllCubes() {
+        return cubeService.allCubes();
+    }
+
+    /**
+     * to check if there exists a cube with a given mac address
+     * 
+     * @param cube to check if it is in database
+     * @return true if it is in database, false otherwise
+     */
+    public boolean isMacAddressKnown(Cube cube){
+        return cubeService.isMacAddressKnown(cube.getMacAddress());
+    }
+    
+    /**
+     * deletes cube and removes its status
+     */
+    public void deleteCube() {
+    	cubeService.deleteCube(this.cube);
+    	statusController.deleteStatus(this.cube.getMacAddress());
+    }
+    
     public Cube getCube() {
         return this.cube;
     }
@@ -48,21 +83,6 @@ public class CubeController {
         this.cube = cube;
     }
 
-    public void saveCube() {
-        this.cube=cubeService.saveCube(this.cube);
-    }
-
-    public List<Cube> getAllCubes() {
-        return cubeService.allCubes();
-    }
-
-    public boolean isMacAddressKnown(Cube cube){
-        return cubeService.isMacAddressKnown(cube.getMacAddress());
-    }
-    
-    public void deleteCube() {
-    	cubeService.deleteCube(this.cube);
-    }
-
 }
+
 

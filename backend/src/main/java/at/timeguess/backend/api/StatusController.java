@@ -187,6 +187,14 @@ public class StatusController {
 	 */
 	public void setInterval(int intervall) {
 		this.interval = intervall;
+	}
+
+	/** remove status of a deleted user, called by {@link CubeController} if a cube is deleted via UI
+	 * @param macAddress of the deleted cube
+	 */
+	public void deleteStatus(String macAddress) {
+		this.cubeStatus.remove(macAddress);
+		this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
 	}  
 	
 	

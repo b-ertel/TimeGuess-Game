@@ -49,7 +49,7 @@
                				<f:selectItem itemLabel="Select" itemValue="" noSelectionOption="true"/>
                				<f:selectItems value="#{cubeController.allCubes}" var="cube" itemLabel="#{cube.id}"/>
                			</p:selectOneMenu>
-                        <p:commandButton title="OK" oncomplete="PF('cubeUseDialog').show()" update=":cubeDetailForm:cubeUseDialog :msg">
+                        <p:commandButton value="OK" oncomplete="PF('cubeUseDialog').show()" update=":cubeDetailForm:cubeUseDialog :msg">
           <!--     				<f:setPropertyActionListener value="#{cube}" target="#{cubeController.cube}" />   -->  
               			</p:commandButton>
 	   				</h:panelGrid> 
@@ -70,7 +70,7 @@
 	                    <h:outputText value="#{cube.name}"/>
 	                </p:column>    
 	                <p:column>
-	                	<p:commandButton title="Choose"
+	                	<p:commandButton value="Choose"
 	                	    oncomplete="PF('cubeUseDialog').show()" update=":cubeDetailForm:cubeUseDialog :msg">
                             <f:setPropertyActionListener value="#{cube}" target="#{cubeController.cube}" />
                         </p:commandButton>
@@ -96,20 +96,22 @@
                         <p:inputText id="id" value="#{curr.id}" disabled="true"/>
                         <p:outputLabel for="macAddress" value="MacAddress: " />
                         <p:inputText id="macAddress" value="#{curr.macAddress}" disabled="true"/>
-                        <p:outputLabel for="name" value="Name: " />
+                        <p:outputLabel for="name" value="Name: "/>
                         <p:inputText id="name" value="#{curr.name}"/>
                     </h:panelGrid>
                     <p:separator />
-     <!--                 <h:panelGrid columns="4">
-                        <p:commandButton value="Save" action="#{cubeController.saveCube()}" oncomplete="PF('useCubeDialog').hide()" update=":cubeTable" />
-                        <p:commandButton value="Configure" action="#{cubeController.saveCube()}" oncomplete="PF('useCubeDialog').hide()" update=":onlineCubeInfo :cubeTable">
-                       		<f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />   // listener for ConfigurationController  
+                      <h:panelGrid columns="7">
+                        <p:commandButton value="Save" action="#{cubeController.saveCube()}" oncomplete="{PF('cubeUseDialog').hide()}" update=":ChatRoomForm:cubeTable :cubeDetailForm:cubeUseDialog :msg" />
+                        <p:commandButton value="Configure" action="#{cubeController.saveCube()}" oncomplete="PF('cubeUseDialog').hide()" update=":ChatRoomForm:cubeTable">
+                       <!-- 		<f:setPropertyActionListener target="/secured/demos/chatRoom.xhtml" value="/secured/demos/chatRoom.xhtml" />   // listener for ConfigurationController  -->
                         </p:commandButton> 
-                        <p:commandButton value="Delete" action="#{cubeController.deleteCube()}" oncomplete="PF('cubeUseDialog').hide()" update=":cubeTable"/>
-                        <p:commandButton value="Abort" onclick="PF('cubeUseDialog').hide()"> 
-                        
-                        </p:commandButton> 
-                    </h:panelGrid> -->
+                  <!--       <h:button value="Configure" outcome="chatRoom"/>
+                        <h:commandButton id="button" value="POST button" action="chatRoom" />  -->    
+                        <p:linkButton value="test" href="chatRoom.xhtml"/>
+                        <p:commandButton value="Delete" action="#{cubeController.deleteCube()}" oncomplete="PF('cubeUseDialog').hide()" update=":ChatRoomForm:cubeTable :cubeDetailForm:cubeUseDialog :msg"/>
+                        <p:commandButton value="Abort" onclick="PF('cubeUseDialog').hide()" update=":cubeDetailForm:cubeUseDialog :msg" /> 
+
+                    </h:panelGrid> 
                 </p:outputPanel> 
              </p:dialog>   
              
@@ -117,7 +119,7 @@
            <o:socket channel="cubeChannel" scope="application"
                 onmessage="function(m){console.log(m);}">
                 <f:ajax event="connectionCubeUpdate"
-                    render="onlineCubeInfo onlineCube" />
+                    render=":ChatRoomForm:onlineCubeInfo :ChatRoomForm:onlineCube" />
             </o:socket>
 
 		</h:form>	
