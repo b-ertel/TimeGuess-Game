@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameTeam;
 import at.timeguess.backend.model.Round;
+import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
 import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
@@ -34,6 +35,8 @@ public class StartRoundController {
 	
 	Set<GameTeam> teams;
 	
+	String message;
+	
 	public void setGame(Game game) {
 		this.game = game;
 	}
@@ -55,7 +58,11 @@ public class StartRoundController {
 	}
 	
 	public void nextRound() {
-		this.game = gameLogic.startNewRound(game);
+		try {
+			this.game = gameLogic.startNewRound(game);
+		} catch(AllTermsUsedInGameException e) {
+			this.message = "All Terms of topic have been used, game ends";
+		} 
 	}
 	
 	public int numberRounds() {
@@ -98,6 +105,16 @@ public class StartRoundController {
 	public void setTeams(Set<GameTeam> teams) {
 		this.teams = teams;
 	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	
+	
 	
 	
 }

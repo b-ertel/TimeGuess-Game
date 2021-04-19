@@ -33,7 +33,11 @@
 	        <p:panel header="Round infos" rendered="#{!startRoundController.hasNoRounds()}">
 		     <p:outputLabel value="#{startRoundController.lastRound()}"/>
 	          <br />  
-		    </p:panel>  
+		    </p:panel> 
+		     <p:panel header="Round infos" rendered="#{not empty startRoundController.message!=null}">
+		     <p:outputLabel value="#{startRoundController.message}"/>
+	          <br />  
+		    </p:panel>   
     	</p:panel>   
         </h:form>
     </ui:define>

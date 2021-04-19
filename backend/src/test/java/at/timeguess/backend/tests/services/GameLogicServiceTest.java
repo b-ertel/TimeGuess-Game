@@ -23,6 +23,7 @@ import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
+import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.repositories.TermRepository;
 import at.timeguess.backend.repositories.TopicRepository;
@@ -100,7 +101,7 @@ public class GameLogicServiceTest {
     @DirtiesContext
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    public void checkNextTerm() {
+    public void checkNextTerm() throws AllTermsUsedInGameException {
     	Game game = gameService.loadGame((long) 1);
     	Term termNotUsed = termRepo.findById((long) 5).get();
     	Assertions.assertEquals(termNotUsed.getName(), gameLogicService.nextTerm(game).getName());
