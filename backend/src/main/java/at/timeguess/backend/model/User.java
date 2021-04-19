@@ -2,27 +2,10 @@ package at.timeguess.backend.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -33,9 +16,9 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
 
     private static final long serialVersionUID = 1L;
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    private Long id;
 
     @Column(length = 100, nullable = false)
     private String username;
@@ -50,28 +33,27 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateDate;
 
+    @Column(length = 50, nullable = false)
     private String password;
 
     private String firstName;
     private String lastName;
     private String email;
-    private String phone;
 
     boolean enabled;
 
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "User_Role")
     @Enumerated(EnumType.STRING)
-    private Set<UserRole> roles;
+    private Set<UserRole> roles = new HashSet<>();
     
     @ManyToMany
-	@JoinTable(
-			name = "team_user", 
-			joinColumns = @JoinColumn(name = "user_id"), 
-			inverseJoinColumns = @JoinColumn(name = "team_id"))
+    @JoinTable(
+            name = "team_user", 
+            joinColumns = @JoinColumn(name = "user_id"), 
+            inverseJoinColumns = @JoinColumn(name = "team_id"))
     private Set<Team> teams;
 
-    //@ManyToMany(mappedBy = "confirmedUsers", fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Game.class)
     @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Game.class)
     @JoinTable(name = "game_user",
             joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
@@ -129,14 +111,6 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
         this.email = email;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     public boolean isEnabled() {
         return enabled;
     }
@@ -187,7 +161,7 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
 
     @Override
     public int hashCode() {
-    	final int prime = 7;
+        final int prime = 7;
         int result = 59;
         result = prime * result + (this.id == null ? 0 : this.id.hashCode());
         result = prime * result + Objects.hashCode(this.username);
@@ -196,13 +170,13 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
 
     @Override
     public boolean equals(Object obj) {
-    	if (this == obj)
-    		return true;
-    	
+        if (this == obj)
+            return true;
+
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        
+
         final User other = (User)obj;
         return Objects.equals(getId(), other.getId()) && Objects.equals(getUsername(), other.getUsername());
     }
@@ -217,8 +191,8 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
         return (null == createDate);
     }
 
-	@Override
-	public int compareTo(User o) {
-		return this.username.compareTo(o.getUsername());
-	}
+    @Override
+    public int compareTo(User o) {
+        return this.username.compareTo(o.getUsername());
+    }
 }

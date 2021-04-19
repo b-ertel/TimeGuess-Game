@@ -55,31 +55,45 @@ public class GameService {
     /**
      * Saves the game.
      * @param game the game to save
-     * @return the updated game
+     * @return the saved game
      */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER') or hasAuthority('ADMIN')")
     public Game saveGame(Game game) {
         boolean isNew = game.isNew();
-        if (isNew)
-            game.setCreator(userService.getAuthenticatedUser());
+        if (isNew) game.setCreator(userService.getAuthenticatedUser());
         Game ret = gameRepo.save(game);
 
-        LOGGER.info("Saving game with id {} done (name '{}' ({})).", ret.getId(), ret.getName(),
-                isNew ? "created" : "updated");
-        // faces message
-        messageBean.alertInformation(isNew ? "New game created" : "Game updated", ret.getName());
+        // show ui message and log
+        messageBean.alertInformation(ret.getName(), isNew ? "New game created" : "Game updated");
+
+        User auth = userService.getAuthenticatedUser();
+        LOGGER.info("Game '{}' (id={}) was {} by User '{}' (id={})", ret.getName(), ret.getId(),
+                isNew ? "created" : "updated", auth.getUsername(), auth.getId());
 
         return ret;
     }
 
+    /**
+     * Deletes the game.
+     * @param game the game to delete
+     */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER') or hasAuthority('ADMIN')")
     public void deleteGame(Game game) {
-        gameRepo.delete(game);
-
-        // faces message and audit log save
-        messageBean.alertInformation("Game deleted", game.getName());
-        
-        LOGGER.info("Game '" + game.getName() + " was deleted!", game.getId());
+        try {
+            gameRepo.delete(game);
+    
+            // show ui message and log
+            messageBean.alertInformation(game.getName(), "Game was deleted");
+    
+            User auth = userService.getAuthenticatedUser();
+            LOGGER.info("Game '{}' (id={}) was deleted by User '{}' (id={})", game.getName(), game.getId(),
+                    auth.getUsername(), auth.getId());
+        }
+        catch (Exception e) {
+            messageBean.alertError(game.getName(), "Deleting game failed");
+            LOGGER.info("Deleting game '{}' (id={}) failed, stack trace:", game.getName(), game.getId());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -92,11 +106,11 @@ public class GameService {
             game.getConfirmedUsers().add(user);
             this.saveGame(game);
 
-            // return faces message for user
-            messageBean.alertInformation("Your participation was successfully confirmed for game ", game.getName());
+            // show ui message and log
+            messageBean.alertInformation(game.getName(), "Your participation was successfully confirmed");
 
-            // save log
-            LOGGER.info("User {} confirmed participation in game {}", user.getUsername(), game.getName());
+            LOGGER.info("User '{}' (id={}) confirmed participation in game '{}' (id={})", user.getUsername(),
+                    user.getId(), game.getName(), game.getId());
         }
     }
 

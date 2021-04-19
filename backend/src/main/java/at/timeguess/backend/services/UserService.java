@@ -18,6 +18,7 @@ import at.timeguess.backend.model.UserRole;
 import at.timeguess.backend.model.utils.GroupingHelper;
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.repositories.UserRepository;
+import at.timeguess.backend.ui.beans.MessageBean;
 
 /**
  * Service for accessing and manipulating user data.
@@ -32,6 +33,9 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private MessageBean messageBean;
 
     /**
      * Returns a collection of all users.
@@ -94,6 +98,16 @@ public class UserService {
     }
 
     /**
+     * Loads a single user identified by its id.
+     * @param id the id to search for
+     * @return the user with the given id
+     */
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #username")
+    public User loadUser(Long id) {
+        return userRepository.findById(id).get();
+    }
+
+    /**
      * Loads a single user identified by its username.
      * @param username the username to search for
      * @return the user with the given username
@@ -108,18 +122,31 @@ public class UserService {
      * This method will also set {@link User#createDate} for new entities or {@link User#updateDate} for updated entities.
      * The user requesting this operation will also be stored as {@link User#createDate} or {@link User#updateUser} respectively.
      * @param user the user to save
-     * @return the updated user
+     * @return the saved user
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public User saveUser(User user) {
-        if (user.isNew()) {
+        User auth = getAuthenticatedUser();
+        if (auth == null) auth = user;
+
+        boolean isNew = user.isNew();
+        if (isNew) {
             user.setCreateDate(new Date());
-            user.setCreateUser(getAuthenticatedUser());
-        } else {
-            user.setUpdateDate(new Date());
-            user.setUpdateUser(getAuthenticatedUser());
+            user.setCreateUser(auth);
         }
-        return userRepository.save(user);
+        else {
+            user.setUpdateDate(new Date());
+            user.setUpdateUser(auth);
+        }
+        User ret = userRepository.save(user);
+
+        // show ui message and log
+        messageBean.alertInformation(ret.getUsername(), isNew ? "New user created" : "User updated");
+
+        LOGGER.info("User '{}' (id={}) was {} by User '{}' (id={})", ret.getUsername(), ret.getId(),
+                isNew ? "created" : "updated", auth.getUsername(), auth.getId());
+
+        return ret;
     }
 
     /**
@@ -128,11 +155,21 @@ public class UserService {
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteUser(User user) {
-        userRepository.delete(user);
+        try {
+            userRepository.delete(user);
 
-        User authUser = getAuthenticatedUser();
-        LOGGER.info("User {} '{}' was deleted by User {} '{}'", user.getId(), user.getUsername(), authUser.getId(),
-                authUser.getUsername());
+            // show ui message and log
+            messageBean.alertInformation(user.getUsername(), "User was deleted");
+
+            User auth = getAuthenticatedUser();
+            LOGGER.info("User '{}' (id={}) was deleted by User '{}' (id={})", user.getUsername(), user.getId(),
+                    auth.getUsername(), auth.getId());
+        }
+        catch (Exception e) {
+            messageBean.alertError(user.getUsername(), "Deleting user failed");
+            LOGGER.info("Deleting user '{}' (id={}) failed, stack trace:", user.getUsername(), user.getId());
+            e.printStackTrace();
+        }
     }
 
     User getAuthenticatedUser() {
