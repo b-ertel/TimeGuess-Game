@@ -54,13 +54,13 @@
   - somehow gameDetailController gets stuck at the problematic game
   - games with Topic/teams/rounds can not get deleted (although the controller tests show the controller can delete)
 -->
-<p:commandButton update=":gameForm:gameEditDialog" oncomplete="PF('gameEditDialog').show()" icon="ui-icon-note" title="Edit">
+<p:commandButton update=":gameForm:gameEditDialog" oncomplete="PF('gameEditDialog').show()" icon="fa fa-edit" title="Edit">
 <f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />
 </p:commandButton>
 
 <p:commandButton action="#{gameDetailController.doDeleteGame}" icon="fa fa-trash" title="Delete" update=":gameForm:gamesTable">
 <f:setPropertyActionListener value="#{tgame}" target="#{gameDetailController.game}" />
-<p:confirm header="Confirmation" message="Are you sure about deleting this game? It cannot be undone." icon="fa-fa-exlamation-triangle" />
+<p:confirm header="Confirmation" message="Are you sure about deleting this game? It cannot be undone." icon="fa fa-exclamation-triangle" />
 </p:commandButton>
 
 </p:column>

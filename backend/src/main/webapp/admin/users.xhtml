@@ -7,9 +7,13 @@
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
+
     <ui:define name ="content">
-        <h:form id="userForm">
-            <p:dataTable id="usersTable" var="user" value="#{userListController.users}">
+        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+
+        <h:form id="userListForm">
+           <ui:remove>show all users</ui:remove>
+           <p:dataTable id="userTable" widgetVar="userTable" var="user" value="#{userListController.users}">
                 <p:column headerText="Username">
                     <h:outputText value="#{user.username}"/>
                 </p:column>
@@ -26,55 +30,77 @@
                     <h:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
-                    <p:commandButton update=":userForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="fa fa-edit" title="Edit">
+                    <p:commandButton title="Edit" icon="fa fa-edit"
+                        oncomplete="PF('userEditDialog').show()" update=":userDetailForm:userEditDialog :msg">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                     </p:commandButton>
-                    <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-trash" title="Delete" update=":userForm:usersTable">
+                    <p:commandButton title="Delete" icon="fa fa-trash"
+                        action="#{userDetailController.doDeleteUser}" update=":userListForm:userTable :msg">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
-                        <p:confirm header="Confirmation" message="Are you sure about deleting this user? This cannot be undone." icon="fa-fa-exlamation-triangle" />
+                        <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this user? This cannot be undone." />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
+        </h:form>
 
-            <p:dialog header="Edit User" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" responsive="true" width="330">
+        <h:form id="userDetailForm">
+            <ui:remove>edit user</ui:remove>
+            <p:dialog header="Edit User" id="userEditDialog" widgetVar="userEditDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" responsive="true" width="330">
+                <p:ajax event="close" update="userData" process="@parent" resetValues="true" />
+
                 <c:set var="curr" value="#{userDetailController.user}" scope="request" />
-                <p:outputPanel id="userData" rendered="#{not empty userDetailController.user}">
-                    <div class="p-grid">
-                        <div class="p-col-4"><p:outputLabel for="username" value="Username: " /></div>
-                        <div class="p-col-8"><p:inputText id="username" value="#{userDetailController.user.username}" disabled="true"/></div>
-                        <div class="p-col-4"><p:outputLabel for="password" value="Password: " /></div>
-                        <div class="p-col-8"><p:password id="password" value="#{userDetailController.user.password}" disabled="true"/></div>
-                    </div>
+                <p:outputPanel id="userData" rendered="#{not empty curr}">
+                    <p:panelGrid columns="2" layout="flex"
+                        columnClasses="p-col-4 p-col-align-center, p-col-8"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top:5px">
+                        <p:outputLabel for="username" value="Username: " />
+                        <p:inputText id="username" value="#{curr.username}" required="true" maxlength="100" />
+                        <p:outputLabel for="password" value="Password: " />
+                        <p:password id="password" value="#{curr.password}" required="true" maxlength="50" />
+                    </p:panelGrid>
                     <p:separator style="margin-bottom:16px" />
-                    <div class="p-grid">
-                        <div class="p-col-4"><p:outputLabel for="firstName" value="First Name: " /></div>
-                        <div class="p-col-8"><p:inputText id="firstName" value="#{userDetailController.user.firstName}"/></div>
-                        <div class="p-col-4"><p:outputLabel for="firstName" value="Last Name: " /></div>
-                        <div class="p-col-8"><p:inputText id="lastName" value="#{userDetailController.user.lastName}"/></div>
-                        <div class="p-col-4"><p:outputLabel for="email" value="E-Mail: " /></div>
-                        <div class="p-col-8"><p:inputText id="email" value="#{userDetailController.user.email}"/></div>
-                        <div class="p-col-4"><p:outputLabel for="phone" value="Phone: " /></div>
-                        <div class="p-col-8"><p:inputMask id="phone" value="#{userDetailController.user.phone}" mask="+99? 999 9999999"/></div>
-                    </div>
+
+                    <p:panelGrid columns="2" layout="flex"
+                        columnClasses="p-col-4 p-col-align-center, p-col-8"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank">
+                        <p:outputLabel for="firstName" value="First Name: " />
+                        <p:inputText id="firstName" value="#{curr.firstName}"/>
+                        <p:outputLabel for="firstName" value="Last Name: " />
+                        <p:inputText id="lastName" value="#{curr.lastName}"/>
+                        <p:outputLabel for="email" value="E-Mail: " />
+                        <p:inputText id="email" value="#{curr.email}"/>
+                    </p:panelGrid>
                     <p:separator style="margin-bottom:16px" />
-                    <div class="p-grid">
-                        <div class="p-col-4"><p:outputLabel for="enabled" value="Enabled: " /></div>
-                        <div class="p-col-8"><p:selectBooleanCheckbox id="enabled" value="#{userDetailController.user.enabled}"/></div>
-                    </div>
-                    <p:separator style="margin-bottom:16px" />
-                    <div class="p-grid">
-                        <div class="p-col-4"><p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userForm:usersTable"/></div>
-                        <div class="p-col-4"><p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}" update=":userForm:userData"/></div>
-                        <div class="p-col-4"><p:commandButton value="Abort" onclick="PF('userEditDialog').hide()"/></div>
-                    </div>
+
+                    <p:panelGrid columns="2" layout="flex"
+                        columnClasses="p-col-4 p-col-align-center, p-col-8"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank">
+                        <p:outputLabel for="enabled" value="Enabled: " />
+                        <p:selectBooleanCheckbox id="enabled" value="#{curr.enabled}"/>
+                    </p:panelGrid>
+                    <p:separator />
+
+                   <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
+                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}"
+                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userEditDialog').hide(); PF('userTable').filter(); }"
+                            update=":userListForm:userTable userData :msg"/>
+                        <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}"
+                            process="@parent" update="userData :msg" resetValues="true"/>
+                        <p:commandButton value="Abort" onclick="PF('userEditDialog').hide()"/>
+                    </p:panelGrid>
                 </p:outputPanel>
             </p:dialog>
-
-            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
-            </p:confirmDialog>
-
         </h:form>
+
+        <h:form>
+            <ui:remove>delete user confirmation</ui:remove>            
+            <p:confirmDialog id="deleteUserConfirm" global="true" closeOnEscape="true" showEffect="fade" hideEffect="fade" width="40%">
+                <p:commandButton value="No" type="button" icon="fa fa-close" styleClass="ui-confirmdialog-no" />
+                <p:commandButton value="Yes" type="button" icon="fa fa-check" styleClass="ui-confirmdialog-yes" />
+            </p:confirmDialog>
+            <p:draggable for="deleteUserConfirm"/>
+        </h:form>
+        
     </ui:define>
 </ui:composition>

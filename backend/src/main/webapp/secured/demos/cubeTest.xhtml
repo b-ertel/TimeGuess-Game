@@ -53,9 +53,7 @@
 
              	</p:panel>
             	</p:panelGrid>
-                  
-	 			    
-				
+                 				
             	<p:separator/>
             	
             	<p:dataTable id="cubeTable" style="width:800px" var="cube" value="#{cubeController.allCubes}">
@@ -75,9 +73,9 @@
                 <p:commandButton value="choose">
                         <f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />
                 </p:commandButton>
-                </p:column>    -->
-            	
+                </p:column>    -->            	
             	</p:dataTable>
+ 
  
           <p:dialog header="Use Cube" id="cubeUseDialog" widgetVar="useCubeDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false"> 
                 <p:outputPanel id="cubeData" rendered="#{not empty cubeController.cube}">

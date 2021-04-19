@@ -21,7 +21,7 @@
                             action="#{termListController.doCreateTerm}"
                             oncomplete="PF('newTermDialog').show()"
                             update=":termsForm:termsTable :toolbarForm:toolbar"/>
-                <p:menuitem value="&nbsp;Load new Terms from JSON file&nbsp;" icon="fa fa-file-code-o"
+                <p:menuitem value="&nbsp;Load new Terms from JSON file&nbsp;" icon="fa fa-file-text-o"
                             oncomplete="PF('newTermsDialog').show()"
                             update=":termsForm:termsTable :toolbarForm:toolbar"/>
                 <p:menuitem value="&nbsp;Refresh&nbsp;" icon="fa fa-refresh"
@@ -38,12 +38,12 @@
                     <h:outputText value="#{term.topic.name}"/>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
-                    <p:commandButton update=":termsForm:termEditDialog" oncomplete="PF('termEditDialog').show()" icon="ui-icon-note" title="Edit">
+                    <p:commandButton update=":termsForm:termEditDialog" oncomplete="PF('termEditDialog').show()" icon="fa fa-edit" title="Edit">
                         <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
                     </p:commandButton>
-                    <p:commandButton action="#{termDetailController.doDeleteTerm}" icon="ui-icon-trash" title="Delete" update=":termsForm:termsTable">
+                    <p:commandButton action="#{termDetailController.doDeleteTerm}" icon="fa fa-trash" title="Delete" update=":termsForm:termsTable">
                         <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
-                        <p:confirm header="Confirmation" message="Are you sure that you want to delete this term? You cannot undo this operation." icon="ui-icon-alert" />
+                        <p:confirm header="Confirmation" message="Are you sure that you want to delete this term? You cannot undo this operation." icon="fa fa-exclamation-triangle" />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
@@ -88,8 +88,8 @@
             </p:dialog>
 
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-close" />
             </p:confirmDialog>
 
         </h:form>

@@ -41,8 +41,9 @@ public class NewGameBean implements Serializable {
             game.setStatus(GameState.SETUP);
 
             gameService.saveGame(game);
-        } else {
-            messageBean.alertErrorFailValidation("ERROR", "Input fields are invalid!");
+        }
+        else {
+            messageBean.alertErrorFailValidation("Game creation failed", "Input fields are invalid");
         }
     }
 
