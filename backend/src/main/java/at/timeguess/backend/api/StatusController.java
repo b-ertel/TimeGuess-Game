@@ -77,7 +77,7 @@ public class StatusController {
     		this.healthStatus.get(message.getIdentifier()).setTimestamp(LocalDateTime.now());
     	}
     	else {
-    		LOGGER.info("new cube is onboarding.....");
+    		LOGGER.info("cube is onboarding.....");
     		updateCube(message);
     		this.healthStatus.put(message.getIdentifier(), new HealthStatus(LocalDateTime.now(), message.getBatteryLevel(), message.getRssi(), message.getIdentifier()));
     		setInterval(10);
