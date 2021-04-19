@@ -10,6 +10,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,8 @@ import at.timeguess.backend.repositories.TermRepository;
 @Component
 @Scope("application")
 public class GameLogicService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(GameLogicService.class);
 
 	@Autowired
 	TermService termService;
@@ -60,9 +64,9 @@ public class GameLogicService {
 	}
 	
 	/**
-	 * method to check wether all terms of a topic have been used or not
+	 * method to check whether all terms of a topic have been used or not
 	 * @param game
-	 * @return boolean wether there a still terms available or not
+	 * @return boolean whether there a still terms available or not
 	 */
 	private boolean stillTermsAvailable(Game game) {
 		if(usedTerms(game).size() == termService.getAllTermsOfTopic(game.getTopic()).size())
@@ -122,14 +126,16 @@ public class GameLogicService {
 	
 	public void startNewRound(Game game) {
 		Round nextRound = new Round();
-		nextRound.setNr(game.getRoundNr()+1);
+		nextRound.setNr(game.getRounds().size()+1);
 		Team nextTeam = getNextTeam(game);
 		nextRound.setGuessingUser(nextUser(game, nextTeam));
 		nextRound.setGuessingTeam(nextTeam);
 		nextRound.setTermToGuess(nextTerm(game));
 		nextRound.setGame(game);
 		game.getRounds().add(nextRound);
-		game.setRoundNr(game.getRoundNr()+1);
+		game.setRoundNr(game.getRounds().size());
+		
+		LOGGER.info("New Round nr '{}', with team '{}' was created, gamerounds '{}'", nextRound.getNr(), nextRound.getGuessingTeam().getName(), game.getRounds().size());
 	}
 	
 	
@@ -142,6 +148,7 @@ public class GameLogicService {
 		}
 		if(lastRound != null) {
 			roundService.saveRound(lastRound);
+			LOGGER.info("Round nr '{}', with team '{}' was saved, gamerounds '{}'", lastRound.getNr(), lastRound.getGuessingTeam().getName(), game.getRounds().size());
 		}
 	}
 }

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
-import at.timeguess.backend.model.User;
 import at.timeguess.backend.repositories.RoundRepository;
 
 
@@ -19,7 +18,7 @@ import at.timeguess.backend.repositories.RoundRepository;
 @Component
 @Scope("application")
 public class RoundService {
-
+	
     @Autowired
     private RoundRepository roundRepository;
 
