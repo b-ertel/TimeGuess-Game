@@ -6,13 +6,16 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
 	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
-	xmlns:demo="http://java.sun.com/jsf/composite/demo"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+                
+    xmlns:demo="http://java.sun.com/jsf/composite/demo"
 	template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
         <!-- see chat.js -->
         <h:outputScript>			
             pfContext=PF
         </h:outputScript>
+        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
 
         <h:form id="ChatRoomForm">
             <div class="chatRoomContent">
@@ -46,7 +49,7 @@
                				<f:selectItem itemLabel="Select" itemValue="" noSelectionOption="true"/>
                				<f:selectItems value="#{cubeController.allCubes}" var="cube" itemLabel="#{cube.id}"/>
                			</p:selectOneMenu>
-              			<p:commandButton value="OK" oncomplete="PF('cubeUseDialog').show()">
+                        <p:commandButton title="OK" oncomplete="PF('cubeUseDialog').show()" update=":cubeDetailForm:cubeUseDialog :msg">
           <!--     				<f:setPropertyActionListener value="#{cube}" target="#{cubeController.cube}" />   -->  
               			</p:commandButton>
 	   				</h:panelGrid> 
@@ -56,36 +59,45 @@
                  				
             	<p:separator/>
             	
-            	<p:dataTable id="cubeTable" style="width:800px" var="cube" value="#{cubeController.allCubes}">
-                <p:column headerText="CubeId">
-                    <h:outputText value="#{cube.id}"/>
-                </p:column>
-                <p:column headerText="MacAddress">
-                    <h:outputText value="#{cube.macAddress}"/>
-                </p:column>
-                <p:column headerText="Name">
-                    <h:outputText value="#{cube.name}"/>
-                </p:column>    
-                <p:column>
-                	<p:commandButton value="choose" action="#{cubeController.setCube(cube)}" oncomplete="PF('cubeUseDialog').show()"/>
-                </p:column>           
-        <!--     <p:column>
-                <p:commandButton value="choose">
-                        <f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />
-                </p:commandButton>
-                </p:column>    -->            	
+            	<p:dataTable id="cubeTable" widgetVar="cubeTable" var="cube" value="#{cubeController.allCubes}" style="width:800px">
+	                <p:column headerText="CubeId">
+	                    <h:outputText value="#{cube.id}"/>
+	                </p:column>
+	                <p:column headerText="MacAddress">
+	                    <h:outputText value="#{cube.macAddress}"/>
+	                </p:column>
+	                <p:column headerText="Name">
+	                    <h:outputText value="#{cube.name}"/>
+	                </p:column>    
+	                <p:column>
+	                	<p:commandButton title="Choose"
+	                	    oncomplete="PF('cubeUseDialog').show()" update=":cubeDetailForm:cubeUseDialog :msg">
+                            <f:setPropertyActionListener value="#{cube}" target="#{cubeController.cube}" />
+                        </p:commandButton>
+	                </p:column>           
+	        <!--     <p:column>
+	                <p:commandButton value="choose">
+	                        <f:setPropertyActionListener value="#{cube}" target="#{cubeFaceController.cube}" />
+	                </p:commandButton>
+	                </p:column>    -->            	
             	</p:dataTable>
+            </div>
+        </h:form>
  
- 
-          <p:dialog header="Use Cube" id="cubeUseDialog" widgetVar="useCubeDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false"> 
-                <p:outputPanel id="cubeData" rendered="#{not empty cubeController.cube}">
+        <h:form id="cubeDetailForm">
+          <p:dialog header="Use Cube" id="cubeUseDialog" widgetVar="cubeUseDialog" dynamic="true"
+              modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
+                <p:ajax event="close" update="cubeData" process="@parent" resetValues="true" />
+                
+                <c:set var="curr" value="#{cubeController.cube}" scope="request" />
+                <p:outputPanel id="cubeData" rendered="#{not empty curr}">
                     <h:panelGrid columns="2">
                         <p:outputLabel for="id" value="Id: " />
-                        <p:inputText id="id" value="#{cubeController.cube.id}" disabled="true"/>
+                        <p:inputText id="id" value="#{curr.id}" disabled="true"/>
                         <p:outputLabel for="macAddress" value="MacAddress: " />
-                        <p:inputText id="macAddress" value="#{cubeController.cube.macAddress}" disabled="true"/>
+                        <p:inputText id="macAddress" value="#{curr.macAddress}" disabled="true"/>
                         <p:outputLabel for="name" value="Name: " />
-                        <p:inputText id="name" value="#{cubeController.cube.name}"/>
+                        <p:inputText id="name" value="#{curr.name}"/>
                     </h:panelGrid>
                     <p:separator />
      <!--                 <h:panelGrid columns="4">
@@ -102,8 +114,6 @@
              </p:dialog>   
              
             
-            </div>
-
            <o:socket channel="cubeChannel" scope="application"
                 onmessage="function(m){console.log(m);}">
                 <f:ajax event="connectionCubeUpdate"
