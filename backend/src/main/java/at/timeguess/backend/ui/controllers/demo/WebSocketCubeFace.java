@@ -49,6 +49,6 @@ public class WebSocketCubeFace {
 
     public void cubeChange() {
         this.currentFace = this.cubeFaceService.allCubeFaces().get(facetsService.getDummyCubeFace()) ;
-        this.websocketManager.getCubeChannel().send("cubeChange");
+        this.websocketManager.getCubeFaceChannel().send("cubeFaceChange");
     }
 }
