@@ -39,7 +39,7 @@ public class Game implements Serializable, Persistable<Long> {
     //      see https://stackoverflow.com/questions/22821695/how-to-fix-hibernate-lazyinitializationexception-failed-to-lazily-initialize-a
     //      are there alternatives?
     //      `Hibernate.initialize(game);` does not work
-    @OneToMany(mappedBy = "game", cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "game", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Round> rounds = new HashSet<>();
 
     @OneToMany(mappedBy = "game", cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)

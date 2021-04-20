@@ -48,8 +48,14 @@ public class WebSocketManager implements Serializable {
     @Push(channel = "messageChannel")
     private PushContext messageChannel;
     @Inject
+    @Push(channel = "cubeFaceChannel")
+    private PushContext cubeFaceChannel;
+    @Inject
     @Push(channel = "cubeChannel")
     private PushContext cubeChannel;
+    @Inject
+    @Push(channel = "termChannel")
+    private PushContext termChannel;
 
     public PushContext getUserRegistrationChannel() {
         return userRegistrationChannel;
@@ -63,4 +69,11 @@ public class WebSocketManager implements Serializable {
     	return cubeChannel;
     }
 
+    public PushContext getTermChannel() {
+        return termChannel;
+    }
+
+	public PushContext getCubeFaceChannel() {
+		return cubeFaceChannel;
+	}
 }

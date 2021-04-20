@@ -2,11 +2,17 @@ package at.timeguess.backend.model;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
@@ -23,8 +29,13 @@ public class Team implements  Comparable<Team> {
     @OneToMany(mappedBy = "team")
     private Set<GameTeam> games;
 
-    @ManyToMany(mappedBy = "teams")
-    private Set<User> teamMembers;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = User.class)
+    @JoinTable(name = "team_user",
+            joinColumns = @JoinColumn(name = "team_id", nullable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
+            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
+            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+   private Set<User> teamMembers;
 
     private TeamState state;
 
@@ -52,6 +63,7 @@ public class Team implements  Comparable<Team> {
         this.games = games;
     }
 
+<<<<<<< HEAD
     /**
      * @return the teamMembers
      */
