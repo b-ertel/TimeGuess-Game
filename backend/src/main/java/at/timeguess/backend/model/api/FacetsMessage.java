@@ -7,8 +7,8 @@ package at.timeguess.backend.model.api;
 public class FacetsMessage {
 
     private String identifier; // MAC address of the TimeFlip device
-    private Integer configuration; // current value of the Calibration version characteristic
-    private Integer facet; // new value of the facets characteristic
+    private int calibrationVersion; // current value of the Calibration version characteristic
+    private int facet; // new value of the facets characteristic
 
     public String getIdentifier() {
         return identifier;
@@ -18,20 +18,20 @@ public class FacetsMessage {
         this.identifier = identifier;
     }
 
-    public Integer getConfiguration() {
-        return configuration;
+    public int getCalibrationVersion() {
+        return calibrationVersion;
     }
 
-    public void setConfiguration(Integer configuration) {
-        this.configuration = configuration;
+    public void setCalibrationVersion(int calibrationVersion) {
+        this.calibrationVersion = calibrationVersion;
     }
 
-    public Integer getFacet() {
+    public int getFacet() {
         return facet;
     }
 
-    public void setFacet(Integer facet) {
+    public void setFacet(int facet) {
         this.facet = facet;
     }
-
+    
 }
