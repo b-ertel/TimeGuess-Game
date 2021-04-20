@@ -32,4 +32,7 @@ public interface UserRepository extends AbstractRepository<User, Long> {
 
     @Query("SELECT COUNT(g) FROM User u JOIN u.teams t JOIN t.games g WHERE u = ?1")
     int getTotalGames(User user);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.username = ?1")
+    int getTotalByUsername(String username);
 }

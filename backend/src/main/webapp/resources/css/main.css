@@ -9,6 +9,7 @@ root {
     font-family: 'Segoe UI', Arial, sans-serif;
     font-size: 1em;
 }
+
 .ui-widget .ui-widget {
     font-size: 1em;
 }
@@ -54,15 +55,32 @@ table {
     margin: 10px;
 }
 
-.login-input {
+.login-box {
     width: 100%;
     margin: 15px 0;
     text-align: center;
     position: relative;
 }
 
-#error_msg {
-    color: crimson;
+.login-input {
+    width: 250px;
+    height: 21px;
+}
+
+.pw-input-box {
+    position: absolute;
+    top: -20px;
+}
+
+.pw-label {
+    position: relative;
+    top:5px;
+}
+
+.pw-input {
+    width: 137px !important;
+    position: relative;
+    left: -10px;
 }
 
 .eye-button {
@@ -76,10 +94,22 @@ table {
     height: 29px !important;
 }
 
-.eye-button-profile {
-    top: 48px;
-    left: -1px;
-    z-index: auto;
+.eye-button-dialog {
+    height: 29px;
+    width: 40px;
+    top: -37px;
+    left: 63px;
+}
+
+.buttonfont {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-weight: bold;
+}
+
+.error_msg {
+    color: #b22222db;
+    font-weight: 500;
+    font-style: oblique;
 }
 
 #header {
@@ -136,7 +166,7 @@ table {
 
 .profile-out-panel td:nth-child(1) {
     width: 90px !important;
- }
+}
 
 .ui-widget-header {
     background: rgba(91, 125, 122, 0.89) !important;
@@ -156,6 +186,69 @@ table {
     background: rgba(91, 125, 122, 0.6) !important;
 }
 
+.ui-panelgrid {
+    border-collapse: collapse
+}
+
+.ui-panelgrid .ui-panelgrid-header {
+    text-align: center;
+    padding: 4px 10px
+}
+
+.ui-panelgrid .ui-panelgrid-footer {
+    text-align: left;
+    padding: 2px 5px
+}
+
+.ui-panelgrid .ui-panelgrid-cell {
+    border-width: 1px;
+    border-style: solid;
+    border-color: inherit;
+    padding: 4px 10px
+}
+
+.ui-panelgrid.ui-noborder .ui-panelgrid-cell {
+    border: 0 none
+}
+
+.ui-panelgrid.ui-noborder .ui-widget-content, .ui-panelgrid.ui-noborder .ui-widget-header
+    {
+    border: 0 none
+}
+
+.ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-content.ui-widget-content,
+    .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-header.ui-widget-header,
+    .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-footer.ui-widget-header,
+    .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-header>tr.ui-widget-header,
+    .ui-panelgrid.ui-panelgrid-blank tbody>tr.ui-widget-content,
+    .ui-panelgrid.ui-panelgrid-blank tbody>tr.ui-widget-content>td.ui-panelgrid-cell,
+    .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-footer>tr.ui-widget-footer
+    {
+    background: 0;
+    border: 0 none
+}
+
+.ui-panelgrid .ui-panelgrid-cell.ui-panelgrid-nopad {
+    padding: 0
+}
+
+.ui-panelgrid .p-grid .ui-panelgrid-cell, .ui-panelgrid .ui-grid-responsive .ui-panelgrid-cell
+    {
+    border: 0 none
+}
+
+@media ( max-width :640px) {
+    .ui-panelgrid .ui-grid-responsive .ui-grid-row {
+        border-top: 1px solid #bcc7cf
+    }
+    .ui-panelgrid .ui-grid-responsive .ui-grid-row:first-child {
+        border-top: 0 none
+    }
+    .ui-panelgrid.ui-noborder .ui-grid-responsive .ui-grid-row {
+        border: 0 none
+    }
+}
+
 .ui-tabs-panel, .ui-tabs-panels {
     padding: 0.3em !important;
 }
@@ -164,7 +257,7 @@ table {
     border-radius: 10px !important;
 }
 
-.ui-tabs .ui-tabs-nav{
+.ui-tabs .ui-tabs-nav {
     background-color: transparent !important;
 }
 
@@ -200,8 +293,21 @@ table {
 .edit-profile-button {
     background: #306585 !important;
     text-shadow: none !important;
-    color: white!important;
+    color: white !important;
     border-radius: 5px;
+}
+
+.form-group {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+#userCreateData .ui-panelgrid-cell.p-col-7, #userData .ui-panelgrid-cell.p-col-7 {
+    height: 40px;
+}
+
+#hall .ui-panelgrid-cell.p-col-7 {
+    height: 100%;
 }
 
 /* custom class to postfix too long lines with '...' */
@@ -211,13 +317,17 @@ table {
 }
 
 .rightm10 {
-    float: right;  
-    text-align:right;
-    margin-right:10px;
+    float: right;
+    text-align: right;
+    margin-right: 10px;
 }
 
 .rightm20 {
-    float: right;  
-    text-align:right;
-    margin-right:20px;
+    float: right;
+    text-align: right;
+    margin-right: 20px;
+}
+
+.left35 {
+    margin-left: 35px;
 }

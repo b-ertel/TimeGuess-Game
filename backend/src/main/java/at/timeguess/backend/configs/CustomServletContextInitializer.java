@@ -24,6 +24,8 @@ public class CustomServletContextInitializer implements ServletContextInitialize
         sc.setInitParameter("org.omnifaces.SOCKET_ENDPOINT_ENABLED", "true");
         // set timezone for all components to system default
         sc.setInitParameter("javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE", "true");
+        // don't get empty string for null values from ui to save in db
+        sc.setInitParameter("javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL", "true");
         // enable gui features
         sc.setInitParameter("primefaces.FONT_AWESOME", "true");
     }
