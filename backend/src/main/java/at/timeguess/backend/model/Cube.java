@@ -67,7 +67,7 @@ public class Cube implements Comparable<Cube>{
         }
         
         final Cube other = (Cube)obj;
-        return Objects.equals(getId(), other.getId());
+        return Objects.equals(getId(), other.getId()) && Objects.equals(getMacAddress(), other.getMacAddress());
 	}
 	
 	@Override
