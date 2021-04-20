@@ -106,8 +106,10 @@ table {
     font-weight: bold;
 }
 
-#error_msg {
-    color: crimson;
+.error_msg {
+    color: #b22222db;
+    font-weight: 500;
+    font-style: oblique;
 }
 
 #header {

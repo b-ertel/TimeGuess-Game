@@ -45,7 +45,8 @@
         </div>
         <div class="login-box">
             <c:if test="${param.error ne null}">
-                <p:outputLabel id="error_msg">Login failed! Enter valid credentials and try again</p:outputLabel>
+                <p:outputLabel class="error_msg">Login failed - ${param.error}</p:outputLabel><br />
+                <p:outputLabel class="error_msg">Enter valid credentials and try again</p:outputLabel>
             </c:if>
         </div>
 
