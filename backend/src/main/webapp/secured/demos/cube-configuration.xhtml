@@ -27,6 +27,8 @@
 				<h:outputText value="#{cubeConfigurationController.instruction}" />
 			</p:panel>
 
+			<h:outputText value="#{cubeConfigurationController.facet}" />
+
 			<!-- This is the list of cube faces to be assigned by the user -->
 			<p:dataTable var="cubeFace"
 				value="#{cubeConfigurationController.cubeFaces}"
@@ -55,7 +57,7 @@
 			</p:panel>
 
 			<o:socket channel="configurationChannel"
-				user="#{sessionInfoBean.currentUserName}"
+				user="#{sessionInfoBean.currentUser}"
 				onmessage="function(m){console.log(m);}">
 				<f:ajax event="facetChange" render=":cubeConfigurationForm" />
 			</o:socket>
