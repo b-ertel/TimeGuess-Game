@@ -1,15 +1,15 @@
-function showPassword() {
-    var field = $('.pw');
-    var button = $("#eyeButton").find("span");
-
-    if (field.attr("type") === "password") {
-        field.attr("type", "text");
-        button.removeClass("fa fa-eye");
-        button.addClass("fa fa-eye-slash")
+function showPassword(button, id = '') {
+    var inpt = $('#password' + id);
+    var span = $(button).find("span");
+    
+    if (inpt.attr("type") === "password") {
+        inpt.attr("type", "text");
+        span.removeClass("fa fa-eye");
+        span.addClass("fa fa-eye-slash")
     }
     else {
-        field.attr("type", "password");
-        button.removeClass("fa fa-eye-slash");
-        button.addClass("fa fa-eye");
+        inpt.attr("type", "password");
+        span.removeClass("fa fa-eye-slash");
+        span.addClass("fa fa-eye");
     }
 }
