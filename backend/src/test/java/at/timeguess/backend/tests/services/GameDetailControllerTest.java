@@ -1,4 +1,4 @@
-package at.timeguess.backend.tests.game;
+package at.timeguess.backend.tests.services;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -66,15 +66,16 @@ public class GameService {
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER') or hasAuthority('ADMIN')")
     public Game saveGame(Game game) {
         boolean isNew = game.isNew();
-        if (isNew)
+        if (isNew) {
             game.setCreator(userService.getAuthenticatedUser());
-
-        // maybe a bit messy to replace gameteams this way
-        Optional<Game> dbGame = gameRepo.findById(game.getId());
-        if (!dbGame.isEmpty()) {
-            Set<GameTeam> origTeams = dbGame.get().getTeams();
-            origTeams.removeAll(game.getTeams());
-            origTeams.stream().forEach(t -> gameTeamService.delete(t));
+        } else {
+            // maybe a bit messy to replace gameteams this way
+            Optional<Game> dbGame = gameRepo.findById(game.getId());
+            if (!dbGame.isEmpty()) {
+                Set<GameTeam> origTeams = dbGame.get().getTeams();
+                origTeams.removeAll(game.getTeams());
+                origTeams.stream().forEach(t -> gameTeamService.delete(t));
+            }
         }
 
         // save all the new gameteams
