@@ -139,7 +139,7 @@ public class UserService {
      * @return the saved user
      */
     @Target(NewUserBean.class)
-    @PostAuthorize("hasAuthority('ADMIN') OR #user.id == null")
+    @PostAuthorize("hasAuthority('ADMIN') OR #user.id == null OR principal.username eq #user.username")
     public User saveUser(User user) {
         // for self registration get any admin user as creator
         // null would work also (setting the property to optional in User class)
