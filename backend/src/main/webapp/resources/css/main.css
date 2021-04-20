@@ -300,8 +300,12 @@ table {
     margin-left: -15px;
 }
 
-#userCreateData .ui-panelgrid-cell.p-col-7 {
-    height: 40px
+#userCreateData .ui-panelgrid-cell.p-col-7, #userData .ui-panelgrid-cell.p-col-7 {
+    height: 40px;
+}
+
+#hall .ui-panelgrid-cell.p-col-7 {
+    height: 100%;
 }
 
 /* custom class to postfix too long lines with '...' */

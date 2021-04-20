@@ -1,5 +1,5 @@
-function showPassword(button, num) {
-    var inpt = $($('.pw')[num]);
+function showPassword(button, id = '') {
+    var inpt = $('#password' + id);
     var span = $(button).find("span");
     
     if (inpt.attr("type") === "password") {

@@ -23,7 +23,7 @@
                 <div class="login-box" style="text-align: center !important;">
                     <p:inputText id="password" type="password" placeholder="Password"
                         required="true" styleClass="login-input pw" />
-                    <button type="button" onclick="showPassword(this, 0)"
+                    <button type="button" onclick="showPassword(this)"
                         class="eye-button eye-button-login ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
                         <span class="fa fa-eye eye-Icon ui-button-text" />
                     </button>
@@ -66,17 +66,17 @@
                         <div class="pw-input-box">
                             <p:inputText id="passwordCreate" value="#{newUserBean.password}"
                                 type="password" placeholder="Password" required="true" styleClass="pw-input pw" />
-                            <button type="button" onclick="showPassword(this, 1)"
+                            <button type="button" onclick="showPassword(this, 'Create')"
                                 class="eye-button eye-button-dialog ui-state-default ui-corner-all">
                                 <span class="fa fa-eye eye-Icon" />
                             </button>
                         </div>
 
-                        <p:outputLabel for="repeatCreate" value="Repeat: " styleClass="pw-label" />
+                        <p:outputLabel for="passwordRepeat" value="Repeat: " styleClass="pw-label" />
                         <div class="pw-input-box">
-                            <p:inputText id="repeatCreate" value="#{newUserBean.repeated}"
+                            <p:inputText id="passwordRepeat" value="#{newUserBean.repeated}"
                                 type="password" placeholder="Repeat" required="true" styleClass="pw-input pw" />
-                            <button type="button" onclick="showPassword(this, 2)"
+                            <button type="button" onclick="showPassword(this, 'Repeat')"
                                 class="eye-button eye-button-dialog ui-state-default ui-corner-all">
                                 <span class="fa fa-eye eye-Icon" />
                             </button>

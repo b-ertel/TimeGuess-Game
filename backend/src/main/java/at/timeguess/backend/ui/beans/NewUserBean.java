@@ -2,7 +2,6 @@ package at.timeguess.backend.ui.beans;
 
 import java.io.Serializable;
 import java.util.EnumSet;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import org.apache.logging.log4j.util.Strings;
@@ -42,8 +41,6 @@ public class NewUserBean implements Serializable {
     private String email;
     private boolean enabled = true;
     private UserRole userRole;
-
-    private static EnumSet<UserRole> userRoles = EnumSet.allOf(UserRole.class);
 
     public String getUsername() {
         return username;
@@ -109,8 +106,12 @@ public class NewUserBean implements Serializable {
         this.enabled = enabled;
     }
 
-    public EnumSet<UserRole> getUserRoles() {
-        return userRoles;
+    /**
+     * Returns a set containing all available user roles.
+     * @return
+     */
+    public EnumSet<UserRole> getAllUserRoles() {
+        return UserRole.getUserRoles();
     }
 
     /**
@@ -131,7 +132,7 @@ public class NewUserBean implements Serializable {
      * @apiNote shows a ui message if input field are invalid.
      */
     public void createUser() {
-        this.createUserFromFields(false, user -> user.getRoles().add(UserRole.PLAYER));
+        this.createUserFromFields(false, user -> user.setRoles(UserRole.mapUserRole(UserRole.PLAYER)));
     }
 
     /**
@@ -140,24 +141,12 @@ public class NewUserBean implements Serializable {
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public void createUserAdmin() {
-        this.createUserFromFields(true, user -> {
-            Set<UserRole> roles = user.getRoles();
-            switch (this.getUserRole()) {
-            case ADMIN:
-                roles.add(UserRole.ADMIN);
-            case MANAGER:
-                roles.add(UserRole.MANAGER);
-                break;
-            default:
-                roles.add(UserRole.PLAYER);
-            }
-        });
+        this.createUserFromFields(true, user -> user.setRoles(UserRole.mapUserRole(this.getUserRole())));
     }
 
     /**
      * Checks if all fields contain valid values.
-     * @param isAdmin true when registering via administrative interface,
-     *                false when registering via user registration interface
+     * @param isAdmin true when registering via administrative interface, false when registering via user registration interface
      * @return true if all necessary fields contain valid values, false otherwise
      */
     public boolean validateInput(boolean isAdminAccess) {
