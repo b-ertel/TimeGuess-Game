@@ -44,7 +44,7 @@ public class Round implements Persistable<Long> {
 	@ManyToOne
 	@JoinColumn(name="termId", nullable=false)
 	private Term termToGuess;
-	
+
 	@ManyToOne
 	@JoinColumn(name="gameId", nullable=false)
 	private Game game;
@@ -88,6 +88,14 @@ public class Round implements Persistable<Long> {
 	public void setCorrectAnswer(boolean correctAnswer) {
 		this.correctAnswer = correctAnswer;
 	}
+	
+	public Term getTermToGuess() {
+		return termToGuess;
+	}
+
+	public void setTermToGuess(Term termToGuess) {
+		this.termToGuess = termToGuess;
+	}
 
 	public void setId(Long id) {
 		this.id = id;
@@ -101,6 +109,13 @@ public class Round implements Persistable<Long> {
 		this.verifyingTeams = verifyingTeams;
 	}
 
+	public Game getGame() {
+		return game;
+	}
+
+	public void setGame(Game game) {
+		this.game = game;
+	}
 
 	@Override
 	public Long getId() {

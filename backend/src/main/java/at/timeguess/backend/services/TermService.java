@@ -45,7 +45,7 @@ public class TermService {
      * @param topic the topic whose terms are returned
      * @return list of terms
      */
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER')")
     public List<Term> getAllTermsOfTopic(Topic topic) {
         return termRepository.findByTopic(topic);
     }
