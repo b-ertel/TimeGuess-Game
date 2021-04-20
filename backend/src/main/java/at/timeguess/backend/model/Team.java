@@ -63,7 +63,6 @@ public class Team implements  Comparable<Team> {
         this.games = games;
     }
 
-<<<<<<< HEAD
     /**
      * @return the teamMembers
      */
