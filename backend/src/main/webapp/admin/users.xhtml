@@ -66,7 +66,7 @@
                         <p:outputLabel for="password" value="Password: " styleClass="pw-label" />
                         <div class="pw-input-box">
                             <p:inputText id="password" value="#{curr.password}"
-                                type="password" placeholder="Password" required="true" styleClass="pw-input pw1" />
+                                type="password" placeholder="Password" required="true" styleClass="pw-input pw" />
                             <button type="button" onclick="showPassword(this)"
                                 class="eye-button eye-button-dialog ui-state-default ui-corner-all">
                                 <span class="fa fa-eye eye-Icon" />
@@ -101,17 +101,17 @@
                         <p:selectBooleanButton id="enabled" value="#{curr.enabled}"
                             onLabel="Yes" offLabel="No" onIcon="fa fa-check" offIcon="fa fa-times" styleClass="rightm10" style="width:6rem" />
                     </p:panelGrid>
-                    <p:separator style="margin:9px 0px 15px" />
-
-                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
-                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}"
-                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userEditDialog').hide(); PF('userTable').filter(); }"
-                            update=":userListForm:userTable userData :msg"/>
-                        <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}"
-                            process="@parent" update=":userDetailForm:userData :msg" resetValues="true"/>
-                        <p:commandButton value="Abort" onclick="PF('userEditDialog').hide()"/>
-                    </p:panelGrid>
                 </p:outputPanel>
+                <p:separator style="margin:11px 0px 12px" />
+
+                <h:panelGrid columns="3">
+                     <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}"
+                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userEditDialog').hide(); PF('userTable').filter(); }"
+                         update=":userListForm:userTable userData :msg"/>
+                     <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}"
+                         process="@parent" update=":userDetailForm:userData :msg" resetValues="true" styleClass="left35"/>
+                     <p:commandButton value="Abort" onclick="PF('userEditDialog').hide()" styleClass="left35"/>
+                </h:panelGrid>
             </p:dialog>
         </h:form>
 
@@ -131,7 +131,7 @@
                         <p:outputLabel for="passwordCreate" value="Password: " styleClass="pw-label" />
                         <div class="pw-input-box">
                             <p:inputText id="passwordCreate" value="#{newUserBean.password}"
-                                type="password" placeholder="Password" required="true" styleClass="pw-input pw2" />
+                                type="password" placeholder="Password" required="true" styleClass="pw-input pw" />
                             <button type="button" onclick="showPassword(this, 'Create')"
                                 class="eye-button eye-button-dialog ui-state-default ui-corner-all">
                                 <span class="fa fa-eye eye-Icon" />
@@ -165,7 +165,7 @@
                             onLabel="Yes" offLabel="No" onIcon="fa fa-check" offIcon="fa fa-times" styleClass="rightm10" style="width:6rem" />
                     </p:panelGrid>
                 </p:outputPanel>
-                <p:separator style="margin:9px 0px 15px" />
+                <p:separator style="margin:11px 0px 12px" />
 
                 <h:panelGrid columns="3">
                     <p:commandButton value="Save" action="#{newUserBean.createUserAdmin}"
