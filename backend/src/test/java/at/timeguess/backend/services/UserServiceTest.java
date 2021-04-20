@@ -1,4 +1,4 @@
-package at.timeguess.backend.tests;
+package at.timeguess.backend.services;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
-import at.timeguess.backend.services.UserService;
 
 /**
  * Tests for {@link UserService}.
