@@ -80,41 +80,25 @@
           </p:selectCheckboxMenu>
           <p:separator />
 
-          <!--TODO - find out what does PF('#{parentName}').filter();?-->
-                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
-                        <p:commandButton value="Save" 
-                                         action="#{gdc.doSaveGame()}"
-                                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('#{dialogName}').hide(); 
-                                          }" 
-                            update="#{parentTable} #{gameData} :msg" />
-                        <p:commandButton value="Reload" action="#{gdc.doReloadGame()}"
-                                                        process="@parent" 
-                                                        update="#{gameData} :msg" 
-                                                        resetValues="true"/>
-                        <p:commandButton value="Abort" onsuccess="PF('#{dialogName}').hide()"/>
-                    </p:panelGrid>
-                </p:outputPanel>
-
-
-
-          <!--<h3>note: at the moment save fails if game has no topic</h3>-->
-          <!--<h:panelGrid columns="3">-->
-                        <!--<p:commandButton value="Save" action="#{gdc.doSaveGame()}"-->
-                            <!--oncomplete="if (args &amp;&amp; !args.validationFailed) { PF(dialogName).hide(); PF(parentTable).filter(); }" -->
-                            <!--update=":gameListForm:gameTable gameData :msg" />-->
-                        <!--<p:commandButton value="Reload" action="#{gdc.doReloadGame()}"-->
-                            <!--process="@parent" update="gameData :msg" resetValues="true"/>-->
-                        <!--<p:commandButton value="Abort" onsuccess="PF(dialogName).hide()"/>-->
-
-          <!--<p:commandButton value="Save" action="#{gdc.doSaveGame()}" oncomplete="PF(dialogName).hide()" update="#{parentTable}"/>-->
-
+          <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
+          <p:commandButton value="Save" 
+                           action="#{gdc.doSaveGame()}"
+                           oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('#{dialogName}').hide(); PF('#{parentName}').filter(); }" 
+                           update="#{parentTable} #{gameData} :msg" />
+          <p:commandButton value="Reload" action="#{gdc.doReloadGame()}"
+                                          process="@parent" 
+                                          update="#{gameData} :msg" 
+                                          resetValues="true"/>
+          <p:commandButton value="Abort" onsuccess="PF('#{dialogName}').hide()"/>
           <!--<p:commandButton value="Delete" action="#{gdc.doDeleteGame()}" -->
                                           <!--disabled="#{gdc.lockedDelete}"-->
                                           <!--oncomplete="PF(dialogName).hide()" -->
                                           <!--update="#{parentTable}"/>-->
-          <!--<p:commandButton value="Abort" onclick="PF(dialogName).hide()"/>-->
-          <!--</h:panelGrid>-->
-          <!--</p:outputPanel>-->
+          </p:panelGrid>
+          </p:outputPanel>
+
+
+
           </p:dialog>
 
           </h:form>
