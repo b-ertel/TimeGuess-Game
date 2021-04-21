@@ -31,7 +31,7 @@ import at.timeguess.backend.utils.CDIContextRelated;
  * It is the controller for the page accessible at "secured/demos/cube-configuration.xhtml".
  */
 @Controller
-@Scope("view")
+@Scope("session")
 @CDIContextRelated
 public class CubeConfigurationController implements Consumer<FacetsEvent> {
 
