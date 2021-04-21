@@ -35,7 +35,6 @@
                     <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout&nbsp;" url="/logout" rendered="#{isLoggedIn}"/>
 
                     <p:submenu label="Development" rendered="#{isLoggedIn}">
-                        <p:menuitem value="Game" url="/debug/game.xhtml" rendered="#{sessionInfoBean.hasRole('PLAYER')}"/>
                         <p:menuitem value="Team" url="/debug/team.xhtml" />
                         <p:menuitem value="CubeTest" url="/secured/demos/cubeTest.xhtml"/>  
                         <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
