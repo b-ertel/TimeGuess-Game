@@ -19,7 +19,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import at.timeguess.backend.services.CubeService;
 
@@ -34,7 +33,7 @@ import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.model.api.StatusResponse;
 
 /**
- * REST Controller for communication with Raspberry Pi and management of cube status.
+ * Controller for communication with Raspberry Pi and management of cube status.
  */
 @Controller
 @Scope("application")
@@ -50,8 +49,8 @@ public class StatusController {
     private WebSocketManager websocketManager;
     
     private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
-    private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
-    private Set<Cube> readyCubes = new HashSet<>();
+
+	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
     private int interval;   // in sec
     
     /**
@@ -132,9 +131,7 @@ public class StatusController {
      */
     public void statusChange(String mac, CubeStatus cubeStatus) {
         this.cubeStatus.get(mac).setStatus(cubeStatus);
-        setReadyCubes();
-
-        this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
+        updateSockets();
     }
         
 	/**
@@ -145,21 +142,18 @@ public class StatusController {
     }  
     
     /**
-     * puts all cubes with status {@link CubeStatus.READY} into readyCubes 
-     */
-    public void setReadyCubes() {
-    	for(Map.Entry<String, CubeStatusInfo> s : this.cubeStatus.entrySet()) {
-    		if(s.getValue().getStatus().equals(CubeStatus.READY))
-    			readyCubes.add(s.getValue().getCube());
-    	}
-    }
-    
-    /**
-     * @return ready cubes i.e. cubes with {@link CubeStatus.READY}
+     * returns cubes with status {@link CubeStatus.READY} 
      */
     public Set<Cube> getReadyCubes() {
- 		return this.readyCubes;
- 	}
+    	
+    	Set<Cube> readyCubes = new HashSet<>();
+    	
+    	for(Map.Entry<String, CubeStatusInfo> s : this.cubeStatus.entrySet()) {
+    		if(s.getValue().getStatus().equals(CubeStatus.LIVE))
+    			readyCubes.add(s.getValue().getCube());
+    	}
+    	return readyCubes;
+    }
 
 	/**
 	 * @return health status of all online cubes i.e. with status 
@@ -197,8 +191,52 @@ public class StatusController {
 	 */
 	public void deleteStatus(String macAddress) {
 		this.cubeStatus.remove(macAddress);
-		this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
-	}  
+		updateSockets();
+	}
 	
+	/**
+	 * check if a cube can be deleted - i.e. if its status is OFFLINE
+	 * 
+	 * @param mac to check status
+	 * @return true if status is OFFLINE false otherwise
+	 */
+	public boolean checkDeletion(String mac) {
+		if(cubeStatus.get(mac) != null) {
+			if(cubeStatus.get(mac).getStatus().equals(CubeStatus.OFFLINE)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * check if a cube can be configured - i.e. if its status is LIVE or READY
+	 * 
+	 * @param mac to check status
+	 * @return true if status is LIVE or READY false otherwise
+	 */
+	public boolean checkConfiguration(String mac) {
+		if(cubeStatus.get(mac) != null) {
+			if(cubeStatus.get(mac).getStatus().equals(CubeStatus.LIVE) ||
+					cubeStatus.get(mac).getStatus().equals(CubeStatus.READY)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * sends a "connectionCubeUpdate" to all socket listener
+	 */
+	public void updateSockets() {
+		this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
+	}
+
+	/** updates cube in CubeStatusInfo
+	 * @param cube to update
+	 */
+	public void updateCube(Cube cube) {
+		this.cubeStatus.get(cube.getMacAddress()).setCube(cube);
+	}
 	
 }

@@ -40,7 +40,6 @@ public class CubeController {
         saveCube();
 
         return this.cube;
-
     }
 
     /**
@@ -48,6 +47,8 @@ public class CubeController {
      */
     public void saveCube() {
         this.cube=cubeService.saveCube(this.cube);
+        statusController.updateCube(this.cube);
+        statusController.updateSockets();
     }
 
     /**
@@ -82,7 +83,6 @@ public class CubeController {
     public void setCube(Cube cube) {
         this.cube = cube;
     }
-
 }
 
 

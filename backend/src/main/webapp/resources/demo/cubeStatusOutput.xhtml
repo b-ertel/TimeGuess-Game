@@ -17,13 +17,13 @@
 		<ui:param name="styleClassName"
 			value="#{cc.attrs.cubeStatusInfo.status eq 'READY' ? 'loggedIn' : 'loggedOut'}" />
 		<h:panelGrid columns="4">
-			<h:outputText value="#{cc.attrs.cubeStatusInfo.cube.name}"
-					styleClass="#{styleClassName}" />
 			<h:outputText value="#{cc.attrs.cubeStatusInfo.cube.id}"
 				styleClass="#{styleClassName}" />
 			<h:outputText value="#{cc.attrs.cubeStatusInfo.status}"
 				styleClass="#{styleClassName}" />
 			<h:outputText value="#{cc.attrs.cubeStatusInfo.status.message}"
+				styleClass="#{styleClassName}" />
+			<h:outputText value="#{cc.attrs.cubeStatusInfo.cube.name}"
 				styleClass="#{styleClassName}" />
 		</h:panelGrid>
 	</cc:implementation>
