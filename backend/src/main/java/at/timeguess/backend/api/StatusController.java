@@ -179,6 +179,14 @@ public class StatusController {
 	public void setInConfig(String macAddress) {
 		statusChange(macAddress, CubeStatus.IN_CONFIG);
 	}
+	
+	/**
+	 * changes status of cube to {@link CubeStatus.IN_GAME}
+	 * @param macAddress of the cubes which should be set to {@link CubeStatus.IN_GAME}
+	 */
+	public void setInGame(String macAddress) {
+		statusChange(macAddress, CubeStatus.IN_GAME);
+	}
 
 	/**
 	 * @return interval of reporting period of the cube
