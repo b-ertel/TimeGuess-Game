@@ -171,6 +171,14 @@ public class StatusController {
 		this.healthStatus.remove(macAddress);
 		statusChange(macAddress, CubeStatus.OFFLINE);
 	}
+	
+	/**
+	 * changes status of cube to {@link CubeStatus.IN_CONFIG}
+	 * @param macAddress of the cubes which should be set to {@link CubeStatus.IN_CONFIG}
+	 */
+	public void setInConfig(String macAddress) {
+		statusChange(macAddress, CubeStatus.IN_CONFIG);
+	}
 
 	/**
 	 * @return interval of reporting period of the cube

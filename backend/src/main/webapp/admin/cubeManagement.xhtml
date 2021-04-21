@@ -78,7 +78,9 @@
                         					update=":cubeDetailForm:cubeUseDialog :msg" />
                         <!-- to be altered for passing cube to ConfigurationService -->
                         <p:commandButton value="Configure" ajax="false" action="/secured/demos/chatRoom.xhtml?faces-redirect=true" 
-                        		rendered="#{statusController.checkConfiguration(curr.macAddress)}" style="color:green" />
+                        		rendered="#{statusController.checkConfiguration(curr.macAddress)}" style="color:green" >
+                        	<f:actionListener binding="#{statusController.setInConfig(curr.macAddress)}" />
+                        </p:commandButton>
                         <p:commandButton value="Delete" action="#{cubeController.deleteCube()}" oncomplete="PF('cubeUseDialog').hide()" rendered="#{statusController.checkDeletion(curr.macAddress)}"
                         						update=":cubeDetailForm:cubeUseDialog :msg"/>
                         <p:commandButton value="Abort" onclick="PF('cubeUseDialog').hide()" update=":cubeDetailForm:cubeUseDialog :msg" /> 
