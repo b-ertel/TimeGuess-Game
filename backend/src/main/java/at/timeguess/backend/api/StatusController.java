@@ -15,8 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.timeguess.backend.services.CubeService;
@@ -34,7 +36,7 @@ import at.timeguess.backend.model.api.StatusResponse;
 /**
  * REST Controller for communication with Raspberry Pi and management of cube status.
  */
-@RestController
+@Controller
 @Scope("application")
 @CDIContextRelated
 public class StatusController {
@@ -68,6 +70,7 @@ public class StatusController {
 	 * @return status response with an interval
 	 */
     @PostMapping("/api/status")
+    @ResponseBody
     private StatusResponse processStatus(@RequestBody StatusMessage message) {
 
     	if(this.healthStatus.containsKey(message.getIdentifier())){
