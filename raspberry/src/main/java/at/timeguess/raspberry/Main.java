@@ -38,8 +38,6 @@ public final class Main {
     // default password for TimeFlip device
     private static final byte[] PASSWORD = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30};
 
-    private static final Long HEALTH_REPORTING_INTERVAL = 1L;
-
     private static String TIMEFLIP_MAC_ADDRESS;
     private static String BACKEND_URL;
 
@@ -222,37 +220,12 @@ public final class Main {
 
         CalibrationVersionHelper calibrationVersionHelper = new CalibrationVersionHelper(calibrationVersionCharacteristic);
 
-        logger.info("Sending onboarding request to backend ...");
-        Unirest.post(BACKEND_URL + "/api/onboarding")
-                .header("Content-Type", "application/json")
-                .body(String.format("{\"identifier\": \"%s\", \"calibrationVersion\": %d}",
-                        TIMEFLIP_MAC_ADDRESS,
-                        calibrationVersionHelper.readCalibrationVersion()))
-                .asJson()
-                .ifSuccess(response -> {
-                    logger.info("Onboarding request successfully sent.");
-                    boolean success = response.getBody().getObject().getBoolean("success");
-                    if (success) {
-                        logger.info("Onboarding successful.");
-                    }
-                    else {
-                        logger.severe("Onboarding not successful.");
-                        timeflip.disconnect();
-                        System.exit(-1);
-                    }
-                })
-                .ifFailure(response -> {
-                    logger.severe("Onboarding request not successfully sent.");
-                    timeflip.disconnect();
-                    System.exit(-1);
-                });
+        logger.info("Enable status messages ...");
+        StatusMessageSender statusMessageSender = new StatusMessageSender(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, calibrationVersionHelper, batteryLevelCharacteristic, timeflip);
+        statusMessageSender.start();
 
-        logger.info("Registering for notifications from the facets characteristic ...");
-        facetsCharacteristic.enableValueNotifications(new FacetsNotification(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, calibrationVersionHelper));
-
-        logger.info("Scheduling regular health requests ...");
-        HealthThread healthThread = new HealthThread(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, timeflip, batteryLevelCharacteristic, HEALTH_REPORTING_INTERVAL);
-        healthThread.start();
+        logger.info("Enable facets messages ...");
+        facetsCharacteristic.enableValueNotifications(new FacetsMessageSender(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, calibrationVersionHelper));
 
         Lock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
