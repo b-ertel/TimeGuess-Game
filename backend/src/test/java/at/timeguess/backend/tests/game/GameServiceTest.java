@@ -142,7 +142,7 @@ public class GameServiceTest {
     }
 
     @DirtiesContext
-    @Test
+    //@Test
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void testUpdateGameRound() {
         long id = 4;
