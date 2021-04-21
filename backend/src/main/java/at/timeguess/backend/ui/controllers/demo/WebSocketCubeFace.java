@@ -1,7 +1,6 @@
 package at.timeguess.backend.ui.controllers.demo;
 import at.timeguess.backend.model.CubeFace;
-import at.timeguess.backend.services.CubeFaceService;
-import at.timeguess.backend.services.FacetsService;
+import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +26,7 @@ import javax.annotation.PostConstruct;
 public class WebSocketCubeFace {
 
     @Autowired
-    CubeFaceService cubeFaceService;
-
-    @Autowired
-    FacetsService facetsService;
+    CubeService cubeService;
 
     @CDIAutowired
     private WebSocketManager websocketManager;
@@ -40,7 +36,7 @@ public class WebSocketCubeFace {
 
     @PostConstruct
     public void setup() {
-        this.currentFace = this.cubeFaceService.allCubeFaces().get((int) (Math.random()*12)) ;
+        this.currentFace = this.cubeService.allCubeFaces().get((int) (Math.random()*12)) ;
     }
 
     public CubeFace getCurrentFace() {
@@ -48,7 +44,7 @@ public class WebSocketCubeFace {
     }
 
     public void cubeChange() {
-        this.currentFace = this.cubeFaceService.allCubeFaces().get(facetsService.getDummyCubeFace()) ;
+        this.currentFace = this.cubeService.allCubeFaces().get(cubeService.getDummyCubeFace()) ;
         this.websocketManager.getCubeFaceChannel().send("cubeFaceChange");
     }
 }

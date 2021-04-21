@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.timeguess.backend.services.FacetsService;
+import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.model.api.FacetsResponse;
 
@@ -16,7 +16,7 @@ import at.timeguess.backend.model.api.FacetsResponse;
 public class FacetsController {
 
     @Autowired
-    private FacetsService facetsService;
+    private CubeService cubeService;
 
     /**
      * Process messages from a TimeFlip device signaling
@@ -27,7 +27,7 @@ public class FacetsController {
      */
     @PostMapping("/api/facets")
     private FacetsResponse processFacets(@RequestBody FacetsMessage message) {
-        return facetsService.processFacets(message);
+        return cubeService.processFacets(message);
     }
 
 }

@@ -18,8 +18,7 @@ import at.timeguess.backend.events.FacetsEvent;
 import at.timeguess.backend.events.FacetsEventListener;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
-import at.timeguess.backend.services.ConfigurationService;
-import at.timeguess.backend.services.CubeFaceService;
+import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
@@ -40,9 +39,7 @@ public class CubeConfigurationController implements Consumer<FacetsEvent> {
     private static final String CLICK_INSTRUCTION = "Click one of the buttons below to assign!";
 
     @Autowired
-    private CubeFaceService cubeFaceService;
-    @Autowired
-    private ConfigurationService configurationService;
+    private CubeService cubeService;
     @Autowired
     private SessionInfoBean sessionInfoBean;
     @Autowired
@@ -58,7 +55,7 @@ public class CubeConfigurationController implements Consumer<FacetsEvent> {
 
     @PostConstruct
     public void init() {
-        cubeFaces = cubeFaceService.allCubeFaces();
+        cubeFaces = cubeService.allCubeFaces();
         facetsEventListener.subscribe(this);
     }
 
@@ -106,7 +103,7 @@ public class CubeConfigurationController implements Consumer<FacetsEvent> {
 
     public void submit() {
         if (isConfigured()) {
-            configurationService.saveMappingForCube(cube, mapping);
+            cubeService.saveMappingForCube(cube, mapping);
         }
     }
 
