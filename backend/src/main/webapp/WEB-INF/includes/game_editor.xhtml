@@ -35,7 +35,8 @@
                                                                             disabled="#{gdc.lockedMaxPoints}"
                                                                             min="1" />
                         <h:outputLabel for="topic" value="Choose topic" />
-                        <p:selectOneMenu id="topic" value="#{curr.topic}" converter="omnifaces.SelectItemsConverter"
+                        <p:selectOneMenu id="topic" value="#{curr.topic}" 
+                                                    converter="omnifaces.SelectItemsConverter"
                                                    disabled="#{gdc.lockedTopic}"
                             required="true" requiredMessage="#{topicMsg}">
                             <p:ajax event="change" process="@this" />
@@ -58,24 +59,27 @@
                         </p:selectOneMenu>
                     </p:panelGrid>
                     <p:separator />
+
           <!--[>Teams go here<]-->
-          <!--<p:selectCheckboxMenu id="multiple" -->
-                                <!--value="#{gdc.game.actualTeams}" -->
-                                <!--converter="#{teamConverter}"-->
-                                <!--disabled="#{gdc.lockedTeam}"-->
-                                <!--label="Teams" -->
-                                <!--style="min-width: 15rem"-->
-                                <!--multiple="true" -->
-                                <!--filter="true" -->
-                                <!--filterMatchMode="startsWith" -->
-                                <!--panelStyle="width: 30rem" scrollHeight="250">-->
-          <!--[><p:ajax event="itemUnselect" listener="#{checkboxView.onItemUnselect}"/><]-->
-          <!--<f:selectItems value="#{gdc.possibleTeams}"-->
-                         <!--var="gteam"-->
-                         <!--itemLabel="#{gteam.name}"-->
-                         <!--/>-->
-          <!--</p:selectCheckboxMenu>-->
-          <!--<p:separator />-->
+          <!--converter="#{teamConverter}"-->
+          <p:selectCheckboxMenu id="multiple" 
+                                value="#{curr.actualTeams}" 
+                                converter="omnifaces.SelectItemsConverter"
+                                disabled="#{gdc.lockedTeam}"
+                                label="Teams" 
+                                style="min-width: 15rem"
+                                multiple="true" 
+                                filter="true" 
+                                filterMatchMode="startsWith" 
+                                panelStyle="width: 30rem" scrollHeight="250">
+          <f:selectItems value="#{gdc.possibleTeams}"
+                         var="gteam"
+                         itemLabel="#{gteam.name}"
+                         />
+
+          </p:selectCheckboxMenu>
+          <p:separator />
+
 
                     <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
                         <p:commandButton value="Save" 
@@ -92,25 +96,6 @@
                 </p:outputPanel>
 
 
-
-          <!--[>Teams go here<]-->
-          <!--<p:selectCheckboxMenu id="multiple" -->
-                                <!--value="#{gdc.game.actualTeams}" -->
-                                <!--converter="#{teamConverter}"-->
-                                <!--disabled="#{gdc.lockedTeam}"-->
-                                <!--label="Teams" -->
-                                <!--style="min-width: 15rem"-->
-                                <!--multiple="true" -->
-                                <!--filter="true" -->
-                                <!--filterMatchMode="startsWith" -->
-                                <!--panelStyle="width: 30rem" scrollHeight="250">-->
-          <!--[><p:ajax event="itemUnselect" listener="#{checkboxView.onItemUnselect}"/><]-->
-          <!--<f:selectItems value="#{gdc.possibleTeams}"-->
-                         <!--var="gteam"-->
-                         <!--itemLabel="#{gteam.name}"-->
-                         <!--/>-->
-          <!--</p:selectCheckboxMenu>-->
-          <!--<p:separator />-->
 
           <!--<h3>note: at the moment save fails if game has no topic</h3>-->
           <!--<h:panelGrid columns="3">-->

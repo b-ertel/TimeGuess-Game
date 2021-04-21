@@ -17,7 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 @Entity
-public class Team implements  Comparable<Team> {
+public class Team implements Comparable<Team> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,13 +29,10 @@ public class Team implements  Comparable<Team> {
     @OneToMany(mappedBy = "team")
     private Set<GameTeam> games;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = User.class)
-    @JoinTable(name = "team_user",
-            joinColumns = @JoinColumn(name = "team_id", nullable = false, updatable = false),
-            inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
-            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
-   private Set<User> teamMembers;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH,
+            CascadeType.PERSIST }, targetEntity = User.class)
+    @JoinTable(name = "team_user", joinColumns = @JoinColumn(name = "team_id", nullable = false, updatable = false), inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT), inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+    private Set<User> teamMembers;
 
     private TeamState state;
 
@@ -88,5 +85,24 @@ public class Team implements  Comparable<Team> {
     @Override
     public int compareTo(Team o) {
         return name.compareTo(o.getName());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[id=%d]", getClass().getSimpleName(), getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (this == obj)
+            return true;
+        return (getId() == ((Team) obj).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return (getId() != null) ? (getClass().getSimpleName().hashCode() + getId().hashCode()) : super.hashCode();
     }
 }
