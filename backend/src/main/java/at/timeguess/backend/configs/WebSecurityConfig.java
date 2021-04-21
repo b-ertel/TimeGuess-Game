@@ -12,9 +12,13 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import at.timeguess.backend.configs.handler.CustomAccessDeniedHandler;
+import at.timeguess.backend.configs.handler.CustomAuthenticationFailureHandler;
 import at.timeguess.backend.spring.CustomizedLogoutSuccessHandler;
 
 /**
@@ -57,8 +61,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Allow only certain roles to use websockets (only logged in users)
                 .antMatchers("/omnifaces.push/**").hasAnyAuthority("ADMIN", "MANAGER", "PLAYER").and().formLogin()
                 .loginPage("/login.xhtml").loginProcessingUrl("/login").defaultSuccessUrl("/secured/welcome.xhtml")
-                .failureUrl("/login.xhtml?error");
-        http.exceptionHandling().accessDeniedPage("/error/access_denied.xhtml");
+                .failureHandler(authenticationFailureHandler());
+        http.exceptionHandling().accessDeniedHandler(accessDeniedHandler());
         http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
 
     }
@@ -70,7 +74,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .usersByUsernameQuery("SELECT username, password, enabled FROM user WHERE username=?")
                 .authoritiesByUsernameQuery("SELECT username, roles FROM user_role r JOIN user u ON r.user_id=u.id WHERE u.username=?");
     }
+    
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
 
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
+    }
+    
     @Bean
     public static PasswordEncoder passwordEncoder() {
         PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();

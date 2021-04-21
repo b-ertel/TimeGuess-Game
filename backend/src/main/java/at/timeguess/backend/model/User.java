@@ -20,7 +20,7 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     private String username;
 
     @ManyToOne(optional = false)
@@ -33,7 +33,7 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateDate;
 
-    @Column(length = 50, nullable = false)
+    @Column(nullable = false)
     private String password;
 
     private String firstName;
@@ -47,21 +47,22 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
     @Enumerated(EnumType.STRING)
     private Set<UserRole> roles = new HashSet<>();
     
-    @ManyToMany
-    @JoinTable(
-            name = "team_user", 
-            joinColumns = @JoinColumn(name = "user_id"), 
-            inverseJoinColumns = @JoinColumn(name = "team_id"))
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Team.class)
+    @JoinTable(name = "team_user",
+            joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "team_id", nullable = false, updatable = false),
+            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
+            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<Team> teams;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Game.class)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Game.class)
     @JoinTable(name = "game_user",
             joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
             inverseJoinColumns = @JoinColumn(name = "game_id", nullable = false, updatable = false),
             foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
             inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<Game> confirmedGames;
-    
+
     @Override
     public Long getId() {
         return id;
