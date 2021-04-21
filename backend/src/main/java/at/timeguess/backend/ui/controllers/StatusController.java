@@ -1,4 +1,4 @@
-package at.timeguess.backend.api;
+package at.timeguess.backend.ui.controllers;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -16,9 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import at.timeguess.backend.services.CubeService;
 
@@ -28,12 +25,12 @@ import at.timeguess.backend.utils.CDIContextRelated;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.CubeStatusInfo;
-import at.timeguess.backend.model.api.HealthStatus;
+import at.timeguess.backend.model.HealthStatus;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.model.api.StatusResponse;
 
 /**
- * Controller for communication with Raspberry Pi and management of cube status.
+ * Controller for management of cube status.
  */
 @Controller
 @Scope("application")
@@ -68,9 +65,7 @@ public class StatusController {
 	 * @param message from the timeflip device from online cube
 	 * @return status response with an interval
 	 */
-    @PostMapping("/api/status")
-    @ResponseBody
-    private StatusResponse processStatus(@RequestBody StatusMessage message) {
+    public StatusResponse processStatus(StatusMessage message) {
 
     	if(this.healthStatus.containsKey(message.getIdentifier())){
     		LOGGER.info("status message received.....");
