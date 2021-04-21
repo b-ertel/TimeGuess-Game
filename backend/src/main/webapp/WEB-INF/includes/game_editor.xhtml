@@ -80,12 +80,12 @@
           </p:selectCheckboxMenu>
           <p:separator />
 
-
+          <!--TODO - find out what does PF('#{parentName}').filter();?-->
                     <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
                         <p:commandButton value="Save" 
                                          action="#{gdc.doSaveGame()}"
                                          oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('#{dialogName}').hide(); 
-                                         PF('#{parentTable}').filter(); }" 
+                                          }" 
                             update="#{parentTable} #{gameData} :msg" />
                         <p:commandButton value="Reload" action="#{gdc.doReloadGame()}"
                                                         process="@parent" 

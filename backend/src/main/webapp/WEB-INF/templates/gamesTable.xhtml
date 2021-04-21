@@ -123,7 +123,7 @@
                         oncomplete="PF('gameEditDialog').show()" update=":gameDetailForm:gameEditDialog :msg">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                     </p:commandButton>
-                    <p:commandButton title="Edit (new)" icon="fa fa-edit" disabled="#{not isAdmin}"
+                    <p:commandButton title="Edit (new)" icon="fa fa-pencil" disabled="#{not isAdmin}"
                         oncomplete="PF('gameEditDialog2').show()" update=":gameDetailFormXX:gameEditDialog2 :msg">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                     </p:commandButton>
