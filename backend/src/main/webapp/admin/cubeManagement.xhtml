@@ -73,18 +73,12 @@
                         <p:inputText id="name" value="#{curr.name}"/>
                     </h:panelGrid>
                     <p:separator />
-                      <h:panelGrid columns="7">
+                      <h:panelGrid columns="4">
                         <p:commandButton value="Save" action="#{cubeController.saveCube()}" oncomplete="{PF('cubeUseDialog').hide()}" 
                         					update=":cubeDetailForm:cubeUseDialog :msg" />
-                  <!--        <p:commandButton value="Configure" action="#{cubeController.saveCube()}" oncomplete="PF('cubeUseDialog').hide()" update=":ChatRoomForm:cubeTable">
-                      		<f:setPropertyActionListener target="/secured/demos/chatRoom.xhtml" value="/secured/demos/chatRoom.xhtml" />   // listener for ConfigurationController 
-                        </p:commandButton>  -->
-                  <!--       <h:button value="Configure" outcome="chatRoom"/>
-                        <h:commandButton id="button" value="POST button" action="chatRoom" />  -->    
-                        <p:linkButton value="Configure" href="cube-configuration.xhtml?cubeId=#{curr.id}" rendered="#{statusController.checkConfiguration(curr.macAddress)}" 
-                        					oncomplete="PF('cubeUseDialog').hide()" style="color:green">
-                        <!--  		<f:setPropertyActionListener target="#{cubeController.saveCube()}"/> -->
-                        </p:linkButton>
+                        <!-- to be altered for passing cube to ConfigurationService -->
+                        <p:commandButton value="Configure" ajax="false" action="/secured/demos/chatRoom.xhtml?faces-redirect=true" 
+                        		rendered="#{statusController.checkConfiguration(curr.macAddress)}" style="color:green" />
                         <p:commandButton value="Delete" action="#{cubeController.deleteCube()}" oncomplete="PF('cubeUseDialog').hide()" rendered="#{statusController.checkDeletion(curr.macAddress)}"
                         						update=":cubeDetailForm:cubeUseDialog :msg"/>
                         <p:commandButton value="Abort" onclick="PF('cubeUseDialog').hide()" update=":cubeDetailForm:cubeUseDialog :msg" /> 

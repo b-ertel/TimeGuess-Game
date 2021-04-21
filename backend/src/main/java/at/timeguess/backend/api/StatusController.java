@@ -149,7 +149,7 @@ public class StatusController {
     	Set<Cube> readyCubes = new HashSet<>();
     	
     	for(Map.Entry<String, CubeStatusInfo> s : this.cubeStatus.entrySet()) {
-    		if(s.getValue().getStatus().equals(CubeStatus.LIVE))
+    		if(s.getValue().getStatus().equals(CubeStatus.READY))
     			readyCubes.add(s.getValue().getCube());
     	}
     	return readyCubes;
