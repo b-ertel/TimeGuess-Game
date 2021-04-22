@@ -8,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.services.CubeService;
-import at.timeguess.backend.api.StatusController;
 import at.timeguess.backend.model.Cube;
 
 /**

@@ -8,9 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import at.timeguess.backend.api.StatusController;
-import at.timeguess.backend.model.api.HealthStatus;
-
+import at.timeguess.backend.model.HealthStatus;
+import at.timeguess.backend.ui.controllers.StatusController;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Map;

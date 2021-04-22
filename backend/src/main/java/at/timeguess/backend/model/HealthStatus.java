@@ -1,4 +1,4 @@
-package at.timeguess.backend.model.api;
+package at.timeguess.backend.model;
 
 import java.time.LocalDateTime;
 
