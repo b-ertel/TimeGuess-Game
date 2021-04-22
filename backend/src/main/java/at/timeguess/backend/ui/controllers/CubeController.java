@@ -2,12 +2,15 @@ package at.timeguess.backend.ui.controllers;
 
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.services.CubeService;
+import at.timeguess.backend.ui.beans.MessageBean;
 import at.timeguess.backend.model.Cube;
 
 /**
@@ -22,6 +25,8 @@ public class CubeController {
     private CubeService cubeService;
     @Autowired
     private StatusController statusController;
+    @Autowired
+    private MessageBean message;
 
     private Cube cube;
 
@@ -48,6 +53,7 @@ public class CubeController {
         this.cube=cubeService.saveCube(this.cube);
         statusController.updateCube(this.cube);
         statusController.updateSockets();
+        message.alertInformation("CubeManagment", "Cube saved");
     }
 
     /**
@@ -73,6 +79,7 @@ public class CubeController {
     public void deleteCube() {
     	cubeService.deleteCube(this.cube);
     	statusController.deleteStatus(this.cube.getMacAddress());
+        message.alertInformation("CubeManagment", "Cube " + this.cube.getId() + " deleted");
     }
     
     public Cube getCube() {
