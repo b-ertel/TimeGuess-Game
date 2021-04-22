@@ -10,20 +10,20 @@
 
 	<cc:interface>
 		<cc:attribute name="cubeStatusInfo"
-			type="at.timeguess.backend.model.Cube"
+			type="at.timeguess.backend.model.CubeStatusInfo"
 			required="true" />
 	</cc:interface>
 	<cc:implementation>
 		<ui:param name="styleClassName"
-			value="#{cc.attrs.cubeStatusInfo.cubeStatus eq 'READY' ? 'loggedIn' : 'loggedOut'}" />
+			value="#{cc.attrs.cubeStatusInfo.status eq 'READY' ? 'loggedIn' : 'loggedOut'}" />
 		<h:panelGrid columns="4">
-			<h:outputText value="#{cc.attrs.cubeStatusInfo.name}"
-					styleClass="#{styleClassName}" />
-			<h:outputText value="#{cc.attrs.cubeStatusInfo.id}"
+			<h:outputText value="#{cc.attrs.cubeStatusInfo.cube.id}"
 				styleClass="#{styleClassName}" />
-			<h:outputText value="#{cc.attrs.cubeStatusInfo.cubeStatus}"
+			<h:outputText value="#{cc.attrs.cubeStatusInfo.status}"
 				styleClass="#{styleClassName}" />
-			<h:outputText value="#{cc.attrs.cubeStatusInfo.cubeStatus.message}"
+			<h:outputText value="#{cc.attrs.cubeStatusInfo.status.message}"
+				styleClass="#{styleClassName}" />
+			<h:outputText value="#{cc.attrs.cubeStatusInfo.cube.name}"
 				styleClass="#{styleClassName}" />
 		</h:panelGrid>
 	</cc:implementation>
