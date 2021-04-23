@@ -22,14 +22,20 @@ public class EqualsImplementationTest {
     public void testUserEqualsContract() {
         User user1 = new User();
         user1.setUsername("user1");
+        user1.setId(1L);
         User user2 = new User();
         user2.setUsername("user2");
+        user2.setId(2L);
         Team team1 = new Team();
         Team team2 = new Team();
+        team1.setId(1L);
+        team2.setId(2L);
         Game game1 = new Game();
         game1.setName("game1");
+        game1.setId(1L);
         Game game2 = new Game();
         game2.setName("game2");
+        game2.setId(2L);
         EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2)
                 .withPrefabValues(Team.class, team1, team2).withPrefabValues(Game.class, game1, game2)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();

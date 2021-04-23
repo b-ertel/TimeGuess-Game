@@ -123,6 +123,10 @@
                         oncomplete="PF('gameEditDialog').show()" update=":gameDetailForm:gameEditDialog :msg">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                     </p:commandButton>
+                    <p:commandButton title="Edit (new)" icon="fa fa-pencil" disabled="#{not isAdmin}"
+                        oncomplete="PF('gameEditDialog2').show()" update=":gameDetailFormXX:gameEditDialog2 :msg">
+                        <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
+                    </p:commandButton>
                     <p:commandButton title="Delete" icon="fa fa-trash" disabled="#{not isAdmin}"
                         action="#{gameDetailController.doDeleteGame}" onsuccess="PF('gameTable').filter()"
                         update="gameListForm:gameTable :msg">
@@ -200,6 +204,7 @@
                 </p:outputPanel>
             </p:dialog>
         </h:form>
+
 
         <h:form id="gameInfoForm">
             <ui:remove>show game info</ui:remove>
@@ -306,5 +311,12 @@
             <p:draggable for="deleteGameConfirm"/>
         </h:form>
 
+        <ui:include src="/WEB-INF/includes/game_editor.xhtml" >
+            <ui:param name="formName" value="gameDetailFormXX" />
+            <ui:param name="dialogName" value="gameEditDialog2" />
+            <ui:param name="gdc" value="#{gameDetailController}" />
+            <ui:param name="parentTable" value=":gameListForm:gameTable"/>
+            <ui:param name="parentName" value="gameTable"/>
+        </ui:include >
     </ui:define>
 </ui:composition>

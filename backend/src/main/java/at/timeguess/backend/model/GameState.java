@@ -6,5 +6,6 @@ public enum GameState {
     PLAYED, // during active game play (changing most settings is blocked)
     HALTED, // game play can not continue until reconfigured (thing timeflip getting lost,
             // too many players disconnect, topic can not change)
-    FINISHED // game is done (changing settings is blocked)
+    FINISHED, // game is done (changing settings is blocked)
+    CANCELED // game was aborted (will not be used for statistics)
 }
