@@ -1,5 +1,6 @@
 package at.timeguess.backend.model;
 
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -94,11 +95,12 @@ public class Team implements Comparable<Team> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null || getClass() != obj.getClass())
             return false;
         if (this == obj)
             return true;
-        return (getId() == ((Team) obj).getId());
+        Team o2 = (Team) obj;
+        return Objects.equals(getId(),o2.getId()) && Objects.equals(getName(), o2.getName());
     }
 
     @Override
