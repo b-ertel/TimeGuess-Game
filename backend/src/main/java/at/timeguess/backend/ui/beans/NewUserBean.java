@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
@@ -19,7 +20,7 @@ import at.timeguess.backend.services.UserService;
  * Bean for creating a new user.
  */
 @Component
-@Scope("view")
+@Scope(WebApplicationContext.SCOPE_REQUEST)
 public class NewUserBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
