@@ -120,6 +120,7 @@ public class NewUserBean implements Serializable {
     public void clearFields() {
         this.setUsername(null);
         this.setPassword(null);
+        this.setRepeated(null);
         this.setFirstName(null);
         this.setLastName(null);
         this.setEmail(null);
