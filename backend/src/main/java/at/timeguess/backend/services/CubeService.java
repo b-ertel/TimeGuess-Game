@@ -2,7 +2,6 @@ package at.timeguess.backend.services;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
@@ -11,7 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import at.timeguess.backend.events.FacetsEventPublisher;
+import at.timeguess.backend.events.ConfiguredFacetsEventPublisher;
+import at.timeguess.backend.events.UnconfiguredFacetsEventPublisher;
 import at.timeguess.backend.model.Configuration;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
@@ -24,7 +24,7 @@ import at.timeguess.backend.repositories.CubeRepository;
 
 /**
  * A service for all kinds of stuff related to cubes, cube faces and configurations.
- * For everything else, have a look at the {@link StatusController}. :)
+ * For everything else, check out the StatusController. :)
  */
 @Service
 public class CubeService {
@@ -39,10 +39,10 @@ public class CubeService {
     private ConfigurationRepository configurationRepository;
 
     @Autowired
-    private FacetsEventPublisher facetsEventPublisher;
+    private UnconfiguredFacetsEventPublisher unconfiguredFacetsEventPublisher;
+    @Autowired
+    private ConfiguredFacetsEventPublisher configuredFacetsEventPublisher;
 
-    // to be removed ...
-    int dummyCubeFace = 0;
 
     /**
      * @param cube: the cube to save
@@ -123,17 +123,24 @@ public class CubeService {
     }
 
     /**
+     * Delete all existing configurations for a given cube.
+     *  
+     * @param cube the cube
+     */
+    public void deleteConfigurations(Cube cube) {
+        for (Configuration configuration : configurationRepository.findByCube(cube)) {
+            configurationRepository.delete(configuration);
+        }
+    }
+        
+    /**
      * Save a new set of new configurations for a given cube.
      * 
      * @param cube the cube
      * @param mapping a mapping of Cube faces to facet numbers
      */
     public void saveMappingForCube(Cube cube, Map<CubeFace, Integer> mapping) {
-        // delete any existing configurations
-        for (Configuration configuration : configurationRepository.findAll()) {
-            configurationRepository.delete(configuration);
-        }
-        // create and save the new configurations
+        deleteConfigurations(cube);
         for (Entry<CubeFace, Integer> entry : mapping.entrySet()) {
             Configuration configuration = new Configuration();
             configuration.setCube(cube);
@@ -142,26 +149,15 @@ public class CubeService {
             configurationRepository.save(configuration);
         }
     }
-
-    /**
-     * Find a cube in the database by its MAC address.
-
-     * 
-     * @param macAddress the MAC address to search for
-     * @return the cube with the given MAC address or null if not found (?)
-     */
-    public Cube findByMacAddress(String macAddress) {
-        return cubeRepo.findByMacAddress(macAddress);
-    }
-
-    /**
-     * Find a cube in the database by its id.
-     * 
-     * @param cubeId the id
-     * @return (optionally) the cube with the given id
-     */
-    public Optional<Cube> findById(Long cubeId) {
-        return cubeRepo.findById(cubeId);
+    
+    private CubeFace getMappedCubeFace(Cube cube, Integer facet) {
+        List<Configuration> configurations = configurationRepository.findByCube(cube);
+        for (Configuration configuration : configurations) {
+            if (configuration.getFacet().equals(facet)) {
+                return configuration.getCubeface();
+            }
+        }
+        return null;
     }
 
     /**
@@ -169,36 +165,25 @@ public class CubeService {
      * in the facets characteristic of a cube.
      *  
      * @param message the message
-     * @return the response to the message
+     * @return the response
      */
-    public FacetsResponse processFacets(FacetsMessage message) {
+    public FacetsResponse processFacetsMessage(FacetsMessage message) {
         String identifier = message.getIdentifier();
-        // TODO calibration version
-        Integer calibrationVersion = message.getCalibrationVersion();
+        int calibrationVersion = message.getCalibrationVersion();
         int facet = message.getFacet();
-
-        // to be removed ...
-        dummyCubeFace = facet % 12;
-
         if (isMacAddressKnown(identifier)) {
-            Cube cube = findByMacAddress(identifier);
-            facetsEventPublisher.publishFacetsEvent(cube, facet);
+            Cube cube = getByMacAddress(identifier);
+            CubeFace cubeFace = getMappedCubeFace(cube, facet);
+            if (cubeFace != null) {
+                configuredFacetsEventPublisher.publishConfiguredFacetsEvent(cube, cubeFace);
+            }
+            else {
+                unconfiguredFacetsEventPublisher.publishUnconfiguredFacetsEvent(cube, facet);
+            }
         }
-
         FacetsResponse response = new FacetsResponse();
-        // TODO calibration version
         response.setCalibrationVersion(calibrationVersion);
         return response;
-    }
-
-    // to be removed ...
-    public int getDummyCubeFace() {
-        return dummyCubeFace;
-    }
-
-    // to be removed ...
-    public void setDummyCubeFace(int dummyCubeFace) {
-        this.dummyCubeFace = dummyCubeFace;
     }
 
 }

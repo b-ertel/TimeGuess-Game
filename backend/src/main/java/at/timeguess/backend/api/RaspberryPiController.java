@@ -32,8 +32,8 @@ public class RaspberryPiController {
      * @return the response
      */
     @PostMapping("/api/facets")
-    private FacetsResponse processFacets(@RequestBody FacetsMessage message) {
-        return cubeService.processFacets(message);
+    private FacetsResponse processFacetsMessage(@RequestBody FacetsMessage message) {
+        return cubeService.processFacetsMessage(message);
     }
     
     /**
