@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameTeam;
-import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
 import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.services.GameLogicService;
@@ -69,23 +68,6 @@ public class StartRoundController {
 		return game.getRounds().size();
 	}
 	
-	public String lastRound() {
-		Round lastRound = new Round();
-		for(Round round : game.getRounds()) {
-			lastRound = round;
-		}
-		if(lastRound.getGuessingUser()==null) {
-			return "No rounds played";
-		} else {
-			String str="";
-			str += "Roundnumber: " + lastRound.getNr();
-			str += " || Team: " + lastRound.getGuessingTeam().getName();
-			str += " || User: " + lastRound.getGuessingUser().getUsername();
-			str += " || Term: " + lastRound.getTermToGuess().getName();
-			return str;
-		}
-		
-	}
 	
 	public boolean hasNoRounds() {
 		if(game==null)

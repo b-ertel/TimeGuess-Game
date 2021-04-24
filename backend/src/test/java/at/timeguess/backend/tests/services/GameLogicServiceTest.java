@@ -1,11 +1,7 @@
 package at.timeguess.backend.tests.services;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,20 +14,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.GameTeam;
-import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
-import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
-import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.repositories.TermRepository;
 import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
-import at.timeguess.backend.services.TopicService;
-import at.timeguess.backend.services.UserService;
-import at.timeguess.backend.ui.beans.NewGameBean;
 
 /**
  * Some very basic tests for {@link GameService}.
@@ -55,7 +44,7 @@ public class GameLogicServiceTest {
     @DirtiesContext
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    public void getNextTeamRightForNewGame() {
+    public void testNextTeam() {
     	Game game = new Game();
 
         game.setName("TestGame");
@@ -82,11 +71,13 @@ public class GameLogicServiceTest {
 			} 
 		}
 		Assertions.assertTrue(nrDifferentStartTeams>1);
+		
+		//TODO: check for existing game with rounds
     }
     
     @DirtiesContext
     @Test
-    public void checkTermsUsed() {
+    public void testUsedTerms() {
     	Game game = gameService.loadGame((long) 1);
     	Term termNotUsed = termRepo.findById((long) 5).get();
     	Assertions.assertFalse(gameLogicService.usedTerms(game).contains(termNotUsed));
@@ -101,10 +92,17 @@ public class GameLogicServiceTest {
     @DirtiesContext
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    public void checkNextTerm() throws AllTermsUsedInGameException {
+    public void testNextTerm() throws AllTermsUsedInGameException {
     	Game game = gameService.loadGame((long) 1);
     	Term termNotUsed = termRepo.findById((long) 5).get();
     	Assertions.assertEquals(termNotUsed.getName(), gameLogicService.nextTerm(game).getName());
+    	
+    	game = gameLogicService.startNewRound(game);
+    	try {
+    		gameLogicService.nextTerm(game);
+    	} catch(AllTermsUsedInGameException e) {
+    		Assertions.assertEquals("All terms have been used in previous rounds", e.getMessage());
+    	}
     }
     
     
