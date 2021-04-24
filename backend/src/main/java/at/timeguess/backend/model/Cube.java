@@ -2,6 +2,7 @@ package at.timeguess.backend.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 @Entity
-public class Cube {
+public class Cube implements Comparable<Cube>{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,10 +20,6 @@ public class Cube {
 	private String macAddress;
 	
 	private String name;
-	
-	private Integer configuration = 0;
-	
-	private CubeStatus cubeStatus = CubeStatus.OFFLINE;
 	
 	@OneToMany(mappedBy="cube")
 	private List<Configuration> configs = new ArrayList<>();
@@ -58,46 +55,38 @@ public class Cube {
 	public void addConfigs(Configuration config) {
 		this.configs.add(config);
 	}
-
-	public Integer getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Integer configuration) {
-		this.configuration = configuration;
-	}
-
-	public CubeStatus getCubeStatus() {
-		return cubeStatus;
-	}
-
-	public void setCubeStatus(CubeStatus cubeStatus) {
-		this.cubeStatus = cubeStatus;
-	}
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
+	
+	@Override
+	public boolean equals(Object obj) {
+    
+		if (this == obj)
+    		return true;
+    	
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Cube other = (Cube) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        return true;
-    }
+        }
+        
+        final Cube other = (Cube)obj;
+        return Objects.equals(getId(), other.getId()) && Objects.equals(getMacAddress(), other.getMacAddress());
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 11;
+	    int result = 57;
+	    result = prime * result + (this.id == null ? 0 : this.id.hashCode());
+	    result = prime * result + Objects.hashCode(this.getMacAddress());
+	    return result;
+	}
+
+	@Override
+	public int compareTo(Cube o) {
+		return getId().compareTo(o.getId());
+	}
+
+	@Override
+	public String toString() {
+		return getId().toString() + " [" + getMacAddress().toString() + "] ";
+	}
 	
 }

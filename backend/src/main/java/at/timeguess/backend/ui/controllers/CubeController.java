@@ -2,20 +2,31 @@ package at.timeguess.backend.ui.controllers;
 
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.services.CubeService;
+import at.timeguess.backend.ui.beans.MessageBean;
 import at.timeguess.backend.model.Cube;
 
 /**
  *  Controller for displaying {@link Cube} entities.
  *
  */
+@Component
+@Scope("view")
 public class CubeController {
 
     @Autowired
     private CubeService cubeService;
+    @Autowired
+    private StatusController statusController;
+    @Autowired
+    private MessageBean message;
 
     private Cube cube;
 
@@ -33,9 +44,44 @@ public class CubeController {
         saveCube();
 
         return this.cube;
-
     }
 
+    /**
+     * saves cube into the database
+     */
+    public void saveCube() {
+        this.cube=cubeService.saveCube(this.cube);
+        statusController.updateCube(this.cube);
+        statusController.updateSockets();
+        message.alertInformation("CubeManagment", "Cube saved");
+    }
+
+    /**
+     * @return all cubes in the databes
+     */
+    public List<Cube> getAllCubes() {
+        return cubeService.allCubes();
+    }
+
+    /**
+     * to check if there exists a cube with a given mac address
+     * 
+     * @param cube to check if it is in database
+     * @return true if it is in database, false otherwise
+     */
+    public boolean isMacAddressKnown(Cube cube){
+        return cubeService.isMacAddressKnown(cube.getMacAddress());
+    }
+    
+    /**
+     * deletes cube and removes its status
+     */
+    public void deleteCube() {
+    	cubeService.deleteCube(this.cube);
+    	statusController.deleteStatus(this.cube.getMacAddress());
+        message.alertInformation("CubeManagment", "Cube " + this.cube.getId() + " deleted");
+    }
+    
     public Cube getCube() {
         return this.cube;
     }
@@ -43,18 +89,6 @@ public class CubeController {
     public void setCube(Cube cube) {
         this.cube = cube;
     }
-
-    public void saveCube() {
-        cubeService.saveCube(this.cube);
-    }
-
-    public List<Cube> getAllCubes() {
-        return cubeService.allCubes();
-    }
-
-    public boolean isMacAddressKnown(Cube cube){
-        return cubeService.isMacAddressKnown(cube.getMacAddress());
-    }
-
 }
+
 

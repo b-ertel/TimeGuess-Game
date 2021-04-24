@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      >
+        Note: Set params!
+        <!--<ui:param name="formName" value="gameDetailForm" />-->
+        <!--<ui:param name="dialogName" value="gameEditDialog2" />-->
+        <!--<ui:param name="gdc" value="#{gameDetailController}" />-->
+        <!--<ui:param name="parentTable" value=":gameForm:gamesTable"/>-->
+        <!--<ui:param name="parentName" value="gamesTable"/>-->
+        <body>
+          <ui:composition>
+          <h:form id="#{formName}">
+          <p:dialog header="Edit Game" id="#{dialogName}" widgetVar="#{dialogName}" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" 
+                showEffect="fade" hideEffect="fade">
+          <p:ajax event="close" update="#{updateVar}" process="@parent" resetValues="true" />
+
+                <c:set var="curr" value="#{gdc.game}" scope="request" />
+                <c:set var="topicMsg" value="Topic: Value is required" />
+                <c:set var="gameData" value="#{dialogName}gameData" />
+                <p:outputPanel id="#{gameData}" rendered="#{not empty curr}">
+                    <p:panelGrid columns="2" layout="flex"
+                        columnClasses="p-col-3 p-col-align-center, p-col-9"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top:5px">
+                        <p:outputLabel for="name" value="Name: " />
+                        <p:inputText id="name" value="#{curr.name}" required="true" maxlength="100" />
+                        <p:outputLabel for="maxPoints" value="Maximum Points: " />
+                        <p:spinner id="maxPoints" value="#{curr.maxPoints}" required="true" 
+                                                                            disabled="#{gdc.lockedMaxPoints}"
+                                                                            min="1" />
+                        <h:outputLabel for="topic" value="Choose topic" />
+                        <p:selectOneMenu id="topic" value="#{curr.topic}" 
+                                                    converter="omnifaces.SelectItemsConverter"
+                                                   disabled="#{gdc.lockedTopic}"
+                            required="true" requiredMessage="#{topicMsg}">
+                            <p:ajax event="change" process="@this" />
+                            <f:selectItem itemLabel="Select" noSelectionOption="true" />
+                            <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    <p:separator style="margin-bottom:16px" />
+
+                    <p:panelGrid columns="2" layout="flex"
+                        columnClasses="p-col-6 p-col-align-center, p-col-6"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank">
+                        <p:outputLabel for="createUser" value="Creator: " />
+                        <p:outputLabel id="createUser" value="#{curr.creator.firstName} (#{curr.creator.firstName} #{curr.creator.lastName})"/>
+                        <h:outputLabel for="state" value="state" />
+                        <p:selectOneMenu id="state" value="#{gameDetailController.game.status}">
+                            <f:selectItems value="#{dataBean.states}" 
+                                           var="state"
+                                           itemDisabled="#{not( gdc.canTraverse(state) )}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    <p:separator />
+
+          <!--[>Teams go here<]-->
+          <!--converter="#{teamConverter}"-->
+          <p:selectCheckboxMenu id="multiple" 
+                                value="#{curr.actualTeams}" 
+                                converter="omnifaces.SelectItemsConverter"
+                                disabled="#{gdc.lockedTeam}"
+                                label="Teams" 
+                                style="min-width: 15rem"
+                                multiple="true" 
+                                filter="true" 
+                                filterMatchMode="startsWith" 
+                                panelStyle="width: 30rem" scrollHeight="250">
+          <f:selectItems value="#{gdc.possibleTeams}"
+                         var="gteam"
+                         itemLabel="#{gteam.name}"
+                         />
+
+          </p:selectCheckboxMenu>
+          <p:separator />
+
+          <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
+          <p:commandButton value="Save" 
+                           action="#{gdc.doSaveGame()}"
+                           oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('#{dialogName}').hide(); PF('#{parentName}').filter(); }" 
+                           update="#{parentTable} #{gameData} :msg" />
+          <p:commandButton value="Reload" action="#{gdc.doReloadGame()}"
+                                          process="@parent" 
+                                          update="#{gameData} :msg" 
+                                          resetValues="true"/>
+          <p:commandButton value="Abort" onsuccess="PF('#{dialogName}').hide()"/>
+          <!--<p:commandButton value="Delete" action="#{gdc.doDeleteGame()}" -->
+                                          <!--disabled="#{gdc.lockedDelete}"-->
+                                          <!--oncomplete="PF(dialogName).hide()" -->
+                                          <!--update="#{parentTable}"/>-->
+          </p:panelGrid>
+          </p:outputPanel>
+
+
+
+          </p:dialog>
+
+          </h:form>
+          </ui:composition>
+        </body>
+</html>
+

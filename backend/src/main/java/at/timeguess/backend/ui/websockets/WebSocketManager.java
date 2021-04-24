@@ -2,6 +2,7 @@ package at.timeguess.backend.ui.websockets;
 
 import java.io.Serializable;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,7 +38,7 @@ import org.omnifaces.cdi.PushContext;
  * https://github.com/spring-projects/spring-framework/issues/22243#issuecomment-460228188
  */
 @Named
-@SessionScoped
+@ApplicationScoped
 public class WebSocketManager implements Serializable {
 
     // add other channels here + getter for them

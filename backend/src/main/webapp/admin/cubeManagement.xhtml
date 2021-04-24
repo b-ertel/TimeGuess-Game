@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+                
+    xmlns:demo="http://java.sun.com/jsf/composite/demo"
+	template="/WEB-INF/templates/main.xhtml">
+    <ui:define name="content">
+        <!-- see chat.js -->
+        <h:outputScript>			
+            pfContext=PF
+        </h:outputScript>
+        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+
+        <h:form id="ChatRoomForm">
+            <div class="chatRoomContent">
+                <h1>Cube Management</h1>
+
+                <p:panelGrid columns="1" style="width: 35%;"
+                        columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
+                                    
+                  <p:panel id= "onlineCube" header="Cubes" style=" border: none; width: 700px;">
+				  
+				  <!-- displays cube status -->
+                  <h3>Cubes Status</h3>
+                     <p:scrollPanel id="onlineCubeInfo"
+                                styleClass="chatRoomPanelContent onlineInfoBox"
+                                widgetVar="onlineInfoWidget">
+                         
+                         <ui:repeat var="cubeStatusInfo"
+                                value="#{statusController.cubeStatusInfos}">
+                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
+                         </ui:repeat>
+                     </p:scrollPanel>
+            	     <p:separator/>
+					
+					<!-- drop down menu for selecting cube -->
+        			<h3>Choose a Cube:</h3>
+	     			<h:panelGrid columns="2">    
+           				<h:outputLabel for="cubeselect" value="Cube: "/> 
+               			<p:selectOneMenu id="cubeselect" value="#{cubeController.cube}" converter="omnifaces.SelectItemsConverter"> 
+               				<f:selectItem itemLabel="Select" itemValue="" noSelectionOption="true"/>
+               				<f:selectItems value="#{cubeController.allCubes}" var="cube" itemLabel="#{cube.id}"/>
+               			</p:selectOneMenu>
+                        <p:commandButton value="OK" oncomplete="PF('cubeUseDialog').show()" update=":cubeDetailForm:cubeUseDialog :msg">  
+              			</p:commandButton>
+	   				</h:panelGrid> 
+
+             	</p:panel>
+            	</p:panelGrid>            	
+            </div>
+        </h:form>
+ 
+ 		<!--  form for choose action for the cube -->
+        <h:form id="cubeDetailForm">
+          <p:dialog header="Use Cube" id="cubeUseDialog" widgetVar="cubeUseDialog" dynamic="true"
+              modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
+                <p:ajax event="close" update="cubeData" process="@parent" resetValues="true" />
+                
+                <c:set var="curr" value="#{cubeController.cube}" scope="request" />
+                <p:outputPanel id="cubeData" rendered="#{not empty curr}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="id" value="Id: " />
+                        <p:inputText id="id" value="#{curr.id}" disabled="true"/>
+                        <p:outputLabel for="macAddress" value="MacAddress: " />
+                        <p:inputText id="macAddress" value="#{curr.macAddress}" disabled="true"/>
+                        <p:outputLabel for="name" value="Name: "/>
+                        <p:inputText id="name" value="#{curr.name}"/>
+                    </h:panelGrid>
+                    <p:separator />
+                      <h:panelGrid columns="4">
+                        <p:commandButton value="Save" action="#{cubeController.saveCube()}" oncomplete="{PF('cubeUseDialog').hide()}" 
+                        					update=":cubeDetailForm:cubeUseDialog :msg" />
+                        <!-- to be altered for passing cube to ConfigurationService -->
+                        <p:commandButton value="Configure" ajax="false" action="/secured/demos/chatRoom.xhtml?faces-redirect=true" 
+                        		rendered="#{statusController.checkConfiguration(curr.macAddress)}" >
+                        	<f:actionListener binding="#{statusController.setInConfig(curr.macAddress)}" />
+                        </p:commandButton>
+                        <p:commandButton value="Delete" action="#{cubeController.deleteCube()}" oncomplete="PF('cubeUseDialog').hide()" rendered="#{statusController.checkDeletion(curr.macAddress)}"
+                        						update=":cubeDetailForm:cubeUseDialog :msg"/>
+                        <p:commandButton value="Abort" onclick="PF('cubeUseDialog').hide()" update=":cubeDetailForm:cubeUseDialog :msg" /> 
+
+                    </h:panelGrid> 
+                </p:outputPanel> 
+             </p:dialog>   
+             
+           <o:socket channel="cubeChannel" scope="application"
+                onmessage="function(m){console.log(m);}">
+                <f:ajax event="connectionCubeUpdate"
+                    render="ChatRoomForm" />
+            </o:socket>
+
+		</h:form>	
+    </ui:define>
+</ui:composition>

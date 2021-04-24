@@ -7,16 +7,14 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import at.timeguess.backend.events.FacetsEventPublisher;
-import at.timeguess.backend.events.OnboardingEventPublisher;
 import at.timeguess.backend.model.Configuration;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
-import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.model.api.FacetsResponse;
 import at.timeguess.backend.model.api.StatusMessage;
@@ -49,59 +47,25 @@ public class CubeService {
     /**
      * @param cube: the cube to save
      */
-    public void saveCube(Cube cube) {
-        cubeRepo.save(cube);
+    public Cube saveCube(Cube cube) {
+        return cubeRepo.save(cube);
     }
 
     /**
      * method to create a new entry for a cube device in the database
      * 
-     * @param message from the new Cube which contains attribtus for the new Cube
+     * @param message from the new Cube which contains attributes for the new Cube
      * @return new Cube
      */
     public Cube createCube(StatusMessage message) {
         Cube newCube = new Cube();
         newCube.setMacAddress(message.getIdentifier());
-        newCube.setConfiguration(message.getCalibrationVersion());  
+        newCube = saveCube(newCube);
 
         LOGGER.info("new Cube createt with mac {}", newCube.getMacAddress());
 
         return newCube;
     }
-
-    /**
-     * method to check whether Cube is known and if it's configured and sets corresponding CubeStatus
-     * 
-     * @param message from the timeflip device from online cube
-     * @return updated cube
-     */
-    public Cube updateCube(StatusMessage message) {
-
-        Cube updatedCube = new Cube();
-
-        if(isMacAddressKnown(message.getIdentifier())) {								// Cube is already in database
-            updatedCube = cubeRepo.findByMacAddress(message.getIdentifier());
-        }
-        else {
-            updatedCube = createCube(message);											// Cube is new and has to be created
-        }
-
-        if(updatedCube.getConfiguration() == message.getCalibrationVersion()
-                && message.getCalibrationVersion() != 0){								// Cube is configured and ready
-            updatedCube.setCubeStatus(CubeStatus.READY);
-        }
-        else { 
-            updatedCube.setCubeStatus(CubeStatus.LIVE);									// Cube lost his configuration or has not been configured yet
-            updatedCube.setConfiguration(0);
-        }
-
-        saveCube(updatedCube);
-
-        LOGGER.info("cube {} was updated and set status to {}", updatedCube.getId(), updatedCube.getCubeStatus());
-
-        return updatedCube;
-    }
-
 
     /**
      * @return a list of all cubes 
@@ -124,7 +88,64 @@ public class CubeService {
     }
 
     /**
+     * find a cube by its mac address
+     * 
+     * @param identifier of cube
+     * @return cube
+     */
+    public Cube getByMacAddress(String identifier) {
+        return cubeRepo.findByMacAddress(identifier);
+    }
+
+    /** deletes a cube
+     * @param cube to delete
+     */
+    public void deleteCube(Cube cube) {
+        cubeRepo.delete(cube);
+
+    }
+
+    /**
+     * @return a list of all CubeFace entities
+     */
+    public List<CubeFace> allCubeFaces(){
+        return cubeFaceRepo.findAll();
+    }
+
+    /**
+     * Checks if a given cube has already been configured.
+     * 
+     * @param cube the cube
+     * @return a boolean indicating if the cube is configured
+     */
+    public boolean isConfigured(Cube cube){
+        return !configurationRepository.findByCube(cube).isEmpty();
+    }
+
+    /**
+     * Save a new set of new configurations for a given cube.
+     * 
+     * @param cube the cube
+     * @param mapping a mapping of Cube faces to facet numbers
+     */
+    public void saveMappingForCube(Cube cube, Map<CubeFace, Integer> mapping) {
+        // delete any existing configurations
+        for (Configuration configuration : configurationRepository.findAll()) {
+            configurationRepository.delete(configuration);
+        }
+        // create and save the new configurations
+        for (Entry<CubeFace, Integer> entry : mapping.entrySet()) {
+            Configuration configuration = new Configuration();
+            configuration.setCube(cube);
+            configuration.setCubeface(entry.getKey());
+            configuration.setFacet(entry.getValue());
+            configurationRepository.save(configuration);
+        }
+    }
+
+    /**
      * Find a cube in the database by its MAC address.
+
      * 
      * @param macAddress the MAC address to search for
      * @return the cube with the given MAC address or null if not found (?)
@@ -178,44 +199,6 @@ public class CubeService {
     // to be removed ...
     public void setDummyCubeFace(int dummyCubeFace) {
         this.dummyCubeFace = dummyCubeFace;
-    }
-
-    /**
-     * @return a list of all CubeFace entities
-     */
-    public List<CubeFace> allCubeFaces(){
-        return cubeFaceRepo.findAll();
-    }
-
-    /**
-     * Checks if a given cube has already been configured.
-     * 
-     * @param cube the cube
-     * @return a boolean indicating if the cube is configured
-     */
-    public boolean isConfigured(Cube cube){
-        return !configurationRepository.findByCube(cube).isEmpty();
-    }
-
-    /**
-     * Save a new set of new configurations for a given cube.
-     * 
-     * @param cube the cube
-     * @param mapping a mapping of Cube faces to facet numbers
-     */
-    public void saveMappingForCube(Cube cube, Map<CubeFace, Integer> mapping) {
-        // delete any existing configurations
-        for (Configuration configuration : configurationRepository.findAll()) {
-            configurationRepository.delete(configuration);
-        }
-        // create and save the new configurations
-        for (Entry<CubeFace, Integer> entry : mapping.entrySet()) {
-            Configuration configuration = new Configuration();
-            configuration.setCube(cube);
-            configuration.setCubeface(entry.getKey());
-            configuration.setFacet(entry.getValue());
-            configurationRepository.save(configuration);
-        }
     }
 
 }
