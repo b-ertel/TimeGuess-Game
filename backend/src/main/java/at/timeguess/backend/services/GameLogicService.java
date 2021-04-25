@@ -1,14 +1,11 @@
 package at.timeguess.backend.services;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +20,6 @@ import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
-import at.timeguess.backend.repositories.RoundRepository;
-import at.timeguess.backend.repositories.TermRepository;
 
 @Component
 @Scope("application")
