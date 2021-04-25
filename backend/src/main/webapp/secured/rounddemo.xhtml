@@ -30,11 +30,7 @@
                                 <h:outputText value="#{gameTeam.team.name}" />
 			                </p:column>
 				        </p:dataTable> 
-	        <p:panel header="Round infos" rendered="#{!startRoundController.hasNoRounds()}">
-		     <p:outputLabel value="#{startRoundController.lastRound()}"/>
-	          <br />  
-		    </p:panel> 
-		     <p:panel header="Round infos" rendered="#{not empty startRoundController.message!=null}">
+		     <p:panel rendered="#{not empty startRoundController.message!=null}">
 		     <p:outputLabel value="#{startRoundController.message}"/>
 	          <br />  
 		    </p:panel>   

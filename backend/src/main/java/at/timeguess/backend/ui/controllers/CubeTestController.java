@@ -43,6 +43,16 @@ public class CubeTestController implements Consumer<ConfiguredFacetsEvent> {
     public void destroy() {
         configuredfacetsEventListener.unsubscribe(this);
     }
+    
+    /**
+     * Prepare the controller for a fresh attempt to test a cube.
+     * 
+     * @param cube the cube to configure
+     */
+    public void prepareForNewTest(Cube cubeToConfigure) {
+        cube = cubeToConfigure;
+        cubeFace = null;
+    }
 
     /**
      * A method for processing a {@link ConfiguredFacetsEvent}.
@@ -72,4 +82,3 @@ public class CubeTestController implements Consumer<ConfiguredFacetsEvent> {
     }
 
 }
-

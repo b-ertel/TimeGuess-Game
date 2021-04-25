@@ -80,14 +80,15 @@
 							update="cubeConfigurationForm:cubeConfigurationDialog :msg"
 							rendered="#{statusController.checkConfiguration(curr.macAddress) and !statusController.isConfigured(curr)}" >
 							<f:actionListener binding="#{statusController.setInConfig(curr.macAddress)}" />
-							<f:setPropertyActionListener value="#{curr}"
-								target="#{cubeConfigurationController.cube}" />
+							<f:actionListener binding="#{cubeConfigurationController.prepareForNewConfiguration(curr)}" />
 						</p:commandButton>
 						<p:commandButton value="Test"
 							oncomplete="PF('cubeTestDialog').show()"
 							update="cubeTestForm:cubeTestDialog :msg" rendered="true">
 							<f:setPropertyActionListener value="#{curr}"
 								target="#{cubeTestController.cube}" />
+							<f:actionListener
+								binding="#{cubeTestController.prepareForNewTest(curr)}" />
 						</p:commandButton>
 						<p:commandButton value="Delete configuration"
 							action="#{cubeController.deleteConfigurations()}"
@@ -121,7 +122,7 @@
 
 		<h:form id="cubeConfigurationForm">
 			<p:dialog header="Cube Configuration" id="cubeConfigurationDialog"
-				widgetVar="cubeConfigurationDialog" dynamic="false" modal="true"
+				widgetVar="cubeConfigurationDialog" dynamic="true" modal="true"
 				resizable="false" closeOnEscape="false" showEffect="fade"
 				hideEffect="fade" responsive="true" closable="false">
 
@@ -139,7 +140,7 @@
 
 					<p:spacer height="5" />
 
-					<p:panel header="Current Facet Number">
+					<p:panel header="Recieved Facet Number">
 						<h:outputText value="#{cubeConfigurationController.facet}" />
 					</p:panel>
 
@@ -156,17 +157,21 @@
 								value="#{cubeConfigurationController.getAssignedFacetNumber(cubeFace)}" />
 						</p:column>
 						<p:column>
-							<p:commandButton title="Assign"
+							<p:commandButton value="Assign"
+								action="#{cubeConfigurationController.assignFacetNumber(cubeFace)}"
 								disabled="#{empty cubeConfigurationController.facet}"
-								update="cubeConfigurationForm:cubeConfigurationOutputPanel :msg">
-								<f:actionListener
-									binding="#{cubeConfigurationController.assign(cubeFace)}" />
-							</p:commandButton>
+								update="cubeConfigurationForm:cubeConfigurationOutputPanel :msg" />
+						</p:column>
+						<p:column>
+							<p:commandButton value="Reset"
+								action="#{cubeConfigurationController.removeAssignedFacetNumber(cubeFace)}"
+								disabled="#{!cubeConfigurationController.hasAssignedFacetNumber(cubeFace)}"
+								update="cubeConfigurationForm:cubeConfigurationOutputPanel :msg" />
 						</p:column>
 					</p:dataTable>
 
 					<p:panel>
-						<p:commandButton title="Submit"
+						<p:commandButton value="Submit"
 							action="#{cubeConfigurationController.submit()}"
 							disabled="#{!cubeConfigurationController.isConfigured()}"
 							onclick="PF('cubeConfigurationDialog').hide()"
@@ -174,9 +179,7 @@
 							update=":cubeDetailForm:cubeUseDialog :msg">
 							<f:actionListener binding="#{statusController.setReady(curr.macAddress)}" />
 						</p:commandButton>
-						<p:commandButton value="Abort" action="#{statusController.setLive(curr.macAddress)}" onclick="PF('cubeConfigurationDialog').hide()">
-						
-						</p:commandButton>
+						<p:commandButton value="Abort" action="#{statusController.setLive(curr.macAddress)}" onclick="PF('cubeConfigurationDialog').hide()" />
 					</p:panel>
 				</p:outputPanel>
 
