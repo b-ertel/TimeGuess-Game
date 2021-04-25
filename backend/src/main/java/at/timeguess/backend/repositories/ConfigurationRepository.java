@@ -1,17 +1,18 @@
 package at.timeguess.backend.repositories;
 
-import com.sun.istack.Nullable;
+import java.util.List;
 
 import at.timeguess.backend.model.Configuration;
 import at.timeguess.backend.model.Cube;
-import at.timeguess.backend.model.CubeFace;
 
 public interface ConfigurationRepository extends AbstractRepository<Configuration, Long> {
 
-	@Nullable
-    public Configuration findByCube(Cube cube);
+    /**
+     * Find all configurations for a given cube.
+     * 
+     * @param cube the cube
+     * @return the list of configurations
+     */
+    List<Configuration> findByCube(Cube cube);
 
-    public Configuration findByCubeface(CubeFace cubeFace);
-
-    public Configuration findByFacet(Integer facet);
 }

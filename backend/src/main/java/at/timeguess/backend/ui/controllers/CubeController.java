@@ -82,6 +82,11 @@ public class CubeController {
         message.alertInformation("CubeManagment", "Cube " + this.cube.getId() + " deleted");
     }
     
+    public void deleteConfigurations() {
+        cubeService.deleteConfigurations(cube);
+        message.alertInformation("CubeManagment", "Configurations for cube " + this.cube.getId() + " deleted");
+    }
+    
     public Cube getCube() {
         return this.cube;
     }

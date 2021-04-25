@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.timeguess.backend.services.FacetsService;
+import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.ui.controllers.StatusController;
 import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.model.api.FacetsResponse;
@@ -19,7 +19,7 @@ import at.timeguess.backend.model.api.StatusResponse;
 public class RaspberryPiController {
 
     @Autowired
-    private FacetsService facetsService;
+    private CubeService cubeService;
     
     @Autowired
     private StatusController statusController;
@@ -32,8 +32,8 @@ public class RaspberryPiController {
      * @return the response
      */
     @PostMapping("/api/facets")
-    private FacetsResponse processFacets(@RequestBody FacetsMessage message) {
-        return facetsService.processFacets(message);
+    private FacetsResponse processFacetsMessage(@RequestBody FacetsMessage message) {
+        return cubeService.processFacetsMessage(message);
     }
     
     /**
