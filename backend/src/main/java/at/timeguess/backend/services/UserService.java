@@ -2,12 +2,15 @@ package at.timeguess.backend.services;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
+import org.hibernate.annotations.Target;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +21,8 @@ import at.timeguess.backend.model.UserRole;
 import at.timeguess.backend.model.utils.GroupingHelper;
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.repositories.UserRepository;
+import at.timeguess.backend.ui.beans.MessageBean;
+import at.timeguess.backend.ui.beans.NewUserBean;
 
 /**
  * Service for accessing and manipulating user data.
@@ -33,6 +38,9 @@ public class UserService {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private MessageBean messageBean;
+
     /**
      * Returns a collection of all users.
      * @return
@@ -46,6 +54,7 @@ public class UserService {
      * Returns a collection of all users with role 'PLAYER'.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public Collection<User> getAllPlayers() {
         return userRepository.findByRole(UserRole.PLAYER);
     }
@@ -54,6 +63,7 @@ public class UserService {
      * Returns a list of all users being team mates of the given user (i.e. belonging to the same teams).
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public Collection<User> getTeammates(User user) {
         return userRepository.findByTeams(user);
     }
@@ -62,6 +72,7 @@ public class UserService {
      * Returns the total number of games played by the given user.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public int getTotalGames(User user) {
         return userRepository.getTotalGames(user);
     }
@@ -70,6 +81,7 @@ public class UserService {
      * Returns the total number of games lost by the given user.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public int getTotalGamesLost(User user) {
         GroupingHelper.List losers = new GroupingHelper.List(gameRepository.findLoserTeams());
         return losers.getSumForIds(userRepository.findAllTeamsIn(user, losers.getIds()));
@@ -79,6 +91,7 @@ public class UserService {
      * Returns the total number of games won by the given user.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public int getTotalGamesWon(User user) {
         GroupingHelper.List winners = new GroupingHelper.List(gameRepository.findWinnerTeams());
         return winners.getSumForIds(userRepository.findAllTeamsIn(user, winners.getIds()));
@@ -88,9 +101,30 @@ public class UserService {
      * Returns the total number of games won by the given user, split up by topic.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public Map<String, Integer> getTotalGamesWonByTopic(User user) {
         GroupingHelper.List winners = new GroupingHelper.List(gameRepository.findWinnerTeamsByTopic());
         return winners.getSumForIdsGroupedByName(userRepository.findAllTeamsIn(user, winners.getIds()));
+    }
+
+    /**
+     * Checks if a user with the given username already exists.
+     * @param username
+     * @return true if the given username is already saved in the database, false otherwise.
+     */
+    @Target(NewUserBean.class)
+    public boolean hasUser(String username) {
+        return userRepository.getTotalByUsername(username) > 0;
+    }
+
+    /**
+     * Loads a single user identified by its id.
+     * @param id the id to search for
+     * @return the user with the given id
+     */
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #username")
+    public User loadUser(Long id) {
+        return userRepository.findById(id).get();
     }
 
     /**
@@ -108,18 +142,36 @@ public class UserService {
      * This method will also set {@link User#createDate} for new entities or {@link User#updateDate} for updated entities.
      * The user requesting this operation will also be stored as {@link User#createDate} or {@link User#updateUser} respectively.
      * @param user the user to save
-     * @return the updated user
+     * @return the saved user
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @Target(NewUserBean.class)
+    @PostAuthorize("hasAuthority('ADMIN') OR #user.id == null OR principal.username eq #user.username")
     public User saveUser(User user) {
-        if (user.isNew()) {
+        // for self registration get any admin user as creator
+        // null would work also (setting the property to optional in User class)
+        // but demo.UserStatusController.afterStatusChange throws an exception then
+        User auth = getAuthenticatedUser();
+        if (auth == null) auth = this.getAdminUser();
+
+        boolean isNew = user.isNew();
+        if (isNew) {
             user.setCreateDate(new Date());
-            user.setCreateUser(getAuthenticatedUser());
-        } else {
-            user.setUpdateDate(new Date());
-            user.setUpdateUser(getAuthenticatedUser());
+            user.setCreateUser(auth);
         }
-        return userRepository.save(user);
+        else {
+            user.setUpdateDate(new Date());
+            user.setUpdateUser(auth);
+        }
+        User ret = userRepository.save(user);
+
+        // show ui message and log
+        messageBean.alertInformation(ret.getUsername(), isNew ? "New user created" : "User updated");
+
+        if (auth == null) auth = ret;
+        LOGGER.info("User '{}' (id={}) was {} by User '{}' (id={})", ret.getUsername(), ret.getId(),
+                isNew ? "created" : "updated", auth.getUsername(), auth.getId());
+
+        return ret;
     }
 
     /**
@@ -128,15 +180,30 @@ public class UserService {
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteUser(User user) {
-        userRepository.delete(user);
+        try {
+            userRepository.delete(user);
 
-        User authUser = getAuthenticatedUser();
-        LOGGER.info("User {} '{}' was deleted by User {} '{}'", user.getId(), user.getUsername(), authUser.getId(),
-                authUser.getUsername());
+            // show ui message and log
+            messageBean.alertInformation(user.getUsername(), "User was deleted");
+
+            User auth = getAuthenticatedUser();
+            LOGGER.info("User '{}' (id={}) was deleted by User '{}' (id={})", user.getUsername(), user.getId(),
+                    auth.getUsername(), auth.getId());
+        }
+        catch (Exception e) {
+            messageBean.alertError(user.getUsername(), "Deleting user failed");
+            LOGGER.info("Deleting user '{}' (id={}) failed, stack trace:", user.getUsername(), user.getId());
+            e.printStackTrace();
+        }
     }
 
     User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findFirstByUsername(auth.getName());
+    }
+    
+    private User getAdminUser() {
+        List<User> admins = userRepository.findByRole(UserRole.ADMIN);
+        return admins.size() > 0 ? admins.get(0) : null;
     }
 }

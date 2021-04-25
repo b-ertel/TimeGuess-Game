@@ -16,11 +16,6 @@ public interface UserRepository extends AbstractRepository<User, Long> {
 
     User findFirstByUsername(String username);
 
-    List<User> findByUsernameContaining(String username);
-
-    @Query("SELECT u FROM User u WHERE CONCAT(u.firstName, ' ', u.lastName) = :wholeName")
-    List<User> findByWholeNameConcat(@Param("wholeName") String wholeName);
-
     @Query("SELECT u FROM User u WHERE :role MEMBER OF u.roles")
     List<User> findByRole(@Param("role") UserRole role);
 
@@ -32,4 +27,7 @@ public interface UserRepository extends AbstractRepository<User, Long> {
 
     @Query("SELECT COUNT(g) FROM User u JOIN u.teams t JOIN t.games g WHERE u = ?1")
     int getTotalGames(User user);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.username = ?1")
+    int getTotalByUsername(String username);
 }

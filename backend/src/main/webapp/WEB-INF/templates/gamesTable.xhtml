@@ -10,20 +10,23 @@
                 template="/WEB-INF/templates/main.xhtml">
 
     <ui:define name ="content">
-        <c:set target="#{gameListController}" property="admin" value="#{isAdminAccess and isAdmin}"/>
+        <c:set value="#{isAdminAccess and isAdmin}" target="#{gameListController}" property="admin"/>
         <c:set var="noEditRight" value="#{!(sessionInfoBean.currentUser.username eq game.creator.username or isAdmin)}" />
 
+        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+
         <h:form id="gameListForm">
-            <ui:remove>create game</ui:remove>
+            <ui:remove>create game command</ui:remove>
             <p:menubar id="toolbar" rendered="#{not isAdminAccess}" style="margin-bottom:10px">
-	            <p:menuitem value="&nbsp;Create Game&nbsp;" icon="fa fa-plus"
-	                             oncomplete="PF('gameCreateDialog').show()" update=":gameCreateForm:gameCreateDialog">
-	            </p:menuitem>
+                <p:menuitem value="&nbsp;Create Game&nbsp;" icon="fa fa-plus"
+                    oncomplete="PF('gameCreateDialog').show()" update=":gameCreateForm:gameCreateDialog" />
             </p:menubar>
 
             <ui:remove>show current games for player only</ui:remove>
             <p:dataView id="gameCurrent" widgetVar="gameCurrent" var="game" rendered="#{not isAdminAccess}"
-                        value="#{gameListController.getGamesCurrent(sessionInfoBean.currentUser)}" gridIcon="fa fa-th-large" listIcon="fa fa-bars" styleClass="game">
+                gridIcon="fa fa-th-large" listIcon="fa fa-bars" styleClass="game"
+                value="#{gameListController.getGamesCurrent(sessionInfoBean.currentUser)}"
+                selection="#{gameListController.selectedGame}" selectionMode="single">
 
                 <p:dataViewGridItem>
                     <div class="game-grid-item card border-1">
@@ -35,8 +38,8 @@
                             <span class="game-badge #{game.status}">#{game.status}</span>
                         </div>
                         <div class="game-grid-item-content">
-                            <p:commandLink title="Info" oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog">
-                                <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />                            
+                            <p:commandLink title="Info" oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog :msg">
+                                <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                                 <p:graphicImage name="images/game.jpg" />
                             </p:commandLink>
                             <div class="game-name">#{game.name}</div>
@@ -45,8 +48,9 @@
                         <div class="game-grid-item-bottom">
                             <h:outputText value="Maximum points: #{game.maxPoints}" styleClass="game-points" />
                             <p:commandButton title="Confirm" icon="fa fa-sign-in"
-                                             action="#{gameListController.confirm(sessionInfoBean.currentUser, game)}" update="gameListForm:gameTable :gameListForm:gameCurrent"
-                                             disabled="#{gameListController.disabledConfirmation(sessionInfoBean.currentUser, game)}">
+                                action="#{gameListController.confirm(sessionInfoBean.currentUser, game)}"
+                                update="gameListForm:gameTable :gameListForm:gameCurrent :msg"
+                                disabled="#{gameListController.disabledConfirmation(sessionInfoBean.currentUser, game)}">
                             </p:commandButton>
                         </div>
                     </div>
@@ -55,7 +59,7 @@
                 <p:dataViewListItem>
                     <div class="game-list-item">
                         <p:commandLink title="Info" oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog">
-                            <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />                           
+                            <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                             <p:graphicImage name="images/game.jpg" />
                         </p:commandLink>
                         <div class="game-list-detail">
@@ -66,8 +70,9 @@
                         </div>
                         <div class="game-list-action">
                             <p:commandButton title="Confirm" value="Confirm" icon="fa fa-sign-in"
-                                             action="#{gameListController.confirm(sessionInfoBean.currentUser, game)}" update="gameListForm:gameTable :gameListForm:gameCurrent"
-                                             disabled="#{gameListController.disabledConfirmation(sessionInfoBean.currentUser, game)}">
+                                action="#{gameListController.confirm(sessionInfoBean.currentUser, game)}"
+                                update="gameListForm:gameTable :gameListForm:gameCurrent :msg"
+                                disabled="#{gameListController.disabledConfirmation(sessionInfoBean.currentUser, game)}">
                             </p:commandButton>
                             <span class="game-badge #{game.status}">#{game.status}</span>
                         </div>
@@ -94,7 +99,8 @@
                                 </p:spinner>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="Host" sortBy="#{game.creator.username}" filterBy="#{game.creator.username}" filterMatchMode="contains" style="width:20%"/>
+                        <p:column headerText="Host" sortBy="#{game.creator.username}"
+                            filterBy="#{game.creator.username}" filterMatchMode="contains" style="width:20%"/>
                         <p:column headerText="Manage Game"/>
                         <p:column headerText="Game Info"/>
                     </p:row>
@@ -114,18 +120,23 @@
                 </p:column>
                 <p:column style="text-align:center">
                     <p:commandButton title="Edit" icon="fa fa-edit" disabled="#{not isAdmin}"
-                        oncomplete="PF('gameEditDialog').show()" update=":gameDetailForm:gameEditDialog">
+                        oncomplete="PF('gameEditDialog').show()" update=":gameDetailForm:gameEditDialog :msg">
+                        <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
+                    </p:commandButton>
+                    <p:commandButton title="Edit (new)" icon="fa fa-pencil" disabled="#{not isAdmin}"
+                        oncomplete="PF('gameEditDialog2').show()" update=":gameDetailFormXX:gameEditDialog2 :msg">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                     </p:commandButton>
                     <p:commandButton title="Delete" icon="fa fa-trash" disabled="#{not isAdmin}"
-                                     action="#{gameDetailController.doDeleteGame}" onsuccess="PF('gameTable').filter()" update="gameListForm:gameTable">
+                        action="#{gameDetailController.doDeleteGame}" onsuccess="PF('gameTable').filter()"
+                        update="gameListForm:gameTable :msg">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
-                        <p:confirm header="Confirmation" icon="ui-icon-alert" message="Are you sure about deleting this game? This cannot be undone." />
+                        <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this game? This cannot be undone." />
                     </p:commandButton>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
                     <p:commandButton title="Info" icon="fa fa-info"
-                                     oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog">
+                        oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog :msg">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                     </p:commandButton>
                 </p:column>
@@ -133,38 +144,36 @@
 
             <p:contextMenu for="gameTable" rendered="#{isAdminAccess}">
                 <p:menuitem value="&nbsp;Edit" icon="fa fa-edit"
-                    oncomplete="PF('gameEditDialog').show()" update=":gameDetailForm:gameEditDialog">
+                    oncomplete="PF('gameEditDialog').show()" update=":gameDetailForm:gameEditDialog :msg">
                     <f:setPropertyActionListener value="#{gameListController.selectedGame}" target="#{gameDetailController.game}" />
                 </p:menuitem>
                 <p:menuitem value="&nbsp;Delete" icon="fa fa-trash" action="#{gameDetailController.doDeleteGame}"
-                    onsuccess="PF('gameTable').filter()" update="gameTable">
+                    onsuccess="PF('gameTable').filter()" update="gameTable :msg">
                     <f:setPropertyActionListener value="#{gameListController.selectedGame}" target="#{gameDetailController.game}" />
                     <p:confirm header="Confirmation" icon="fa fa-warning" message="Are you sure about deleting this game? This cannot be undone." />
                 </p:menuitem>
             </p:contextMenu>
         </h:form>
 
-        <h:form id="gameDetailForm" enctype="multipart/form-data">
+        <h:form id="gameDetailForm">
             <ui:remove>edit game</ui:remove>
-            <p:dialog header="Edit Game" id="gameEditDialog" widgetVar="gameEditDialog"
+            <p:dialog header="Edit Game" id="gameEditDialog" widgetVar="gameEditDialog" dynamic="true"
                 modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
                 <p:ajax event="close" update="gameData" process="@parent" resetValues="true" />
 
-                <ui:remove>next line needs to set true if attachments are in a separate tab, false if they are inside the details tab</ui:remove>
                 <c:set var="curr" value="#{gameDetailController.game}" scope="request" />
-
-                <p:growl id="message" showDetail="true" skipDetailIfEqualsSummary="true" />
-
+                <c:set var="topicMsg" value="Topic: Value is required" />
                 <p:outputPanel id="gameData" rendered="#{not empty curr}">
-                       <p:panelGrid columns="2" layout="flex"
-                           columnClasses="p-col-3 p-col-align-center, p-col-9"
-                           contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top:5px">
+                    <p:panelGrid columns="2" layout="flex"
+                        columnClasses="p-col-3 p-col-align-center, p-col-9"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top:5px">
                         <p:outputLabel for="name" value="Name: " />
-                        <p:inputText id="name" value="#{curr.name}" required="true" />
-                              <p:outputLabel for="maxPoints" value="Maximum Points: " />
-                           <p:spinner id="maxPoints" value="#{curr.maxPoints}" min="1" />
+                        <p:inputText id="name" value="#{curr.name}" required="true" maxlength="100" />
+                        <p:outputLabel for="maxPoints" value="Maximum Points: " />
+                        <p:spinner id="maxPoints" value="#{curr.maxPoints}" required="true" min="1" />
                         <h:outputLabel for="topic" value="Choose topic" />
-                        <p:selectOneMenu id="topic" value="#{curr.topic}" converter="omnifaces.SelectItemsConverter">
+                        <p:selectOneMenu id="topic" value="#{curr.topic}" converter="omnifaces.SelectItemsConverter"
+                            required="true" requiredMessage="#{topicMsg}">
                             <p:ajax event="change" process="@this" />
                             <f:selectItem itemLabel="Select" noSelectionOption="true" />
                             <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
@@ -172,58 +181,58 @@
                     </p:panelGrid>
                     <p:separator style="margin-bottom:16px" />
 
-                       <p:panelGrid columns="2" layout="flex"
-                           columnClasses="p-col-6 p-col-align-center, p-col-6"
-                           contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank">
+                    <p:panelGrid columns="2" layout="flex"
+                        columnClasses="p-col-6 p-col-align-center, p-col-6"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank">
                         <p:outputLabel for="createUser" value="Creator: " />
                         <p:outputLabel id="createUser" value="#{curr.creator.firstName} (#{curr.creator.firstName} #{curr.creator.lastName})"/>
                         <h:outputLabel for="state" value="state" />
                         <p:selectOneMenu id="state" value="#{gameDetailController.game.status}">
                             <f:selectItems value="#{dataBean.states}" />
                         </p:selectOneMenu>
-                    </p:panelGrid>    
+                    </p:panelGrid>
                     <p:separator />
-                    
+
                     <p:panelGrid columns="3" styleClass="ui-panelgrid-blank">
                         <p:commandButton value="Save" action="#{gameDetailController.doSaveGame()}"
                             oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameEditDialog').hide(); PF('gameTable').filter(); }" 
-                            update=":gameListForm:gameTable :gameDetailForm:message gameData" />
+                            update=":gameListForm:gameTable gameData :msg" />
                         <p:commandButton value="Reload" action="#{gameDetailController.doReloadGame()}"
-                            process="@parent" update="gameData" resetValues="true"/>
+                            process="@parent" update="gameData :msg" resetValues="true"/>
                         <p:commandButton value="Abort" onsuccess="PF('gameEditDialog').hide()"/>
                     </p:panelGrid>
                 </p:outputPanel>
             </p:dialog>
         </h:form>
 
+
         <h:form id="gameInfoForm">
-            <p:dialog header="Game Info" id="gameInfoDialog" widgetVar="gameInfoDialog" modal="true"
-                      dynamic="true" resizable="false" showEffect="fade" hideEffect="fade" closeOnEscape="true" width="330">
-                <c:set var="curr" value="#{gameDetailController.game}" scope="request"/>
-                <c:set var="creatorInfo" value="#{curr.creator}" scope="request"/><!--  -->
-    
+            <ui:remove>show game info</ui:remove>
+            <p:dialog header="Game Info" id="gameInfoDialog" widgetVar="gameInfoDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" width="330">
+
                 <p:panel id="gameInfoData" rendered="#{not empty curr}">
                     <div class="p-grid">
-                        <div class="p-col-8"><p:outputLabel for="nameInfo" value="Name: "/></div>
-                        <div class="p-col-4"><h:outputLabel id="nameInfo" value="#{curr.name}"/></div>
-                        <div class="p-col-7"><p:outputLabel for="topicInfo" value="Topic: "/></div>
-                        <div class="p-col-5"><h:outputText id="topicInfo" value="#{curr.topic.name}" /></div>
-                        <div class="p-col-9"><p:outputLabel for="maxPointsInfo" value="Maximum Points: " /></div>
-                        <div class="p-col-3"><h:outputLabel id="maxPointsInfo" value="#{curr.maxPoints}" /></div>
+                        <div class="p-col-7"><p:outputLabel for="nameInfo" value="Name: "/></div>
+                        <div class="p-col-5"><h:outputLabel id="nameInfo" value="#{curr.name}" styleClass="rightm10"/></div>
+                        <div class="p-col-6"><p:outputLabel for="topicInfo" value="Topic: "/></div>
+                        <div class="p-col-6"><h:outputText id="topicInfo" value="#{curr.topic.name}" styleClass="rightm10"/></div>
+                        <div class="p-col-9"><p:outputLabel for="maxPointsInfo" value="Maximum Points: "/></div>
+                        <div class="p-col-3"><h:outputLabel id="maxPointsInfo" value="#{curr.maxPoints}" styleClass="rightm10"/></div>
                     </div>
                     <p:separator style="margin-bottom:16px" />
 
                     <div class="p-grid">
                         <div class="p-col-7"><p:outputLabel for="statusInfo" value="Status: "/></div>
-                        <div class="p-col-5"><h:outputText id="statusInfo" value="#{curr.status}"/></div>
+                        <div class="p-col-5"><h:outputText id="statusInfo" value="#{curr.status}" styleClass="rightm10"/></div>
                         <div class="p-col-9"><p:outputLabel for="roundInfo" value="Number of Rounds played: "/></div>
-                        <div class="p-col-3"><h:outputText id="roundInfo" value="#{curr.rounds.size()}"/></div>
+                        <div class="p-col-3"><h:outputText id="roundInfo" value="#{curr.rounds.size()}" styleClass="rightm10"/></div>
                     </div>
                     <p:separator style="margin-bottom:16px" />
 
                     <div class="p-grid">
                         <div class="p-col-8"><p:outputLabel for="createUserInfo" value="Game creator: "/></div>
-                        <div class="p-col-4"><h:outputText id="createUserInfo" value="#{creatorInfo.username}"/></div>
+                        <div class="p-col-4"><h:outputText id="createUserInfo" value="#{curr.creator.username}" styleClass="rightm10"/></div>
                     </div>
 
                     <!-- 
@@ -256,19 +265,22 @@
         </h:form>
 
         <h:form id="gameCreateForm">
-            <p:dialog header="Create Game" id="gameCreateDialog" widgetVar="gameCreateDialog"
-                      modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true">
+            <ui:remove>create new game</ui:remove>            
+            <p:dialog header="Create Game" id="gameCreateDialog" widgetVar="gameCreateDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
+                <p:ajax event="close" update="gameCreateData" process="@parent" resetValues="true" />
 
                 <p:outputPanel id="gameCreateData">
                     <p:panelGrid columns="2" layout="flex"
-                                columnClasses="p-col-3 p-col-align-center, p-col-9"
-                                contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top: 5px ">
+                        columnClasses="p-col-3 p-col-align-center, p-col-9"
+                        contentStyleClass="ui-fluid" styleClass="ui-panelgrid-blank" style="margin-top: 5px">
                         <p:outputLabel for="nameCreate" value="Name: "/>
-                        <p:inputText id="nameCreate" value="#{newGameBean.gameName}" required="true"/>
+                        <p:inputText id="nameCreate" value="#{newGameBean.gameName}" required="true" maxlength="100" />
                         <p:outputLabel for="maxPointsCreate" value="Maximum Points: "/>
-                        <p:spinner id="maxPointsCreate" value="#{newGameBean.maxPoints}" min="1" />
+                        <p:spinner id="maxPointsCreate" value="#{newGameBean.maxPoints}" required="true" min="1" />
                         <h:outputLabel for="topicCreate" value="Choose topic" />
-                        <p:selectOneMenu id="topicCreate" value="#{newGameBean.topic}" converter="omnifaces.SelectItemsConverter">
+                        <p:selectOneMenu id="topicCreate" value="#{newGameBean.topic}" converter="omnifaces.SelectItemsConverter"
+                            required="true" requiredMessage="#{topicMsg}">
                             <p:ajax event="change" process="@this" />
                             <f:selectItem itemLabel="Select" noSelectionOption="true" />
                             <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
@@ -278,24 +290,33 @@
 
                     <h:panelGrid columns="3">
                         <p:commandButton value="Save" action="#{newGameBean.createGame()}"
-                                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); PF('gameTable').filter(); }"
-                                         update=":gameListForm:gameTable :gameListForm:gameCurrent :gameDetailForm:message gameCreateData"/>
+                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); }"
+                            update=":gameListForm :gameInfoForm:gameInfoData gameCreateData :msg">
+                        </p:commandButton>
                         <p:commandButton value="Reload" action="#{newGameBean.clearFields()}"
-                                         process="@parent" update=":gameCreateForm:gameCreateData" resetValues="true"/>
+                            process="@parent" update=":gameCreateForm:gameCreateData :msg" resetValues="true"/>
                         <p:commandButton value="Abort" onclick="PF('gameCreateDialog').hide()"/>
                     </h:panelGrid>
-    
+
                 </p:outputPanel>
             </p:dialog>
         </h:form>
 
         <h:form>
-            <p:confirmDialog id="deleteGameConfirm" global="true" showEffect="fade" hideEffect="fade" width="40%">
-                <p:commandButton value="Yes" type="button" icon="fa fa-check" styleClass="ui-confirmdialog-yes" />
+            <ui:remove>delete game confirmation</ui:remove>
+            <p:confirmDialog id="deleteGameConfirm" global="true" closeOnEscape="true" showEffect="fade" hideEffect="fade" width="40%">
                 <p:commandButton value="No" type="button" icon="fa fa-times" styleClass="ui-confirmdialog-no" />
+                <p:commandButton value="Yes" type="button" icon="fa fa-check" styleClass="ui-confirmdialog-yes" />
             </p:confirmDialog>
             <p:draggable for="deleteGameConfirm"/>
         </h:form>
 
+        <ui:include src="/WEB-INF/includes/game_editor.xhtml" >
+            <ui:param name="formName" value="gameDetailFormXX" />
+            <ui:param name="dialogName" value="gameEditDialog2" />
+            <ui:param name="gdc" value="#{gameDetailController}" />
+            <ui:param name="parentTable" value=":gameListForm:gameTable"/>
+            <ui:param name="parentName" value="gameTable"/>
+        </ui:include >
     </ui:define>
 </ui:composition>

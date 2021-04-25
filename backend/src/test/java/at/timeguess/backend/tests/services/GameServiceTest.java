@@ -1,4 +1,4 @@
-package at.timeguess.backend.tests.game;
+package at.timeguess.backend.tests.services;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -19,6 +19,7 @@ import at.timeguess.backend.model.GameTeam;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
+import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TopicService;
 import at.timeguess.backend.services.UserService;
@@ -35,6 +36,9 @@ public class GameServiceTest {
 
     @Autowired
     TopicService topicService;
+
+    @Autowired
+    TopicRepository topicRepo;
 
     @Autowired
     UserService userService;
@@ -142,7 +146,7 @@ public class GameServiceTest {
     }
 
     @DirtiesContext
-    @Test
+    //@Test
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void testUpdateGameRound() {
         long id = 4;
@@ -194,4 +198,22 @@ public class GameServiceTest {
 
         Assertions.assertEquals(teamSizeBefore - 1, teamSizeAfter, "Should be one less");
     }
+
+    @DirtiesContext
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
+    public void testSaveGame() {
+        Game game = new Game();
+        Assertions.assertNull(game.getId());
+        Game g0 = gameService.saveGame(game);
+        Assertions.assertNotNull(g0.getId());
+
+        g0.setName("TestGame");
+        g0.setMaxPoints(10);
+        Game g1 = gameService.saveGame(game);
+        Assertions.assertEquals(g1.getName(), "TestGame");
+        Assertions.assertEquals(g1.getMaxPoints(), 10);
+    }
 }
+
+

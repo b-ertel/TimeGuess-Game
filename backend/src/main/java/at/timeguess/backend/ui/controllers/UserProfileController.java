@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.UserService;
@@ -15,7 +16,7 @@ import at.timeguess.backend.services.UserService;
  * Controller for the user profile view.
  */
 @Component
-@Scope("view")
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class UserProfileController implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,7 +51,7 @@ public class UserProfileController implements Serializable {
      * Action to force a reload of the currently displayed user.
      */
     public void doReloadUser() {
-        user = userService.loadUser(user.getUsername());
+        user = userService.loadUser(user.getId());
     }
 
     /**

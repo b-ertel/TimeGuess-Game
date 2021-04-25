@@ -1,12 +1,18 @@
 package at.timeguess.backend.repositories;
 
+import java.util.List;
+
 import at.timeguess.backend.model.Configuration;
+import at.timeguess.backend.model.Cube;
 
 public interface ConfigurationRepository extends AbstractRepository<Configuration, Long> {
 
-    public Configuration findByCube(Long id);
+    /**
+     * Find all configurations for a given cube.
+     * 
+     * @param cube the cube
+     * @return the list of configurations
+     */
+    List<Configuration> findByCube(Cube cube);
 
-    public Configuration findByCubeface(Long id);
-
-    public Configuration findByFacet(Integer facet);
 }

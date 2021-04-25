@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
-import at.timeguess.backend.services.CubeFaceService;
+import at.timeguess.backend.services.CubeService;
 
 /**
  * @author a controller to manage {@link CubeFace} un UI 
@@ -19,7 +19,7 @@ import at.timeguess.backend.services.CubeFaceService;
 public class CubeFaceController {
 	
 	@Autowired
-	CubeFaceService cubeFaceService;
+	CubeService cubeService;
 	
 	private CubeFace cubeFace;
 	
@@ -27,7 +27,7 @@ public class CubeFaceController {
 	 * @return a list of all CubeFace entities
 	 */
 	public List<CubeFace> getAllCubeFaces(){
-		return cubeFaceService.allCubeFaces();
+		return cubeService.allCubeFaces();
 	}
 
 	public CubeFace getCubeFace() {
@@ -37,5 +37,5 @@ public class CubeFaceController {
 	public void setCubeFace(CubeFace cubeface) {
 		this.cubeFace = cubeface;
 	}
-
+	
 }
