@@ -182,6 +182,31 @@ public class StatusController {
 	public void setInGame(String macAddress) {
 		statusChange(macAddress, CubeStatus.IN_GAME);
 	}
+	
+	/**
+	 * changes status of cube to {@link CubeStatus.READY}
+	 * @param macAddress of the cubes which should be set to {@link CubeStatus.READY}
+	 */
+	public void setReady(String macAddress) {
+		statusChange(macAddress, CubeStatus.READY);
+	}
+	
+	/**
+	 * changes status of cube to {@link CubeStatus.LIVE}
+	 * @param macAddress of the cubes which should be set to {@link CubeStatus.LIVE}
+	 */
+	public void setLive(String macAddress) {
+		statusChange(macAddress, CubeStatus.LIVE);
+	}
+	
+	/**
+	 * checks if a Cube is configured i.e. if there is any entry for it in the Configuration Table
+	 * 
+	 * @return true if it has a Configuration, false otherwise
+	 */
+	public boolean isConfigured(Cube cube) {
+		return cubeService.isConfigured(cube);
+	}
 
 	/**
 	 * @return interval of reporting period of the cube
@@ -203,6 +228,18 @@ public class StatusController {
 	public void deleteStatus(String macAddress) {
 		this.cubeStatus.remove(macAddress);
 		updateSockets();
+	}
+	
+	/** changes Status if configuration is deleted via UI
+	 * @param macAddress of cube which status should be changed
+	 */
+	public void changeStatus(String macAddress) {
+		if(this.cubeStatus.get(macAddress).getStatus().equals(CubeStatus.LIVE)){
+			statusChange(macAddress, CubeStatus.READY);
+		}
+		else {
+			statusChange(macAddress, CubeStatus.OFFLINE);
+		}
 	}
 	
 	/**
