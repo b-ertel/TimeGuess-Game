@@ -54,6 +54,7 @@ public class UserService {
      * Returns a collection of all users with role 'PLAYER'.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public Collection<User> getAllPlayers() {
         return userRepository.findByRole(UserRole.PLAYER);
     }
@@ -62,6 +63,7 @@ public class UserService {
      * Returns a list of all users being team mates of the given user (i.e. belonging to the same teams).
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public Collection<User> getTeammates(User user) {
         return userRepository.findByTeams(user);
     }
@@ -70,6 +72,7 @@ public class UserService {
      * Returns the total number of games played by the given user.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public int getTotalGames(User user) {
         return userRepository.getTotalGames(user);
     }
@@ -78,6 +81,7 @@ public class UserService {
      * Returns the total number of games lost by the given user.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public int getTotalGamesLost(User user) {
         GroupingHelper.List losers = new GroupingHelper.List(gameRepository.findLoserTeams());
         return losers.getSumForIds(userRepository.findAllTeamsIn(user, losers.getIds()));
@@ -87,6 +91,7 @@ public class UserService {
      * Returns the total number of games won by the given user.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public int getTotalGamesWon(User user) {
         GroupingHelper.List winners = new GroupingHelper.List(gameRepository.findWinnerTeams());
         return winners.getSumForIds(userRepository.findAllTeamsIn(user, winners.getIds()));
@@ -96,6 +101,7 @@ public class UserService {
      * Returns the total number of games won by the given user, split up by topic.
      * @return
      */
+    @PreAuthorize("hasAuthority('PLAYER')")
     public Map<String, Integer> getTotalGamesWonByTopic(User user) {
         GroupingHelper.List winners = new GroupingHelper.List(gameRepository.findWinnerTeamsByTopic());
         return winners.getSumForIdsGroupedByName(userRepository.findAllTeamsIn(user, winners.getIds()));

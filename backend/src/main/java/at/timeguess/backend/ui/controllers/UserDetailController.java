@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
@@ -21,7 +22,7 @@ import at.timeguess.backend.ui.beans.MessageBean;
  * Controller for the user detail view.
  */
 @Component
-@Scope("view")
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class UserDetailController implements Serializable {
 
     private static final long serialVersionUID = 1L;
