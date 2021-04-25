@@ -149,7 +149,7 @@
 						<p:column>
 							<p:commandButton title="Assign"
 								disabled="#{empty cubeConfigurationController.facet}"
-								update="cubeConfigurationForm:cubeConfigurationOutputPanel">
+								update="cubeConfigurationForm:cubeConfigurationOutputPanel :msg">
 								<f:actionListener
 									binding="#{cubeConfigurationController.assign(cubeFace)}" />
 							</p:commandButton>
@@ -159,7 +159,10 @@
 					<p:panel>
 						<p:commandButton title="Submit"
 							action="#{cubeConfigurationController.submit()}"
-							disabled="#{!cubeConfigurationController.isConfigured()}" />
+							disabled="#{!cubeConfigurationController.isConfigured()}"
+							onclick="PF('cubeConfigurationDialog').hide()"
+							oncomplete="PF('cubeUseDialog').show()"
+							update=":cubeDetailForm:cubeUseDialog :msg" />
 					</p:panel>
 				</p:outputPanel>
 
