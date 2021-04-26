@@ -164,4 +164,3 @@ public class CubeConfigurationController implements Consumer<UnconfiguredFacetsE
     }
 
 }
-
