@@ -57,6 +57,16 @@
                                            var="state"
                                            itemDisabled="#{not( gdc.canTraverse(state) )}"/>
                         </p:selectOneMenu>
+
+                        <h:outputLabel for="cube" value="cube" />
+                        <p:selectOneMenu id="cube" 
+                                         value="#{gameDetailController.game.cube}"
+                                         converter="omnifaces.SelectItemsConverter" >
+                            <f:selectItem itemLabel="NONE" noSelectionOption="true" />
+                            <f:selectItems value="#{cubeService.allCubes()}" 
+                                           var="ccube"
+                                           itemDisabled="#{not(cubeService.isConfigured(ccube))}"/>
+                        </p:selectOneMenu>
                     </p:panelGrid>
                     <p:separator />
 

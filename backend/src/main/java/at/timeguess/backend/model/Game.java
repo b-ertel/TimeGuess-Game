@@ -59,6 +59,9 @@ public class Game implements Serializable, Persistable<Long> {
     @ManyToOne
     private User creator;
 
+    @ManyToOne
+    private Cube cube;
+
     public Long getId() {
         return id;
     }
@@ -155,6 +158,20 @@ public class Game implements Serializable, Persistable<Long> {
      */
     public void setCreator(User creator) {
         this.creator = creator;
+    }
+
+    /**
+     * @return the cube
+     */
+    public Cube getCube() {
+        return cube;
+    }
+
+    /**
+     * @param cube the cube to set
+     */
+    public void setCube(Cube cube) {
+        this.cube = cube;
     }
 
     @Override
