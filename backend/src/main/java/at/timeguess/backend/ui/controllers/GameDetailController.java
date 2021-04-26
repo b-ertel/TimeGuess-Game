@@ -1,15 +1,15 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
@@ -23,6 +23,7 @@ import at.timeguess.backend.ui.beans.MessageBean;
  * Controller for the game detail view.
  */
 @Component
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class GameDetailController implements Serializable {
 
     private static final long serialVersionUID = -3429788166384535247L;

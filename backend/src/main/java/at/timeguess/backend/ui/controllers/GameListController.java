@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import org.springframework.web.context.WebApplicationContext;
+
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.GameService;
@@ -13,7 +15,7 @@ import at.timeguess.backend.services.GameService;
  * Controller for the game list view.
  */
 @Component
-@Scope("view")
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class GameListController {
 
     @Autowired

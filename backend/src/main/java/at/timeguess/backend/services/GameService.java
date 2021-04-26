@@ -4,10 +4,11 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ import at.timeguess.backend.ui.beans.MessageBean;
  * Service for accessing and manipulating game data.
  */
 @Component
-@Scope("application")
+@ApplicationScoped
 public class GameService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);

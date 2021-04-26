@@ -6,6 +6,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
@@ -16,7 +17,7 @@ import at.timeguess.backend.services.GameService;
  * Bean for creating a new game.
  */
 @Component
-@Scope("view")
+@Scope(WebApplicationContext.SCOPE_REQUEST)
 public class NewGameBean implements Serializable {
 
     private static final long serialVersionUID = -4340754545184734831L;
