@@ -161,15 +161,13 @@ public class CubeService {
     }
 
     /**
-     * Process a message recieved through the REST API signaling a change
-     * in the facets characteristic of a cube.
+     * Process a {@link FacetsMessage}.
      *  
      * @param message the message
      * @return the response
      */
     public FacetsResponse processFacetsMessage(FacetsMessage message) {
         String identifier = message.getIdentifier();
-        int calibrationVersion = message.getCalibrationVersion();
         int facet = message.getFacet();
         if (isMacAddressKnown(identifier)) {
             Cube cube = getByMacAddress(identifier);
@@ -182,7 +180,6 @@ public class CubeService {
             }
         }
         FacetsResponse response = new FacetsResponse();
-        response.setCalibrationVersion(calibrationVersion);
         return response;
     }
 

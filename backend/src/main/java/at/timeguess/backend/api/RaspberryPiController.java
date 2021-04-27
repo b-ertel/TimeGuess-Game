@@ -25,8 +25,7 @@ public class RaspberryPiController {
     private StatusController statusController;
 
     /**
-     * Process messages from a TimeFlip device signaling
-     * a change of the facets characteristic.
+     * Process a {@link FacetsMessage}.
      * 
      * @param message the message
      * @return the response
