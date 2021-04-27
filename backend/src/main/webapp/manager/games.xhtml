@@ -6,4 +6,12 @@
     <ui:include src="/WEB-INF/templates/gamesTable.xhtml">
         <ui:param name="isAdminAccess" value="#{true}" />
     </ui:include>
+    
+    <ui:include src="/WEB-INF/includes/gameDetails.xhtml" >
+        <ui:param name="formName" value="gameDetailFormXX" />
+        <ui:param name="dialogName" value="gameEditDialog2" />
+        <ui:param name="gdc" value="#{gameDetailController}" />
+        <ui:param name="parentTable" value=":gameListForm:gameTable"/>
+        <ui:param name="parentName" value="gameTable"/>
+    </ui:include >
 </ui:composition>

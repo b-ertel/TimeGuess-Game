@@ -1,6 +1,5 @@
 package at.timeguess.backend.services;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,21 +40,30 @@ public class UserService {
     private MessageBean messageBean;
 
     /**
-     * Returns a collection of all users.
+     * Returns a list of all users.
      * @return
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Collection<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     /**
-     * Returns a collection of all users with role 'PLAYER'.
+     * Returns a list of all users with role 'PLAYER'.
      * @return
      */
     @PreAuthorize("hasAuthority('PLAYER')")
-    public Collection<User> getAllPlayers() {
+    public List<User> getAllPlayers() {
         return userRepository.findByRole(UserRole.PLAYER);
+    }
+
+    /**
+     * Returns a list of all users with role 'PLAYER', which are not currently playing.
+     * @return
+     */
+    @PreAuthorize("hasAuthority('PLAYER')")
+    public List<User> getAvailablePlayers() {
+        return userRepository.findAvailablePlayers();
     }
 
     /**
@@ -64,7 +71,7 @@ public class UserService {
      * @return
      */
     @PreAuthorize("hasAuthority('PLAYER')")
-    public Collection<User> getTeammates(User user) {
+    public List<User> getTeammates(User user) {
         return userRepository.findByTeams(user);
     }
 
@@ -118,6 +125,15 @@ public class UserService {
     }
 
     /**
+     * Checks if the given user is currently playing or not.
+     * @return
+     */
+    @PreAuthorize("hasAuthority('PLAYER')")
+    public boolean isAvailablePlayer(User user) {
+        return userRepository.getIsAvailablePlayer(user);
+    }
+
+    /**
      * Loads a single user identified by its id.
      * @param id the id to search for
      * @return the user with the given id
@@ -145,7 +161,7 @@ public class UserService {
      * @return the saved user
      */
     @Target(NewUserBean.class)
-    @PostAuthorize("hasAuthority('ADMIN') OR #user.id == null OR principal.username eq #user.username")
+    @PreAuthorize("hasAuthority('ADMIN') OR #user.id == null OR principal.username eq #user.username")
     public User saveUser(User user) {
         // for self registration get any admin user as creator
         // null would work also (setting the property to optional in User class)
@@ -201,7 +217,7 @@ public class UserService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findFirstByUsername(auth.getName());
     }
-    
+
     private User getAdminUser() {
         List<User> admins = userRepository.findByRole(UserRole.ADMIN);
         return admins.size() > 0 ? admins.get(0) : null;

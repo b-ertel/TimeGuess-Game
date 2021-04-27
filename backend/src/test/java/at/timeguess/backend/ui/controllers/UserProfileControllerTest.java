@@ -3,7 +3,7 @@ package at.timeguess.backend.ui.controllers;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -53,11 +53,11 @@ public class UserProfileControllerTest {
     @ValueSource(longs = { 4, 5, 6, 89, 888 })
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testGetTeammates(Long userId) {
-        Collection<User> users = TestUtils.createUsers(10);
+        List<User> users = TestUtils.createEntities(TestUtils::createUser, 10);
         User user = assertMockUser(userId);
         when(userService.getTeammates(user)).thenReturn(users);
 
-        Collection<User> result = userProfileController.getTeammates();
+        List<User> result = userProfileController.getTeammates();
 
         verify(userService).getTeammates(user);
         assertEquals(users, result);

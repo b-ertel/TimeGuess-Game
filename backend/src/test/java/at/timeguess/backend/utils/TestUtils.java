@@ -24,8 +24,8 @@ public class TestUtils {
     public final static Map<Integer, UserRole> USERROLES;
 
     /**
-     * List of arguments for parameterized tests: user + map of pairs topic/count
-     * To be extracted by a separate method producing a stream for JUnit5
+     * List of arguments for parameterized tests: user + map of pairs topic/count To be extracted by a separate method
+     * producing a stream for JUnit5
      */
     public final static List<Arguments> USER_TOTALWINSBYTOPIC;
 
@@ -36,16 +36,16 @@ public class TestUtils {
         USERROLES.put(3, UserRole.PLAYER);
 
         USER_TOTALWINSBYTOPIC = List.of(
-            Arguments.of("admin", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 0 } })),
-            Arguments.of("user1", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 1 } })),
-            Arguments.of("user2", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 1 }, { "STAR WARS", 0 } })),
-            Arguments.of("elvis", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 0 } })),
-            Arguments.of("michael", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 1 }, { "STAR WARS", 1 } })),
-            Arguments.of("felix", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 1 } })),
-            Arguments.of("lorenz", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 1 }, { "STAR WARS", 0 } })),
-            Arguments.of("verena", toMap(new Object[][] { { "GEOGRAPHY", 1 }, { "MOVIES", 0 }, { "STAR WARS", 0 } })),
-            Arguments.of("claudia", toMap(new Object[][] { { "GEOGRAPHY", 1 }, { "MOVIES", 1 }, { "STAR WARS", 0 } })),
-            Arguments.of("clemens", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 1 } })));
+                Arguments.of("admin",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 0 } })),
+                Arguments.of("user1",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 1 } })),
+                Arguments.of("user2",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 1 }, { "STAR WARS", 0 } })),
+                Arguments.of("elvis",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 0 } })),
+                Arguments.of("michael", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 1 }, { "STAR WARS", 1 } })),
+                Arguments.of("felix",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 1 } })),
+                Arguments.of("lorenz",  toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 1 }, { "STAR WARS", 0 } })),
+                Arguments.of("verena",  toMap(new Object[][] { { "GEOGRAPHY", 1 }, { "MOVIES", 0 }, { "STAR WARS", 0 } })),
+                Arguments.of("claudia", toMap(new Object[][] { { "GEOGRAPHY", 1 }, { "MOVIES", 1 }, { "STAR WARS", 0 } })),
+                Arguments.of("clemens", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 1 } })));
     }
 
     /**
@@ -61,7 +61,7 @@ public class TestUtils {
 
     /**
      * Creates a simple user with the given id only
-     * @param username
+     * @param userid
      * @return
      */
     public static User createUser(Long userid) {
@@ -70,12 +70,41 @@ public class TestUtils {
         return user;
     }
 
-    public static List<User> createUsers(int count) {
-        List<User> list = new ArrayList<>();
+    /**
+     * Creates a list of the given number of entities, constructing each with the given function and an arbitrary long value
+     * @param count
+     * @param createEntity
+     * @return
+     */
+    public static <T> List<T> createEntities(Function<Long, T> createEntity, int count) {
+        List<T> list = new ArrayList<>();
         for (long i = 0; i < count; i++) {
-            list.add(TestUtils.createUser((i + 1) * 10));
+            list.add(createEntity.apply((i + 1) * 10));
         }
         return list;
+    }
+
+    /**
+     * Creates a list of entities from the given string list, constructing each with the given function
+     * @param fromList
+     * @param createEntity
+     * @return
+     */
+    public static <T> List<T> createEntities(Function<String, T> createEntity, Collection<String> fromList) {
+        return fromList.stream().map(createEntity).collect(Collectors.toList());
+    }
+
+    /**
+     * Compares the given lists using the {@link compareTo} function on all contained items.
+     * @param <T>
+     * @param expected
+     * @param result
+     */
+    public static <T extends Comparable<T>> void assertLists(Collection<T> expected, Collection<T> result) {
+        assertTrue(expected.size() == result.size());
+
+        List<T> notInBoth = result.stream().filter(r -> expected.stream().filter(e -> e.compareTo(r) == 0).count() != 1).collect(Collectors.toList());
+        assertTrue(notInBoth.size() == 0, "expected and result lists should correspond, but don't");
     }
 
     /**
@@ -86,8 +115,7 @@ public class TestUtils {
      * @param expectResult true if the list is expected to contain elements, false if not
      * @param checker      a functor checking each element in the list
      */
-    public static <T> void assertResultList(Collection<T> result, String errMsg, boolean expectResult,
-            Function<T, Boolean> checker) {
+    public static <T> void assertResultList(Collection<T> result, String errMsg, boolean expectResult, Function<T, Boolean> checker) {
         assertNotNull(result, "resulting list must not be null");
         assertTrue(expectResult ? result.size() > 0 : result.size() == 0, "was " + (expectResult ? "" : "not") + " expecting a result");
 
@@ -99,5 +127,4 @@ public class TestUtils {
     private static Map<String, Integer> toMap(Object[][] values) {
         return Stream.of(values).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1]));
     }
-
 }

@@ -15,8 +15,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
-import at.timeguess.backend.model.GameTeam;
 import at.timeguess.backend.model.Round;
+import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.repositories.TopicRepository;
@@ -146,7 +146,7 @@ public class GameServiceTest {
     }
 
     @DirtiesContext
-    //@Test
+    // @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void testUpdateGameRound() {
         long id = 4;
@@ -178,7 +178,7 @@ public class GameServiceTest {
         long id = 4;
         Game game = gameService.loadGame(id);
         Assertions.assertNotNull(game, "Game \"" + id + "\" could not be loaded from test data source");
-        Set<GameTeam> teams = game.getTeams();
+        Set<Team> teams = game.getTeams();
 
         Assertions.assertTrue(teams.size() > 0, "there should be teams");
 
@@ -186,10 +186,10 @@ public class GameServiceTest {
 
         // TODO check adding team
         // quickly find an element to remove
-        List<GameTeam> rl = teams.stream().collect(Collectors.toList());
+        List<Team> rl = teams.stream().collect(Collectors.toList());
         teams.remove(rl.get(0));
 
-        // NOTE need to explicitely setTeams
+        // NOTE need to explicitly setTeams
         game.setTeams(teams);
         gameService.saveGame(game);
 
@@ -215,5 +215,3 @@ public class GameServiceTest {
         Assertions.assertEquals(g1.getMaxPoints(), 10);
     }
 }
-
-

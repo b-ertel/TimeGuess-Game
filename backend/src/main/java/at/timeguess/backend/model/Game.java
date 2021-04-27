@@ -2,7 +2,6 @@ package at.timeguess.backend.model;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,7 +24,7 @@ public class Game implements Serializable, Persistable<Long> {
 
     private int maxPoints;
 
-    private GameState status; // more finegrained replacement for status
+    private GameState status; // more fine grained replacement for status
 
     private int roundNr;
 
@@ -113,26 +112,12 @@ public class Game implements Serializable, Persistable<Long> {
         this.rounds = rounds;
     }
 
-    public Set<GameTeam> getTeams() {
-        return teams;
+    public Set<Team> getTeams() {
+        return teams.stream().map(GameTeam::getTeam).collect(Collectors.toSet());
     }
 
-    public void setTeams(Set<GameTeam> teams) {
-        this.teams = teams;
-    }
-
-    // NOTE for the editing its convenient to have the Teams directly
-    public List<Team> getActualTeams(){
-        return teams.stream().map(gt -> gt.getTeam()).collect(Collectors.toList());
-    }
-
-    public void setActualTeams(List<Team> newTeams){
-        teams = teams.stream().filter(t -> newTeams.contains(t.getTeam())).collect(Collectors.toSet());
-        
-        newTeams.removeAll(getActualTeams());
-        // from here newTeams only contains teams not already joined
-        List<GameTeam> newGameTeams = newTeams.stream().map(t -> new GameTeam(this, t)).collect(Collectors.toList());
-        teams.addAll(newGameTeams);
+    public void setTeams(Set<Team> teams) {
+        this.teams = teams.stream().map(t -> new GameTeam(this, t)).collect(Collectors.toSet());
     }
 
     public Topic getTopic() {
@@ -157,35 +142,36 @@ public class Game implements Serializable, Persistable<Long> {
         this.creator = creator;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 7;
-        int result = 17;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + ((topic == null) ? 0 : topic.hashCode());
-        result = prime * result + ((creator == null) ? 0 : creator.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        final Game o2 = (Game) obj;
-
-        return Objects.equals(id, o2.getId())
-                && Objects.equals(name, o2.getName())
-                && Objects.equals(topic, o2.getTopic())
-                && Objects.equals(creator, o2.getCreator());
-    }
-
     public Set<User> getConfirmedUsers() {
         return confirmedUsers;
     }
 
     public void setConfirmedUsers(Set<User> confirmedUsers) {
         this.confirmedUsers = confirmedUsers;
+    }
+
+    public int getTeamCount() {
+        return teams == null ? 0 : teams.size();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 7;
+        int result = 17;
+        result = prime * result + (id == null ? 0 : id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        final Game other = (Game) obj;
+        return Objects.equals(getId(), other.getId());
     }
 
     @Override

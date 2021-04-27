@@ -22,12 +22,12 @@
 	        <p:outputLabel value="Game: #{startRoundController.game.name}"/>
 	          <br />  
 	        <p:outputLabel value="Round: #{startRoundController.game.rounds.size()}"/>
-	        <p:dataTable id="team" var="gameTeam" value="#{startRoundController.teams}">
+	        <p:dataTable id="team" var="team" value="#{startRoundController.teams}">
 				            <p:column headerText="Id">
-				                <h:outputText value="#{gameTeam.team.id}" />
+				                <h:outputText value="#{team.id}" />
 				            </p:column>
 				            <p:column headerText="Name">
-                                <h:outputText value="#{gameTeam.team.name}" />
+                                <h:outputText value="#{team.name}" />
 			                </p:column>
 				        </p:dataTable> 
 		     <p:panel rendered="#{not empty startRoundController.message!=null}">

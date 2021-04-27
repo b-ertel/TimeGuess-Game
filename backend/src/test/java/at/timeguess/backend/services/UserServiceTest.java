@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -265,14 +264,27 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAllPlayers() {
-        List<String> usernames = Arrays.asList("admin", "user1", "user2", "michael", "felix", "lorenz", "verena", "claudia", "clemens");
-        List<User> users = usernames.stream().map(TestUtils::createUser).collect(Collectors.toList());
+        List<User> expected = TestUtils.createEntities(TestUtils::createUser, Arrays.asList("admin", "user1", "user2", "michael", "felix", "lorenz", "verena", "claudia", "clemens"));
+        Collection<User> result = userService.getAllPlayers();
 
-        Collection<User> results = userService.getAllPlayers();
-        // can't just compare both lists because dummy list does not contain User.ids, which User.equals compares
-        // => this way User.compareTo can be covered also
-        List<User> notInBoth = results.stream().filter(r -> users.stream().filter(u -> u.compareTo(r) == 0).count() < 1).collect(Collectors.toList());
-        assertTrue(notInBoth.size() == 0, "input and output user lists should correspond, but don't");
+        TestUtils.assertLists(expected, result);
+    }
+
+    @Test
+    @WithMockUser(username = "user2", authorities = { "PLAYER" })
+    public void testGetAvailablePlayers() {
+        List<User> expected = TestUtils.createEntities(TestUtils::createUser, Arrays.asList("admin", "user2", "michael", "felix", "claudia"));
+        Collection<User> result = userService.getAvailablePlayers();
+
+        TestUtils.assertLists(expected, result);
+    }
+
+    //@CsvSource(delimiter = '|', value = { "admin|true", "user1|true", "user2|true", "elvis|false", "michael|true", "felix|true", "lorenz|true", "verena|true", "claudia|true", "clemens|true" })
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = { "1|true", "2|false", "3|true", "4|false", "5|true", "6|true", "7|false", "8|false", "9|true", "10|false", "11|false" })
+    @WithMockUser(username = "user2", authorities = { "PLAYER" })
+    public void testIsAvailablePlayer(long userid, boolean expected) {
+        assertEquals(expected, userService.isAvailablePlayer(TestUtils.createUser(userid)));
     }
 
     @ParameterizedTest

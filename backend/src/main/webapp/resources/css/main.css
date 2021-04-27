@@ -302,6 +302,19 @@ table {
     margin-left: -15px;
 }
 
+.ui-dialog-content.ui-widget-content table {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.ui-dialog-content.ui-widget-content td {
+    text-align: center;
+}
+
+#gameCreateData .ui-menu .ui-menuitem {
+	float: right;
+}
+
 #userCreateData .ui-panelgrid-cell.p-col-7, #userData .ui-panelgrid-cell.p-col-7 {
     height: 40px;
 }
@@ -326,8 +339,4 @@ table {
     float: right;
     text-align: right;
     margin-right: 20px;
-}
-
-.left35 {
-    margin-left: 35px;
 }

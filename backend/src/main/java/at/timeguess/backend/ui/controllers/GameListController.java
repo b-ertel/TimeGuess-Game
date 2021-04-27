@@ -24,7 +24,8 @@ public class GameListController {
     private Boolean isAdmin = null;
 
     /**
-     * Sets whether this instance is used for administrative access or not (different lists are returned by {@link getGames()}.
+     * Sets whether this instance is used for administrative access or not
+     * (different lists are returned by {@link getGames()}.
      * @param isAdmin
      */
     public void setAdmin(Boolean isAdmin) {
@@ -49,15 +50,17 @@ public class GameListController {
      * Returns a list of all current games for the given user.
      */
     public Collection<Game> getGamesCurrent(User user) {
-        return gameService.getAllGames();//TODO: use this for production: gameService.getByUser(user, true);
+        // TODO: use this for production (IMPORTANT!):
+        // gameService.getByUser(user, true);
+        return gameService.getAllGames();
     }
 
     /**
-     * Returns and sets a list of games, by default all returned by {@link getGames()} (helper methods for primefaces datatable filter and sort).
+     * Returns and sets a list of games, by default all returned by {@link getGames()}
+     * (helper methods for primefaces datatable filter and sort).
      */
     public Collection<Game> getFilterGames() {
-        if (filterGames == null)
-            filterGames = getGames();
+        if (filterGames == null) filterGames = getGames();
         return filterGames;
     }
 
@@ -77,21 +80,21 @@ public class GameListController {
     }
 
     /**
-     * Confirms given users participation in given game.
-     * @param user user whose participation in given game is confirmed.
-     * @param game game for which to confirm given users participation.
-     */
-    public void confirm(User user, Game game) {
-        this.gameService.confirm(user, game);
-    }
-
-    /**
      * Returns whether participation confirmation is possible for the given user and game.
      * @param user the user whose participation confirmation is checked for the given game.
      * @param game the game whose participation confirmation is checked for the given user.
      * @return true if participation confirmation is disabled, false otherwise.
      */
-    public boolean disabledConfirmation(User user, Game game) {
+    public boolean isDisabledConfirmation(User user, Game game) {
         return gameService.disabledConfirmation(user, game);
+    }
+
+    /**
+     * Confirms given users participation in given game.
+     * @param user user whose participation in given game is confirmed.
+     * @param game game for which to confirm given users participation.
+     */
+    public void doConfirm(User user, Game game) {
+        this.gameService.confirm(user, game);
     }
 }

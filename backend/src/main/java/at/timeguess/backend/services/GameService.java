@@ -1,8 +1,6 @@
 package at.timeguess.backend.services;
 
 import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
-import at.timeguess.backend.model.GameTeam;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.ui.beans.MessageBean;
@@ -31,8 +28,6 @@ public class GameService {
     private GameRepository gameRepo;
     @Autowired
     private UserService userService;
-    @Autowired
-    private GameTeamService gameTeamService;
 
     @Autowired
     private MessageBean messageBean;
@@ -59,28 +54,15 @@ public class GameService {
 
     /**
      * Saves the game.
-     *
      * @param game the game to save
      * @return the saved game
      */
-    @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER') or hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('ADMIN')")
     public Game saveGame(Game game) {
         boolean isNew = game.isNew();
         if (isNew) {
             game.setCreator(userService.getAuthenticatedUser());
-        } else {
-            // maybe a bit messy to replace gameteams this way
-            Optional<Game> dbGame = gameRepo.findById(game.getId());
-            if (!dbGame.isEmpty()) {
-                Set<GameTeam> origTeams = dbGame.get().getTeams();
-                origTeams.removeAll(game.getTeams());
-                origTeams.stream().forEach(t -> gameTeamService.delete(t));
-            }
         }
-
-        // save all the new gameteams
-        game.getTeams().stream().forEach(t -> gameTeamService.save(t));
-
         Game ret = gameRepo.save(game);
 
         // show ui message and log
@@ -101,10 +83,10 @@ public class GameService {
     public void deleteGame(Game game) {
         try {
             gameRepo.delete(game);
-    
+
             // show ui message and log
             messageBean.alertInformation(game.getName(), "Game was deleted");
-    
+
             User auth = userService.getAuthenticatedUser();
             LOGGER.info("Game '{}' (id={}) was deleted by User '{}' (id={})", game.getName(), game.getId(),
                     auth.getUsername(), auth.getId());
@@ -118,7 +100,6 @@ public class GameService {
 
     /**
      * Confirms given users participation in given game.
-     *
      * @param user user whose participation in given game is confirmed.
      * @param game game for which to confirm given users participation.
      */
@@ -135,13 +116,9 @@ public class GameService {
     }
 
     /**
-     * Returns whether participation confirmation is possible for the given user and
-     * game.
-     *
-     * @param user the user whose participation confirmation is checked for the
-     *             given game.
-     * @param game the game whose participation confirmation is checked for the
-     *             given user.
+     * Returns whether participation confirmation is possible for the given user and game.
+     * @param user the user whose participation confirmation is checked for the given game.
+     * @param game the game whose participation confirmation is checked for the given user.
      * @return true if participation confirmation is disabled, false otherwise.
      */
     public boolean disabledConfirmation(User user, Game game) {
@@ -151,7 +128,6 @@ public class GameService {
 
     /**
      * Returns whether participation confirmation is possible for the given game.
-     *
      * @param game the game whose participation confirmation is checked.
      * @return true if participation confirmation is disabled, false otherwise.
      */

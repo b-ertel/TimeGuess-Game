@@ -3,7 +3,7 @@ package at.timeguess.backend.ui.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -35,10 +35,10 @@ public class UserListControllerTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testGetUsers() {
-        Collection<User> users = TestUtils.createUsers(10);
+        List<User> users = TestUtils.createEntities(TestUtils::createUser, 10);
         when(userService.getAllUsers()).thenReturn(users);
 
-        Collection<User> result = userListController.getUsers();
+        List<User> result = userListController.getUsers();
 
         verify(userService).getAllUsers();
         assertEquals(users, result);
@@ -47,10 +47,10 @@ public class UserListControllerTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testGetAllPlayers() {
-        Collection<User> users = TestUtils.createUsers(10);
+        List<User> users = TestUtils.createEntities(TestUtils::createUser, 10);
         when(userService.getAllPlayers()).thenReturn(users);
 
-        Collection<User> result = userListController.getAllPlayers();
+        List<User> result = userListController.getAllPlayers();
 
         verify(userService).getAllPlayers();
         assertEquals(users, result);
