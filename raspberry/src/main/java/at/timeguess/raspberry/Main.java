@@ -21,8 +21,6 @@ import tinyb.BluetoothGattCharacteristic;
 import tinyb.BluetoothGattService;
 import tinyb.BluetoothManager;
 
-import kong.unirest.Unirest;
-
 /**
  * Entry point for program to search for Bluetooth devices and communicate with them
  */
