@@ -199,6 +199,16 @@ public class StatusController {
 	}
 	
 	/**
+	 * gets status of a given cube
+	 * 
+	 * @param macAddress of cube to get its status
+	 * @return CubeStatus
+	 */
+	public CubeStatus getStatus(String macAddress) {
+		return this.cubeStatus.get(macAddress).getStatus();
+	}
+	
+	/**
 	 * checks if a Cube is configured i.e. if there is any entry for it in the Configuration Table
 	 * 
 	 * @return true if it has a Configuration, false otherwise
