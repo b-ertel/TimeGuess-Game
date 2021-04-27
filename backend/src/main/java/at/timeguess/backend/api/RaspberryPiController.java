@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.ui.controllers.StatusController;
 import at.timeguess.backend.model.api.FacetsMessage;
-import at.timeguess.backend.model.api.FacetsResponse;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.model.api.StatusResponse;
 
@@ -28,11 +27,10 @@ public class RaspberryPiController {
      * Process a {@link FacetsMessage}.
      * 
      * @param message the message
-     * @return the response
      */
     @PostMapping("/api/facets")
-    private FacetsResponse processFacetsMessage(@RequestBody FacetsMessage message) {
-        return cubeService.processFacetsMessage(message);
+    private void processFacetsMessage(@RequestBody FacetsMessage message) {
+        cubeService.processFacetsMessage(message);
     }
     
     /**

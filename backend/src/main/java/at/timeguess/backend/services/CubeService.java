@@ -16,7 +16,6 @@ import at.timeguess.backend.model.Configuration;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.api.FacetsMessage;
-import at.timeguess.backend.model.api.FacetsResponse;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.repositories.ConfigurationRepository;
 import at.timeguess.backend.repositories.CubeFaceRepository;
@@ -164,9 +163,8 @@ public class CubeService {
      * Process a {@link FacetsMessage}.
      *  
      * @param message the message
-     * @return the response
      */
-    public FacetsResponse processFacetsMessage(FacetsMessage message) {
+    public void processFacetsMessage(FacetsMessage message) {
         String identifier = message.getIdentifier();
         int facet = message.getFacet();
         if (isMacAddressKnown(identifier)) {
@@ -179,8 +177,6 @@ public class CubeService {
                 unconfiguredFacetsEventPublisher.publishUnconfiguredFacetsEvent(cube, facet);
             }
         }
-        FacetsResponse response = new FacetsResponse();
-        return response;
     }
 
 }
