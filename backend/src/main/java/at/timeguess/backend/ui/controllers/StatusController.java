@@ -75,10 +75,10 @@ public class StatusController {
     	}
     	else {
     		LOGGER.info("cube is onboarding.....");
-    		updateCube(message);
     		this.healthStatus.put(message.getIdentifier(), new HealthStatus(LocalDateTime.now(), message.getBatteryLevel(), message.getRssi(), message.getIdentifier()));
     		setInterval(10);
     	}
+		updateCube(message);    	
     	
         StatusResponse response = new StatusResponse();
         response.setReportingInterval(this.interval);
@@ -119,8 +119,7 @@ public class StatusController {
     	
     	return updatedCube;
     }
-       
-
+      
 	/**
      * is called in case cube changes its status, updates status in GUI
      */
@@ -182,6 +181,31 @@ public class StatusController {
 	public void setInGame(String macAddress) {
 		statusChange(macAddress, CubeStatus.IN_GAME);
 	}
+	
+	/**
+	 * changes status of cube to {@link CubeStatus.READY}
+	 * @param macAddress of the cubes which should be set to {@link CubeStatus.READY}
+	 */
+	public void setReady(String macAddress) {
+		statusChange(macAddress, CubeStatus.READY);
+	}
+	
+	/**
+	 * changes status of cube to {@link CubeStatus.LIVE}
+	 * @param macAddress of the cubes which should be set to {@link CubeStatus.LIVE}
+	 */
+	public void setLive(String macAddress) {
+		statusChange(macAddress, CubeStatus.LIVE);
+	}
+	
+	/**
+	 * checks if a Cube is configured i.e. if there is any entry for it in the Configuration Table
+	 * 
+	 * @return true if it has a Configuration, false otherwise
+	 */
+	public boolean isConfigured(Cube cube) {
+		return cubeService.isConfigured(cube);
+	}
 
 	/**
 	 * @return interval of reporting period of the cube
@@ -203,6 +227,18 @@ public class StatusController {
 	public void deleteStatus(String macAddress) {
 		this.cubeStatus.remove(macAddress);
 		updateSockets();
+	}
+	
+	/** changes Status if configuration is deleted via UI
+	 * @param macAddress of cube which status should be changed
+	 */
+	public void changeStatus(String macAddress) {
+		if(this.cubeStatus.get(macAddress).getStatus().equals(CubeStatus.READY)){
+			statusChange(macAddress, CubeStatus.LIVE);
+		}
+		else {
+			statusChange(macAddress, CubeStatus.OFFLINE);
+		}
 	}
 	
 	/**
