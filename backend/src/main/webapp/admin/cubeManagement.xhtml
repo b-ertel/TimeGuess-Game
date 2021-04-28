@@ -84,8 +84,7 @@
 						</p:commandButton>
 						<p:commandButton value="Test"
 							oncomplete="PF('cubeTestDialog').show()"
-							update="cubeTestForm:cubeTestDialog :msg" rendered="#{statusController.isConfigured(curr) and statusController.getStatus(curr.macAddress) eq 'LIVE' or 
-										statusController.getStatus(curr.macAddress) eq 'READY'}">
+							update="cubeTestForm:cubeTestDialog :msg" rendered="#{statusController.getStatus(curr.macAddress) eq 'READY'}">
 							<f:actionListener
 								binding="#{cubeTestController.prepareForNewTest(curr)}" />
 						</p:commandButton>
