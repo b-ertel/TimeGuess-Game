@@ -40,7 +40,7 @@
 		                        <div class="p-col-7"><p:outputLabel value="#{playRoundController.cubeFace.points}"/></div>
 		                </div>
 				</p:outputPanel>
-				<p:outputPanel header="RoundInfo">
+				<p:outputPanel header="RoundInfo" rendered="#{not empty playRoundController.currentRound}">
 						<div class="p-grid">
 		                        <div class="p-col-5"><p:outputLabel value="User: " /></div>
 		                        <div class="p-col-7"><p:outputLabel value="#{playRoundController.currentRound.guessingUser.username}"/></div>
@@ -57,9 +57,9 @@
 			
 
 
-				<o:socket channel="cubeTestChannel"
+				<o:socket channel="newRoundChannel"
 					onmessage="function(m){console.log(m);}">
-					<f:ajax event="newCubeFace" render="currentRoundPanel" 
+					<f:ajax event="startRound" render="currentRoundPanel" 
 							listener="#{playRoundController.startNewRound()}"/>
 				</o:socket>
 

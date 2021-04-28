@@ -82,7 +82,7 @@ public class PlayRoundController implements Consumer<ConfiguredFacetsEvent> {
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (cube.equals(configuredFacetsEvent.getCube())) {
             cubeFace = configuredFacetsEvent.getCubeFace();
-            websocketManager.getCubeTestChannel().send("newCubeFace");
+            websocketManager.getNewRoundChannel().send("startRound");
         }
     }
 	
