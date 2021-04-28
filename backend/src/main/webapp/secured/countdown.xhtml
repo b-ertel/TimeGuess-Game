@@ -10,26 +10,32 @@
                 
     xmlns:demo="http://java.sun.com/jsf/composite/demo"
 	template="/WEB-INF/templates/main.xhtml">
-
-     <ui:define name ="countdown">
- 
+    <ui:define name="content">
+        <!-- see chat.js -->
+        <h:outputScript>			
+            pfContext=PF
+        </h:outputScript>
+        
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
-
-        <h:form id="countdownForm">
+        
+		<h:form id="countdownForm">
             <p:panel id="count">
-            	<h:outputText value="#{countDownController.time}"/> 
+            	<h1 class="p-text-center">
+             		<h:outputText value="#{countDownController.getCountDown()}" style="font-weight:bold; font-size:40px !important"/> 
+             	</h1>
             </p:panel>
-            
+            <p:panelGrid columns="2">
+            	<p:commandButton value="start" action="#{countDownController.startCountdown(2,0)}"/>
+            	<p:commandButton value="stop" action="#{countDownController.stop()}"/>
+            </p:panelGrid>
+           
             
          	<o:socket channel="countDownChannel" scope="application"
                 onmessage="function(m){console.log(m);}">
                 <f:ajax event="countDownUpdate"
-                    render="countdownForm" />
+                    render=":countdownForm:count" />
             </o:socket> 
-            
-           
 		</h:form> 
-		
 
 			
    </ui:define>   
