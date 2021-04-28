@@ -11,8 +11,8 @@
     xmlns:demo="http://java.sun.com/jsf/composite/demo"
 	template="/WEB-INF/templates/main.xhtml">
 
-    <ui:define name ="countdown">
-
+     <ui:define name ="countdown">
+ 
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
 
         <h:form id="countdownForm">
@@ -25,7 +25,12 @@
                 onmessage="function(m){console.log(m);}">
                 <f:ajax event="countDownUpdate"
                     render="countdownForm" />
-            </o:socket>
-		</h:form>
-    </ui:define>
-</ui:composition>
+            </o:socket> 
+            
+           
+		</h:form> 
+		
+
+			
+   </ui:define>   
+</ui:composition> 

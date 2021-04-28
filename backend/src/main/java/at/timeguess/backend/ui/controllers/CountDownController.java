@@ -24,13 +24,15 @@ public class CountDownController {
     @CDIAutowired
 	private WebSocketManager webSocketManager;
 	
-	public void startCountdown() {
+	public void startCountdown(int minutes) {
 		this.countDown = new CountDown();
 		this.countDown.setMinutes(minutes);
+		count();
 	}
 	
 	public void count() {
 		while(minutes != 0) {
+			System.out.println(countDown);
 			minutes--;
 			this.countDown.setMinutes(minutes);
 			webSocketManager.getCubeChannel().send("countDownUpdate");
@@ -41,7 +43,7 @@ public class CountDownController {
 	public static void main(String args[]) {
 		System.out.println("Does this work?");
 		CountDownController controller = new CountDownController();
-		controller.startCountdown();
+		controller.startCountdown(60);
 	}
 
 	public CountDown getCountDown() {
