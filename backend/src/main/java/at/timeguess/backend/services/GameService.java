@@ -1,6 +1,7 @@
 package at.timeguess.backend.services;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -163,7 +164,13 @@ public class GameService {
      * @param game the game for which one wants to know the teams.
      */
     public Set<Team> getTeams(Game game) {
-        return game.getTeams();
+        Set<GameTeam> gameTeams = game.getTeams();
+        Set<Team> teams = new HashSet<>();
+        for (GameTeam gameTeam : gameTeams) {
+            teams.add(gameTeam.getTeam());
+
+        }
+        return teams;
     }
 
 }
