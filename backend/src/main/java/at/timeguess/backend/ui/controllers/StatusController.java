@@ -37,6 +37,14 @@ import at.timeguess.backend.model.api.StatusResponse;
 @CDIContextRelated
 public class StatusController {
 
+    // the value of the calibration version characteristic after
+    // a reset of the TimeFlip device
+    private static final int CALIBRATION_VERSION_AFTER_RESET = 0;
+    // the value of the calibration version characteristic to be written
+    // to a TimeFlip device after it has successfully established
+    // a connection with the backend
+    private static final int CALIBRATION_VERSION_AFTER_CONNECTION = 1;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusController.class);
 	
     @Autowired
@@ -77,11 +85,12 @@ public class StatusController {
     		LOGGER.info("cube is onboarding.....");
     		this.healthStatus.put(message.getIdentifier(), new HealthStatus(LocalDateTime.now(), message.getBatteryLevel(), message.getRssi(), message.getIdentifier()));
     		setInterval(10);
+    		updateCube(message); 
     	}
-		updateCube(message);    	
-    	
+   	
         StatusResponse response = new StatusResponse();
         response.setReportingInterval(this.interval);
+        response.setCalibrationVersion(CALIBRATION_VERSION_AFTER_CONNECTION);
         return response;
     }
     
@@ -99,6 +108,12 @@ public class StatusController {
 		if(cubeService.isMacAddressKnown(message.getIdentifier())) {						// Cube is already in database
 			updatedCube = cubeService.getByMacAddress(message.getIdentifier());
 			LOGGER.info("cube is known...");
+
+			// delete any existing configurations if a reset of the TimeFlip device is detected
+			if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {
+			    LOGGER.info("calibration version is 0 --> cube lost configuration");
+				cubeService.deleteConfigurations(updatedCube);
+			}
 			
 			if(cubeService.isConfigured(updatedCube)){										// Cube is configured and ready
 				statusChange(updatedCube.getMacAddress(), CubeStatus.READY);
