@@ -85,9 +85,9 @@ public class StatusController {
     		LOGGER.info("cube is onboarding.....");
     		this.healthStatus.put(message.getIdentifier(), new HealthStatus(LocalDateTime.now(), message.getBatteryLevel(), message.getRssi(), message.getIdentifier()));
     		setInterval(10);
+    		updateCube(message); 
     	}
-		updateCube(message);    	
-    	
+   	
         StatusResponse response = new StatusResponse();
         response.setReportingInterval(this.interval);
         response.setCalibrationVersion(CALIBRATION_VERSION_AFTER_CONNECTION);
@@ -111,7 +111,8 @@ public class StatusController {
 
 			// delete any existing configurations if a reset of the TimeFlip device is detected
 			if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {
-			    cubeService.deleteConfigurations(updatedCube);
+			    LOGGER.info("calibration version is 0 --> cube lost configuration");
+				cubeService.deleteConfigurations(updatedCube);
 			}
 			
 			if(cubeService.isConfigured(updatedCube)){										// Cube is configured and ready
