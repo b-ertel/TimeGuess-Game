@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:demo="http://java.sun.com/jsf/composite/demo"
+	template="/WEB-INF/templates/main.xhtml">
+    <ui:define name="content">
+        <!-- see chat.js -->
+        <h:outputScript>			
+            pfContext=PF
+        </h:outputScript>
+
+        <h:form id="gameRoomForm">
+            <div class="gameRoomContent">
+                <h1>Gameroom</h1>
+
+                <p:panelGrid columns="1" style="width: 100%;"
+                        columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
+
+                    <h3>Term</h3>
+                    <p:scrollPanel id="termInfo">
+                        <ui:repeat var="term"
+                                   value="#{webSocketTermController.currentTerm}">
+                            <demo:termOutput term="#{term}" />
+                        </ui:repeat>
+                    </p:scrollPanel>
+                    <h:commandButton id="termBtn" value="newTerm"
+                                     action="#{webSocketTermController.termChange}">
+                    </h:commandButton>
+
+                    <h3>CubeFace</h3>
+                    <p:panel id="cubeFace">
+                        <ui:repeat var="cubeFace"
+                                   value="#{webSocketCubeFace.currentFace}">
+                            <p style="font-weight: bold;"> time </p>
+                            <h:outputText value="#{cubeFace.time}" style="font-weight: bold;"/>
+                            <p style="font-weight: bold;"> points: </p>
+                            <h:outputText value="#{cubeFace.points}" style="font-weight: bold;"/>
+                            <p style="font-weight: bold;"> id </p>
+                            <h:outputText value="#{cubeFace.id}" style="font-weight: bold;"/>
+                        </ui:repeat>
+                    </p:panel>
+
+                </p:panelGrid>
+            </div>
+
+
+            <o:socket channel="termChannel" scope="application"
+                      onmessage="function(m){console.log(m);}">
+                <f:ajax event="termUpdate"
+                        render="termInfo"
+                        listener="#{userChatController.synchronizeRecipients()}" />              <!-- TODO: listener auf gegnerisches Team ändern...  -->
+            </o:socket>
+
+            <o:socket channel="cubeFaceChannel" scope="application"
+                      onmessage="function(m){console.log(m);}">
+                <f:ajax event="cubeFaceChange"
+                        render="cubeFace"
+                        listener="#{userChatController.synchronizeRecipients()}" />              <!-- TODO: listener auf alle im Spiel ändern...  -->
+            </o:socket>
+
+
+
+
+        </h:form>
+    </ui:define>
+</ui:composition>

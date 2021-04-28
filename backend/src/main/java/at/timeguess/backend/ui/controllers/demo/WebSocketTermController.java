@@ -50,7 +50,8 @@ public class WebSocketTermController {
 
     public void termChange() {
         this.currentTerm = this.termService.getAllTerms().get((int) (Math.random()*20));
-        this.websocketManager.getTermChannel().send("termUpdate");
+        this.websocketManager.getFirstTermChannel().send("termUpdate");
+        this.websocketManager.getSecondTermChannel().send("termUpdate");
     }
 
 }
