@@ -48,6 +48,8 @@ public class WebSocketGameController {
     private Term currentTerm;
     private Term controllTerm;
 
+    private Queue<Team> teams = new LinkedList<>();
+
     private List<User> guessingUsers = new LinkedList<>();
     private List<User> controllingUsers = new LinkedList<>();
 
@@ -55,15 +57,22 @@ public class WebSocketGameController {
     @PostConstruct
     public void setup() {
         this.currentTerm = this.termService.getAllTerms().get((int) (Math.random()*20));
+
         this.controllTerm = new Term();
         this.controllTerm.setName("WAIT FOR THE NEXT TERM");
 
         //todo: make this chooosable during the game
         Game testGame = gameService.loadGame(1L);
-        Set<Team> teams = gameService.getTeams(testGame);
-        List<Team> teamsList = new ArrayList<Team>(teams);
-        this.guessingUsers.addAll(teamsList.get(0).getTeamMembers());
-        this.guessingUsers.addAll(teamsList.get(1).getTeamMembers());
+        this.teams = new LinkedList<>(gameService.getTeams(testGame));
+        //List<Team> teamsList = new ArrayList<Team>(teams);
+        //this.guessingUsers.addAll(teamsList.get(0).getTeamMembers());
+        //this.controllingUsers.addAll(teamsList.get(1).getTeamMembers());
+        Team guessingTeam = this.teams.poll();
+        this.guessingUsers.addAll(guessingTeam.getTeamMembers());
+        for (Team controllTeam : this.teams){
+            this.controllingUsers.addAll(controllTeam.getTeamMembers());
+        }
+        this.teams.add(guessingTeam);
     }
 
 
@@ -72,28 +81,42 @@ public class WebSocketGameController {
      * anymore and hence it should be removed from any undelivered
      * term-recipient-list
      */
-
     public void synchronizeRecipients() {
             this.guessingUsers.removeIf(user -> !this.chatController.getPossibleRecipients().contains(user));
             this.controllingUsers.removeIf(user -> !this.chatController.getPossibleRecipients().contains(user));
     }
 
     public Term getCurrentTerm() {
-        if (this.guessingUsers.contains(this.sessionInfoBean.getCurrentUser())) {
             return this.currentTerm;
-        }
-        if (this.controllingUsers.contains(this.sessionInfoBean.getCurrentUser())) {
-            return this.controllTerm;
-        }
-        else {
-            return new Term();
-        }
     }
+    
+    
 
     public void termChange() {
         this.currentTerm = this.termService.getAllTerms().get((int) (Math.random()*20));
         this.websocketManager.getFirstTermChannel().send("termUpdate");
-        this.websocketManager.getSecondTermChannel().send("termUpdate");
+        Team guessingTeam = this.teams.poll();
+        this.guessingUsers = new LinkedList<>();
+        this.controllingUsers = new LinkedList<>();
+        this.guessingUsers.addAll(guessingTeam.getTeamMembers());
+        for (Team controllTeam : this.teams){
+            this.controllingUsers.addAll(controllTeam.getTeamMembers());
+        }
+        this.teams.add(guessingTeam);
     }
 
+
+
+
+    public List<User> getGuessingUsers() {
+        return guessingUsers;
+    }
+
+    public List<User> getControllingUsers() {
+        return controllingUsers;
+    }
+
+    public Term getControllTerm() {
+        return controllTerm;
+    }
 }

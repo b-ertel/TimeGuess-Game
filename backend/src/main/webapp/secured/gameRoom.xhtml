@@ -24,32 +24,19 @@
                     <h3>Term</h3>
                     <p:scrollPanel id="termInfo">
                         <ui:repeat var="term"
-                                   value="#{webSocketTermController.currentTerm}">
+                                   value="#{webSocketUserGameController.currentTerm}">
                             <demo:termOutput term="#{term}" />
                         </ui:repeat>
                     </p:scrollPanel>
                     <h:commandButton id="termBtn" value="newTerm"
-                                     action="#{webSocketTermController.termChange}">
+                                     action="#{webSocketGameController.termChange}">
                     </h:commandButton>
-
-                    <h3>CubeFace</h3>
-                    <p:panel id="cubeFace">
-                        <ui:repeat var="cubeFace"
-                                   value="#{webSocketCubeFace.currentFace}">
-                            <p style="font-weight: bold;"> time </p>
-                            <h:outputText value="#{cubeFace.time}" style="font-weight: bold;"/>
-                            <p style="font-weight: bold;"> points: </p>
-                            <h:outputText value="#{cubeFace.points}" style="font-weight: bold;"/>
-                            <p style="font-weight: bold;"> id </p>
-                            <h:outputText value="#{cubeFace.id}" style="font-weight: bold;"/>
-                        </ui:repeat>
-                    </p:panel>
 
                 </p:panelGrid>
             </div>
 
 
-            <o:socket channel="termChannel" scope="application"
+            <o:socket channel="firstTermChannel" scope="application"
                       onmessage="function(m){console.log(m);}">
                 <f:ajax event="termUpdate"
                         render="termInfo"
