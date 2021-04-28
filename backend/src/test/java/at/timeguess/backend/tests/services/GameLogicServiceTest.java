@@ -11,12 +11,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.GameTeam;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
+import at.timeguess.backend.repositories.CubeFaceRepository;
 import at.timeguess.backend.repositories.TermRepository;
 import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.services.GameLogicService;
@@ -39,7 +41,10 @@ public class GameLogicServiceTest {
 	TopicRepository topicRepo;
 	
 	@Autowired
-	TermRepository termRepo;   
+	TermRepository termRepo; 
+	
+	@Autowired
+	CubeFaceRepository facetRepository;
     
     @DirtiesContext
     @Test
@@ -97,13 +102,12 @@ public class GameLogicServiceTest {
     	Term termNotUsed = termRepo.findById((long) 5).get();
     	Assertions.assertEquals(termNotUsed.getName(), gameLogicService.nextTerm(game).getName());
     	
-    	game = gameLogicService.startNewRound(game);
+    	//game = gameLogicService.startNewRound(game);
     	try {
     		gameLogicService.nextTerm(game);
-    	} catch(AllTermsUsedInGameException e) {
+    	} catch(Exception e) {
     		Assertions.assertEquals("All terms have been used in previous rounds", e.getMessage());
     	}
     }
-    
-    
+       
 }

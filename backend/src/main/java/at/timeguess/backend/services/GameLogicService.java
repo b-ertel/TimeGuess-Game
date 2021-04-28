@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameTeam;
 import at.timeguess.backend.model.Round;
@@ -64,16 +65,16 @@ public class GameLogicService {
 	 * @return term to guess
 	 * @throws AllTermsUsedInGameException, if every term has been played
 	 */
-	public Term nextTerm(Game game) throws AllTermsUsedInGameException {
-		if (stillTermsAvailable(game)) {
+	public Term nextTerm(Game game) /*throws AllTermsUsedInGameException*/ {
+		/*if (stillTermsAvailable(game)) {*/
 			List<Term> terms = termService.getAllTermsOfTopic(game.getTopic());
 			Set<Term> usedTerms = usedTerms(game);
 			usedTerms.stream().forEach(term -> terms.remove(term));
 			Random rand = new Random();
 			return terms.get(rand.nextInt(terms.size()));
-		} else {
-			throw new AllTermsUsedInGameException();
-		}
+		/*} else {
+		*	throw new AllTermsUsedInGameException();
+		*}*/
 	}
 	
 	public Team getNextTeam(Game game){
@@ -129,21 +130,20 @@ public class GameLogicService {
 	}
 	
 	
-	public Game startNewRound(Game game) throws AllTermsUsedInGameException {
+	public Round startNewRound(Game game, CubeFace cubeFace) /*throws AllTermsUsedInGameException*/ {
 		Round nextRound = new Round();
 		nextRound.setNr(game.getRounds().size()+1);
+		nextRound.setPoints(cubeFace.getPoints());
 		Team nextTeam = getNextTeam(game);
 		nextRound.setGuessingUser(nextUser(game, nextTeam));
 		nextRound.setGuessingTeam(nextTeam);
 		nextRound.setTermToGuess(nextTerm(game));
 		nextRound.setGame(game);
 		game.getRounds().add(nextRound);
-		game.setRoundNr(game.getRounds().size());
-		
+		game.setRoundNr(game.getRoundNr()+1);
 		LOGGER.info("New Round nr '{}', with team '{}' and user '{}' was created", nextRound.getNr(), nextRound.getGuessingTeam().getName(), nextRound.getGuessingUser().getUsername());
-		return game;
+		return nextRound;
 	}
-	
 	
 	public void saveLastRound(Game game) {
 		Set<Round> rounds = game.getRounds();
