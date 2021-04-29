@@ -1,9 +1,11 @@
 package at.timeguess.backend.services;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import at.timeguess.backend.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +13,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.timeguess.backend.model.Game;
-import at.timeguess.backend.model.GameState;
-import at.timeguess.backend.model.GameTeam;
-import at.timeguess.backend.model.User;
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.ui.beans.MessageBean;
 
@@ -159,4 +157,20 @@ public class GameService {
         GameState status = game.getStatus();
         return !(status == GameState.SETUP || status == GameState.VALID_SETUP);
     }
+
+    /**
+     * Returns the teams for the given game.
+     *
+     * @param game the game for which one wants to know the teams.
+     */
+    public Set<Team> getTeams(Game game) {
+        Set<GameTeam> gameTeams = game.getTeams();
+        Set<Team> teams = new HashSet<>();
+        for (GameTeam gameTeam : gameTeams) {
+            teams.add(gameTeam.getTeam());
+
+        }
+        return teams;
+    }
+
 }

@@ -1,7 +1,9 @@
 package at.timeguess.backend.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
+import at.timeguess.backend.model.Term;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,7 +14,7 @@ import at.timeguess.backend.model.utils.GroupingHelper;
 
 public interface GameRepository extends AbstractRepository<Game, Long> {
 
-    /**
+        /**
      * to find open games (GameState.VALID_SETUP), active (GameState.PLAYED), finished (GameState.FINISHED)
      * @param status
      * @return
