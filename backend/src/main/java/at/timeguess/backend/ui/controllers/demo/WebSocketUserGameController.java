@@ -1,5 +1,6 @@
 package at.timeguess.backend.ui.controllers.demo;
 
+import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,15 @@ public class WebSocketUserGameController {
     @Autowired
     private WebSocketGameController webSocketGameController;
 
-    public Term getCurrentTerm() {
+    public Round getCurrentRound() {
         if (this.webSocketGameController.getGuessingUsers().contains(this.sessionInfoBean.getCurrentUser())) {
-            return this.webSocketGameController.getCurrentTerm();
+            return this.webSocketGameController.getCurrentRound();
         }
         else if (this.webSocketGameController.getControllingUsers().contains(this.sessionInfoBean.getCurrentUser())) {
-            return this.webSocketGameController.getControllTerm();
+            return this.webSocketGameController.getControllRound();
         }
         else {
-            Term notInTeamTerm = new Term();
-            notInTeamTerm.setName("You are not in a team...");
-            return notInTeamTerm;
+            return null;
         }
     }
 

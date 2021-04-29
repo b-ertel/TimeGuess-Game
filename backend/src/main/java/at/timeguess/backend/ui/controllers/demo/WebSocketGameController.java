@@ -1,12 +1,21 @@
 package at.timeguess.backend.ui.controllers.demo;
 
+import at.timeguess.backend.events.ConfiguredFacetsEvent;
+import at.timeguess.backend.events.ConfiguredFacetsEventListener;
+import at.timeguess.backend.model.Cube;
+import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.User;
+import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.repositories.UserRepository;
+import at.timeguess.backend.services.CubeService;
+import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TermService;
+import at.timeguess.backend.ui.beans.NewGameBean;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
@@ -16,7 +25,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import java.util.*;
+import java.util.function.Consumer;
 
 
 /**
@@ -31,7 +43,11 @@ import java.util.*;
 @Controller
 @Scope("application")
 @CDIContextRelated
-public class WebSocketGameController {
+public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> {
+	@Autowired
+	private NewGameBean newGameBean;
+	@Autowired
+	private TopicRepository topicRepo;
     @Autowired
     private SessionInfoBean sessionInfoBean;
     @Autowired
@@ -42,37 +58,51 @@ public class WebSocketGameController {
     private ChatManagerController chatController;
     @Autowired
     private GameService gameService;
+    @Autowired
+	CubeService cubeService;
     @CDIAutowired
     private WebSocketManager websocketManager;
+    @Autowired
+    private ConfiguredFacetsEventListener configuredfacetsEventListener;
+    @Autowired
+	GameLogicService gameLogic;
 
-    private Term currentTerm;
-    private Term controllTerm;
+    private Game currentGame;
+    private Round currentRound;
+    private CubeFace cubeFace;
+    private Round controllRound;
 
-    private Queue<Team> teams = new LinkedList<>();
+    private Map<Game, Team> teams = new HashMap<>();
 
     private List<User> guessingUsers = new LinkedList<>();
     private List<User> controllingUsers = new LinkedList<>();
 
+    private Map<Cube, Game> listOfGames = new HashMap<>();
 
     @PostConstruct
     public void setup() {
-        this.currentTerm = this.termService.getAllTerms().get((int) (Math.random()*20));
+    	configuredfacetsEventListener.subscribe(this);
+        newGameBean.setGameName("TestGame");
+ 		newGameBean.setMaxPoints(10);
+ 		newGameBean.setTopic(topicRepo.findById((long) 1).get());
+ 		newGameBean.createGame();
+ 		Game testgame = gameService.loadGame((long) 8);
+ 		testgame.setTeams(gameService.loadGame((long) 1).getTeams());
+ 		testgame.getTeams().addAll(gameService.loadGame((long) 2).getTeams());
+ 		testgame.setRoundNr(0);
+ 		this.currentGame = testgame;
+ 		Cube cube = cubeService.getByMacAddress("56:23:89:34:56");
+ 		
+ 		listOfGames.put(cube, testgame);
+        this.controllRound = new Round();
 
-        this.controllTerm = new Term();
-        this.controllTerm.setName("WAIT FOR THE NEXT TERM");
-
-        //todo: make this chooosable during the game
-        Game testGame = gameService.loadGame(1L);
-        this.teams = new LinkedList<>(gameService.getTeams(testGame));
-        //List<Team> teamsList = new ArrayList<Team>(teams);
-        //this.guessingUsers.addAll(teamsList.get(0).getTeamMembers());
-        //this.controllingUsers.addAll(teamsList.get(1).getTeamMembers());
-        Team guessingTeam = this.teams.poll();
-        this.guessingUsers.addAll(guessingTeam.getTeamMembers());
-        for (Team controllTeam : this.teams){
-            this.controllingUsers.addAll(controllTeam.getTeamMembers());
-        }
-        this.teams.add(guessingTeam);
+        testgame.getActualTeams().stream().forEach(team -> teams.put(testgame, team));
+        
+    }
+    
+    @PreDestroy
+    public void destroy() {
+        configuredfacetsEventListener.unsubscribe(this);
     }
 
 
@@ -85,28 +115,21 @@ public class WebSocketGameController {
             this.guessingUsers.removeIf(user -> !this.chatController.getPossibleRecipients().contains(user));
             this.controllingUsers.removeIf(user -> !this.chatController.getPossibleRecipients().contains(user));
     }
-
-    public Term getCurrentTerm() {
-            return this.currentTerm;
-    }
     
-    
-
-    public void termChange() {
-        this.currentTerm = this.termService.getAllTerms().get((int) (Math.random()*20));
-        this.websocketManager.getFirstTermChannel().send("termUpdate");
-        Team guessingTeam = this.teams.poll();
-        this.guessingUsers = new LinkedList<>();
-        this.controllingUsers = new LinkedList<>();
-        this.guessingUsers.addAll(guessingTeam.getTeamMembers());
-        for (Team controllTeam : this.teams){
-            this.controllingUsers.addAll(controllTeam.getTeamMembers());
+    /**
+     * A method for processing a {@link ConfiguredFacetsEvent}.
+     */
+    @Override
+    public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
+        if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
+        	cubeFace = configuredFacetsEvent.getCubeFace();
+            websocketManager.getNewRoundChannel().send("startRound");
         }
-        this.teams.add(guessingTeam);
     }
-
-
-
+    
+    public void startNewRound() {
+    	currentRound = gameLogic.startNewRound(currentGame, cubeFace);
+    }
 
     public List<User> getGuessingUsers() {
         return guessingUsers;
@@ -116,7 +139,15 @@ public class WebSocketGameController {
         return controllingUsers;
     }
 
-    public Term getControllTerm() {
-        return controllTerm;
+    public Round getControllRound() {
+        return controllRound;
     }
+    
+    public Round getCurrentRound() {
+        return this.currentRound;
+    }
+
+	public CubeFace getCubeFace() {
+		return cubeFace;
+	}
 }
