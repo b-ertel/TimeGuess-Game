@@ -18,18 +18,37 @@
         
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
         
-		<h:form id="countdownForm">
-            <p:panel id="count">
+		<h:form id="countdownForm" style="width:500px;">
+            <p:panel id="count" header="Time to Guess" >
             	<h1 class="p-text-center">
              		<h:outputText value="#{countDownController.getCountDown()}" style="font-weight:bold; font-size:40px !important"/> 
              	</h1>
             </p:panel>
-            <p:panelGrid columns="2">
-            	<p:commandButton value="start" action="#{countDownController.startCountdown(2,0)}"/>
-            	<p:commandButton value="stop" action="#{countDownController.stop()}"/>
+            <h:panelGrid columns="2">
+            	<p:panel>
+            	    <p:outputLabel for="min" value="Min: "/>
+                	<p:inputText id="min" value="#{countDownController.min}"/>
+            	</p:panel>
+            	<p:panel>
+            	    <p:outputLabel for="sec" value="Sec: "/>
+                	<p:inputText id="sec" value="#{countDownController.sec}"/>
+            	</p:panel>
+            </h:panelGrid>   
+            <p:panelGrid>
+            	<p:separator/>
+            </p:panelGrid>         
+            <p:panel>         	
+                <p:commandButton value="start" action="#{countDownController.startCountDown()}"/>
+                <p:commandButton value="stop" action="#{countDownController.endCountDown()}"/>
+            	<p:commandButton value="reset" action="#{countDownController.resetCountDown()}"/>
+            </p:panel>
+
+ <!--          <p:panelGrid columns="4">
+            	<p:commandButton value="start test 2.0 min" action="#{countDownControllerNew.startCountDown(2,0)}"/>
+            	<p:commandButton value="stop" action="#{countDownControllerNew.endCountDown()}"/>
+            	<p:commandButton value="reset" action="#{countDownControllerNew.resetCountDown()}"/>
             </p:panelGrid>
-           
-            
+-->              
          	<o:socket channel="countDownChannel" scope="application"
                 onmessage="function(m){console.log(m);}">
                 <f:ajax event="countDownUpdate"

@@ -1,5 +1,10 @@
 package at.timeguess.backend.ui.controllers;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Timer;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
@@ -19,72 +24,73 @@ public class CountDownController {
 
 	private int min;
 	private int sec;
-	private boolean count;
+	
+	private Timer timer;
+	int delay = 1000; //milliseconds
 	
     @CDIAutowired
 	private WebSocketManager webSocketManager;
 	
-	public void startCountdown(int min, int sec) {
-		this.min = min;
-		this.sec= sec;
-		run();
-		System.out.println(getCountDown());
-		count();
-	}
-	
-	public void count() {
-		
-			while(min >= 0) {
-				while(sec > 0) {
-					if(count == false) {
-						break;
-					}
-					sec--;
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					webSocketManager.getCountDownChannel().send("countDownUpdate");
-				
-					if(min==0) {
-						break;
-					}
-				}
-				min--;
-				sec = 60;
-			}
-
-	}
-	
-	
-	public void setCountDown(int min, int sec){
+	public void startCountDown(int min, int sec) {
 		setMin(min);
 		setSec(sec);
+		
+		ActionListener task = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				count();
+			}
+		};
+		
+		this.timer = new Timer(delay, task);
+		this.timer.start();
 	}
 	
-	
-	public void run() {
-		this.count=true;
+	public void startCountDown() {		
+		ActionListener task = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				count();
+			}
+		};
+		
+		this.timer = new Timer(delay, task);
+		this.timer.start();
 	}
 	
-	public void stop() {
-		this.count=false;
+	public void endCountDown() {
+		this.timer.stop();
 	}
 	
 	public String getCountDown() {
 		return getMin() + " : " + getSec();
 	}
-
-	/*
-	public static void main(String args[]) {
-		System.out.println("Does this work?");
-		CountDownController controller = new CountDownController();
-		controller.startCountdown(1, 0);
+	
+	public void resetCountDown(){
+		setMin(0);
+		setSec(0);
+		webSocketManager.getCountDownChannel().send("countDownUpdate");	
 	}
-*/
 
+	public void count() {
+		if (min > 0) {
+			if(sec > 0) {
+				sec--;
+			}
+			else {
+				min--;
+				sec = 59;
+			}
+		}
+		else if (min==0 && sec>0){
+			sec--;
+		}
+		else {
+			endCountDown();
+		}
+		webSocketManager.getCountDownChannel().send("countDownUpdate");		
+	}
+	
 	public int getMin() {
 		return min;
 	}
@@ -100,7 +106,6 @@ public class CountDownController {
 	public void setSec(int sec) {
 		this.sec = sec;
 	}
-
 }
 
 
