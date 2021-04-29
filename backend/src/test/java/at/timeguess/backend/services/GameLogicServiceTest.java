@@ -1,4 +1,4 @@
-package at.timeguess.backend.tests.services;
+package at.timeguess.backend.services;
 
 import java.util.Set;
 
@@ -17,8 +17,6 @@ import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
 import at.timeguess.backend.repositories.TermRepository;
 import at.timeguess.backend.repositories.TopicRepository;
-import at.timeguess.backend.services.GameLogicService;
-import at.timeguess.backend.services.GameService;
 
 /**
  * Some very basic tests for {@link GameLogicService}.

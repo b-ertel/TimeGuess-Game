@@ -1,6 +1,8 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.util.Collection;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -35,21 +37,21 @@ public class GameListController {
     /**
      * Returns a list of all games.
      */
-    public Collection<Game> getGames() {
+    public List<Game> getGames() {
         return isAdmin != null && isAdmin ? gameService.getAllGames() : gameService.getAllCurrent();
     }
 
     /**
      * Returns a list of all games for the given user (current and past).
      */
-    public Collection<Game> getGames(User user) {
+    public List<Game> getGames(User user) {
         return gameService.getByUser(user, false);
     }
 
     /**
      * Returns a list of all current games for the given user.
      */
-    public Collection<Game> getGamesCurrent(User user) {
+    public List<Game> getGamesCurrent(User user) {
         // TODO: use this for production (IMPORTANT!):
         // gameService.getByUser(user, true);
         return gameService.getAllGames();

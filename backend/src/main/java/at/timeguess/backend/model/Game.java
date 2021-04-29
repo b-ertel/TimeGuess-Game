@@ -19,7 +19,7 @@ public class Game implements Serializable, Persistable<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(length = 100, nullable = false, unique = true)
     private String name;
 
     private int maxPoints;
@@ -34,22 +34,20 @@ public class Game implements Serializable, Persistable<Long> {
     // TODO derive roundNr from this list to be consistent.
     //
     // TODO works only with FetchType.EAGER - otherwise gives
-    //      `org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role: at.timeguess.backend.model.Game.rounds, could not initialize proxy - no Session`
+    //      `org.hibernate.LazyInitializationException:
+    //      failed to lazily initialize a collection of role: at.timeguess.backend.model.Game.rounds, could not initialize proxy - no Session`
     //      see https://stackoverflow.com/questions/22821695/how-to-fix-hibernate-lazyinitializationexception-failed-to-lazily-initialize-a
     //      are there alternatives?
     //      `Hibernate.initialize(game);` does not work
-    @OneToMany(mappedBy = "game", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "game", cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Round> rounds = new HashSet<>();
 
     @OneToMany(mappedBy = "game", cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<GameTeam> teams = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = User.class)
-    @JoinTable(name = "game_user", 
-        joinColumns = @JoinColumn(name = "game_id", nullable = false, updatable = false),
-        inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
-        foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-        inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH,
+            CascadeType.PERSIST }, targetEntity = User.class)
+    @JoinTable(name = "game_user", joinColumns = @JoinColumn(name = "game_id", nullable = false, updatable = false), inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT), inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<User> confirmedUsers;
 
     @ManyToOne
@@ -58,6 +56,7 @@ public class Game implements Serializable, Persistable<Long> {
     @ManyToOne
     private User creator;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -113,11 +112,11 @@ public class Game implements Serializable, Persistable<Long> {
     }
 
     public Set<Team> getTeams() {
-        return teams.stream().map(GameTeam::getTeam).collect(Collectors.toSet());
+        return teams == null ? null : teams.stream().map(GameTeam::getTeam).collect(Collectors.toSet());
     }
 
     public void setTeams(Set<Team> teams) {
-        this.teams = teams.stream().map(t -> new GameTeam(this, t)).collect(Collectors.toSet());
+        this.teams = teams == null ? null : teams.stream().map(t -> new GameTeam(this, t)).collect(Collectors.toSet());
     }
 
     public Topic getTopic() {
@@ -143,7 +142,7 @@ public class Game implements Serializable, Persistable<Long> {
     }
 
     public Set<User> getConfirmedUsers() {
-        return confirmedUsers;
+        return confirmedUsers == null ? new HashSet<>() : confirmedUsers;
     }
 
     public void setConfirmedUsers(Set<User> confirmedUsers) {
@@ -164,7 +163,8 @@ public class Game implements Serializable, Persistable<Long> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
+        if (this == obj)
+            return true;
 
         if (obj == null || getClass() != obj.getClass()) {
             return false;

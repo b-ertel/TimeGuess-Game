@@ -1,110 +1,36 @@
 package at.timeguess.backend.utils;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.params.provider.Arguments;
-
-import at.timeguess.backend.model.User;
-import at.timeguess.backend.model.UserRole;
 
 public class TestUtils {
 
     /**
-     * Maps user roles to numbers
-     */
-    public final static Map<Integer, UserRole> USERROLES;
-
-    /**
-     * List of arguments for parameterized tests: user + map of pairs topic/count To be extracted by a separate method
-     * producing a stream for JUnit5
-     */
-    public final static List<Arguments> USER_TOTALWINSBYTOPIC;
-
-    static {
-        USERROLES = new HashMap<>();
-        USERROLES.put(1, UserRole.ADMIN);
-        USERROLES.put(2, UserRole.MANAGER);
-        USERROLES.put(3, UserRole.PLAYER);
-
-        USER_TOTALWINSBYTOPIC = List.of(
-                Arguments.of("admin",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 0 } })),
-                Arguments.of("user1",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 1 } })),
-                Arguments.of("user2",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 1 }, { "STAR WARS", 0 } })),
-                Arguments.of("elvis",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 0 } })),
-                Arguments.of("michael", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 1 }, { "STAR WARS", 1 } })),
-                Arguments.of("felix",   toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 1 } })),
-                Arguments.of("lorenz",  toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 1 }, { "STAR WARS", 0 } })),
-                Arguments.of("verena",  toMap(new Object[][] { { "GEOGRAPHY", 1 }, { "MOVIES", 0 }, { "STAR WARS", 0 } })),
-                Arguments.of("claudia", toMap(new Object[][] { { "GEOGRAPHY", 1 }, { "MOVIES", 1 }, { "STAR WARS", 0 } })),
-                Arguments.of("clemens", toMap(new Object[][] { { "GEOGRAPHY", 0 }, { "MOVIES", 0 }, { "STAR WARS", 1 } })));
-    }
-
-    /**
-     * Creates a simple user with the given username only
-     * @param username
-     * @return
-     */
-    public static User createUser(String username) {
-        User user = new User();
-        user.setUsername(username);
-        return user;
-    }
-
-    /**
-     * Creates a simple user with the given id only
-     * @param userid
-     * @return
-     */
-    public static User createUser(Long userid) {
-        User user = new User();
-        user.setId(userid);
-        return user;
-    }
-
-    /**
-     * Creates a list of the given number of entities, constructing each with the given function and an arbitrary long value
-     * @param count
-     * @param createEntity
-     * @return
-     */
-    public static <T> List<T> createEntities(Function<Long, T> createEntity, int count) {
-        List<T> list = new ArrayList<>();
-        for (long i = 0; i < count; i++) {
-            list.add(createEntity.apply((i + 1) * 10));
-        }
-        return list;
-    }
-
-    /**
-     * Creates a list of entities from the given string list, constructing each with the given function
-     * @param fromList
-     * @param createEntity
-     * @return
-     */
-    public static <T> List<T> createEntities(Function<String, T> createEntity, Collection<String> fromList) {
-        return fromList.stream().map(createEntity).collect(Collectors.toList());
-    }
-
-    /**
-     * Compares the given lists using the {@link compareTo} function on all contained items.
+     * Asserts the given lists, comparing them using {@link Object#equals} on all contained items.
      * @param <T>
      * @param expected
      * @param result
      */
-    public static <T extends Comparable<T>> void assertLists(Collection<T> expected, Collection<T> result) {
-        assertTrue(expected.size() == result.size());
+    public static <T> void assertLists(Collection<T> expected, Collection<T> result) {
+        assertLists(expected, result, (r, e) -> Objects.equals(e, r));
+    }
 
-        List<T> notInBoth = result.stream().filter(r -> expected.stream().filter(e -> e.compareTo(r) == 0).count() != 1).collect(Collectors.toList());
-        assertTrue(notInBoth.size() == 0, "expected and result lists should correspond, but don't");
+    /**
+     * Asserts the given lists, comparing them using the {@link compareTo} function on all contained items.
+     * @param <T>
+     * @param expected
+     * @param result
+     */
+    public static <T extends Comparable<T>> void assertListsCompare(Collection<T> expected, Collection<T> result) {
+        assertLists(expected, result, (r, e) -> e.compareTo(r) == 0);
     }
 
     /**
@@ -115,7 +41,8 @@ public class TestUtils {
      * @param expectResult true if the list is expected to contain elements, false if not
      * @param checker      a functor checking each element in the list
      */
-    public static <T> void assertResultList(Collection<T> result, String errMsg, boolean expectResult, Function<T, Boolean> checker) {
+    public static <T> void assertResultList(Collection<T> result, String errMsg, boolean expectResult,
+            Function<T, Boolean> checker) {
         assertNotNull(result, "resulting list must not be null");
         assertTrue(expectResult ? result.size() > 0 : result.size() == 0, "was " + (expectResult ? "" : "not") + " expecting a result");
 
@@ -124,7 +51,14 @@ public class TestUtils {
         }
     }
 
-    private static Map<String, Integer> toMap(Object[][] values) {
-        return Stream.of(values).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1]));
+    private static <T> void assertLists(Collection<T> expected, Collection<T> result,
+            BiFunction<T, T, Boolean> predicate) {
+        int expSize = expected.size(), resSize = result.size();
+        assertEquals(expSize, resSize, String.format("expected list size of %d but is %d", expSize, resSize));
+
+        List<T> notInBoth = result.stream()
+                .filter(r -> expected.stream().filter(e -> predicate.apply(e, r)).count() != 1)
+                .collect(Collectors.toList());
+        assertEquals(0, notInBoth.size(), "expected and result lists should correspond, but don't");
     }
 }

@@ -1,6 +1,6 @@
 package at.timeguess.backend.services;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,28 +32,49 @@ public class GameService {
     @Autowired
     private MessageBean messageBean;
 
-    public Collection<Game> getAllGames() {
+    public List<Game> getAllGames() {
         return gameRepo.findAll();
     }
 
-    public Collection<Game> getAllCurrent() {
+    /**
+     * Returns a list of all games currently in setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
+     * @return
+     */
+    public List<Game> getAllCurrent() {
         return gameRepo.findAllCurrent();
     }
 
-    public Collection<Game> getByStatus(GameState gs) {
+    /**
+     * Returns a list of all games with the given status.
+     * @param gs
+     * @return
+     */
+    public List<Game> getByStatus(GameState gs) {
         return gameRepo.findByStatus(gs);
     }
 
-    public Collection<Game> getByUser(User user, boolean current) {
+    /**
+     * Returns a list of all games the given user is associated to,
+     * optionally restricted to games currently in setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
+     * @param user
+     * @param current
+     * @return
+     */
+    public List<Game> getByUser(User user, boolean current) {
         return current ? gameRepo.findByUserCurrent(user) : gameRepo.findByUserAll(user);
     }
 
+    /**
+     * Loads a single game identified by its id.
+     * @param gameId
+     * @return
+     */
     public Game loadGame(Long gameId) {
         return gameRepo.findById(gameId).get();
     }
 
     /**
-     * Saves the game.
+     * Saves the game. If the game is new the user requesting this operation will be stored as {@link Game#creator}.
      * @param game the game to save
      * @return the saved game
      */
@@ -92,8 +113,9 @@ public class GameService {
                     auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
-            messageBean.alertError(game.getName(), "Deleting game failed");
-            LOGGER.info("Deleting game '{}' (id={}) failed, stack trace:", game.getName(), game.getId());
+            String name = game == null ? "Unknown" : game.getName();
+            messageBean.alertError(name, "Deleting game failed");
+            LOGGER.info("Deleting game '{}' (id={}) failed, stack trace:", name, game == null ? "null" : game.getId());
             e.printStackTrace();
         }
     }
@@ -106,6 +128,7 @@ public class GameService {
     public void confirm(User user, Game game) {
         if (!this.disabledConfirmation(user, game)) {
             game.getConfirmedUsers().add(user);
+            this.saveGame(game);
 
             // show ui message and log
             messageBean.alertInformation(game.getName(), "Your participation was successfully confirmed");
@@ -123,7 +146,7 @@ public class GameService {
      */
     public boolean disabledConfirmation(User user, Game game) {
         // game confirmation generally disabled or user not invited?
-        return disabledConfirmation(game) || gameRepo.findByUserConfirmation(user, game) < 1;
+        return disabledConfirmation(game) || !gameRepo.getIsNeededConfirmation(user, game);
     }
 
     /**

@@ -1,9 +1,10 @@
 package at.timeguess.backend.services;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static at.timeguess.backend.utils.TestSetup.*;
+import static at.timeguess.backend.utils.TestUtils.*;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +29,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
-import at.timeguess.backend.utils.TestUtils;
+import at.timeguess.backend.utils.TestSetup;
 
 /**
  * Tests for {@link UserService}.
@@ -46,7 +47,7 @@ public class UserServiceTest {
     public void testDatainitialization(String username, Integer roleExpected) {
         User user = assertLoadUser(username, true, "User '%s' could not be loaded");
 
-        assertTrue(user.getRoles().contains(TestUtils.USERROLES.get(roleExpected)), String.format("User '%s' does not have role %s", user, TestUtils.USERROLES.get(roleExpected).toString()));
+        assertTrue(user.getRoles().contains(USERROLES.get(roleExpected)), String.format("User '%s' does not have role %s", user, USERROLES.get(roleExpected).toString()));
         assertNotNull(user.getCreateUser(), String.format("User '%s' does not have a createUser defined", user));
         assertNotNull(user.getCreateDate(), String.format("User '%s' does not have a createDate defined", user));
         assertNull(user.getUpdateUser(), String.format("User '%s' has a updateUser defined", user));
@@ -114,11 +115,18 @@ public class UserServiceTest {
         toBeCreatedUser.setLastName(lName);
         toBeCreatedUser.setEmail(email);
         toBeCreatedUser.setRoles(Set.of(UserRole.PLAYER, UserRole.MANAGER));
+        
+        toBeCreatedUser.setId(0L);
+        assertTrue(toBeCreatedUser.isNew());
+        toBeCreatedUser.setId(null);
+        assertTrue(toBeCreatedUser.isNew());
+        
         userService.saveUser(toBeCreatedUser);
 
         User freshlyCreatedUser = assertLoadUser(username, true, "New user '%s' could not be loaded from test data source after being saved");
         assertEquals(username, freshlyCreatedUser.getUsername(), "User '%s' does not have a the correct username attribute stored being saved");
         assertEquals(password, freshlyCreatedUser.getPassword(), String.format("User '%s' does not have a the correct password attribute stored being saved", username));
+        assertEquals(true, freshlyCreatedUser.isEnabled(), String.format("User '%s' does not have a the correct activation state stored being saved", username));
         assertEquals(fName, freshlyCreatedUser.getFirstName(), String.format("User '%s' does not have a the correct firstName attribute stored being saved", username));
         assertEquals(lName, freshlyCreatedUser.getLastName(), String.format("User '%s' does not have a the correct lastName attribute stored being saved", username));
         assertEquals(email, freshlyCreatedUser.getEmail(), String.format("User '%s' does not have a the correct email attribute stored being saved", username));
@@ -202,7 +210,7 @@ public class UserServiceTest {
     @WithAnonymousUser
     public void testUnauthorizedSaveUserSuccess(String username) {
         assertDoesNotThrow(() -> {
-            User expected = TestUtils.createUser(username);
+            User expected = createUser(username);
             expected.setPassword("pword");
             
             User result = userService.saveUser(expected);
@@ -264,27 +272,26 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAllPlayers() {
-        List<User> expected = TestUtils.createEntities(TestUtils::createUser, Arrays.asList("admin", "user1", "user2", "michael", "felix", "lorenz", "verena", "claudia", "clemens"));
-        Collection<User> result = userService.getAllPlayers();
+        List<User> expected = createEntities(TestSetup::createUser, Arrays.asList("admin", "user1", "user2", "michael", "felix", "lorenz", "verena", "claudia", "clemens"));
+        List<User> result = userService.getAllPlayers();
 
-        TestUtils.assertLists(expected, result);
+        assertListsCompare(expected, result);
     }
 
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAvailablePlayers() {
-        List<User> expected = TestUtils.createEntities(TestUtils::createUser, Arrays.asList("admin", "user2", "michael", "felix", "claudia"));
-        Collection<User> result = userService.getAvailablePlayers();
+        List<User> expected = createEntities(TestSetup::createUser, Arrays.asList("admin", "michael"));
+        List<User> result = userService.getAvailablePlayers();
 
-        TestUtils.assertLists(expected, result);
+        assertListsCompare(expected, result);
     }
 
-    //@CsvSource(delimiter = '|', value = { "admin|true", "user1|true", "user2|true", "elvis|false", "michael|true", "felix|true", "lorenz|true", "verena|true", "claudia|true", "clemens|true" })
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "1|true", "2|false", "3|true", "4|false", "5|true", "6|true", "7|false", "8|false", "9|true", "10|false", "11|false" })
+    @CsvSource(delimiter = '|', value = { "1|true", "2|false", "3|false", "4|false", "5|true", "6|false", "7|false", "8|false", "9|false", "10|false", "11|false" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
-    public void testIsAvailablePlayer(long userid, boolean expected) {
-        assertEquals(expected, userService.isAvailablePlayer(TestUtils.createUser(userid)));
+    public void testIsAvailablePlayer(long userId, boolean expected) {
+        assertEquals(expected, userService.isAvailablePlayer(createUser(userId)));
     }
 
     @ParameterizedTest
@@ -293,12 +300,12 @@ public class UserServiceTest {
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetTeammates(String username, String usernamesExpected) {
         User user = assertLoadUser(username);
-        TestUtils.assertResultList(userService.getTeammates(user), "found user list should not contain %s but does",
+        assertResultList(userService.getTeammates(user), "found user list should not contain %s but does",
             usernamesExpected != null && usernamesExpected.length() > 0, u -> usernamesExpected.contains(u.getUsername()));
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "admin|0", "user1|2", "user2|1", "elvis|0", "michael|3", "felix|3", "lorenz|4", "verena|3", "claudia|2", "clemens|3" })
+    @CsvSource(delimiter = '|', value = { "admin|0", "user1|1", "user2|1", "elvis|0", "michael|3", "felix|3", "lorenz|3", "verena|2", "claudia|2", "clemens|2" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetTotalGames(String username, Integer totalExpected) {
         User user = assertLoadUser(username);
@@ -308,7 +315,7 @@ public class UserServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "admin|0", "user1|1", "user2|0", "elvis|0", "michael|1", "felix|2", "lorenz|3", "verena|2", "claudia|0", "clemens|2" })
+    @CsvSource(delimiter = '|', value = { "admin|0", "user1|1", "user2|0", "elvis|0", "michael|1", "felix|2", "lorenz|2", "verena|1", "claudia|0", "clemens|2" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetTotalGamesLost(String username, Integer totalExpected) {
         User user = assertLoadUser(username);
@@ -318,7 +325,7 @@ public class UserServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "admin|0", "user1|1", "user2|1", "elvis|0", "michael|2", "felix|1", "lorenz|1", "verena|1", "claudia|2", "clemens|1" })
+    @CsvSource(delimiter = '|', value = { "admin|0", "user1|0", "user2|1", "elvis|0", "michael|2", "felix|1", "lorenz|1", "verena|1", "claudia|2", "clemens|0" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetTotalGamesWon(String username, Integer totalExpected) {
         User user = assertLoadUser(username);
@@ -353,6 +360,6 @@ public class UserServiceTest {
     }
 
     private static Stream<Arguments> provideWonByTopic() {
-        return TestUtils.USER_TOTALWINSBYTOPIC.stream();
+        return USER_TOTALWINSBYTOPIC.stream();
     }
 }

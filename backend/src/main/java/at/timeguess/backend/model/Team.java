@@ -30,24 +30,25 @@ public class Team implements Serializable, Comparable<Team>, Persistable<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(length = 100, nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "team")
     private Set<GameTeam> games;
 
     @ManyToMany(fetch = FetchType.EAGER,
-        cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST },
-        targetEntity = User.class)
+            cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST },
+            targetEntity = User.class)
     @JoinTable(name = "team_user",
-        joinColumns = @JoinColumn(name = "team_id", nullable = false, updatable = false),
-        inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
-        foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-        inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+            joinColumns = @JoinColumn(name = "team_id", nullable = false, updatable = false),
+            inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
+            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
+            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<User> teamMembers;
 
     private TeamState state;
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -65,11 +66,11 @@ public class Team implements Serializable, Comparable<Team>, Persistable<Long> {
     }
 
     public Set<Game> getGames() {
-        return games.stream().map(GameTeam::getGame).collect(Collectors.toSet());
+        return games == null ? null : games.stream().map(GameTeam::getGame).collect(Collectors.toSet());
     }
 
     public void setGames(Set<Game> games) {
-        this.games = games.stream().map(g -> new GameTeam(g, this)).collect(Collectors.toSet());
+        this.games = games == null ? null : games.stream().map(g -> new GameTeam(g, this)).collect(Collectors.toSet());
     }
 
     /**
@@ -105,7 +106,7 @@ public class Team implements Serializable, Comparable<Team>, Persistable<Long> {
 
         if (obj == null || getClass() != obj.getClass()) return false;
 
-        Team o2 = (Team) obj;
+        final Team o2 = (Team) obj;
         return Objects.equals(getId(), o2.getId());
     }
 

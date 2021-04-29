@@ -55,7 +55,7 @@ public interface UserRepository extends AbstractRepository<User, Long> {
      * Returns the total number of games played by the given user.
      * @return
      */
-    @Query("SELECT COUNT(g) FROM User u JOIN u.teams t JOIN t.games g WHERE u = ?1")
+    @Query("SELECT COUNT(g) FROM User u JOIN u.teams t JOIN t.games tg JOIN tg.game g WHERE u = ?1 AND g.status IN (4, 5)")
     int getTotalGames(User user);
 
     /**

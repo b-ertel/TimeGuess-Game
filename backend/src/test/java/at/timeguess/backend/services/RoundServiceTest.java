@@ -1,4 +1,4 @@
-package at.timeguess.backend.tests.services;
+package at.timeguess.backend.services;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.repositories.GameRepository;
-import at.timeguess.backend.services.RoundService;
 
 /**
  * Some very basic tests for {@link RoundService}.

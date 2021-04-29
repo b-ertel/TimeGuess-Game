@@ -156,7 +156,7 @@ public class UserService {
     /**
      * Saves the user.
      * This method will also set {@link User#createDate} for new entities or {@link User#updateDate} for updated entities.
-     * The user requesting this operation will also be stored as {@link User#createDate} or {@link User#updateUser} respectively.
+     * The user requesting this operation will also be stored as {@link User#createUser} or {@link User#updateUser} respectively.
      * @param user the user to save
      * @return the saved user
      */
@@ -213,6 +213,10 @@ public class UserService {
         }
     }
 
+    /**
+     * Returns the user representing the currently authenticated principal.
+     * @return
+     */
     User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findFirstByUsername(auth.getName());
