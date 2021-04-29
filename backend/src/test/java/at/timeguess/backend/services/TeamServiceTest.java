@@ -121,6 +121,27 @@ public class TeamServiceTest {
         assertNull(team.getTeamMembers());
     }
 
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DirtiesContext
+    public void testSaveTeamWithEmptyName() {
+        assertDoesNotThrow(() -> {
+            Team toBeCreatedTeam = new Team();
+            teamService.saveTeam(toBeCreatedTeam);
+        });
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DirtiesContext
+    public void testSaveTeamWithExistingName() {
+        assertDoesNotThrow(() -> {
+            Team team = assertLoadTeam("Team 4", true, "Team '%s' could not be loaded from test data source");
+            team.setName("Team 5");
+            teamService.saveTeam(team);
+        });
+    }
+
     private Team assertLoadTeam(long teamId, boolean shouldExist, String msgFormat) {
         Team team = teamService.findById(teamId).orElse(null);
         if (shouldExist) assertNotNull(team, String.format(msgFormat, String.valueOf(teamId)));

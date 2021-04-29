@@ -18,7 +18,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.test.context.support.TestExecutionEvent;
@@ -140,12 +139,21 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     @DirtiesContext
-    public void testExceptionForEmptyUsername() {
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            assertLoadUser("admin", true, "Admin user '%s' could not be loaded from test data source");
-
+    public void testSaveUserWithEmptyUsername() {
+        assertDoesNotThrow(() -> {
             User toBeCreatedUser = new User();
             userService.saveUser(toBeCreatedUser);
+        });
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DirtiesContext
+    public void testSaveUserWithExistingUsername() {
+        assertDoesNotThrow(() -> {
+            User user = assertLoadUser("admin", true, "Admin user '%s' could not be loaded from test data source");
+            user.setUsername("user1");
+            userService.saveUser(user);
         });
     }
 

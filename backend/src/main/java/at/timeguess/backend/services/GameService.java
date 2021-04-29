@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
@@ -19,7 +20,7 @@ import at.timeguess.backend.ui.beans.MessageBean;
  * Service for accessing and manipulating game data.
  */
 @Component
-@Scope("application")
+@Scope(WebApplicationContext.SCOPE_APPLICATION)
 public class GameService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
@@ -80,19 +81,30 @@ public class GameService {
      */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('ADMIN')")
     public Game saveGame(Game game) {
-        boolean isNew = game.isNew();
-        if (isNew) {
-            game.setCreator(userService.getAuthenticatedUser());
+        Game ret = null;
+        try {
+            boolean isNew = game.isNew();
+            if (isNew) {
+                game.setCreator(userService.getAuthenticatedUser());
+            }
+            ret = gameRepo.save(game);
+
+            // show ui message and log
+            messageBean.alertInformation(ret.getName(), isNew ? "New game created" : "Game updated");
+
+            User auth = userService.getAuthenticatedUser();
+            LOGGER.info("Game '{}' (id={}) was {} by User '{}' (id={})", ret.getName(), ret.getId(),
+                    isNew ? "created" : "updated", auth.getUsername(), auth.getId());
         }
-        Game ret = gameRepo.save(game);
+        catch (Exception e) {
+            String msg = "Saving game failed";
+            if (e.getMessage().contains("GAME(NAME)"))
+                msg += String.format(": game named '%s' already exists", game.getName());
+            messageBean.alertError(game.getName(), msg);
 
-        // show ui message and log
-        messageBean.alertInformation(ret.getName(), isNew ? "New game created" : "Game updated");
-
-        User auth = userService.getAuthenticatedUser();
-        LOGGER.info("Game '{}' (id={}) was {} by User '{}' (id={})", ret.getName(), ret.getId(),
-                isNew ? "created" : "updated", auth.getUsername(), auth.getId());
-
+            LOGGER.info("Saving game '{}' (id={}) failed, stack trace:", game.getName(), game.getId());
+            e.printStackTrace();
+        }
         return ret;
     }
 

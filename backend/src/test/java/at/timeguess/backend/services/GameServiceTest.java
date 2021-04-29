@@ -249,6 +249,27 @@ public class GameServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DirtiesContext
+    public void testSaveGameWithEmptyName() {
+        assertDoesNotThrow(() -> {
+            Game toBeCreatedGame = new Game();
+            gameService.saveGame(toBeCreatedGame);
+        });
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @DirtiesContext
+    public void testSaveGameWithExistingName() {
+        assertDoesNotThrow(() -> {
+            Game game = assertLoadGame(1, true, "Game '%s' could not be loaded from test data source");
+            game.setName("Game 2");
+            gameService.saveGame(game);
+        });
+    }
+
+    @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void testConfirm() {

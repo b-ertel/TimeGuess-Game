@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
@@ -16,7 +17,7 @@ import at.timeguess.backend.repositories.TeamRepository;
 import at.timeguess.backend.ui.beans.MessageBean;
 
 @Component
-@Scope("application")
+@Scope(WebApplicationContext.SCOPE_APPLICATION)
 public class TeamService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamService.class);
@@ -88,15 +89,26 @@ public class TeamService {
      */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('ADMIN')")
     public Team saveTeam(Team team) {
-        boolean isNew = team.isNew();
+        Team ret = null;
+        try {
+            boolean isNew = team.isNew();
 
-        Team ret = teamRepository.save(team);
+            ret = teamRepository.save(team);
 
-        // show ui message and log
-        messageBean.alertInformation(ret.getName(), isNew ? "New team created" : "Team updated");
+            // show ui message and log
+            messageBean.alertInformation(ret.getName(), isNew ? "New team created" : "Team updated");
 
-        LOGGER.info("Team '{}' (id={}) was {}", ret.getName(), ret.getId(), isNew ? "created" : "updated");
+            LOGGER.info("Team '{}' (id={}) was {}", ret.getName(), ret.getId(), isNew ? "created" : "updated");
+        }
+        catch (Exception e) {
+            String msg = "Saving team failed";
+            if (e.getMessage().contains("TEAM(NAME)"))
+                msg += String.format(": team named '%s' already exists", team.getName());
+            messageBean.alertError(team.getName(), msg);
 
+            LOGGER.info("Saving team '{}' (id={}) failed, stack trace:", team.getName(), team.getId());
+            e.printStackTrace();
+        }
         return ret;
     }
 }

@@ -212,7 +212,8 @@ public class GameDetailController implements Serializable {
      */
     public void doSaveGame() {
         if (doValidateGame()) {
-            game = this.gameService.saveGame(game);
+            Game ret = this.gameService.saveGame(game);
+            if (ret != null) game = ret;
         }
         else messageBean.alertErrorFailValidation("Saving game failed", "Input fields are invalid");
     }

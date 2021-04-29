@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
@@ -26,7 +27,7 @@ import at.timeguess.backend.ui.beans.NewUserBean;
  * Service for accessing and manipulating user data.
  */
 @Component
-@Scope("application")
+@Scope(WebApplicationContext.SCOPE_APPLICATION)
 public class UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
@@ -163,30 +164,41 @@ public class UserService {
     @Target(NewUserBean.class)
     @PreAuthorize("hasAuthority('ADMIN') OR #user.id == null OR principal.username eq #user.username")
     public User saveUser(User user) {
-        // for self registration get any admin user as creator
-        // null would work also (setting the property to optional in User class)
-        // but demo.UserStatusController.afterStatusChange throws an exception then
-        User auth = getAuthenticatedUser();
-        if (auth == null) auth = this.getAdminUser();
+        User ret = null;
+        try {
+            // for self registration get any admin user as creator
+            // null would work also (setting the property to optional in User class)
+            // but demo.UserStatusController.afterStatusChange throws an exception then
+            User auth = getAuthenticatedUser();
+            if (auth == null) auth = this.getAdminUser();
 
-        boolean isNew = user.isNew();
-        if (isNew) {
-            user.setCreateDate(new Date());
-            user.setCreateUser(auth);
+            boolean isNew = user.isNew();
+            if (isNew) {
+                user.setCreateDate(new Date());
+                user.setCreateUser(auth);
+            }
+            else {
+                user.setUpdateDate(new Date());
+                user.setUpdateUser(auth);
+            }
+            ret = userRepository.save(user);
+
+            // show ui message and log
+            messageBean.alertInformation(ret.getUsername(), isNew ? "New user created" : "User updated");
+
+            if (auth == null) auth = ret;
+            LOGGER.info("User '{}' (id={}) was {} by User '{}' (id={})", ret.getUsername(), ret.getId(),
+                    isNew ? "created" : "updated", auth.getUsername(), auth.getId());
         }
-        else {
-            user.setUpdateDate(new Date());
-            user.setUpdateUser(auth);
+        catch (Exception e) {
+            String msg = "Saving user failed";
+            if (e.getMessage().contains("USER(USERNAME)"))
+                msg += String.format(": user named '%s' already exists", user.getUsername());
+            messageBean.alertError(user.getUsername(), msg);
+
+            LOGGER.info("Saving user '{}' (id={}) failed, stack trace:", user.getUsername(), user.getId());
+            e.printStackTrace();
         }
-        User ret = userRepository.save(user);
-
-        // show ui message and log
-        messageBean.alertInformation(ret.getUsername(), isNew ? "New user created" : "User updated");
-
-        if (auth == null) auth = ret;
-        LOGGER.info("User '{}' (id={}) was {} by User '{}' (id={})", ret.getUsername(), ret.getId(),
-                isNew ? "created" : "updated", auth.getUsername(), auth.getId());
-
         return ret;
     }
 

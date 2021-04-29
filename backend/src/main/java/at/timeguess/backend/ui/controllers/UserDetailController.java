@@ -99,8 +99,11 @@ public class UserDetailController implements Serializable {
         if (this.doValidateUser()) {
             this.checkPasswordChange();
 
-            user = this.userService.saveUser(user);
-            orgPassword = user.getPassword();
+            User ret = this.userService.saveUser(user);
+            if (ret != null) {
+                user = ret;
+                orgPassword = user.getPassword();
+            }
         }
         else messageBean.alertErrorFailValidation("Saving user failed", "Input fields are invalid");
     }
