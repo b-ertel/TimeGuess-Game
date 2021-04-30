@@ -1,26 +1,18 @@
 package at.timeguess.backend.ui.controllers;
 
-import java.io.FileReader;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.inject.Named;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Term;
-import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.model.exceptions.TermAlreadyExistsException;
 import at.timeguess.backend.services.TermService;
 
 /**
@@ -29,7 +21,7 @@ import at.timeguess.backend.services.TermService;
 @Component
 @Named
 @RequestScoped
-@Scope("view")
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class TermListController implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -40,44 +32,37 @@ public class TermListController implements Serializable {
     /**
      * Internal terms cache.
      */
-    private List<Term> terms;
+    private Collection<Term> filterTerms;
+    private Term selectedTerm;
 
     /**
-     * Cache the uploaded file.
+     * Returns a list of all all terms.
      */
-    private UploadedFile file;
-
-    @PostConstruct
-    public void reloadTerms() {
-        terms = termService.getAllTerms();
-    }
-
     public List<Term> getTerms() {
-        return terms;
+        return termService.getAllTerms();
     }
 
-    public void doCreateTerm() {
-        Term term = new Term();
-        Topic topic = new Topic();
-        term.setTopic(topic);
-        try {
-            term = termService.saveTerm(term);
-            terms.add(term);
-        } catch (TermAlreadyExistsException e) {
-            ;
-        };
+    /**
+     * Returns and sets a list of games, by default all returned by
+     * {@link getTerms()} (helper methods for primefaces datatable filter and sort).
+     */
+    public Collection<Term> getFilterTerms() {
+        if (filterTerms == null) filterTerms = getTerms();
+        return filterTerms;
     }
 
-    public void doLoadTermsJSON(FileUploadEvent event) throws Exception {
-
-        FacesMessage message = new FacesMessage("Successful", event.getFile().getFileName() + " is uploaded.");
-        FacesContext.getCurrentInstance().addMessage(null, message);
-
-        System.out.print(file);
-
-        // Object jsonFile = new JSONParser().parse(file);
-        // JSONObject termsJSON = (JSONObject) jsonFile;
-
+    public void setFilterTerms(Collection<Term> games) {
+        filterTerms = games;
     }
-    
+
+    /**
+     * Returns and sets the currently selected game (helper methods for primefaces datatable contextmenu).
+     */
+    public Term getSelectedTerm() {
+        return selectedTerm;
+    }
+
+    public void setSelectedTerm(Term selectedTerm) {
+        this.selectedTerm = selectedTerm;
+    }
 }

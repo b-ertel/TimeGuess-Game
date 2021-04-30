@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -30,8 +31,7 @@ public class Topic implements Comparable<Topic>, Persistable<Long>, Serializable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: should be also 'nullable = false, unique = true' (but at the moment "Add new Term" crashes then)
-    @Column(length = 100)
+    @Column(length = 100, nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE)
@@ -55,7 +55,7 @@ public class Topic implements Comparable<Topic>, Persistable<Long>, Serializable
     }
 
     public Set<Term> getTerms() {
-        return terms;
+        return terms == null ? new HashSet<>() : terms;
     }
 
     public void setTerms(Set<Term> terms) {

@@ -1,37 +1,45 @@
 package at.timeguess.backend.services;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
+import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.exceptions.TermAlreadyExistsException;
 import at.timeguess.backend.repositories.TermRepository;
 import at.timeguess.backend.repositories.TopicRepository;
+import at.timeguess.backend.ui.beans.MessageBean;
 
 /**
  * Provides an interface to the model for managing {@link Term} entities.
  */
 @Component
-@Scope("application")
+@Scope(WebApplicationContext.SCOPE_APPLICATION)
 public class TermService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TermService.class);
 
     @Autowired
     private TermRepository termRepository;
-
     @Autowired
     private TopicRepository topicRepository;
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private MessageBean messageBean;
 
     /**
      * Returns a list of all terms.
-     *
      * @return list of all terms
      */
     @PreAuthorize("hasAuthority('MANAGER')")
@@ -41,7 +49,6 @@ public class TermService {
 
     /**
      * Returns a list of all terms from a single topic.
-     *
      * @param topic the topic whose terms are returned
      * @return list of terms
      */
@@ -52,7 +59,6 @@ public class TermService {
 
     /**
      * Loads a single Term identified by it's ID.
-     *
      * @param id the id of the term to load
      * @return a single Term
      */
@@ -62,36 +68,38 @@ public class TermService {
     }
 
     /**
-     * Loads a single Term identified by it's name.
-     *
-     * @param name the name of the term to load
-     * @return a single Term
-     */
-    @PreAuthorize("hasAuthority('MANAGER')")
-    public Term loadTerm(String name, Topic topic) {
-        return termRepository.findByName(name, topic);
-    }
-
-    /**
      * Saves the Term.
-     *
      * @param term the term to save
      * @return the new term
      * @throws TermAlreadyExistsException
      */
     @PreAuthorize("hasAuthority('MANAGER')")
-    public Term saveTerm(Term term) throws TermAlreadyExistsException {
-        if (term.isNew()) {
-            Term newTerm = termRepository.save(term);
-            return newTerm;
-        } else {
-            throw new TermAlreadyExistsException();
+    public Term saveTerm(Term term) {
+        Term ret = null;
+        try {
+            boolean isNew = term.isNew();
+
+            ret = termRepository.save(term);
+
+            // show ui message and log
+            messageBean.alertInformation(ret.getName(), isNew ? "New term created" : "Term updated");
+
+            LOGGER.info("Term '{}' (id={}) was {}", ret.getName(), ret.getId(), isNew ? "created" : "updated");
         }
+        catch (Exception e) {
+            String msg = "Saving term failed";
+            if (e.getMessage().contains("TERM(TOPIC, NAME)"))
+                msg += String.format(": term named '%s' already exists", term.getName());
+            messageBean.alertError(term.getName(), msg);
+
+            LOGGER.info("Saving term '{}' (id={}) failed, stack trace:", term.getName(), term.getId());
+            e.printStackTrace();
+        }
+        return ret;
     }
 
     /**
-     * Updates the Term. 
-     *
+     * Updates the Term.
      * @param term the term to update
      * @return the updated term
      */
@@ -106,7 +114,8 @@ public class TermService {
         if (topicNames.contains(topicName)) {
             Topic newTopic = topicRepository.findByName(topicName);
             term.setTopic(newTopic);
-        } else {
+        }
+        else {
             Topic newTopic = new Topic();
             newTopic.setName(topicName);
             topicRepository.save(newTopic);
@@ -118,12 +127,25 @@ public class TermService {
 
     /**
      * Deletes the term.
-     *
      * @param term the term to delete
      */
     @PreAuthorize("hasAuthority('MANAGER')")
     public void deleteTerm(Term term) {
-        termRepository.delete(term);
-    }
+        try {
+            termRepository.delete(term);
 
+            // show ui message and log
+            messageBean.alertInformation(term.getName(), "Term was deleted");
+
+            User auth = userService.getAuthenticatedUser();
+            LOGGER.info("Term '{}' (id={}) was deleted by User '{}' (id={})", term.getName(), term.getId(),
+                    auth.getUsername(), auth.getId());
+        }
+        catch (Exception e) {
+            String name = term == null ? "Unknown" : term.getName();
+            messageBean.alertError(name, "Deleting term failed");
+            LOGGER.info("Deleting term '{}' (id={}) failed, stack trace:", name, term == null ? "null" : term.getId());
+            e.printStackTrace();
+        }
+    }
 }

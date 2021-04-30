@@ -13,7 +13,7 @@
 
         <h:form id="userListForm">
             <ui:remove>create user command</ui:remove>
-            <p:menubar id="toolbar" style="margin-bottom:10px">
+            <p:menubar id="toolbar" styleClass="pagemenu">
                 <p:menuitem value="&nbsp;Create User&nbsp;" icon="fa fa-user-plus"
                     oncomplete="PF('userCreateDialog').show()" update=":userCreateForm:userCreateDialog" />
             </p:menubar>

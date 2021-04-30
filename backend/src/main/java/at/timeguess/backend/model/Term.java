@@ -11,12 +11,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.util.Objects;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.springframework.data.domain.Persistable;
 
 /**
  * Entity representing Terms.
  */
+@Table(uniqueConstraints = @UniqueConstraint(columnNames={"topic", "name"}))
 @Entity
 @SequenceGenerator(name = "seq", initialValue = 30, allocationSize = 100)
 public class Term implements Persistable<Long>, Serializable {
@@ -27,8 +30,7 @@ public class Term implements Persistable<Long>, Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: should be also 'nullable = false, unique = true' (but at the moment "Add new Term" crashes then)
-    @Column(length = 250)
+    @Column(length = 250, nullable = false)
     private String name;
 
     @ManyToOne

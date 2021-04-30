@@ -4,94 +4,178 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
-<style type="text/css">
-    pre code {
-        background-color: #eee;
-        border: 1px solid #999;
-        display: block;
-        padding: 20px;
-    }
-</style>
+
     <ui:define name ="content">
-        <h:form id="toolbarForm">
-            <p:menubar id="toolbar">
-                <p:menuitem value="&nbsp;Add new Term&nbsp;" icon="fa fa-plus"
-                            action="#{termListController.doCreateTerm}"
-                            oncomplete="PF('newTermDialog').show()"
-                            update=":termsForm:termsTable :toolbarForm:toolbar"/>
-                <p:menuitem value="&nbsp;Load new Terms from JSON file&nbsp;" icon="fa fa-file-text-o"
-                            oncomplete="PF('newTermsDialog').show()"
-                            update=":termsForm:termsTable :toolbarForm:toolbar"/>
-                <p:menuitem value="&nbsp;Refresh&nbsp;" icon="fa fa-refresh"
-                            action="#{termListController.reloadTerms()}"
-                            update=":termsForm:termsTable :toolbarForm:toolbar"/>
+        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+
+        <h:form id="termListForm">
+            <ui:remove>create term command</ui:remove>
+            <p:menubar id="toolbar" styleClass="pagemenu">
+                <p:menuitem value="&nbsp;Create Term&nbsp;" icon="fa fa-plus"
+                    oncomplete="PF('termCreateDialog').show()" update=":termCreateForm:termCreateDialog"/>
+                <p:menuitem icon="fa fa-file-text-o" value="&nbsp;Load new Terms from file&nbsp;"
+                    oncomplete="PF('newTermsDialog').show()" update=":termListForm:termTable"/>
             </p:menubar>
-        </h:form>
-        <h:form id="termsForm">
-            <p:dataTable id="termsTable" var="term" value="#{termListController.terms}">
-                <p:column headerText="Term">
+
+            <ui:remove>show all terms</ui:remove>
+            <p:dataTable id="termTable" widgetVar="termTable" var="term" value="#{termListController.terms}" filteredValue="#{termListController.filterTerms}"
+                rowKey="#{term.id}" selection="#{termListController.selectedTerm}" selectionMode="single">
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column headerText="Term" sortBy="#{term.name}" filterBy="#{term.name}" filterMatchMode="contains" />
+                        <p:column headerText="Topic" sortBy="#{term.topic}" filterBy="#{term.topic.name}" filterMatchMode="contains" />
+                        <p:column headerText="Manage Term" style="width:10%"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <p:column>
                     <h:outputText value="#{term.name}"/>
                 </p:column>
-                <p:column headerText="Topic">
+                <p:column>
                     <h:outputText value="#{term.topic.name}"/>
                 </p:column>
-                <p:column style="width:100px;text-align: center">
-                    <p:commandButton update=":termsForm:termEditDialog" oncomplete="PF('termEditDialog').show()" icon="fa fa-edit" title="Edit">
+                <p:column style="text-align:center">
+                    <p:commandButton title="Edit" icon="fa fa-edit"
+                        oncomplete="PF('termEditDialog').show()" update=":termDetailForm:termEditDialog :msg">
                         <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
                     </p:commandButton>
-                    <p:commandButton action="#{termDetailController.doDeleteTerm}" icon="fa fa-trash" title="Delete" update=":termsForm:termsTable">
+                    <p:commandButton title="Delete" icon="fa fa-trash"
+                        action="#{termDetailController.doDeleteTerm}" onsuccess="PF('termTable').filter()"
+                        update=":termListForm:termTable :msg">
                         <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
-                        <p:confirm header="Confirmation" message="Are you sure that you want to delete this term? You cannot undo this operation." icon="fa fa-exclamation-triangle" />
+                        <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this term? This cannot be undone." />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
 
-            <p:dialog header="Edit Term" id="termEditDialog" widgetVar="termEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                <p:outputPanel id="termData" rendered="#{not empty termDetailController.term}">
-                    <h:panelGrid columns="2">
-                        <p:outputLabel for="name" value="Name: " />
-                        <p:inputText id="name" value="#{termDetailController.term.name}"/>
+            <p:contextMenu for="termTable">
+                <p:menuitem value="&nbsp;Edit" icon="fa fa-edit"
+                    oncomplete="PF('termEditDialog').show()" update=":termDetailForm:termEditDialog :msg">
+                    <f:setPropertyActionListener value="#{termListController.selectedTerm}" target="#{termDetailController.term}" />
+                </p:menuitem>
+                <p:menuitem value="&nbsp;Delete" icon="fa fa-trash" action="#{termDetailController.doDeleteTerm}"
+                    onsuccess="PF('termTable').filter()" update="termTable :msg">
+                    <f:setPropertyActionListener value="#{termListController.selectedTerm}" target="#{termDetailController.term}" />
+                    <p:confirm header="Confirmation" icon="fa fa-warning" message="Are you sure about deleting this term? This cannot be undone." />
+                </p:menuitem>
+            </p:contextMenu>
+        </h:form>
+
+        <h:form id="termDetailForm" prependId="false">
+            <ui:remove>edit term</ui:remove>
+            <p:dialog header="Edit Term" id="termEditDialog" widgetVar="termEditDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                <p:ajax event="close" update="termData" process="@parent" resetValues="true" />
+                
+                <c:set var="curr" value="#{termDetailController.term}" scope="request" />
+                <p:outputPanel id="termData" rendered="#{not empty curr}">
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                        columnClasses="p-col-3, p-col-9" contentStyleClass="ui-fluid">
+                        
+                        <p:outputLabel for="name" value="Term: " />
+                        <p:inputText id="name" value="#{curr.name}" required="true" maxlength="250"/>
+                        
                         <p:outputLabel for="topic" value="Topic: " />
-                        <p:inputText id="topic" value="#{termDetailController.term.topic.name}" disabled="true"/>
-                    </h:panelGrid>
-                    <p:separator />
+                        <p:inputText id="topic" value="#{curr.topic.name}" disabled="true"/>
+                    </p:panelGrid>
+                    <p:separator style="margin:11px 0px 12px" />
+
                     <h:panelGrid columns="3">
-                        <p:commandButton value="Save" action="#{termDetailController.doUpdateTerm()}" oncomplete="PF('termEditDialog').hide();#{termListController.reloadTerms()}" update=":termsForm:termsTable"/>
-                        <p:commandButton value="Reload" action="#{termDetailController.doReloadTerm()}" update=":termsForm:termData"/>
+                        <p:commandButton value="Save" action="#{termDetailController.doSaveTerm()}"
+                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('termEditDialog').hide(); PF('termTable').filter(); }"
+                            update=":termListForm:termTable termData :msg"/>
+                        <p:commandButton value="Reload" action="#{termDetailController.doReloadTerm()}"
+                            process="@parent" update=":termDetailForm:termData :msg" resetValues="true"/>
                         <p:commandButton value="Abort" onclick="PF('termEditDialog').hide()"/>
                     </h:panelGrid>
                 </p:outputPanel>
             </p:dialog>
+        </h:form>
 
-            <p:dialog header="Upload new Terms" id="newTermsDialog" widgetVar="newTermsDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+        <h:form id="termUploadForm" prependId="false">
+            <p:dialog header="Upload new Terms" id="newTermsDialog" widgetVar="newTermsDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" responsive="true" width="430">
+                
                 <p:outputPanel id="newPanel">
-                    Upload a JSON file in the following format:
-                    <pre><code>
+                    <p:panel>
+                        <p:outputLabel for="sampleJson">Upload a JSON file in the following format:</p:outputLabel>
+                        <h:outputFormat id="sampleJson" styleClass="code"><pre><code>
+        {
             "Topic 1": [
                 "Term 1",
                 "Term 2",
                 "Term 3"
-                ],
+            ],
             "Topic 2": [
                 "Term 4",
                 "Term 5",
                 "Term 6"
-                ]
-            
-                    </code></pre>
-                    <p:fileUpload value="#{termListController.file}" mode="simple" skinSimple="true" auto="true"
-                                process="@this" update="messages"
-                                listener="#{termListController.doLoadTermsJSON}"/>
+            ]
+        }
+                        </code></pre></h:outputFormat>
+                        <div style="margin-bottom:8px">Existing topics will be extended, new ones created.</div>
+                        <div>You can upload multiple files at once, each containing terms for one or multiple topics - but all in one is faster.</div>
+                    </p:panel>
+
+                    <p:fileUpload id="termUpload" chooseIcon="fa fa-file-text-o" uploadIcon="fa fa-upload" cancelIcon="fa fa-window-close-o"
+                        listener="#{topicListController.doUploadTerms}" update=":termListForm:termTable :msg"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('newTermsDialog').hide(); }"
+                        mode="advanced" multiple="true" dragDropSupport="true" sizeLimit="1000000"
+                        allowTypes="/(\.|\/)(json)$/i" style="margin:8px 0px 8px" />
                 </p:outputPanel>
+                <p:separator style="margin:11px 0px 12px" />
+
+                <h:panelGrid columns="1">
+                    <p:commandButton value="Abort" onclick="PF('newTermsDialog').hide()" />
+                </h:panelGrid>
             </p:dialog>
+        </h:form>
 
-            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-close" />
+        <h:form id="termCreateForm" prependId="false">
+            <ui:remove>create new term</ui:remove>
+            <p:dialog header="Create Term" id="termCreateDialog" widgetVar="termCreateDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                <p:ajax event="close" update="termCreateData" process="@parent" resetValues="true" />
+
+                <p:outputPanel id="termCreateData">
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                        columnClasses="p-col-3, p-col-9" contentStyleClass="ui-fluid">
+
+                        <p:outputLabel for="termnameCreate" value="Term: " />
+                        <p:inputText id="termnameCreate" value="#{newTermBean.termName}" required="true" maxlength="250" />
+
+                        <h:outputLabel for="topicCreate" value="Topic: " />
+                        <p:selectOneMenu id="topicCreate" value="#{newTermBean.topic}" converter="omnifaces.SelectItemsConverter"
+                            required="true" requiredMessage="Topic: Value is required">
+                            <p:ajax event="change" process="@this" />
+                            <f:selectItem itemLabel="Select" />
+                            <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:separator style="margin:11px 0px 12px" />
+
+                <h:panelGrid columns="3">
+                    <p:commandButton value="Save" action="#{newTermBean.createTerm}"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('termCreateDialog').hide(); }"
+                        update=":termListForm:termTable termCreateData :msg" />
+                    <p:commandButton value="Reload" action="#{newTermBean.clearFields}"
+                        process="@parent" update=":termCreateForm:termCreateData :msg" resetValues="true" />
+                    <p:commandButton value="Abort" onclick="PF('termCreateDialog').hide()" />
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <ui:remove>delete term confirmation</ui:remove>            
+            <p:confirmDialog id="deleteTermConfirm" global="true" closeOnEscape="true" showEffect="fade" hideEffect="fade" width="40%">
+                <p:commandButton value="No" type="button" icon="fa fa-close" styleClass="ui-confirmdialog-no" />
+                <p:commandButton value="Yes" type="button" icon="fa fa-check" styleClass="ui-confirmdialog-yes" />
             </p:confirmDialog>
-
+            <p:draggable for="deleteTermConfirm"/>
         </h:form>
     </ui:define>
 </ui:composition>

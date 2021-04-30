@@ -23,7 +23,7 @@ import at.timeguess.backend.ui.beans.MessageBean;
 @Scope(WebApplicationContext.SCOPE_APPLICATION)
 public class GameService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameService.class);
 
     @Autowired
     private GameRepository gameRepo;

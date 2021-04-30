@@ -22,7 +22,7 @@
             <c:set var="curr" value="#{gameDetailController.game}" scope="request" />
             
             <ui:remove>create game command</ui:remove>
-            <p:menubar id="toolbar" rendered="#{not isAdminAccess}" style="margin-bottom:10px">
+            <p:menubar id="toolbar" rendered="#{not isAdminAccess}" styleClass="pagemenu">
                 <p:menuitem value="&nbsp;Create Game&nbsp;" icon="fa fa-plus"
                     oncomplete="PF('gameCreateDialog').show()" update=":gameCreateForm:gameCreateDialog" />
             </p:menubar>

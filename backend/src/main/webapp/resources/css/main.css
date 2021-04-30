@@ -140,6 +140,10 @@ table {
     background: rgba(255, 255, 255, 0.85);
 }
 
+.ui-menu {
+    
+}
+
 .ui-menu-child {
     padding-right: 15px !important;
     background: transparent;
@@ -312,7 +316,7 @@ table {
 }
 
 #gameCreateData .ui-menu .ui-menuitem {
-	float: right;
+    float: right;
 }
 
 #userCreateData .ui-panelgrid-cell.p-col-7, #userData .ui-panelgrid-cell.p-col-7 {
@@ -339,4 +343,16 @@ table {
     float: right;
     text-align: right;
     margin-right: 20px;
+}
+
+.pagemenu {
+    margin-bottom: 10px;
+}
+
+pre code {
+    font-family: monospace;
+    font-size: smaller !important;
+    background-color: #eee;
+    border: 1px solid #999;
+    display: block;
 }
