@@ -1,6 +1,5 @@
 package at.timeguess.backend.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -14,9 +13,7 @@ import org.springframework.web.context.WebApplicationContext;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
-import at.timeguess.backend.model.exceptions.TermAlreadyExistsException;
 import at.timeguess.backend.repositories.TermRepository;
-import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.ui.beans.MessageBean;
 
 /**
@@ -30,8 +27,6 @@ public class TermService {
 
     @Autowired
     private TermRepository termRepository;
-    @Autowired
-    private TopicRepository topicRepository;
     @Autowired
     private UserService userService;
 
@@ -71,7 +66,6 @@ public class TermService {
      * Saves the Term.
      * @param term the term to save
      * @return the new term
-     * @throws TermAlreadyExistsException
      */
     @PreAuthorize("hasAuthority('MANAGER')")
     public Term saveTerm(Term term) {
@@ -96,33 +90,6 @@ public class TermService {
             e.printStackTrace();
         }
         return ret;
-    }
-
-    /**
-     * Updates the Term.
-     * @param term the term to update
-     * @return the updated term
-     */
-    @PreAuthorize("hasAuthority('MANAGER')")
-    public Term updateTerm(Term term) {
-        String topicName = term.getTopic().getName();
-        List<Topic> topicList = topicRepository.findAll();
-        List<String> topicNames = new ArrayList<>();
-        for (Topic t : topicList) {
-            topicNames.add(t.getName());
-        }
-        if (topicNames.contains(topicName)) {
-            Topic newTopic = topicRepository.findByName(topicName);
-            term.setTopic(newTopic);
-        }
-        else {
-            Topic newTopic = new Topic();
-            newTopic.setName(topicName);
-            topicRepository.save(newTopic);
-            term.setTopic(newTopic);
-        }
-        Term newTerm = termRepository.save(term);
-        return newTerm;
     }
 
     /**

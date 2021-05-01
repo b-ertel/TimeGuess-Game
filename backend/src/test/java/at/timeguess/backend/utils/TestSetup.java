@@ -144,13 +144,23 @@ public class TestSetup {
     }
 
     /**
-     * Creates a list of entities from the given string list, constructing each with the given function.
+     * Creates a list of entities from the given D list, constructing each with the given function passing the D value.
      * @param createEntity
      * @param fromList
      * @return
      */
-    public static <D, T> List<T> createEntities(Function<D, T> createEntity, Collection<D> fromList) {
-        return fromList.stream().map(createEntity).collect(Collectors.toList());
+    public static <D, T> List<T> createEntities(Function<D, T> createEntity, Collection<D> from) {
+        return createEntities(createEntity, from.stream());
+    }
+
+    /**
+     * Creates a list of entities from the given D stream, constructing each with the given function passing the D value.
+     * @param createEntity
+     * @param fromList
+     * @return
+     */
+    public static <D, T> List<T> createEntities(Function<D, T> createEntity, Stream<D> from) {
+        return from.map(createEntity).collect(Collectors.toList());
     }
 
     /**
@@ -165,8 +175,9 @@ public class TestSetup {
     }
 
     private static List<Long> createList(String colonSeparatedIntList) {
-        return Strings.isEmpty(colonSeparatedIntList) ? new ArrayList<>()
-                : Stream.of(colonSeparatedIntList.split(";")).map(Long::valueOf).collect(Collectors.toList());
+        return Strings.isEmpty(colonSeparatedIntList) ?
+            new ArrayList<>() :
+            Stream.of(colonSeparatedIntList.split(";")).map(Long::valueOf).collect(Collectors.toList());
     }
 
     private static Map<String, Integer> toMap(Object[][] values) {

@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -81,9 +80,8 @@ public class TopicListController implements Serializable {
             JSONObject content = (JSONObject) new JSONParser().parse(reader);
             content.forEach((toName, terms) -> {
                 String topicName = (String) toName;
-                Pattern topicPattern = Pattern.compile(topicName, Pattern.CASE_INSENSITIVE);
-                Optional<Topic> topic = topics.stream().filter(t -> topicPattern.matcher(t.getName()).matches())
-                        .findFirst();
+                String topicPattern = "(?i)" + topicName;
+                Optional<Topic> topic = topics.stream().filter(t -> t.getName().matches(topicPattern)).findFirst();
 
                 // no topic exists for name -> create new
                 if (topic.isEmpty()) {
@@ -98,17 +96,18 @@ public class TopicListController implements Serializable {
                     ((JSONArray) terms).forEach(teName -> {
                         // create term only if not already exists
                         String termName = (String) teName;
-                        Pattern termPattern = Pattern.compile(termName, Pattern.CASE_INSENSITIVE);
-                        if (!currTopic.getTerms().stream().anyMatch(t -> termPattern.matcher(t.getName()).matches())) {
+                        String termPattern = "(?i)" + termName;
+                        if (!currTopic.getTerms().stream().anyMatch(t -> t.getName().matches(termPattern))) {
                             Term newTerm = new Term();
                             newTerm.setName(termName.toUpperCase());
                             newTerm.setTopic(currTopic);
                             if (termService.saveTerm(newTerm) == null)
-                                messageBean.alertError(termName, "Importing term failed: could not create term");
+                                messageBean.alertErrorFailValidation(termName, "Importing term failed: could not create term");
                         }
                     });
                 }
-                else messageBean.alertError(topicName, "Importing terms failed: could not find or create topic");
+                else
+                    messageBean.alertError(topicName, "Importing terms failed: could not find or create topic");
             });
             return true;
         }

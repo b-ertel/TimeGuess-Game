@@ -61,19 +61,12 @@ public class TermDetailController implements Serializable {
      * Action to save the currently displayed term.
      */
     public void doSaveTerm() {
-        if (doValidateGame()) {
+        if (doValidateTerm()) {
             Term ret = this.termService.saveTerm(term);
             if (ret != null) term = ret;
         }
         else
             messageBean.alertErrorFailValidation("Saving term failed", "Input fields are invalid");
-    }
-
-    /**
-     * Action to update the currently displayed term.
-     */
-    public void doUpdateTerm() {
-        term = this.termService.updateTerm(term);
     }
 
     /**
@@ -88,8 +81,9 @@ public class TermDetailController implements Serializable {
      * Checks if all fields contain valid values.
      * @return true if all fields contain valid values, false otherwise
      */
-    public boolean doValidateGame() {
+    public boolean doValidateTerm() {
         if (Strings.isBlank(term.getName())) return false;
+        if (term.getTopic() == null || term.getTopic().isNew()) return false;
         return true;
     }
 }

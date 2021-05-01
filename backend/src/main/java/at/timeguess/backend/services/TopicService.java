@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.model.exceptions.TopicAlreadyExistsException;
 import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.ui.beans.MessageBean;
 
@@ -58,7 +57,6 @@ public class TopicService {
      * Saves the Topic.
      * @param topic the topic to save
      * @return the new topic
-     * @throws TopicAlreadyExistsException
      */
     @PreAuthorize("hasAuthority('MANAGER')")
     public Topic saveTopic(Topic topic) {

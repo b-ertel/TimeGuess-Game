@@ -274,7 +274,20 @@ public class GameDetailControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
-    public void testDoSaveGameFailure(Long gameId) {
+    public void testDoSaveTermFailure(Long termId) {
+        Game game = assertMockGame(termId, true, false);
+        when(gameService.saveGame(game)).thenReturn(null);
+
+        gameDetailController.doSaveGame();
+
+        verify(gameService).saveGame(game);
+        verifyNoInteractions(messageBean);
+        assertEquals(game, gameDetailController.getGame());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 11, 22 })
+    public void testDoSaveGameInvalid(Long gameId) {
         assertMockGame(gameId);
         reset(gameService);
 

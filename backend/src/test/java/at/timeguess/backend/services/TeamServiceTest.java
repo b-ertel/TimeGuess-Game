@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -48,16 +49,19 @@ public class TeamServiceTest {
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAllTeams() {
-        List<Team> expected = createEntities(TestSetup::createTeam, "1;2;3;4;5;6;7;8");
+        List<Team> expected = createEntities(TestSetup::createTeam, LongStream.rangeClosed(1, 8).boxed());
         List<Team> result = teamService.getAllTeams();
 
         assertLists(expected, result);
+        
+        expected = createEntities(id -> teamService.findById(id).get(), LongStream.rangeClosed(1, 8).boxed());
+        assertListsCompare(expected, result);
     }
 
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAvailableTeams() {
-        List<Team> expected = createEntities(TestSetup::createTeam, "1;2;4;6");
+        List<Team> expected = createEntities(TestSetup::createTeam, LongStream.of(1, 2, 4, 6).boxed());
         List<Team> result = teamService.getAvailableTeams();
 
         assertLists(expected, result);

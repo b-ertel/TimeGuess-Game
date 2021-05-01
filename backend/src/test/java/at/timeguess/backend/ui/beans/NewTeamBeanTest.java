@@ -63,8 +63,8 @@ public class NewTeamBeanTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
-    public void testIsAvailablePlayer(Long gameId) {
-        User user = createUser(6L);
+    public void testIsAvailablePlayer(Long userId) {
+        User user = createUser(userId);
 
         when(userService.isAvailablePlayer(user)).thenReturn(true);
         assertTrue(newTeamBean.isAvailablePlayer(user));
@@ -76,9 +76,8 @@ public class NewTeamBeanTest {
         verify(userService).isAvailablePlayer(user);
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = { 1, 2, 3 })
-    public void testClearFields(Integer roleNr) {
+    @Test
+    public void testClearFields() {
         String name = fillBean();
 
         assertEquals(name, newTeamBean.getTeamName());

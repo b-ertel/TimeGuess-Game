@@ -74,8 +74,8 @@ public class NewGameBeanTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
-    public void testIsAvailableTeam(Long gameId) {
-        Team team = createTeam(6L);
+    public void testIsAvailableTeam(Long teamId) {
+        Team team = createTeam(teamId);
 
         when(teamService.isAvailableTeam(team)).thenReturn(true);
         assertTrue(newGameBean.isAvailableTeam(team));
@@ -89,10 +89,10 @@ public class NewGameBeanTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
-    public void testAddNewTeam(Long gameId) {
+    public void testAddNewTeam(Long teamId) {
         assertDoesNotThrow(() -> newGameBean.addNewTeam(null));
 
-        Team team6 = createTeam(6L);
+        Team team6 = createTeam(teamId);
         newGameBean.addNewTeam(team6);
         assertTrue(newGameBean.getTeams().contains(team6));
 
@@ -106,9 +106,8 @@ public class NewGameBeanTest {
         verifyNoInteractions(teamService);
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = { 1, 2, 3 })
-    public void testClearFields(Integer roleNr) {
+    @Test
+    public void testClearFields() {
         String name = fillBean();
 
         assertEquals(name, newGameBean.getGameName());

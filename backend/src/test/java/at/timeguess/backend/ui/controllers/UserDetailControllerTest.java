@@ -105,8 +105,21 @@ public class UserDetailControllerTest {
     }
 
     @ParameterizedTest
+    @ValueSource(longs = { 11, 22 })
+    public void testDoSaveTermFailure(Long termId) {
+        User user = assertMockUser(termId, true);
+        when(userService.saveUser(user)).thenReturn(null);
+
+        userDetailController.doSaveUser();
+
+        verify(userService).saveUser(user);
+        verifyNoInteractions(messageBean);
+        assertEquals(user, userDetailController.getUser());
+    }
+
+    @ParameterizedTest
     @ValueSource(longs = { 1, 40, 444 })
-    public void testDoSaveUserFailure(Long userId) {
+    public void testDoSaveUserInvalid(Long userId) {
         assertMockUser(userId, false);
         reset(userService);
 
