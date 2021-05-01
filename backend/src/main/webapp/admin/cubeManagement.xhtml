@@ -271,7 +271,7 @@
 							size="5" />
 						<p:commandButton value="Submit change"
 							action="#{intervalController.doUpdateReportingInterval()}"
-							update="editIntervalOutputPanel" />
+							update="editIntervalOutputPanel :msg" />
 
 						<p:outputLabel for="expirationInterval" value="Expiration Interval: " />
 						<p:inputText disabled="true"
@@ -285,7 +285,7 @@
 							size="5" />
 						<p:commandButton value="Submit change"
 							action="#{intervalController.doUpdateExpirationInterval()}"
-							update="editIntervalOutputPanel" />
+							update="editIntervalOutputPanel :msg" />
 					</h:panelGrid>
 				</p:outputPanel>
 			</p:dialog>
@@ -317,7 +317,7 @@
 							size="5" />
 						<p:commandButton value="Submit change"
 							action="#{thresholdController.doUpdateBatteryLevelThreshold()}"
-							update="editThresholdOutputPanel" />
+							update="editThresholdOutputPanel :msg" />
 
 						<p:outputLabel for="rssiThreshold" value="RSSI Threshold: " />
 						<p:inputText disabled="true"
@@ -331,7 +331,7 @@
 							size="5" />
 						<p:commandButton value="Submit change"
 							action="#{thresholdController.doUpdateRssiThreshold()}"
-							update="editThresholdOutputPanel" />
+							update="editThresholdOutputPanel :msg" />
 					</h:panelGrid>
 				</p:outputPanel>
 			</p:dialog>
