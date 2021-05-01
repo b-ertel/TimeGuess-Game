@@ -80,7 +80,7 @@
 
             <h:panelGrid columns="3">
                 <p:commandButton value="Save" action="#{newGameBean.createGame()}"
-                    oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); }"
+                    oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); PF('gameTable').filter(); }"
                     process="nameCreate maxPointsCreate topicCreate teamsCreate @this"
                     update="gameCreateData :gameListForm :gameInfoForm:gameInfoData :msg" validateClient="true" />
                 <p:commandButton value="Reload" action="#{newGameBean.clearFields}"

@@ -122,7 +122,7 @@
 
                     <p:fileUpload id="termUpload" chooseIcon="fa fa-file-text-o" uploadIcon="fa fa-upload" cancelIcon="fa fa-window-close-o"
                         listener="#{topicListController.doUploadTerms}" update=":termListForm:termTable :msg"
-                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('newTermsDialog').hide(); }"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('newTermsDialog').hide(); PF('termTable').filter(); }"
                         mode="advanced" multiple="true" dragDropSupport="true" sizeLimit="1000000"
                         allowTypes="/(\.|\/)(json)$/i" style="margin:8px 0px 8px" />
                 </p:outputPanel>
@@ -159,8 +159,8 @@
                 <p:separator style="margin:11px 0px 12px" />
 
                 <h:panelGrid columns="3">
-                    <p:commandButton value="Save" action="#{newTermBean.createTerm}"
-                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('termCreateDialog').hide(); }"
+                    <p:commandButton value="Save" action="#{newTermBean.createTerm()}"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('termCreateDialog').hide(); PF('termTable').filter(); }"
                         update=":termListForm:termTable termCreateData :msg" />
                     <p:commandButton value="Reload" action="#{newTermBean.clearFields}"
                         process="@parent" update=":termCreateForm:termCreateData :msg" resetValues="true" />
