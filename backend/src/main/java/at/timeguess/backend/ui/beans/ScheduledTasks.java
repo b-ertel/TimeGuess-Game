@@ -9,6 +9,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.HealthStatus;
+import at.timeguess.backend.model.IntervalType;
+import at.timeguess.backend.model.ThresholdType;
+import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.ui.controllers.StatusController;
 
 import java.time.format.DateTimeFormatter;
@@ -23,6 +26,9 @@ public class ScheduledTasks {
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
 
 	@Autowired
+	private CubeService cubeService;
+	
+	@Autowired
 	private StatusController statusController;
 	
 //	@Scheduled(fixedRate = 5000) // means every 5 sec
@@ -36,16 +42,16 @@ public class ScheduledTasks {
 		}
 		else {
 			for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) {
-				if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(statusController.getInterval()))) {
+				if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
 					log.info("cube with mac {} lost connection", m.getKey());
 					statusController.setOffline(m.getKey());
 					log.info("cube with mac {} changed to status OFFLINE", m.getKey());
 				}
 				else {
-					if(m.getValue().getBatteryLevel() < 8) {
+					if(m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {
 						log.info("cube with mac {} has low battery (level at {})", m.getKey(), m.getValue().getBatteryLevel());
 					}
-					if(m.getValue().getRssi() == 0) {
+					if(m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {
 						log.info("something with rssid.....");
 					}
 					

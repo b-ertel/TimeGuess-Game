@@ -26,6 +26,7 @@ import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.CubeStatusInfo;
 import at.timeguess.backend.model.HealthStatus;
+import at.timeguess.backend.model.IntervalType;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.model.api.StatusResponse;
 
@@ -56,7 +57,6 @@ public class StatusController {
     private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
 
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
-    private int interval;   // in sec
     
     /**
      * creates a status for each Cube in the database
@@ -84,12 +84,11 @@ public class StatusController {
     	else {
     		LOGGER.info("cube is onboarding.....");
     		this.healthStatus.put(message.getIdentifier(), new HealthStatus(LocalDateTime.now(), message.getBatteryLevel(), message.getRssi(), message.getIdentifier()));
-    		setInterval(10);
     		updateCube(message); 
     	}
    	
         StatusResponse response = new StatusResponse();
-        response.setReportingInterval(this.interval);
+        response.setReportingInterval(cubeService.queryInterval(IntervalType.REPORTING_INTERVAL));
         response.setCalibrationVersion(CALIBRATION_VERSION_AFTER_CONNECTION);
         return response;
     }
@@ -230,20 +229,6 @@ public class StatusController {
 	 */
 	public boolean isConfigured(Cube cube) {
 		return cubeService.isConfigured(cube);
-	}
-
-	/**
-	 * @return interval of reporting period of the cube
-	 */
-	public int getInterval() {
-		return interval;
-	}
-
-	/** sets reporting interval for the cube
-	 * @param intervall
-	 */
-	public void setInterval(int intervall) {
-		this.interval = intervall;
 	}
 
 	/** remove status of a deleted user, called by {@link CubeController} if a cube is deleted via UI
