@@ -16,7 +16,6 @@ import at.timeguess.backend.model.Configuration;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.api.FacetsMessage;
-import at.timeguess.backend.model.api.FacetsResponse;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.repositories.ConfigurationRepository;
 import at.timeguess.backend.repositories.CubeFaceRepository;
@@ -161,15 +160,12 @@ public class CubeService {
     }
 
     /**
-     * Process a message recieved through the REST API signaling a change
-     * in the facets characteristic of a cube.
+     * Process a {@link FacetsMessage}.
      *  
      * @param message the message
-     * @return the response
      */
-    public FacetsResponse processFacetsMessage(FacetsMessage message) {
+    public void processFacetsMessage(FacetsMessage message) {
         String identifier = message.getIdentifier();
-        int calibrationVersion = message.getCalibrationVersion();
         int facet = message.getFacet();
         if (isMacAddressKnown(identifier)) {
             Cube cube = getByMacAddress(identifier);
@@ -181,9 +177,6 @@ public class CubeService {
                 unconfiguredFacetsEventPublisher.publishUnconfiguredFacetsEvent(cube, facet);
             }
         }
-        FacetsResponse response = new FacetsResponse();
-        response.setCalibrationVersion(calibrationVersion);
-        return response;
     }
 
 }
