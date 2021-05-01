@@ -18,6 +18,19 @@ public class EqualsImplementationTest {
     }
 
     @Test
+    public void testCubeEqualsContract() {
+        Cube cube1 = createCube(1L);
+        Cube cube2 = createCube(2L);
+        Configuration cfg1 = new Configuration();
+        cfg1.setId(1L);
+        Configuration cfg2 = new Configuration();
+        cfg2.setId(2L);
+        EqualsVerifier.forClass(Cube.class).withPrefabValues(Cube.class, cube1, cube2)
+                .withPrefabValues(Configuration.class, cfg1, cfg2)
+                .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
+    }
+
+    @Test
     public void testGameEqualsContract() {
         Game game1 = createGame(1L);
         Game game2 = createGame(2L);
@@ -34,8 +47,10 @@ public class EqualsImplementationTest {
         Cube cube1 = createCube(1L);
         Cube cube2 = createCube(2L);
         EqualsVerifier.forClass(Game.class).withPrefabValues(Game.class, game1, game2)
-                .withPrefabValues(Topic.class, topic1, topic2).withPrefabValues(Team.class, team1, team2)
-                .withPrefabValues(User.class, user1, user2).withPrefabValues(Round.class, round1, round2)
+                .withPrefabValues(Topic.class, topic1, topic2)
+                .withPrefabValues(Team.class, team1, team2)
+                .withPrefabValues(User.class, user1, user2)
+                .withPrefabValues(Round.class, round1, round2)
                 .withPrefabValues(Cube.class, cube1, cube2)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
@@ -54,7 +69,8 @@ public class EqualsImplementationTest {
         User user1 = createUser(1L);
         User user2 = createUser(2L);
         EqualsVerifier.forClass(Team.class).withPrefabValues(Team.class, team1, team2)
-                .withPrefabValues(Game.class, game1, game2).withPrefabValues(User.class, user1, user2)
+                .withPrefabValues(Game.class, game1, game2)
+                .withPrefabValues(User.class, user1, user2)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
@@ -86,7 +102,8 @@ public class EqualsImplementationTest {
         Game game1 = createGame(1L);
         Game game2 = createGame(2L);
         EqualsVerifier.forClass(User.class).withPrefabValues(User.class, user1, user2)
-            .withPrefabValues(Team.class, team1, team2).withPrefabValues(Game.class, game1, game2)
+            .withPrefabValues(Team.class, team1, team2)
+            .withPrefabValues(Game.class, game1, game2)
             .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 

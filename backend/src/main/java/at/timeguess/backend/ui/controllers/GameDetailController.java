@@ -235,6 +235,7 @@ public class GameDetailController implements Serializable {
     public boolean doValidateGame() {
         if (Strings.isBlank(game.getName())) return false;
         if (game.getMaxPoints() <= 0) return false;
+        if (game.getCube() == null || game.getCube().isNew()) return false;
         if (game.getTopic() == null) return false;
         if (game.getTeamCount() < 2) return false;
         return true;

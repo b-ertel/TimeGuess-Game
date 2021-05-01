@@ -315,6 +315,15 @@ table {
     text-align: center;
 }
 
+.ui-dataview-list .ui-dataview-listcontainer {
+    list-style: none;
+}
+
+div.ui-multiselectlistbox-listcontainer {
+    float: none !important;
+    width: auto;
+}
+
 #gameCreateData .ui-menu .ui-menuitem {
     float: right;
 }

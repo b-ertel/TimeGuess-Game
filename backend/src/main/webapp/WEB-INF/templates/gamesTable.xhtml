@@ -46,6 +46,7 @@
                         <div class="game-grid-item-content">
                             <p:commandLink title="Info" oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog :msg">
                                 <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
+                                <f:setPropertyActionListener value="#{game}" target="#{teamMemberBean.game}" />
                                 <p:graphicImage name="images/game.jpg" />
                             </p:commandLink>
                             <div class="game-name">#{game.name}</div>
@@ -66,6 +67,7 @@
                     <div class="game-list-item">
                         <p:commandLink title="Info" oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog">
                             <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
+                            <f:setPropertyActionListener value="#{game}" target="#{teamMemberBean.game}" />
                             <p:graphicImage name="images/game.jpg" />
                         </p:commandLink>
                         <div class="game-list-detail">
@@ -143,6 +145,7 @@
                     <p:commandButton title="Info" icon="fa fa-info"
                         oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog :msg">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
+                        <f:setPropertyActionListener value="#{game}" target="#{teamMemberBean.game}" />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
@@ -158,58 +161,49 @@
         <h:form id="gameInfoForm">
             <ui:remove>show game info</ui:remove>
             <p:dialog header="Game Info" id="gameInfoDialog" widgetVar="gameInfoDialog" dynamic="true"
-                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" width="330">
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" width="380">
 
-                <p:panel id="gameInfoData" rendered="#{not empty curr}">
-                    <div class="p-grid">
-                        <div class="p-col-7"><p:outputLabel for="nameInfo" value="Name: "/></div>
-                        <div class="p-col-5"><h:outputLabel id="nameInfo" value="#{curr.name}" styleClass="rightm10"/></div>
-                        <div class="p-col-6"><p:outputLabel for="topicInfo" value="Topic: "/></div>
-                        <div class="p-col-6"><h:outputText id="topicInfo" value="#{curr.topic.name}" styleClass="rightm10"/></div>
-                        <div class="p-col-9"><p:outputLabel for="maxPointsInfo" value="Maximum Points: "/></div>
-                        <div class="p-col-3"><h:outputLabel id="maxPointsInfo" value="#{curr.maxPoints}" styleClass="rightm10"/></div>
-                    </div>
-                    <p:separator style="margin-bottom:16px" />
+                <p:outputPanel id="gameInfoData" rendered="#{not empty curr}">
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                            columnClasses="p-col-6, p-col-6" contentStyleClass="ui-fluid">
+                        <p:outputLabel for="nameInfo" value="Name: "/>
+                        <h:outputLabel id="nameInfo" value="#{curr.name}" styleClass="rightm10"/>
+                        
+                        <p:outputLabel for="topicInfo" value="Topic: "/>
+                        <h:outputText id="topicInfo" value="#{curr.topic.name}" styleClass="rightm10"/>
+                        
+                        <p:outputLabel for="maxPointsInfo" value="Maximum Points: "/>
+                        <h:outputLabel id="maxPointsInfo" value="#{curr.maxPoints}" styleClass="rightm10"/>
+                    </p:panelGrid>
+                    <p:separator style="margin:8px 0px 14px" />
 
-                    <div class="p-grid">
-                        <div class="p-col-7"><p:outputLabel for="statusInfo" value="Status: "/></div>
-                        <div class="p-col-5"><h:outputText id="statusInfo" value="#{curr.status}" styleClass="rightm10"/></div>
-                        <div class="p-col-9"><p:outputLabel for="roundInfo" value="Number of Rounds played: "/></div>
-                        <div class="p-col-3"><h:outputText id="roundInfo" value="#{curr.rounds.size()}" styleClass="rightm10"/></div>
-                    </div>
-                    <p:separator style="margin-bottom:16px" />
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                            columnClasses="p-col-8, p-col-4" contentStyleClass="ui-fluid">
+                        <p:outputLabel for="statusInfo" value="Status: "/>
+                        <h:outputText id="statusInfo" value="#{curr.status}" styleClass="rightm10"/>
+                        
+                        <p:outputLabel for="roundInfo" value="Number of Rounds played: "/>
+                        <h:outputText id="roundInfo" value="#{curr.rounds.size()}" styleClass="rightm10"/>
+                    </p:panelGrid>
+                    <p:separator style="margin:8px 0px 14px" />
 
-                    <div class="p-grid">
-                        <div class="p-col-8"><p:outputLabel for="createUserInfo" value="Game creator: "/></div>
-                        <div class="p-col-4"><h:outputText id="createUserInfo" value="#{curr.creator.username}" styleClass="rightm10"/></div>
-                    </div>
-
-                    <!-- 
-                    <p:dataTable var="team" value="#{curr.teams}" sortBy="#{team.name}" >
-                        <p:headerRow field="team.team.name" expandable="true" expanded="#{team.name != 'Team 1'}">
-                            <p:column colspan="2">
-                                <div class="p-d-inline-flex p-ai-center" style="vertical-align: middle">
-                                    <h:outputText styleClass="p-ml-2" value="#{team.name}"/>
-                                </div>
-                            </p:column>
-                        </p:headerRow>
-                        <p:column headerText="Team">
-                            <h:outputText value="#{team.team.name}" />
-                        </p:column>
-                        <p:column headerText="Player">
-                            <h:outputText value="#{team.team.user.username}" />
-                        </p:column>
-                        <p:summaryRow>
-                            <p:column colspan="2" style="text-align:right">
-                                <h:outputText value="Total Players:"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{team.team.teamMembers.size()}"/>
-                            </p:column>
-                        </p:summaryRow>
-                    </p:dataTable>
-                    -->
-                </p:panel>
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                            columnClasses="p-col-6, p-col-6" contentStyleClass="ui-fluid">
+                        <p:outputLabel for="createUserInfo" value="Game creator: "/>
+                        <h:outputText id="createUserInfo" value="#{curr.creator.username}" styleClass="rightm10"/>                        
+                    </p:panelGrid>
+                                        
+                    <h:panelGrid columns="1" style="margin-top:3px">
+                        <p:multiSelectListbox value="#{teamMemberBean.team}" header="Teams and Players">
+                            <f:selectItems value="#{teamMemberBean.teams}" />
+                        </p:multiSelectListbox>
+                    </h:panelGrid>
+                    <p:separator style="margin:11px 0px 12px" />
+    
+                    <h:panelGrid columns="1">
+                        <p:commandButton value="Abort" onclick="PF('gameInfoDialog').hide()" />
+                    </h:panelGrid>
+                </p:outputPanel>
             </p:dialog>
         </h:form>
  

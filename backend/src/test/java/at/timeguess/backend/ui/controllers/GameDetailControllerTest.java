@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.Team;
@@ -319,6 +320,20 @@ public class GameDetailControllerTest {
         assertFalse(gameDetailController.doValidateGame());
         game.setMaxPoints(20);
         assertFalse(gameDetailController.doValidateGame());
+
+        Cube cube = null;
+        game.setCube(cube);
+        assertFalse(gameDetailController.doValidateGame());
+        cube = new Cube();
+        game.setCube(cube);
+        assertFalse(gameDetailController.doValidateGame());
+        cube = createCube(0L);
+        game.setCube(cube);
+        assertFalse(gameDetailController.doValidateGame());
+        cube.setId(9L);
+        game.setCube(cube);
+        assertFalse(gameDetailController.doValidateGame());
+
         game.setTopic(createTopic(5L));
         assertFalse(gameDetailController.doValidateGame());
         game.setTeams(Set.of(createTeam(2L)));
@@ -349,6 +364,7 @@ public class GameDetailControllerTest {
         if (full) {
             game.setName("agame");
             game.setMaxPoints(200);
+            game.setCube(createCube(100L));
             game.setTopic(createTopic(15L));
             game.setTeams(Set.of(createTeam(2L), createTeam(15L)));
         }

@@ -3,8 +3,8 @@ package at.timeguess.backend.ui.controllers;
 import static at.timeguess.backend.utils.TestSetup.createEntities;
 import static at.timeguess.backend.utils.TestSetup.createTopic;
 import static at.timeguess.backend.utils.TestSetup.createUser;
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -177,9 +177,9 @@ public class TopicStatisticControllerTest {
 
         assertTrue(topicStatController.getPlayedWithTopic());
         verify(topicStatService).nrOfGamesWithTopic(topic);
-        
+
         when(topicStatService.nrOfGamesWithTopic(topic)).thenReturn(0);
-        
+
         assertFalse(topicStatController.getPlayedWithTopic());
         verify(topicStatService, times(2)).nrOfGamesWithTopic(topic);
     }
