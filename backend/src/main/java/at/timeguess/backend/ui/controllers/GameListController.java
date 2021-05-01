@@ -96,6 +96,21 @@ public class GameListController implements Serializable {
     }
 
     /**
+     * Checks if the given game can be deleted currently (it cannot while played).
+     * @return
+     */
+    public boolean isLockedDelete(Game game) {
+        if (game == null) return true;
+        
+        switch (game.getStatus()) {
+            case PLAYED:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
      * Confirms given users participation in given game.
      * @param user user whose participation in given game is confirmed.
      * @param game game for which to confirm given users participation.

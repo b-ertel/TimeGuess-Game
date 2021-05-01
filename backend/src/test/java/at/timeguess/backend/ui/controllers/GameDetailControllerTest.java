@@ -216,22 +216,22 @@ public class GameDetailControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
-    public void testIsLockedDelete(Long gameId) {
+    public void testIsLockedCube(Long gameId) {
         Game game = assertMockGameAndReset(gameId);
 
         game.setStatus(GameState.SETUP);
-        assertFalse(gameDetailController.isLockedDelete());
+        assertFalse(gameDetailController.isLockedCube());
         game.setStatus(GameState.VALID_SETUP);
-        assertFalse(gameDetailController.isLockedDelete());
+        assertFalse(gameDetailController.isLockedCube());
         game.setStatus(GameState.HALTED);
-        assertFalse(gameDetailController.isLockedDelete());
-        game.setStatus(GameState.FINISHED);
-        assertFalse(gameDetailController.isLockedDelete());
-        game.setStatus(GameState.CANCELED);
-        assertFalse(gameDetailController.isLockedDelete());
+        assertFalse(gameDetailController.isLockedCube());
 
         game.setStatus(GameState.PLAYED);
-        assertTrue(gameDetailController.isLockedDelete());
+        assertTrue(gameDetailController.isLockedCube());
+        game.setStatus(GameState.FINISHED);
+        assertTrue(gameDetailController.isLockedCube());
+        game.setStatus(GameState.CANCELED);
+        assertTrue(gameDetailController.isLockedCube());
 
         verifyNoInteractions(gameService);
         assertEquals(gameId, gameDetailController.getGame().getId());

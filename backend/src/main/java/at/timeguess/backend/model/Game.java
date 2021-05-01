@@ -45,9 +45,13 @@ public class Game implements Serializable, Persistable<Long> {
     @OneToMany(mappedBy = "game", cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<GameTeam> teams = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH,
-            CascadeType.PERSIST }, targetEntity = User.class)
-    @JoinTable(name = "game_user", joinColumns = @JoinColumn(name = "game_id", nullable = false, updatable = false), inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT), inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+    @ManyToMany(fetch = FetchType.EAGER, 
+        cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = User.class)
+    @JoinTable(name = "game_user",
+        joinColumns = @JoinColumn(name = "game_id", nullable = false, updatable = false),
+        inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
+        foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
+        inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<User> confirmedUsers;
 
     @ManyToOne
@@ -55,6 +59,9 @@ public class Game implements Serializable, Persistable<Long> {
 
     @ManyToOne
     private User creator;
+
+    @ManyToOne
+    private Cube cube;
 
     @Override
     public Long getId() {
@@ -151,6 +158,20 @@ public class Game implements Serializable, Persistable<Long> {
 
     public int getTeamCount() {
         return teams == null ? 0 : teams.size();
+    }
+
+    /**
+     * @return the cube
+     */
+    public Cube getCube() {
+        return cube;
+    }
+
+    /**
+     * @param cube the cube to set
+     */
+    public void setCube(Cube cube) {
+        this.cube = cube;
     }
 
     @Override

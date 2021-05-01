@@ -97,6 +97,9 @@ public class NewTermBeanTest {
         Topic topic = null;
         newTermBean.setTopic(topic);
         assertFalse(newTermBean.validateInput());
+        topic = new Topic();
+        newTermBean.setTopic(topic);
+        assertFalse(newTermBean.validateInput());
         topic = createTopic(0L);
         newTermBean.setTopic(topic);
         assertFalse(newTermBean.validateInput());

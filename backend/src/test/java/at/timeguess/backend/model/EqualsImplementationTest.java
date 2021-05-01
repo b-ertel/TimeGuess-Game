@@ -31,9 +31,12 @@ public class EqualsImplementationTest {
         round1.setId(1L);
         Round round2 = new Round();
         round2.setId(2L);
+        Cube cube1 = createCube(1L);
+        Cube cube2 = createCube(2L);
         EqualsVerifier.forClass(Game.class).withPrefabValues(Game.class, game1, game2)
                 .withPrefabValues(Topic.class, topic1, topic2).withPrefabValues(Team.class, team1, team2)
                 .withPrefabValues(User.class, user1, user2).withPrefabValues(Round.class, round1, round2)
+                .withPrefabValues(Cube.class, cube1, cube2)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 

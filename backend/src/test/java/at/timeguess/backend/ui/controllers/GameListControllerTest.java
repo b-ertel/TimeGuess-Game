@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -17,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.utils.TestSetup;
@@ -142,6 +145,30 @@ public class GameListControllerTest {
 
         verify(gameService, times(2)).disabledConfirmation(user, game);
         assertFalse(result);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 11, 22 })
+    public void testIsLockedDelete(Long gameId) {
+        Game game = expected.get(4);
+
+        game.setStatus(GameState.SETUP);
+        assertFalse(gameListController.isLockedDelete(game));
+        game.setStatus(GameState.VALID_SETUP);
+        assertFalse(gameListController.isLockedDelete(game));
+        game.setStatus(GameState.HALTED);
+        assertFalse(gameListController.isLockedDelete(game));
+        game.setStatus(GameState.FINISHED);
+        assertFalse(gameListController.isLockedDelete(game));
+        game.setStatus(GameState.CANCELED);
+        assertFalse(gameListController.isLockedDelete(game));
+
+        game.setStatus(GameState.PLAYED);
+        assertTrue(gameListController.isLockedDelete(game));
+        game = null;
+        assertTrue(gameListController.isLockedDelete(game));        
+
+        verifyNoInteractions(gameService);
     }
 
     @Test

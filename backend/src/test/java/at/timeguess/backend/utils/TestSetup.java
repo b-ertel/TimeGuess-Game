@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.params.provider.Arguments;
 
+import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.Team;
@@ -75,6 +76,17 @@ public class TestSetup {
         Game game = new Game();
         game.setId(gameId);
         return game;
+    }
+
+    /**
+     * Creates a simple cube with the given id only.
+     * @param cubeId
+     * @return
+     */
+    public static Cube createCube(Long cubeId) {
+        Cube cube = new Cube();
+        cube.setId(cubeId);
+        return cube;
     }
 
     /**

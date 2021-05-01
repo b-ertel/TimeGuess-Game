@@ -81,7 +81,7 @@ public class Cube implements Comparable<Cube>{
 
 	@Override
 	public int compareTo(Cube o) {
-		return getId().compareTo(o.getId());
+        return this.getId() == null ? o.getId() == null ? 0 : -1 : o.getId() == null ? 1 : this.getId().compareTo(o.getId());
 	}
 
 	@Override

@@ -1,9 +1,6 @@
 package at.timeguess.backend.ui.beans;
 
-import static at.timeguess.backend.utils.TestSetup.createEntities;
-import static at.timeguess.backend.utils.TestSetup.createGame;
-import static at.timeguess.backend.utils.TestSetup.createTeam;
-import static at.timeguess.backend.utils.TestSetup.createTopic;
+import static at.timeguess.backend.utils.TestSetup.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,6 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.services.GameService;
@@ -113,6 +111,7 @@ public class NewGameBeanTest {
         assertEquals(name, newGameBean.getGameName());
         assertTrue(newGameBean.getMaxPoints() > 0);
         assertNotNull(newGameBean.getTopic());
+        assertNotNull(newGameBean.getCube());
         assertTrue(newGameBean.getTeams().size() > 0);
 
         newGameBean.clearFields();
@@ -120,6 +119,7 @@ public class NewGameBeanTest {
         assertNull(newGameBean.getGameName());
         assertEquals(0, newGameBean.getMaxPoints());
         assertNull(newGameBean.getTopic());
+        assertNull(newGameBean.getCube());
         assertNull(newGameBean.getTeams());
     }
 
@@ -157,6 +157,19 @@ public class NewGameBeanTest {
         newGameBean.setMaxPoints(20);
         assertFalse(newGameBean.validateInput());
 
+        Cube cube = null;
+        newGameBean.setCube(cube);
+        assertFalse(newGameBean.validateInput());
+        cube = new Cube();
+        newGameBean.setCube(cube);
+        assertFalse(newGameBean.validateInput());
+        cube = createCube(0L);
+        newGameBean.setCube(cube);
+        assertFalse(newGameBean.validateInput());
+        cube.setId(9L);
+        newGameBean.setCube(cube);
+        assertFalse(newGameBean.validateInput());
+
         newGameBean.setTopic(createTopic(3L));
         assertFalse(newGameBean.validateInput());
 
@@ -181,6 +194,7 @@ public class NewGameBeanTest {
 
         newGameBean.setGameName(foo);
         newGameBean.setMaxPoints(100);
+        newGameBean.setCube(createCube(6L));
         newGameBean.setTopic(createTopic(12L));
         newGameBean.setTeams(Set.of(createTeam(2L), createTeam(15L)));
         return foo;

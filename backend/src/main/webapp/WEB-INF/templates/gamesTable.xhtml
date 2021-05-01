@@ -12,8 +12,9 @@
     <ui:define name ="content">
         <c:set value="#{isAdminAccess and isAdmin}" target="#{gameListController}" property="admin"/>
         <c:set var="noEditRight" value="#{!(sessionInfoBean.currentUser.username eq game.creator.username or isAdmin)}" />
+        <c:set var="cubeMsg" value="Cube: Value is required" scope="application" />
         <c:set var="topicMsg" value="Topic: Value is required" scope="application" />
-        <c:set var="teamsMsg" value="Teams: Select at least 2 teams" scope="application" />
+        <c:set var="teamsMsg" value="Teams: Select at least 2" scope="application" />
         <c:set var="sel2Label" value="Select at least 2" scope="application" />
 
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
@@ -128,15 +129,14 @@
                         oncomplete="PF('gameEditDialog').show()" update=":gameDetailForm:gameEditDialog :msg">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                     </p:commandButton>
+                    <p:commandButton title="Delete" icon="fa fa-trash" disabled="#{(not isAdmin) or gameListController.isLockedDelete(game)}"
+                        action="#{gameDetailController.doDeleteGame}" onsuccess="PF('gameTable').filter()" update="gameTable :msg">
+                        <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
+                        <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this game? This cannot be undone." />
+                    </p:commandButton>
                     <p:commandButton title="Edit (new)" icon="fa fa-pencil" disabled="#{not isAdmin}"
                         oncomplete="PF('gameEditDialog2').show()" update=":gameDetailFormXX:gameEditDialog2 :msg">
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
-                    </p:commandButton>
-                    <p:commandButton title="Delete" icon="fa fa-trash" disabled="#{not isAdmin}"
-                        action="#{gameDetailController.doDeleteGame}" onsuccess="PF('gameTable').filter()"
-                        update="gameListForm:gameTable :msg">
-                        <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
-                        <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this game? This cannot be undone." />
                     </p:commandButton>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
@@ -151,11 +151,6 @@
                 <p:menuitem value="&nbsp;Edit" icon="fa fa-edit"
                     oncomplete="PF('gameEditDialog').show()" update=":gameDetailForm:gameEditDialog :msg">
                     <f:setPropertyActionListener value="#{gameListController.selectedGame}" target="#{gameDetailController.game}" />
-                </p:menuitem>
-                <p:menuitem value="&nbsp;Delete" icon="fa fa-trash" action="#{gameDetailController.doDeleteGame}"
-                    onsuccess="PF('gameTable').filter()" update="gameTable :msg">
-                    <f:setPropertyActionListener value="#{gameListController.selectedGame}" target="#{gameDetailController.game}" />
-                    <p:confirm header="Confirmation" icon="fa fa-warning" message="Are you sure about deleting this game? This cannot be undone." />
                 </p:menuitem>
             </p:contextMenu>
         </h:form>

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
+import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.Team;
@@ -43,6 +44,8 @@ public class NewGameBean implements Serializable {
     private String gameName;
     private int maxPoints = 10;
     private Topic topic;
+    private Cube cube;
+
     private Set<Team> teams = new HashSet<>();
 
     /**
@@ -85,6 +88,15 @@ public class NewGameBean implements Serializable {
      */
     public void setTopic(Topic topic) {
         this.topic = topic;
+    }
+    
+    public Cube getCube() {
+        return cube;
+    }
+
+    
+    public void setCube(Cube cube) {
+        this.cube = cube;
     }
 
     /**
@@ -137,6 +149,7 @@ public class NewGameBean implements Serializable {
         this.setGameName(null);
         this.setMaxPoints(0);
         this.setTopic(null);
+        this.setCube(null);
         this.setTeams(null);
     }
 
@@ -151,6 +164,7 @@ public class NewGameBean implements Serializable {
             game.setName(gameName);
             game.setMaxPoints(maxPoints);
             game.setTopic(topic);
+            game.setCube(cube);
             game.setTeams(teams);
             game.setStatus(GameState.SETUP);
 
@@ -172,6 +186,7 @@ public class NewGameBean implements Serializable {
     public boolean validateInput() {
         if (Strings.isBlank(gameName)) return false;
         if (maxPoints <= 0) return false;
+        if (cube == null || cube.getId() == null || cube.getId() == 0L) return false;
         if (topic == null) return false;
         if (teams == null || teams.size() < 2) return false;
         return true;

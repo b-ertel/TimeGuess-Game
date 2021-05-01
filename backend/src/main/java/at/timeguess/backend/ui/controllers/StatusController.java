@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,6 +163,13 @@ public class StatusController {
     			readyCubes.add(s.getValue().getCube());
     	}
     	return readyCubes;
+    }
+    
+    /**
+     * returns all cubes
+     */
+    public List<Cube> getAllCubes() {
+    	return cubeService.allCubes();
     }
 
 	/**

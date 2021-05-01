@@ -180,12 +180,14 @@ public class GameDetailController implements Serializable {
     }
 
     /**
-     * Checks if the saved game can be deleted currently (it should not while it is played).
+     * Checks if the cube can be changed for the saved game.
      * @return
      */
-    public boolean isLockedDelete() {
+    public boolean isLockedCube() {
         switch (game.getStatus()) {
             case PLAYED:
+            case FINISHED:
+            case CANCELED:
                 return true;
             default:
                 return false;

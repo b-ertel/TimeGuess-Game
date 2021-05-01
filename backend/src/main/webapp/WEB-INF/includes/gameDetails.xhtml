@@ -106,11 +106,13 @@
                             <p:inputText id="name" value="#{curr.name}" required="true" maxlength="100" />
                             
                             <p:outputLabel for="maxPoints" value="Maximum Points: " />
-                            <p:spinner id="maxPoints" value="#{curr.maxPoints}" required="true" min="1" disabled="#{gameDetailController.lockedMaxPoints}" />
+                            <p:spinner id="maxPoints" value="#{curr.maxPoints}" required="true" min="1"
+                                disabled="#{gameDetailController.lockedMaxPoints}" />
                             
                             <h:outputLabel for="topic" value="Topic: " />
                             <p:selectOneMenu id="topic" value="#{curr.topic}" converter="omnifaces.SelectItemsConverter"
-                                required="true" requiredMessage="#{topicMsg}" disabled="#{gameDetailController.lockedTopic}">
+                                required="true" requiredMessage="#{topicMsg}"
+                                disabled="#{gameDetailController.lockedTopic}">
                                 <p:ajax event="change" process="@this" />
                                 <f:selectItem itemLabel="Select" />
                                 <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
@@ -121,11 +123,21 @@
                         <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
                             columnClasses="p-col-6, p-col-6" contentStyleClass="ui-fluid">
                             <p:outputLabel for="createUser" value="Creator: " />
-                            <p:outputLabel id="createUser" value="#{curr.creator.firstName} (#{curr.creator.firstName} #{curr.creator.lastName})"/>
+                            <p:outputLabel id="createUser" value="#{curr.creator.firstName} (#{curr.creator.firstName} #{curr.creator.lastName})" />
                             
                             <h:outputLabel for="state" value="State: " />
                             <p:selectOneMenu id="state" value="#{curr.status}">
-                                <f:selectItems value="#{gameDetailController.allGameStates}" var="state" itemDisabled="#{not gameDetailController.canTraverse(state)}"/>
+                                <f:selectItems value="#{gameDetailController.allGameStates}" var="state"
+                                    itemDisabled="#{not gameDetailController.canTraverse(state)}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="cube" value="Cube: " />
+                            <p:selectOneMenu id="cube" value="#{curr.cube}" converter="omnifaces.SelectItemsConverter"
+                               required="true" requiredMessage="#{cubeMsg}"
+                               disabled="#{gameDetailController.lockedCube}">
+                               <f:selectItem itemLabel="Select" />
+                               <f:selectItems value="#{statusController.allCubes}" var="cu"
+                                   itemDisabled="#{not statusController.isConfigured(cu)}"/>
                             </p:selectOneMenu>
                         </p:panelGrid>
                         <p:separator style="margin:12px 0px 20px" />
@@ -138,8 +150,8 @@
                                 disabled="#{gameDetailController.lockedTopic}"
                                 multiple="true" filter="true" filterMatchMode="contains">
                                 <!-- have to use all teams, otherwise list doesn't work -->
-                                <f:selectItems value="#{gdc.allTeams}" var="t" itemLabel="#{t.name}"
-                                   itemDisabled="#{not gdc.isAvailableTeam(t)}" />
+                                <f:selectItems value="#{gameDetailController.allTeams}" var="t" itemLabel="#{t.name}"
+                                   itemDisabled="#{not gameDetailController.isAvailableTeam(t)}" />
                             </p:selectCheckboxMenu>
                         </p:panelGrid>
                     </p:outputPanel>
