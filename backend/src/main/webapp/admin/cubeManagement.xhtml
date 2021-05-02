@@ -314,7 +314,9 @@
 							decimalPlaces="0"
 							thousandSeparator=""
 							required="true"
-							size="5" />
+							size="5"
+							minValue="0"
+							maxValue="100" />
 						<p:commandButton value="Submit change"
 							action="#{thresholdController.doUpdateBatteryLevelThreshold()}"
 							update="editThresholdOutputPanel :msg" />
