@@ -164,13 +164,6 @@ public class StatusController {
     	}
     	return readyCubes;
     }
-    
-    /**
-     * returns all cubes
-     */
-    public List<Cube> getAllCubes() {
-    	return cubeService.allCubes();
-    }
 
 	/**
 	 * @return health status of all online cubes i.e. with status 

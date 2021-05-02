@@ -42,7 +42,7 @@
                     <p:selectOneMenu id="cubeCreate" value="#{newGameBean.cube}" converter="omnifaces.SelectItemsConverter"
                        required="true" requiredMessage="#{cubeMsg}">
                        <f:selectItem itemLabel="Select" />
-                       <f:selectItems value="#{statusController.allCubes}" var="cu"
+                       <f:selectItems value="#{cubeController.allCubes}" var="cu"
                            itemDisabled="#{not statusController.isReady(cu)}"/>
                     </p:selectOneMenu>
 

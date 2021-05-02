@@ -136,7 +136,7 @@
                                required="true" requiredMessage="#{cubeMsg}"
                                disabled="#{gameDetailController.lockedCube}">
                                <f:selectItem itemLabel="Select" />
-                               <f:selectItems value="#{statusController.allCubes}" var="cu"
+                               <f:selectItems value="#{cubeController.allCubes}" var="cu"
                                    itemDisabled="#{not statusController.isReady(cu)}"/>
                             </p:selectOneMenu>
                         </p:panelGrid>
