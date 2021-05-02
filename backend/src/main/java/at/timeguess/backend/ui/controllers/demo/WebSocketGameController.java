@@ -67,7 +67,6 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     @Autowired
 	GameLogicService gameLogic;
 
-    private Game currentGame;
     private Round currentRound;
     private CubeFace cubeFace;
     private Round controllRound;
@@ -90,7 +89,6 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
  		testgame.setTeams(gameService.loadGame((long) 1).getTeams());
  		testgame.getTeams().addAll(gameService.loadGame((long) 2).getTeams());
  		testgame.setRoundNr(0);
- 		this.currentGame = testgame;
  		Cube cube = cubeService.getByMacAddress("56:23:89:34:56");
  		
  		listOfGames.put(cube, testgame);
@@ -122,13 +120,13 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     @Override
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
-        	cubeFace = configuredFacetsEvent.getCubeFace();
-            websocketManager.getNewRoundChannel().send("startRound");
+        	startNewRound(listOfGames.get(configuredFacetsEvent.getCube()), configuredFacetsEvent.getCubeFace()); 	
+        	this.websocketManager.getNewRoundChannel().send("newRound");
         }
     }
     
-    public void startNewRound() {
-    	currentRound = gameLogic.startNewRound(currentGame, cubeFace);
+    public void startNewRound(Game game, CubeFace cubeFace) {
+    	currentRound = gameLogic.startNewRound(game, cubeFace);
     }
 
     public List<User> getGuessingUsers() {
