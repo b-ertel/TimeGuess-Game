@@ -209,9 +209,12 @@ public class CubeService {
      * @param value the new value of the interval
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void updateInterval(IntervalType type, int value) {
+    public void updateInterval(IntervalType type, int value) throws IllegalArgumentException {
         // the underlying assumption here is that the repository always contains such an object ...
         Interval interval = intervalRepository.findByType(type);
+        if (value <= 0) {
+            throw new IllegalArgumentException("The value of an interval has to be a positive integer!");
+        }
         interval.setValue(value);
         intervalRepository.save(interval);
     }

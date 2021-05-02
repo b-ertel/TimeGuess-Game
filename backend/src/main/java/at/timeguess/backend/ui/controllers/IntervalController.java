@@ -67,16 +67,26 @@ public class IntervalController {
      * Update the reporting interval.
      */
     public void doUpdateReportingInterval() {
-        cubeService.updateInterval(IntervalType.REPORTING_INTERVAL, reportingInterval);
-        messageBean.alertInformation("Intervals", "Reporting interval successfully updated.");
+        try {
+            cubeService.updateInterval(IntervalType.REPORTING_INTERVAL, reportingInterval);
+            messageBean.alertInformation("Intervals", "Reporting interval successfully updated.");
+        }
+        catch (IllegalArgumentException e) {
+            messageBean.alertError("Intervals", e.getMessage());
+        }
     }
 
     /**
      * Update the expiration interval.
      */
     public void doUpdateExpirationInterval() {
-        cubeService.updateInterval(IntervalType.EXPIRATION_INTERVAL, expirationInterval);
-        messageBean.alertInformation("Intervals", "Expiration interval successfully updated.");
+        try {
+            cubeService.updateInterval(IntervalType.EXPIRATION_INTERVAL, expirationInterval);
+            messageBean.alertInformation("Intervals", "Expiration interval successfully updated.");
+        }
+        catch (IllegalArgumentException e) {
+            messageBean.alertError("Intervals", e.getMessage());
+        }
     }
 
 }
