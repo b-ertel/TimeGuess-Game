@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import at.timeguess.backend.model.Game;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
 
 /**
@@ -22,12 +23,15 @@ public class CountDownDisplayController {
 	private SessionInfoBean sessionBean;
 		
 	/**
-	 * @return countdown if current user is in game   --> to be adjusted for more games
+	 * @return countdown if current user is in given game
 	 */
-	public String getCountDown() {
-		if(countDownController.getGameMembers().contains(sessionBean.getCurrentUser().getUsername()))
-			setCountDown(countDownController.getCountDown());
+	public String getCountDown(Game game) {
 		
+		if(countDownController.getMembersPerGame().get(game.getId()) != null){
+			if(countDownController.getMembersPerGame().get(game.getId()).contains(sessionBean.getCurrentUserName())){
+				setCountDown(countDownController.getCountDown());
+			}
+		}
 		return this.countDown;
 	}
 	

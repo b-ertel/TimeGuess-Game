@@ -17,6 +17,7 @@ import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TermService;
 import at.timeguess.backend.ui.beans.NewGameBean;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
+import at.timeguess.backend.ui.controllers.CountDownController;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -56,6 +57,8 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     private TermService termService;
     @Autowired
     private ChatManagerController chatController;
+    @Autowired
+    private CountDownController countDownController;
     @Autowired
     private GameService gameService;
     @Autowired
@@ -129,6 +132,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     
     public void startNewRound() {
     	currentRound = gameLogic.startNewRound(currentGame, cubeFace);
+    	countDownController.startCountDown(cubeFace, currentGame);
     }
 
     public List<User> getGuessingUsers() {
@@ -150,4 +154,14 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
 	public CubeFace getCubeFace() {
 		return cubeFace;
 	}
+
+	public Game getCurrentGame() {
+		return currentGame;
+	}
+
+	public void setCurrentGame(Game currentGame) {
+		this.currentGame = currentGame;
+	}
+	
+	
 }

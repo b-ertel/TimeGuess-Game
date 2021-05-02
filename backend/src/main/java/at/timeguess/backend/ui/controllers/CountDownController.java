@@ -2,17 +2,24 @@ package at.timeguess.backend.ui.controllers;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.Timer;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.Team;
+import at.timeguess.backend.model.User;
+import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -30,13 +37,15 @@ public class CountDownController {
 	private int sec;
 	
 	private List<String> gameMembers = new CopyOnWriteArrayList<>();  // for one game to play
-	private Map<Game, String> membersPerGame = new ConcurrentHashMap<>(); // for more games to play
+	private Map<Long, Set<String>> membersPerGame = new ConcurrentHashMap<>(); // for more games to play
 	
 	private Timer timer;
 	int delay = 1000; //milliseconds
 	
     @CDIAutowired
 	private WebSocketManager webSocketManager;
+    @Autowired
+    private GameService gameService;
 	
 	/**
 	 * starts countDown with given variables
@@ -47,17 +56,27 @@ public class CountDownController {
 	public void startCountDown(int min, int sec) {
 		setMin(min);
 		setSec(sec);
-		startCountDown();
+		startCountDown(null);
+	}
+	
+	public void startCountDown(CubeFace cubeFace, Game game) {
+		setMin(cubeFace.getTime());
+		setSec(0);
+
+		for(Team t : gameService.getTeams(game)){
+			addMembersPerGame(game, t.getTeamMembers());
+		}
+		startCountDown(game.getId());
 	}
 	
 	/**
 	 * starts countDown
 	 */
-	public void startCountDown() {		
+	public void startCountDown(Long gameId) {		
 		ActionListener task = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				count();
+				count(gameId);
 			}
 		};
 		
@@ -82,16 +101,17 @@ public class CountDownController {
 	/**
 	 * reset countDown
 	 */
-	public void resetCountDown(){
+	public void resetCountDown(Long gameId){
 		setMin(0);
 		setSec(0);
-		webSocketManager.getCountDownChannel().send("countDownUpdate", gameMembers);	
+		Set<String> players = this.membersPerGame.get(gameId);
+		webSocketManager.getCountDownChannel().send("countDownUpdate", players);	
 	}
 
 	/**
 	 * step in counting down - informs websocket listener after each update
 	 */
-	public void count() {
+	public void count(Long gameId) {
 		if (min > 0) {
 			if(sec > 0) {
 				sec--;
@@ -107,7 +127,8 @@ public class CountDownController {
 		else {
 			endCountDown();
 		}
-		webSocketManager.getCountDownChannel().send("countDownUpdate", gameMembers);		
+		Set<String> players = this.membersPerGame.get(gameId);
+		webSocketManager.getCountDownChannel().send("countDownUpdate", players);		
 	}
 	
 	public int getMin() {
@@ -138,16 +159,21 @@ public class CountDownController {
 		this.gameMembers.add(newGameMember);
 	}
 
-	public Map<Game, String> getMembersPerGame() {
+	public Map<Long, Set<String>> getMembersPerGame() {
 		return membersPerGame;
 	}
-
-	public void setMembersPerGame(Map<Game, String> membersPerGame) {
-		this.membersPerGame = membersPerGame;
-	}
 	
-	public void addMembersPerGame(Game game, String gameMember) {
-		this.membersPerGame.put(game, gameMember);
+	public void addMembersPerGame(Game game, Set<User> teamMembers) {
+		
+		if(!this.membersPerGame.containsKey(game.getId())) {
+			this.membersPerGame.put(game.getId(), new HashSet<>());
+		}
+		
+		for(User u : teamMembers) {
+			this.membersPerGame.get(game.getId()).add(u.getUsername());
+		}
+		
+		
 	}
 }
 
