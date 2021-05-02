@@ -1,6 +1,7 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 import at.timeguess.backend.services.CubeService;
@@ -27,6 +29,7 @@ import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.CubeStatusInfo;
 import at.timeguess.backend.model.HealthStatus;
 import at.timeguess.backend.model.IntervalType;
+import at.timeguess.backend.model.ThresholdType;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.model.api.StatusResponse;
 
@@ -47,15 +50,14 @@ public class StatusController {
     private static final int CALIBRATION_VERSION_AFTER_CONNECTION = 1;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatusController.class);
+    private final DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
 	
     @Autowired
     private CubeService cubeService;
-    
     @CDIAutowired
     private WebSocketManager websocketManager;
     
     private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
-
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
     
     /**
@@ -296,4 +298,29 @@ public class StatusController {
 		this.cubeStatus.get(cube.getMacAddress()).setCube(cube);
 	}
 	
+	/**
+	 * scheduled task which checks in a fixed interval which cubes are online; 
+	 * if online cubes are not reporting in the given reporting interval (set by admin) 
+	 * their status is set to OFFLINE and their healthStatus is removed
+	 */
+	@Scheduled(fixedRate = 5000) 		// 5000 means every 5 seconds
+    public void updateHealthStatus() {
+                           		
+		for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) {   
+			if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
+				LOGGER.info("[{}] cube with mac {} lost connection", LocalDateTime.now().format(myFormat), m.getKey());
+				setOffline(m.getKey());
+				LOGGER.info("[{}] cube with mac {} changed to status OFFLINE", LocalDateTime.now().format(myFormat), m.getKey());
+			}              
+			else {                 
+				if(m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {
+					LOGGER.info("[{}] cube with mac {} has low battery (level at {})", LocalDateTime.now().format(myFormat), m.getKey(), m.getValue().getBatteryLevel());                
+				}
+				if(m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {
+					LOGGER.info("[{}] cube with mac {} reported rssi level at {}", LocalDateTime.now().format(myFormat),  m.getKey(), m.getValue().getRssi());                
+				}
+			}
+		}
+	}
+
 }
