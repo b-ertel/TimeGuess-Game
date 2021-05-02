@@ -1,9 +1,13 @@
 package at.timeguess.backend.ui.controllers;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.User;
@@ -13,8 +17,10 @@ import at.timeguess.backend.services.GameService;
  * Controller for the game list view.
  */
 @Component
-@Scope("view")
-public class GameListController {
+@Scope(WebApplicationContext.SCOPE_SESSION)
+public class GameListController implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Autowired
     private GameService gameService;
@@ -24,7 +30,8 @@ public class GameListController {
     private Boolean isAdmin = null;
 
     /**
-     * Sets whether this instance is used for administrative access or not (different lists are returned by {@link getGames()}.
+     * Sets whether this instance is used for administrative access or not
+     * (different lists are returned by {@link getGames()}.
      * @param isAdmin
      */
     public void setAdmin(Boolean isAdmin) {
@@ -34,30 +41,32 @@ public class GameListController {
     /**
      * Returns a list of all games.
      */
-    public Collection<Game> getGames() {
+    public List<Game> getGames() {
         return isAdmin != null && isAdmin ? gameService.getAllGames() : gameService.getAllCurrent();
     }
 
     /**
      * Returns a list of all games for the given user (current and past).
      */
-    public Collection<Game> getGames(User user) {
+    public List<Game> getGames(User user) {
         return gameService.getByUser(user, false);
     }
 
     /**
      * Returns a list of all current games for the given user.
      */
-    public Collection<Game> getGamesCurrent(User user) {
-        return gameService.getAllGames();//TODO: use this for production: gameService.getByUser(user, true);
+    public List<Game> getGamesCurrent(User user) {
+        // TODO: use this for production (IMPORTANT!):
+        //return gameService.getByUser(user, true);
+        return gameService.getAllGames();
     }
 
     /**
-     * Returns and sets a list of games, by default all returned by {@link getGames()} (helper methods for primefaces datatable filter and sort).
+     * Returns and sets a list of games, by default all returned by {@link getGames()}
+     * (helper methods for primefaces datatable filter and sort).
      */
     public Collection<Game> getFilterGames() {
-        if (filterGames == null)
-            filterGames = getGames();
+        if (filterGames == null) filterGames = getGames();
         return filterGames;
     }
 
@@ -77,21 +86,36 @@ public class GameListController {
     }
 
     /**
-     * Confirms given users participation in given game.
-     * @param user user whose participation in given game is confirmed.
-     * @param game game for which to confirm given users participation.
-     */
-    public void confirm(User user, Game game) {
-        this.gameService.confirm(user, game);
-    }
-
-    /**
      * Returns whether participation confirmation is possible for the given user and game.
      * @param user the user whose participation confirmation is checked for the given game.
      * @param game the game whose participation confirmation is checked for the given user.
      * @return true if participation confirmation is disabled, false otherwise.
      */
-    public boolean disabledConfirmation(User user, Game game) {
+    public boolean isDisabledConfirmation(User user, Game game) {
         return gameService.disabledConfirmation(user, game);
+    }
+
+    /**
+     * Checks if the given game can be deleted currently (it cannot while played).
+     * @return
+     */
+    public boolean isLockedDelete(Game game) {
+        if (game == null) return true;
+        
+        switch (game.getStatus()) {
+            case PLAYED:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Confirms given users participation in given game.
+     * @param user user whose participation in given game is confirmed.
+     * @param game game for which to confirm given users participation.
+     */
+    public void doConfirm(User user, Game game) {
+        this.gameService.confirm(user, game);
     }
 }

@@ -2,9 +2,9 @@ package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +80,7 @@ public class UserDetailController implements Serializable {
      * Returns a set containing all available user roles.
      * @return
      */
-    public EnumSet<UserRole> getAllUserRoles() {
+    public Set<UserRole> getAllUserRoles() {
         return UserRole.getUserRoles();
     }
 
@@ -99,8 +99,11 @@ public class UserDetailController implements Serializable {
         if (this.doValidateUser()) {
             this.checkPasswordChange();
 
-            user = this.userService.saveUser(user);
-            orgPassword = user.getPassword();
+            User ret = this.userService.saveUser(user);
+            if (ret != null) {
+                user = ret;
+                orgPassword = user.getPassword();
+            }
         }
         else messageBean.alertErrorFailValidation("Saving user failed", "Input fields are invalid");
     }

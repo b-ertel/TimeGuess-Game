@@ -140,6 +140,10 @@ table {
     background: rgba(255, 255, 255, 0.85);
 }
 
+.ui-menu {
+    
+}
+
 .ui-menu-child {
     padding-right: 15px !important;
     background: transparent;
@@ -302,6 +306,28 @@ table {
     margin-left: -15px;
 }
 
+.ui-dialog-content.ui-widget-content table {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.ui-dialog-content.ui-widget-content td {
+    text-align: center;
+}
+
+.ui-dataview-list .ui-dataview-listcontainer {
+    list-style: none;
+}
+
+div.ui-multiselectlistbox-listcontainer {
+    float: none !important;
+    width: auto;
+}
+
+#gameCreateData .ui-menu .ui-menuitem {
+    float: right;
+}
+
 #userCreateData .ui-panelgrid-cell.p-col-7, #userData .ui-panelgrid-cell.p-col-7 {
     height: 40px;
 }
@@ -328,6 +354,14 @@ table {
     margin-right: 20px;
 }
 
-.left35 {
-    margin-left: 35px;
+.pagemenu {
+    margin-bottom: 10px;
+}
+
+pre code {
+    font-family: monospace;
+    font-size: smaller !important;
+    background-color: #eee;
+    border: 1px solid #999;
+    display: block;
 }
