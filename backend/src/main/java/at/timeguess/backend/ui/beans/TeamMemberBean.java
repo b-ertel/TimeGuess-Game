@@ -26,7 +26,6 @@ public class TeamMemberBean implements Serializable {
     /**
      * Attributes to cache the currently displayed items
      */
-    private Game game;
     private Team team;
     private List<SelectItem> teams;
 
@@ -35,8 +34,7 @@ public class TeamMemberBean implements Serializable {
      * @param game
      */
     public void setGame(Game game) {
-        this.game = game;
-        this.init();
+        this.init(game);
     }
 
     /**
@@ -63,7 +61,7 @@ public class TeamMemberBean implements Serializable {
         return teams;
     }
 
-    private void init() {
+    private void init(Game game) {
         teams = game == null || game.getTeams() == null ? null : game.getTeams().stream().map(t -> {
             SelectItemGroup ret = new SelectItemGroup(t.getName());
             ret.setValue(t);

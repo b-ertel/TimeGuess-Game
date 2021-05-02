@@ -21,10 +21,8 @@ public class EqualsImplementationTest {
     public void testCubeEqualsContract() {
         Cube cube1 = createCube(1L);
         Cube cube2 = createCube(2L);
-        Configuration cfg1 = new Configuration();
-        cfg1.setId(1L);
-        Configuration cfg2 = new Configuration();
-        cfg2.setId(2L);
+        Configuration cfg1 = createConfig(1L);
+        Configuration cfg2 = createConfig(2L);
         EqualsVerifier.forClass(Cube.class).withPrefabValues(Cube.class, cube1, cube2)
                 .withPrefabValues(Configuration.class, cfg1, cfg2)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
@@ -40,10 +38,8 @@ public class EqualsImplementationTest {
         Team team2 = createTeam(2L);
         User user1 = createUser(1L);
         User user2 = createUser(2L);
-        Round round1 = new Round();
-        round1.setId(1L);
-        Round round2 = new Round();
-        round2.setId(2L);
+        Round round1 = createRound(1L);
+        Round round2 = createRound(2L);
         Cube cube1 = createCube(1L);
         Cube cube2 = createCube(2L);
         EqualsVerifier.forClass(Game.class).withPrefabValues(Game.class, game1, game2)

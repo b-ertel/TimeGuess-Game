@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -13,9 +15,11 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.params.provider.Arguments;
 
+import at.timeguess.backend.model.Configuration;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
+import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
@@ -68,14 +72,12 @@ public class TestSetup {
     }
 
     /**
-     * Creates a simple game with the given id only.
-     * @param gameId
+     * Creates a simple configuration with the given id only.
+     * @param configId
      * @return
      */
-    public static Game createGame(Long gameId) {
-        Game game = new Game();
-        game.setId(gameId);
-        return game;
+    public static Configuration createConfig(Long configId) {
+        return createEntity(Configuration::new, e -> e.setId(configId));
     }
 
     /**
@@ -84,9 +86,25 @@ public class TestSetup {
      * @return
      */
     public static Cube createCube(Long cubeId) {
-        Cube cube = new Cube();
-        cube.setId(cubeId);
-        return cube;
+        return createEntity(Cube::new, e -> e.setId(cubeId));
+    }
+
+    /**
+     * Creates a simple game with the given id only.
+     * @param gameId
+     * @return
+     */
+    public static Game createGame(Long gameId) {
+        return createEntity(Game::new, e -> e.setId(gameId));
+    }
+
+    /**
+     * Creates a simple round with the given id only.
+     * @param roundId
+     * @return
+     */
+    public static Round createRound(Long roundId) {
+        return createEntity(Round::new, e -> e.setId(roundId));
     }
 
     /**
@@ -95,9 +113,7 @@ public class TestSetup {
      * @return
      */
     public static Team createTeam(Long teamId) {
-        Team team = new Team();
-        team.setId(teamId);
-        return team;
+        return createEntity(Team::new, e -> e.setId(teamId));
     }
 
     /**
@@ -106,20 +122,16 @@ public class TestSetup {
      * @return
      */
     public static Term createTerm(Long termId) {
-        Term term = new Term();
-        term.setId(termId);
-        return term;
+        return createEntity(Term::new, e -> e.setId(termId));
     }
 
     /**
-     * Creates a simple team with the given id only.
+     * Creates a simple topic with the given id only.
      * @param topicId
      * @return
      */
     public static Topic createTopic(Long topicId) {
-        Topic topic = new Topic();
-        topic.setId(topicId);
-        return topic;
+        return createEntity(Topic::new, e -> e.setId(topicId));
     }
 
     /**
@@ -128,9 +140,7 @@ public class TestSetup {
      * @return
      */
     public static User createUser(String username) {
-        User user = new User();
-        user.setUsername(username);
-        return user;
+        return createEntity(User::new, e -> e.setUsername(username));
     }
 
     /**
@@ -139,9 +149,7 @@ public class TestSetup {
      * @return
      */
     public static User createUser(Long userId) {
-        User user = new User();
-        user.setId(userId);
-        return user;
+        return createEntity(User::new, e -> e.setId(userId));
     }
 
     /**
@@ -184,6 +192,12 @@ public class TestSetup {
      */
     public static <T> List<T> createEntities(Function<Long, T> createEntity, String colonSeparatedIntList) {
         return createList(colonSeparatedIntList).stream().map(createEntity).collect(Collectors.toList());
+    }
+
+    private static <T> T createEntity(Supplier<T> constructor, Consumer<T> keySetter) {
+        T entity = constructor.get();
+        keySetter.accept(entity);
+        return entity;
     }
 
     private static List<Long> createList(String colonSeparatedIntList) {
