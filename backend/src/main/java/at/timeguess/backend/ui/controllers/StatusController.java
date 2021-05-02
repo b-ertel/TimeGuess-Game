@@ -152,7 +152,7 @@ public class StatusController {
     }  
     
     /**
-     * returns cubes with status {@link CubeStatus.READY} 
+     * returns cubes with status {@link CubeStatus.READY}
      */
     public Set<Cube> getReadyCubes() {
     	
@@ -239,6 +239,16 @@ public class StatusController {
 	public boolean isConfigured(Cube cube) {
 		return cubeService.isConfigured(cube);
 	}
+    
+    /**
+     * checks if a Cube has status {@link CubeStatus.READY}
+     * 
+     * @param cube cube to get its ready status
+     * @return true if has status {@link CubeStatus.READY}, false otherwise
+     */
+    public boolean isReady(Cube cube) {
+        return this.cubeStatus.get(cube.getMacAddress()).getStatus() == CubeStatus.READY;
+    }
 
 	/**
 	 * @return interval of reporting period of the cube

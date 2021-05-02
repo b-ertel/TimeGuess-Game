@@ -43,7 +43,7 @@
                        required="true" requiredMessage="#{cubeMsg}">
                        <f:selectItem itemLabel="Select" />
                        <f:selectItems value="#{statusController.allCubes}" var="cu"
-                           itemDisabled="#{not statusController.isConfigured(cu)}"/>
+                           itemDisabled="#{not statusController.isReady(cu)}"/>
                     </p:selectOneMenu>
 
                     <h:outputLabel for="teamsCreate" value="Teams: " />

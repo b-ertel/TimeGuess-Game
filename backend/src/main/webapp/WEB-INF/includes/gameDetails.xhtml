@@ -137,7 +137,7 @@
                                disabled="#{gameDetailController.lockedCube}">
                                <f:selectItem itemLabel="Select" />
                                <f:selectItems value="#{statusController.allCubes}" var="cu"
-                                   itemDisabled="#{not statusController.isConfigured(cu)}"/>
+                                   itemDisabled="#{not statusController.isReady(cu)}"/>
                             </p:selectOneMenu>
                         </p:panelGrid>
                         <p:separator style="margin:12px 0px 20px" />
