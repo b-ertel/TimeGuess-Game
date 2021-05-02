@@ -60,13 +60,15 @@ public class WebSocketManager implements Serializable {
     @Inject
     @Push(channel = "secondTermChannel")
     private PushContext secondTermChannel;
-    
     @Inject
     @Push(channel = "cubeConfigurationChannel")
     private PushContext cubeConfigurationChannel;
     @Inject
     @Push(channel = "cubeTestChannel")
     private PushContext cubeTestChannel;
+    @Inject
+    @Push(channel = "countDownChannel")
+    private PushContext countDownChannel;
     
     @Inject
     @Push(channel = "newRoundChannel")
@@ -101,6 +103,10 @@ public class WebSocketManager implements Serializable {
 
     public PushContext getCubeTestChannel() {
         return cubeTestChannel;
+    }
+    
+    public PushContext getCountDownChannel() {
+        return countDownChannel;
     }
 
 	public PushContext getNewRoundChannel() {
