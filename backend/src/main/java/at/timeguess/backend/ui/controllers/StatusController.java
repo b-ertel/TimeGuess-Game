@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,7 +153,7 @@ public class StatusController {
     }  
     
     /**
-     * returns cubes with status {@link CubeStatus.READY} 
+     * returns cubes with status {@link CubeStatus.READY}
      */
     public Set<Cube> getReadyCubes() {
     	
@@ -232,6 +233,16 @@ public class StatusController {
 	public boolean isConfigured(Cube cube) {
 		return cubeService.isConfigured(cube);
 	}
+    
+    /**
+     * checks if a Cube has status {@link CubeStatus.READY}
+     * 
+     * @param cube cube to get its ready status
+     * @return true if has status {@link CubeStatus.READY}, false otherwise
+     */
+    public boolean isReady(Cube cube) {
+        return this.cubeStatus.get(cube.getMacAddress()).getStatus() == CubeStatus.READY;
+    }
 
 	/** remove status of a deleted user, called by {@link CubeController} if a cube is deleted via UI
 	 * @param macAddress of the deleted cube
