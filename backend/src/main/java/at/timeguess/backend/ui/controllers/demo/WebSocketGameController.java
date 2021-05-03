@@ -85,7 +85,16 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     @PostConstruct
     public void setup() {
     	configuredfacetsEventListener.subscribe(this);
+    	newGameBean.setGameName("TestGame");
+ 		newGameBean.setMaxPoints(10);
+ 		newGameBean.setTopic(topicRepo.findById((long) 1).get());
+ 		newGameBean.createGame();
  		Game testgame = gameService.loadGame((long) 8);
+ 		testgame.setTeams(gameService.loadGame((long) 1).getTeams());
+ 		testgame.getTeams().addAll(gameService.loadGame((long) 2).getTeams());
+ 		testgame.setRoundNr(0);
+
+ 		
  		List<User> users = new ArrayList<>();
  		List<String> usernames = new ArrayList<>();
  		testgame.getActualTeams().stream().forEach(team -> users.addAll(team.getTeamMembers()));
