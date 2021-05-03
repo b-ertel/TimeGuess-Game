@@ -9,13 +9,10 @@ import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.repositories.TopicRepository;
-import at.timeguess.backend.repositories.UserRepository;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
-import at.timeguess.backend.services.TermService;
 import at.timeguess.backend.ui.beans.NewGameBean;
-import at.timeguess.backend.ui.beans.SessionInfoBean;
 import at.timeguess.backend.ui.controllers.CountDownController;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
@@ -49,8 +46,6 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
 	@Autowired
 	private TopicRepository topicRepo;
     @Autowired
-    private ChatManagerController chatController;
-    @Autowired
     private CountDownController countDownController;
     @Autowired
     private GameService gameService;
@@ -81,7 +76,6 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
  		testgame.getTeams().addAll(gameService.loadGame((long) 2).getTeams());
  		testgame.setRoundNr(0);
 
- 		
  		List<User> users = new ArrayList<>();
  		List<String> usernames = new ArrayList<>();
  		testgame.getActualTeams().stream().forEach(team -> users.addAll(team.getTeamMembers()));
@@ -101,7 +95,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
    
     /**
      * A method for processing a {@link ConfiguredFacetsEvent}.
-     * Method is called on facet-event, checks to which game it corresponds and calls startNewMethod() to initialize new round.
+     * Method is called on facet-event, checks to which game it corresponds and calls startNewRound() to initialize new round.
      */
     @Override
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
@@ -136,7 +130,6 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
 	public void setCurrentGame(Game currentGame) {
 		this.currentGame = currentGame;
 	}
-	
 	
 	/**
 	 * A method to put all usernames of players, that are online, into a list
