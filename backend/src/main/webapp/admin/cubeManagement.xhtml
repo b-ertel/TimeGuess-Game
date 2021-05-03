@@ -28,7 +28,7 @@
             </p:menubar>
         </h:form>
 
-        <h:form id="ChatRoomForm">
+        <h:form id="CubeStatusForm">
             <div class="chatRoomContent">
                 <h1>Cube Management</h1>
 
@@ -44,7 +44,7 @@
                                 widgetVar="onlineInfoWidget">
                          
                          <ui:repeat var="cubeStatusInfo"
-                                value="#{statusController.cubeStatusInfos}">
+                                value="#{cubeStatusController.cubeStatusInfos}">
                             <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
                          </ui:repeat>
                      </p:scrollPanel>
@@ -89,25 +89,25 @@
 						<p:commandButton value="Configure"
 							oncomplete="PF('cubeConfigurationDialog').show()"
 							update="cubeConfigurationForm:cubeConfigurationDialog :msg"
-							rendered="#{statusController.checkConfiguration(curr.macAddress) and !statusController.isConfigured(curr)}" >
-							<f:actionListener binding="#{statusController.setInConfig(curr.macAddress)}" />
+							rendered="#{cubeStatusController.checkConfiguration(curr.macAddress) and !cubeStatusController.isConfigured(curr)}" >
+							<f:actionListener binding="#{cubeStatusController.setInConfig(curr.macAddress)}" />
 							<f:actionListener binding="#{cubeConfigurationController.prepareForNewConfiguration(curr)}" />
 						</p:commandButton>
 						<p:commandButton value="Test"
 							oncomplete="PF('cubeTestDialog').show()"
-							update="cubeTestForm:cubeTestDialog :msg" rendered="#{statusController.getStatus(curr.macAddress) eq 'READY'}">
+							update="cubeTestForm:cubeTestDialog :msg" rendered="#{cubeStatusController.getStatus(curr.macAddress) eq 'READY'}">
 							<f:actionListener
 								binding="#{cubeTestController.prepareForNewTest(curr)}" />
 						</p:commandButton>
 						<p:commandButton value="Delete configuration"
 							action="#{cubeController.deleteConfigurations()}"
 							update=":cubeDetailForm:cubeUseDialog :msg"
-							rendered="#{statusController.isConfigured(curr)}">
+							rendered="#{cubeStatusController.isConfigured(curr)}">
 							<p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this configuration? This cannot be undone." />
-							<f:actionListener binding="#{statusController.changeStatus(curr.macAddress)}" />
+							<f:actionListener binding="#{cubeStatusController.changeStatus(curr.macAddress)}" />
 						</p:commandButton>
                         <p:commandButton value="Delete Cube" action="#{cubeController.deleteCube()}" oncomplete="PF('cubeUseDialog').hide()" 
-                        	rendered="#{statusController.checkDeletion(curr.macAddress)}" update=":cubeDetailForm:cubeUseDialog :msg">
+                        	rendered="#{cubeStatusController.checkDeletion(curr)}" update=":cubeDetailForm:cubeUseDialog :msg :CubeStatusForm:onlineCube">
                         	<p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this cube? This cannot be undone." />
                         </p:commandButton>
                         <p:commandButton value="Abort" onclick="PF('cubeUseDialog').hide()" update=":cubeDetailForm:cubeUseDialog :msg" /> 
@@ -124,7 +124,7 @@
            <o:socket channel="cubeChannel" scope="application"
                 onmessage="function(m){console.log(m);}">
                 <f:ajax event="connectionCubeUpdate"
-                    render="ChatRoomForm" />
+                    render="CubeStatusForm" />
             </o:socket>
 
 		</h:form>	
@@ -186,9 +186,9 @@
 							onclick="PF('cubeConfigurationDialog').hide()"
 							oncomplete="PF('cubeUseDialog').show()"
 							update=":cubeDetailForm:cubeUseDialog :msg">
-							<f:actionListener binding="#{statusController.setReady(curr.macAddress)}" />
+							<f:actionListener binding="#{cubeStatusController.setReady(curr.macAddress)}" />
 						</p:commandButton>
-						<p:commandButton value="Abort" action="#{statusController.setLive(curr.macAddress)}" onclick="PF('cubeConfigurationDialog').hide()" />
+						<p:commandButton value="Abort" action="#{cubeStatusController.setLive(curr.macAddress)}" onclick="PF('cubeConfigurationDialog').hide()" />
 					</p:panel>
 				</p:outputPanel>
 
