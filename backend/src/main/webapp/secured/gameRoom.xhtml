@@ -14,9 +14,31 @@
             pfContext=PF
         </h:outputScript>
 
+		<h:form>
+			<p:panel style="font-size:24px !important; width:180px;">
+			<h1>Gameroom</h1>
+			</p:panel>
+		</h:form>
+		
+        <h:form id="countdownForm" style="width:500px; text-align:center; align:right; margin: 0 auto;">
+            <p:panel id="count">
+            <h3>Time to Guess</h3>
+            	<h1 class="p-text-center">
+             		<h:outputText value="#{countDownDisplayController.getCountDown(webSocketGameController.currentGame)}" style="font-weight:bold; font-size:40px !important"/> 
+             	</h1>
+            </p:panel>
+      
+         	<o:socket channel="countDownChannel" scope="session"
+         	    user="#{sessionInfoBean.currentUserName}"
+                onmessage="function(m){console.log(m);}">
+                <f:ajax event="countDownUpdate"
+                    render=":countdownForm:count" />
+            </o:socket> 
+		</h:form>
+
         <h:form id="gameRoomForm">
             <div class="gameRoomContent">
-                <h1>Gameroom</h1>
+      <!--         <h1>Gameroom</h1> -->   
 
                 <p:panelGrid columns="1" style="width: 100%;"
                         columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
@@ -55,5 +77,6 @@
             </o:socket>
 
         </h:form>
+        
     </ui:define>
 </ui:composition>

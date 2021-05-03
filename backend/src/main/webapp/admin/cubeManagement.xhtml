@@ -17,6 +17,17 @@
         </h:outputScript>
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
 
+        <h:form id="toolbarForm">
+            <p:menubar id="toolbar">
+                <p:menuitem value="&nbsp;Edit intervals&nbsp;" icon="fa fa-cogs"
+                            oncomplete="PF('editIntervalDialog').show()"
+                            update=":editIntervalForm:editIntervalDialog :toolbarForm:toolbar"/>
+                <p:menuitem value="&nbsp;Edit thresholds&nbsp;" icon="fa fa-cogs"
+                            oncomplete="PF('editThresholdDialog').show()"
+                            update=":editThresholdForm:editThresholdDialog :toolbarForm:toolbar"/>
+            </p:menubar>
+        </h:form>
+
         <h:form id="ChatRoomForm">
             <div class="chatRoomContent">
                 <h1>Cube Management</h1>
@@ -84,7 +95,7 @@
 						</p:commandButton>
 						<p:commandButton value="Test"
 							oncomplete="PF('cubeTestDialog').show()"
-							update="cubeTestForm:cubeTestDialog :msg" rendered="#{statusController.isConfigured(curr)}">
+							update="cubeTestForm:cubeTestDialog :msg" rendered="#{statusController.getStatus(curr.macAddress) eq 'READY'}">
 							<f:actionListener
 								binding="#{cubeTestController.prepareForNewTest(curr)}" />
 						</p:commandButton>
@@ -232,5 +243,100 @@
 			</p:dialog>
 		</h:form>
 
+		<h:form id="editIntervalForm">
+			<p:dialog header="Edit Intervals" id="editIntervalDialog"
+				widgetVar="editIntervalDialog" dynamic="true" modal="true"
+				resizable="false" closeOnEscape="true" showEffect="fade"
+				hideEffect="fade" responsive="true">
+
+				<p:outputPanel id="editIntervalOutputPanel">
+					<p:panel header="What can you do here?">
+						<h:outputText value="Here it is possible to change the reporting interval (i.e., the interval in seconds at which we expect to recieve status messages and which is communicated via the status response) and the expiration interval (i.e., the interval in seconds after which we change the status to offline if no status message was recieved) for TimeFlip devices." />
+					</p:panel>
+
+					<p:spacer height="5" />
+
+					<h:panelGrid columns="4">
+						<p:outputLabel for="reportingInterval"
+							value="Reporting Interval: "
+							title=""/>
+						<p:inputText disabled="true"
+							value="#{intervalController.savedReportingInterval}"
+							size="5" />
+						<p:inputNumber id="reportingInterval"
+							value="#{intervalController.reportingInterval}"
+							decimalPlaces="0"
+							thousandSeparator=""
+							required="true"
+							size="5" />
+						<p:commandButton value="Submit change"
+							action="#{intervalController.doUpdateReportingInterval()}"
+							update="editIntervalOutputPanel :msg" />
+
+						<p:outputLabel for="expirationInterval" value="Expiration Interval: " />
+						<p:inputText disabled="true"
+							value="#{intervalController.savedExpirationInterval}"
+							size="5" />
+						<p:inputNumber id="expirationInterval"
+							value="#{intervalController.expirationInterval}"
+							decimalPlaces="0"
+							thousandSeparator=""
+							required="true"
+							size="5" />
+						<p:commandButton value="Submit change"
+							action="#{intervalController.doUpdateExpirationInterval()}"
+							update="editIntervalOutputPanel :msg" />
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+		</h:form>
+
+		<h:form id="editThresholdForm">
+			<p:dialog header="Edit Thresholds" id="editThresholdDialog"
+				widgetVar="editThresholdDialog" dynamic="true" modal="true"
+				resizable="false" closeOnEscape="true" showEffect="fade"
+				hideEffect="fade" responsive="true">
+
+				<p:outputPanel id="editThresholdOutputPanel">
+					<p:panel header="What can you do here?">
+						<h:outputText value="Here it is possible to change the battery level threshold (i.e., the minimum allowable value of the battery level characteristic) and the RSSI threshold (i.e., the minimum allowable value of the RSSI property) for TimeFlip devices." />
+					</p:panel>
+
+					<p:spacer height="5" />
+
+					<h:panelGrid columns="4">
+						<p:outputLabel for="batteryLevelThreshold" value="Battery Level Threshold: " />
+						<p:inputText disabled="true"
+							value="#{thresholdController.savedBatteryLevelThreshold}"
+							size="5" />
+						<p:inputNumber id="batteryLevelThreshold"
+							value="#{thresholdController.batteryLevelThreshold}"
+							decimalPlaces="0"
+							thousandSeparator=""
+							required="true"
+							size="5"
+							minValue="0"
+							maxValue="100" />
+						<p:commandButton value="Submit change"
+							action="#{thresholdController.doUpdateBatteryLevelThreshold()}"
+							update="editThresholdOutputPanel :msg" />
+
+						<p:outputLabel for="rssiThreshold" value="RSSI Threshold: " />
+						<p:inputText disabled="true"
+							value="#{thresholdController.savedRssiThreshold}"
+							size="5" />
+						<p:inputNumber id="rssiThreshold"
+							value="#{thresholdController.rssiThreshold}"
+							decimalPlaces="0"
+							thousandSeparator=""
+							required="true"
+							size="5" />
+						<p:commandButton value="Submit change"
+							action="#{thresholdController.doUpdateRssiThreshold()}"
+							update="editThresholdOutputPanel :msg" />
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+		</h:form>
     </ui:define>
 </ui:composition>
