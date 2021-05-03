@@ -51,7 +51,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     @Autowired
     private GameService gameService;
     @Autowired
-	CubeService cubeService;
+	private CubeService cubeService;
     @CDIAutowired
     private WebSocketManager websocketManager;
     @Autowired
