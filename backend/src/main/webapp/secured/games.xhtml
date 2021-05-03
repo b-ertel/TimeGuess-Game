@@ -4,97 +4,106 @@
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:p="http://primefaces.org/ui">
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/templates/main.xhtml">
 
-    <ui:include src="/WEB-INF/templates/gamesTable.xhtml">
-        <ui:param name="isAdminAccess" value="#{false}" />
-    </ui:include>
+    <ui:define name ="content">
 
-    <h:form id="gameCreateForm" prependId="false">
-        <ui:remove>create new game</ui:remove>
-        <p:dialog header="Create Game" id="gameCreateDialog" widgetVar="gameCreateDialog" dynamic="true"
-            modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
-            <p:ajax event="close" update="gameCreateData teamCreateData" process="@this" resetValues="true" />
+        <ui:include src="/WEB-INF/includes/gamesTable.xhtml">
+            <ui:param name="isAdminAccess" value="#{false}" />
+        </ui:include>
 
-            <p:outputPanel id="gameCreateData">
-                <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
-                    columnClasses="p-col-4, p-col-8" contentStyleClass="ui-fluid">
+        <ui:include src="/WEB-INF/includes/statistics.xhtml"/>
 
-                    <p:outputLabel for="nameCreate" value="Name: "/>
-                    <p:inputText id="nameCreate" value="#{newGameBean.gameName}" required="true" maxlength="100" />
+        <ui:include src="/WEB-INF/includes/highscores.xhtml"/>
 
-                    <p:outputLabel for="maxPointsCreate" value="Maximum Points: "/>
-                    <p:spinner id="maxPointsCreate" value="#{newGameBean.maxPoints}" required="true" min="1" />
-                    
-                    <h:outputLabel for="topicCreate" value="Topic: " />
-                    <p:selectOneMenu id="topicCreate" value="#{newGameBean.topic}" converter="omnifaces.SelectItemsConverter"
-                        required="true" requiredMessage="#{topicMsg}">
-                        <p:ajax event="change" process="@this" />
-                        <f:selectItem itemLabel="Select" />
-                        <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
-                    </p:selectOneMenu>
-                    <p:separator style="margin:7px 0px 15px" />
-                </p:panelGrid>
+        <h:form id="gameCreateForm" prependId="false">
+            <ui:remove>create new game</ui:remove>
+            <p:dialog header="Create Game" id="gameCreateDialog" widgetVar="gameCreateDialog" dynamic="true"
+                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
+                <p:ajax event="close" update="gameCreateData teamCreateData" process="@this" resetValues="true" />
 
-                <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
-                    columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
-                    <h:outputLabel for="cubeCreate" value="Cube: " />
-                    <p:selectOneMenu id="cubeCreate" value="#{newGameBean.cube}" converter="omnifaces.SelectItemsConverter"
-                       required="true" requiredMessage="#{cubeMsg}">
-                       <f:selectItem itemLabel="Select" />
-                       <f:selectItems value="#{cubeController.allCubes}" var="cu"
-                           itemDisabled="#{not statusController.isReady(cu)}"/>
-                    </p:selectOneMenu>
+                <p:outputPanel id="gameCreateData">
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                        columnClasses="p-col-4, p-col-8" contentStyleClass="ui-fluid">
 
-                    <h:outputLabel for="teamsCreate" value="Teams: " />
-                    <p:selectCheckboxMenu id="teamsCreate" value="#{newGameBean.teams}" label="#{sel2Label}"
-                        required="true" requiredMessage="#{teamsMsg}" dynamic="true"
-                        multiple="true" filter="true" filterMatchMode="contains">
-                        <!-- have to use all teams, otherwise list doesn't work -->
-                        <f:selectItems id="teamsCreateAll" value="#{newGameBean.allTeams}" var="t" itemLabel="#{t.name}"
-                            itemDisabled="#{not newGameBean.isAvailableTeam(t)}" />
-                    </p:selectCheckboxMenu>
-                </p:panelGrid>
-            </p:outputPanel>
-            <p:separator style="margin:9px 0px 16px" />
+                        <p:outputLabel for="nameCreate" value="Name: "/>
+                        <p:inputText id="nameCreate" value="#{newGameBean.gameName}" required="true" maxlength="100" />
 
-            <p:outputPanel id="teamCreateData">
-                <p:menubar id="newteamCreate" style="margin-bottom:18px">
-                    <p:menuitem value="&nbsp;Create Team&nbsp;" icon="fa fa-plus"
-                        actionListener="#{newGameBean.addNewTeam(newTeamBean.createTeam())}"
-                        process="teamnameCreate playersCreate @this" update="gameCreateData teamCreateData :msg" validateClient="true" />
-                </p:menubar>
+                        <p:outputLabel for="maxPointsCreate" value="Maximum Points: "/>
+                        <p:spinner id="maxPointsCreate" value="#{newGameBean.maxPoints}" required="true" min="1" />
+                        
+                        <h:outputLabel for="topicCreate" value="Topic: " />
+                        <p:selectOneMenu id="topicCreate" value="#{newGameBean.topic}" converter="omnifaces.SelectItemsConverter"
+                            required="true" requiredMessage="#{topicMsg}">
+                            <p:ajax event="change" process="@this" />
+                            <f:selectItem itemLabel="Select" />
+                            <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
+                        </p:selectOneMenu>
+                        <p:separator style="margin:7px 0px 15px" />
+                    </p:panelGrid>
 
-                <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
-                    columnClasses="p-col-4, p-col-8" contentStyleClass="ui-fluid">
-                    
-                    <p:outputLabel for="teamnameCreate" value="Name: "/>
-                    <p:inputText id="teamnameCreate" value="#{newTeamBean.teamName}" required="true" maxlength="100" />
-                    <p:separator style="margin:6px 0px 16px" />
-                </p:panelGrid>
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
+                        columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
+                        <h:outputLabel for="cubeCreate" value="Cube: " />
+                        <p:selectOneMenu id="cubeCreate" value="#{newGameBean.cube}" converter="omnifaces.SelectItemsConverter"
+                           required="true" requiredMessage="#{cubeMsg}">
+                           <f:selectItem itemLabel="Select" />
+                           <f:selectItems value="#{cubeController.allCubes}" var="cu"
+                               itemDisabled="#{not statusController.isReady(cu)}"/>
+                        </p:selectOneMenu>
 
-                <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
-                    columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
-                    <h:outputLabel for="playersCreate" value="Players: " />
-                    <p:selectCheckboxMenu id="playersCreate" value="#{newTeamBean.players}" label="#{sel2Label}"
-                        required="true" requiredMessage="Players: Select at least 2 players" converter="omnifaces.SelectItemsConverter"
-                        multiple="true" filter="true" filterMatchMode="contains">
-                        <f:selectItems value="#{newTeamBean.allPlayers}" var="p" itemLabel="#{p.username}"
-                            itemDisabled="#{not newTeamBean.isAvailablePlayer(p)}" />
-                    </p:selectCheckboxMenu>
-                </p:panelGrid>
-            </p:outputPanel>
-            <p:separator style="margin:9px 0px 12px" />
+                        <h:outputLabel for="teamsCreate" value="Teams: " />
+                        <p:selectCheckboxMenu id="teamsCreate" value="#{newGameBean.teams}" label="#{sel2Label}"
+                            required="true" requiredMessage="#{teamsMsg}" dynamic="true"
+                            multiple="true" filter="true" filterMatchMode="contains">
+                            <!-- have to use all teams, otherwise list doesn't work -->
+                            <f:selectItems id="teamsCreateAll" value="#{newGameBean.allTeams}" var="t" itemLabel="#{t.name}"
+                                itemDisabled="#{not newGameBean.isAvailableTeam(t)}" />
+                        </p:selectCheckboxMenu>
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:separator style="margin:9px 0px 16px" />
 
-            <h:panelGrid columns="3">
-                <p:commandButton value="Save" action="#{newGameBean.createGame()}"
-                    oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); PF('gameTable').filter(); }"
-                    process="nameCreate maxPointsCreate cubeCreate topicCreate teamsCreate @this"
-                    update="gameCreateData :gameListForm :gameInfoForm:gameInfoData :msg" validateClient="true" />
-                <p:commandButton value="Reload" action="#{newGameBean.clearFields}"
-                    process="@parent" update="gameCreateData :msg" resetValues="true"/>
-                <p:commandButton value="Abort" onsuccess="PF('gameCreateDialog').hide()"/>
-            </h:panelGrid>
-        </p:dialog>
-    </h:form>
+                <p:outputPanel id="teamCreateData">
+                    <p:menubar id="newteamCreate" style="margin-bottom:18px">
+                        <p:menuitem value="&nbsp;Create Team&nbsp;" icon="fa fa-plus"
+                            actionListener="#{newGameBean.addNewTeam(newTeamBean.createTeam())}"
+                            process="teamnameCreate playersCreate @this" update="gameCreateData teamCreateData :msg" validateClient="true" />
+                    </p:menubar>
+
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                        columnClasses="p-col-4, p-col-8" contentStyleClass="ui-fluid">
+                        
+                        <p:outputLabel for="teamnameCreate" value="Name: "/>
+                        <p:inputText id="teamnameCreate" value="#{newTeamBean.teamName}" required="true" maxlength="100" />
+                        <p:separator style="margin:6px 0px 16px" />
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
+                        columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
+                        <h:outputLabel for="playersCreate" value="Players: " />
+                        <p:selectCheckboxMenu id="playersCreate" value="#{newTeamBean.players}" label="#{sel2Label}"
+                            required="true" requiredMessage="Players: Select at least 2 players" converter="omnifaces.SelectItemsConverter"
+                            multiple="true" filter="true" filterMatchMode="contains">
+                            <f:selectItems value="#{newTeamBean.allPlayers}" var="p" itemLabel="#{p.username}"
+                                itemDisabled="#{not newTeamBean.isAvailablePlayer(p)}" />
+                        </p:selectCheckboxMenu>
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:separator style="margin:9px 0px 12px" />
+
+                <h:panelGrid columns="3">
+                    <p:commandButton value="Save" action="#{newGameBean.createGame()}"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); PF('gameTable').filter(); }"
+                        process="nameCreate maxPointsCreate cubeCreate topicCreate teamsCreate @this"
+                        update="gameCreateData :gameListForm :gameInfoForm:gameInfoData :msg" validateClient="true" />
+                    <p:commandButton value="Reload" action="#{newGameBean.clearFields}"
+                        process="@parent" update="gameCreateData :msg" resetValues="true"/>
+                    <p:commandButton value="Abort" onsuccess="PF('gameCreateDialog').hide()"/>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+
+    </ui:define>
 </ui:composition>

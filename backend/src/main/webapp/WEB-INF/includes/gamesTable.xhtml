@@ -1,15 +1,13 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:c="http://java.sun.com/jsp/jstl/core"
-                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
-                template="/WEB-INF/templates/main.xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
 
-    <ui:define name ="content">
+    <body>
+        <ui:composition>
         <c:set value="#{isAdminAccess and isAdmin}" target="#{gameListController}" property="admin"/>
         <c:set var="noEditRight" value="#{!(sessionInfoBean.currentUser.username eq game.creator.username or isAdmin)}" />
         <c:set var="cubeMsg" value="Cube: Value is required" scope="application" />
@@ -24,7 +22,7 @@
             
             <ui:remove>create game command</ui:remove>
             <p:menubar id="toolbar" rendered="#{not isAdminAccess}" styleClass="pagemenu">
-                <p:menuitem value="&nbsp;Create Game&nbsp;" icon="fa fa-plus"
+                <p:menuitem value="&#xA0;Create Game&#xA0;" icon="fa fa-plus"
                     oncomplete="PF('gameCreateDialog').show()" update=":gameCreateForm:gameCreateDialog" />
             </p:menubar>
 
@@ -136,10 +134,6 @@
                         <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                         <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this game? This cannot be undone." />
                     </p:commandButton>
-                    <p:commandButton title="Edit (new)" icon="fa fa-pencil" disabled="#{not isAdmin}"
-                        oncomplete="PF('gameEditDialog2').show()" update=":gameDetailFormXX:gameEditDialog2 :msg">
-                        <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
-                    </p:commandButton>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
                     <p:commandButton title="Info" icon="fa fa-info"
@@ -151,7 +145,7 @@
             </p:dataTable>
 
             <p:contextMenu for="gameTable" rendered="#{isAdminAccess}">
-                <p:menuitem value="&nbsp;Edit" icon="fa fa-edit"
+                <p:menuitem value="&#xA0;Edit" icon="fa fa-edit"
                     oncomplete="PF('gameEditDialog').show()" update=":gameDetailForm:gameEditDialog :msg">
                     <f:setPropertyActionListener value="#{gameListController.selectedGame}" target="#{gameDetailController.game}" />
                 </p:menuitem>
@@ -215,6 +209,6 @@
             </p:confirmDialog>
             <p:draggable for="deleteGameConfirm"/>
         </h:form>
-
-    </ui:define>
-</ui:composition>
+        </ui:composition>
+    </body>
+</html>
