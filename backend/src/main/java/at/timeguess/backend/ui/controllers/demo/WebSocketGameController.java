@@ -7,7 +7,6 @@ import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
-import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.repositories.UserRepository;
@@ -29,7 +28,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 
@@ -51,12 +49,6 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
 	@Autowired
 	private TopicRepository topicRepo;
     @Autowired
-    private SessionInfoBean sessionInfoBean;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private TermService termService;
-    @Autowired
     private ChatManagerController chatController;
     @Autowired
     private CountDownController countDownController;
@@ -72,14 +64,8 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
 	GameLogicService gameLogic;
 
     private Round currentRound;
-    private CubeFace cubeFace;
     private Round controllRound;
     private Game currentGame;
-
-    private Map<Game, List<String>> playersOfGame = new HashMap<>();
-
-    private List<User> guessingUsers = new LinkedList<>();
-    private List<User> controllingUsers = new LinkedList<>();
 
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
@@ -104,10 +90,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
  		
  		listOfGames.put(cube, testgame);
         this.controllRound = new Round();
-        this.currentGame = testgame;
-
-        playersOfGame.put(testgame, usernames);
-        
+        this.currentGame = testgame;        
     }
     
     @PreDestroy
@@ -115,40 +98,27 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
         configuredfacetsEventListener.unsubscribe(this);
     }
 
-
-    /**
-     * When a user logs out, there shouldn't be the possibility to send him terms
-     * anymore and hence it should be removed from any undelivered
-     * term-recipient-list
-     */
-    public void synchronizeRecipients() {
-            this.guessingUsers.removeIf(user -> !this.chatController.getPossibleRecipients().contains(user));
-            this.controllingUsers.removeIf(user -> !this.chatController.getPossibleRecipients().contains(user));
-    }
-    
+   
     /**
      * A method for processing a {@link ConfiguredFacetsEvent}.
+     * Method is called on facet-event, checks to which game it corresponds and calls startNewMethod() to initialize new round.
      */
     @Override
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) { 
-        	this.cubeFace = configuredFacetsEvent.getCubeFace();
         	startNewRound(listOfGames.get(configuredFacetsEvent.getCube()), configuredFacetsEvent.getCubeFace()); 
         }
     }
     
+    /**
+     * Method that starts a new Round for a game. It initializes a new round and also calls a method to start the countdown.
+     * @param currentGame, game for which round should be started
+     * @param cubeFace, face that sets round parameter
+     */
     public void startNewRound(Game currentGame, CubeFace cubeFace) {
     	this.currentRound = gameLogic.startNewRound(currentGame, cubeFace);
     	this.websocketManager.getNewRoundChannel().send("newRound", getAllUsernamesOfGameTeams(currentGame.getActualTeams()));
     	countDownController.startCountDown(cubeFace, currentGame);
-    }
-
-    public List<User> getGuessingUsers() {
-        return guessingUsers;
-    }
-
-    public List<User> getControllingUsers() {
-        return controllingUsers;
     }
 
     public Round getControllRound() {
@@ -159,10 +129,6 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
         return this.currentRound;
     }
 
-	public CubeFace getCubeFace() {
-		return cubeFace;
-	}
-
 	public Game getCurrentGame() {
 		return currentGame;
 	}
@@ -172,6 +138,11 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
 	}
 	
 	
+	/**
+	 * A method to put all usernames of players, that are online, into a list
+	 * @param listOfTeams
+	 * @return list of usernames
+	 */
 	private List<String> getAllUsernamesOfGameTeams(List<Team> listOfTeams){
 		List<String> usernames = new ArrayList<>();
 		List<User> users = new ArrayList<>();
