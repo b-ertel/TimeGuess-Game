@@ -73,6 +73,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     private Round currentRound;
     private CubeFace cubeFace;
     private Round controllRound;
+    private Game currentGame;
 
     private Map<Game, List<String>> playersOfGame = new HashMap<>();
 
@@ -93,6 +94,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
  		
  		listOfGames.put(cube, testgame);
         this.controllRound = new Round();
+        this.currentGame = testgame;
 
         playersOfGame.put(testgame, usernames);
         
@@ -120,9 +122,9 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     @Override
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) { 
-        	Collection<String> users = playersOfGame.get(listOfGames.get(configuredFacetsEvent.getCube()));
-        	startNewRound(listOfGames.get(configuredFacetsEvent.getCube()), configuredFacetsEvent.getCubeFace()); 
-        	this.websocketManager.getNewRoundChannel().send("newRound", users);
+        	this.cubeFace = configuredFacetsEvent.getCubeFace();
+        	startNewRound(); 
+        	this.websocketManager.getNewRoundChannel().send("newRound");
         }
     }
     

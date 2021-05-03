@@ -68,11 +68,10 @@
                 </p:panelGrid>
             </div>
 
-			<o:socket channel="newRoundChannel" scope="session"
+			<o:socket channel="newRoundChannel" scope="application"
                       onmessage="function(m){console.log(m);}">
                 <f:ajax event="newRound"
                         render=":gameRoomForm:roundInfo" 
-                        listener="#{webSocketUserGameController.startNewRound()}"
                         />              <!-- TODO: listener auf gegnerisches Team ändern...  -->
             </o:socket>
 
