@@ -52,7 +52,7 @@
 				                        <div class="p-col-5"><p:outputLabel value="Team: " /></div>
 				                        <div class="p-col-7"><p:outputLabel value="#{webSocketUserGameController.currentRound.guessingTeam.name}"/></div>
 				                        <div class="p-col-5"><p:outputLabel value="Roundnr: " /></div>
-				                        <div class="p-col-7"><p:outputLabel value="#{webSocketGameController.currentRound.nr}"/></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{webSocketUserGameController.currentRound.nr}"/></div>
 				                        <ui:fragment rendered="#{webSocketUserGameController.isGuessingPlayer()}">
    										<div class="p-col-5"><p:outputLabel value="Term: " /></div>
 				                        <div class="p-col-7"><p:outputLabel value="#{webSocketUserGameController.currentRound.termToGuess.name}"/></div>

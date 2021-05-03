@@ -25,6 +25,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 
@@ -56,11 +57,10 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     @Autowired
     private ConfiguredFacetsEventListener configuredfacetsEventListener;
     @Autowired
-	GameLogicService gameLogic;
+	private GameLogicService gameLogic;
 
-    private Round currentRound;
+    private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
     private Round controllRound;
-    private Game currentGame;
 
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
@@ -83,8 +83,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
  		Cube cube = cubeService.getByMacAddress("56:23:89:34:56");
  		
  		listOfGames.put(cube, testgame);
-        this.controllRound = new Round();
-        this.currentGame = testgame;        
+        this.controllRound = new Round();       
     }
     
     @PreDestroy
@@ -110,7 +109,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
      * @param cubeFace, face that sets round parameter
      */
     public void startNewRound(Game currentGame, CubeFace cubeFace) {
-    	this.currentRound = gameLogic.startNewRound(currentGame, cubeFace);
+    	this.currentRound.put(currentGame, gameLogic.startNewRound(currentGame, cubeFace));
     	this.websocketManager.getNewRoundChannel().send("newRound", getAllUsernamesOfGameTeams(currentGame.getActualTeams()));
     	countDownController.startCountDown(cubeFace, currentGame);
     }
@@ -119,18 +118,30 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
         return controllRound;
     }
     
-    public Round getCurrentRound() {
-        return this.currentRound;
+    public Round getCurrentRoundOfGame(Game game) {
+        return this.currentRound.get(game);
+    }
+    
+    /**
+     * method to get the current round for a given user, called by {@link WebSocketUserGameController}
+     * 
+     * @param user to find current round
+     * @return current round
+     */
+    public Round getCurrentRoundForUser(User user) {
+    	
+    	Round round = new Round();
+   
+    	for(Map.Entry<Game, Round> e : currentRound.entrySet()) {
+    		for(Team t : e.getKey().getActualTeams()) {
+    			if(t.getTeamMembers().contains(user)) {
+    				round = e.getValue();
+    			}
+    		}
+    	}
+    	return round;
     }
 
-	public Game getCurrentGame() {
-		return currentGame;
-	}
-
-	public void setCurrentGame(Game currentGame) {
-		this.currentGame = currentGame;
-	}
-	
 	/**
 	 * A method to put all usernames of players, that are online, into a list
 	 * @param listOfTeams

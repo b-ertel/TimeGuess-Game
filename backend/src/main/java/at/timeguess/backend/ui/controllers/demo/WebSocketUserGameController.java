@@ -1,10 +1,7 @@
 package at.timeguess.backend.ui.controllers.demo;
 
 import at.timeguess.backend.model.Round;
-import at.timeguess.backend.model.Term;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -29,7 +26,7 @@ public class WebSocketUserGameController {
 
     
     public void startNewRound() {
-        this.currentRound = webSocketGameController.getCurrentRound();
+    	this.currentRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     }
     
     public Round getCurrentRound() {
@@ -37,7 +34,7 @@ public class WebSocketUserGameController {
     }
     
     public boolean isGuessingPlayer() {
-    	return !webSocketGameController.getCurrentRound().getGuessingUser().getUsername().equals(sessionInfoBean.getCurrentUserName());
+    	return !webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser()).getGuessingUser().getUsername().equals(sessionInfoBean.getCurrentUserName());
     }
 
 }
