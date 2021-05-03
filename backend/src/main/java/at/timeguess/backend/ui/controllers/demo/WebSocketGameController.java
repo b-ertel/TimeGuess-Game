@@ -29,6 +29,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 
@@ -132,13 +133,13 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) { 
         	this.cubeFace = configuredFacetsEvent.getCubeFace();
-        	startNewRound(); 
-        	this.websocketManager.getNewRoundChannel().send("newRound");
+        	startNewRound(listOfGames.get(configuredFacetsEvent.getCube()), configuredFacetsEvent.getCubeFace()); 
         }
     }
     
-    public void startNewRound() {
-    	currentRound = gameLogic.startNewRound(currentGame, cubeFace);
+    public void startNewRound(Game currentGame, CubeFace cubeFace) {
+    	this.currentRound = gameLogic.startNewRound(currentGame, cubeFace);
+    	this.websocketManager.getNewRoundChannel().send("newRound", getAllUsernamesOfGameTeams(currentGame.getActualTeams()));
     	countDownController.startCountDown(cubeFace, currentGame);
     }
 
@@ -170,5 +171,15 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
 		this.currentGame = currentGame;
 	}
 	
+	
+	private List<String> getAllUsernamesOfGameTeams(List<Team> listOfTeams){
+		List<String> usernames = new ArrayList<>();
+		List<User> users = new ArrayList<>();
+		for(Team team : listOfTeams) {
+			users.addAll(team.getTeamMembers());
+		}
+		users.stream().forEach(user -> usernames.add(user.getUsername()));
+		return usernames;
+	}
 	
 }
