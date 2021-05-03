@@ -45,14 +45,6 @@
 
                     <h3>Round</h3>
                        <p:panel id="roundInfo" header="RoundInformations">
-						<p:outputPanel header="FlipInfo" rendered="#{not empty webSocketGameController.cubeFace}">
-								<div class="p-grid">
-				                        <div class="p-col-5"><p:outputLabel value="Activity: " /></div>
-				                        <div class="p-col-7"><p:outputLabel value="#{webSocketGameController.cubeFace.activity}"/></div>
-				                        <div class="p-col-5"><p:outputLabel value="Points: " /></div>
-				                        <div class="p-col-7"><p:outputLabel value="#{webSocketGameController.cubeFace.points}"/></div>
-				                </div>
-						</p:outputPanel>
 						<p:outputPanel header="RoundInfo" rendered="#{not empty webSocketGameController.currentRound}">
 								<div class="p-grid">
 				                        <div class="p-col-5"><p:outputLabel value="User: " /></div>
@@ -61,21 +53,29 @@
 				                        <div class="p-col-7"><p:outputLabel value="#{webSocketGameController.currentRound.guessingTeam.name}"/></div>
 				                        <div class="p-col-5"><p:outputLabel value="Roundnr: " /></div>
 				                        <div class="p-col-7"><p:outputLabel value="#{webSocketGameController.currentRound.nr}"/></div>
-				                        <div class="p-col-5"><p:outputLabel value="Term: " /></div>
+				                        <ui:fragment rendered="#{webSocketUserGameController.isGuessingPlayer()}">
+   										<div class="p-col-5"><p:outputLabel value="Term: " /></div>
 				                        <div class="p-col-7"><p:outputLabel value="#{webSocketGameController.currentRound.termToGuess.name}"/></div>
+										</ui:fragment>
+				                        <div class="p-col-5"><p:outputLabel value="Points: " /></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{webSocketGameController.currentRound.points}"/></div>
+				                        <div class="p-col-5"><p:outputLabel value="Activity: " /></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{webSocketGameController.currentRound.activity}"/></div>
+				                     
 				                </div>
 						</p:outputPanel>
 					</p:panel> 
                 </p:panelGrid>
             </div>
 
-
-            <o:socket channel="newRoundChannel" scope="application"
+			<o:socket channel="newRoundChannel" scope="session"
                       onmessage="function(m){console.log(m);}">
-                <f:ajax event="startRound"
-                        render="roundInfo"
-                        listener="#{webSocketGameController.startNewRound()}" />              <!-- TODO: listener auf gegnerisches Team ändern...  -->
+                <f:ajax event="newRound"
+                        render=":gameRoomForm:roundInfo" 
+                        listener="#{webSocketUserGameController.startNewRound()}"
+                        />              <!-- TODO: listener auf gegnerisches Team ändern...  -->
             </o:socket>
+
         </h:form>
         
     </ui:define>

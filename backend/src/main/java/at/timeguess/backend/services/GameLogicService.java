@@ -138,7 +138,9 @@ public class GameLogicService {
 		nextRound.setGuessingUser(nextUser(game, nextTeam));
 		nextRound.setGuessingTeam(nextTeam);
 		nextRound.setTermToGuess(nextTerm(game));
+		nextRound.setActivity(cubeFace.getActivity());
 		nextRound.setGame(game);
+		
 		game.getRounds().add(nextRound);
 		game.setRoundNr(game.getRoundNr()+1);
 		LOGGER.info("New Round nr '{}', with team '{}' and user '{}' was created", nextRound.getNr(), nextRound.getGuessingTeam().getName(), nextRound.getGuessingUser().getUsername());
