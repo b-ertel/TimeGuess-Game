@@ -71,7 +71,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     private CubeFace cubeFace;
     private Round controllRound;
 
-    private Map<Game, Team> teams = new HashMap<>();
+    private Map<Game, List<String>> playersOfGame = new HashMap<>();
 
     private List<User> guessingUsers = new LinkedList<>();
     private List<User> controllingUsers = new LinkedList<>();
@@ -81,20 +81,17 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     @PostConstruct
     public void setup() {
     	configuredfacetsEventListener.subscribe(this);
-        newGameBean.setGameName("TestGame");
- 		newGameBean.setMaxPoints(10);
- 		newGameBean.setTopic(topicRepo.findById((long) 1).get());
- 		newGameBean.createGame();
  		Game testgame = gameService.loadGame((long) 8);
- 		testgame.setTeams(gameService.loadGame((long) 1).getTeams());
- 		testgame.getTeams().addAll(gameService.loadGame((long) 2).getTeams());
- 		testgame.setRoundNr(0);
+ 		List<User> users = new ArrayList<>();
+ 		List<String> usernames = new ArrayList<>();
+ 		testgame.getActualTeams().stream().forEach(team -> users.addAll(team.getTeamMembers()));
+ 		users.stream().forEach(user -> usernames.add(user.getUsername()));
  		Cube cube = cubeService.getByMacAddress("56:23:89:34:56");
  		
  		listOfGames.put(cube, testgame);
         this.controllRound = new Round();
 
-        testgame.getActualTeams().stream().forEach(team -> teams.put(testgame, team));
+        playersOfGame.put(testgame, usernames);
         
     }
     
@@ -119,9 +116,10 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
      */
     @Override
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
-        if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
-        	startNewRound(listOfGames.get(configuredFacetsEvent.getCube()), configuredFacetsEvent.getCubeFace()); 	
-        	this.websocketManager.getNewRoundChannel().send("newRound");
+        if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) { 
+        	Collection<String> users = playersOfGame.get(listOfGames.get(configuredFacetsEvent.getCube()));
+        	startNewRound(listOfGames.get(configuredFacetsEvent.getCube()), configuredFacetsEvent.getCubeFace()); 
+        	this.websocketManager.getNewRoundChannel().send("newRound", users);
         }
     }
     

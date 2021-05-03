@@ -50,7 +50,8 @@
                       onmessage="function(m){console.log(m);}">
                 <f:ajax event="newRound"
                         render=":gameRoomForm:roundInfo" 
-                        listener="#{webSocketUserGameController.startNewRound()}"/>              <!-- TODO: listener auf gegnerisches Team ändern...  -->
+                        listener="#{webSocketUserGameController.startNewRound()}"
+                        />              <!-- TODO: listener auf gegnerisches Team ändern...  -->
             </o:socket>
 
         </h:form>
