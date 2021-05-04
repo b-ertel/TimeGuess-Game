@@ -55,7 +55,15 @@ public class CubeStatusController {
     @CDIAutowired
     private WebSocketManager websocketManager;
     
-    private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
+    public WebSocketManager getWebsocketManager() {
+		return websocketManager;
+	}
+
+	public void setWebsocketManager(WebSocketManager websocketManager) {
+		this.websocketManager = websocketManager;
+	}
+
+	private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
     
     /**
