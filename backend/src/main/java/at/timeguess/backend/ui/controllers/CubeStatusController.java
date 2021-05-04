@@ -4,14 +4,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +37,7 @@ import at.timeguess.backend.model.api.StatusResponse;
 @Controller
 @Scope("application")
 @CDIContextRelated
-public class StatusController {
+public class CubeStatusController {
 
     // the value of the calibration version characteristic after
     // a reset of the TimeFlip device
@@ -50,7 +47,7 @@ public class StatusController {
     // a connection with the backend
     private static final int CALIBRATION_VERSION_AFTER_CONNECTION = 1;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StatusController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CubeStatusController.class);
     private final DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
 	
     @Autowired
@@ -152,20 +149,6 @@ public class StatusController {
         return Collections.unmodifiableCollection(this.cubeStatus.values());
     }  
     
-    /**
-     * returns cubes with status {@link CubeStatus.READY}
-     */
-    public Set<Cube> getReadyCubes() {
-    	
-    	Set<Cube> readyCubes = new HashSet<>();
-    	
-    	for(Map.Entry<String, CubeStatusInfo> s : this.cubeStatus.entrySet()) {
-    		if(s.getValue().getStatus().equals(CubeStatus.READY))
-    			readyCubes.add(s.getValue().getCube());
-    	}
-    	return readyCubes;
-    }
-
 	/**
 	 * @return health status of all online cubes i.e. with status 
 	 * {@link CubeStatus.READY, CubeStatus.LIVE or CubeStatus.IN_CONFIGURATION}
@@ -222,7 +205,12 @@ public class StatusController {
 	 * @return CubeStatus
 	 */
 	public CubeStatus getStatus(String macAddress) {
-		return this.cubeStatus.get(macAddress).getStatus();
+		if(this.cubeStatus.get(macAddress) != null)
+			return this.cubeStatus.get(macAddress).getStatus();
+		else {
+			return null;
+		}
+			
 	}
 	
 	/**
@@ -270,9 +258,9 @@ public class StatusController {
 	 * @param mac to check status
 	 * @return true if status is OFFLINE false otherwise
 	 */
-	public boolean checkDeletion(String mac) {
-		if(cubeStatus.get(mac) != null) {
-			if(cubeStatus.get(mac).getStatus().equals(CubeStatus.OFFLINE)) {
+	public boolean checkDeletion(Cube cube) {
+		if(cubeStatus.get(cube.getMacAddress()) != null) {
+			if(cubeStatus.get(cube.getMacAddress()).getStatus().equals(CubeStatus.OFFLINE) && !isConfigured(cube)) {
 				return true;
 			}
 		}
