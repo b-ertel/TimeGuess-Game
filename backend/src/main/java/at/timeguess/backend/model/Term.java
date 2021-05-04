@@ -33,6 +33,8 @@ public class Term implements Persistable<Long>, Serializable {
     @Column(length = 250, nullable = false)
     private String name;
 
+    private boolean enabled;
+
     @ManyToOne
     @JoinColumn(name = "topic", nullable = false)
     private Topic topic;
@@ -52,6 +54,18 @@ public class Term implements Persistable<Long>, Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void enable() {
+        this.enabled = true;
+    }
+
+    public void disable() {
+        this.enabled = false;
     }
 
     public Topic getTopic() {

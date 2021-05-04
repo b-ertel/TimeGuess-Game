@@ -34,6 +34,8 @@ public class Topic implements Comparable<Topic>, Persistable<Long>, Serializable
     @Column(length = 100, nullable = false, unique = true)
     private String name;
 
+    private boolean enabled;
+
     @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE)
     private Set<Term> terms;
 
@@ -52,6 +54,18 @@ public class Topic implements Comparable<Topic>, Persistable<Long>, Serializable
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void enable() {
+        this.enabled = true;
+    }
+
+    public void disable() {
+        this.enabled = false;
     }
 
     public Set<Term> getTerms() {

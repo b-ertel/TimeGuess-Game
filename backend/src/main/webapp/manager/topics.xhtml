@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+<style type="text/css">
+    pre code {
+        background-color: #eee;
+        border: 1px solid #999;
+        display: block;
+        padding: 20px;
+    }
+</style>
+    <ui:define name ="content">
+        <h:form id="topicsForm">
+            <ui:remove>show all terms</ui:remove>
+            <p:dataTable id="topicTable" widgetVar="topicTable" var="term" value="#{topicListController.terms}" filteredValue="#{topicListController.filterTerms}"
+                rowKey="#{term.id}" selection="#{topicListController.selectedTerm}" selectionMode="single">
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column headerText="Term" sortBy="#{term.name}" filterBy="#{term.name}" filterMatchMode="contains" />
+                        <p:column headerText="Topic" sortBy="#{term.topic}" filterBy="#{term.topic.name}" filterMatchMode="contains" />
+                        <p:column headerText="Enable Term" style="width:10%"/>
+                        <p:column headerText="Edit Term" style="width:10%"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <p:column>
+                    <h:outputText value="#{term.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{term.topic.name}"/>
+                </p:column>
+                <p:column style="text-align:center">
+                    <h:selectBooleanCheckbox value="#{term.enabled}" disabled="#{!term.topic.enabled}" />
+                </p:column>
+                <p:column style="text-align:center">
+                    <p:commandButton title="Edit" icon="fa fa-edit"
+                        oncomplete="PF('termEditDialog').show()" update=":termDetailForm:termEditDialog :msg">
+                        <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -87,6 +87,7 @@ public class TopicListController implements Serializable {
                 if (topic.isEmpty()) {
                     Topic newTopic = new Topic();
                     newTopic.setName(topicName.toUpperCase());
+                    newTopic.enable();
                     topic = Optional.ofNullable(topicService.saveTopic(newTopic));
                 }
 
@@ -100,6 +101,7 @@ public class TopicListController implements Serializable {
                         if (!currTopic.getTerms().stream().anyMatch(t -> t.getName().matches(termPattern))) {
                             Term newTerm = new Term();
                             newTerm.setName(termName.toUpperCase());
+                            newTerm.enable();
                             newTerm.setTopic(currTopic);
                             if (termService.saveTerm(newTerm) == null)
                                 messageBean.alertErrorFailValidation(termName, "Importing term failed: could not create term");

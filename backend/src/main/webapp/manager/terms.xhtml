@@ -27,7 +27,8 @@
                     <p:row>
                         <p:column headerText="Term" sortBy="#{term.name}" filterBy="#{term.name}" filterMatchMode="contains" />
                         <p:column headerText="Topic" sortBy="#{term.topic}" filterBy="#{term.topic.name}" filterMatchMode="contains" />
-                        <p:column headerText="Manage Term" style="width:10%"/>
+                        <p:column headerText="Enable Term" style="width:10%"/>
+                        <p:column headerText="Edit Term" style="width:10%"/>
                     </p:row>
                 </p:columnGroup>
 
@@ -38,15 +39,12 @@
                     <h:outputText value="#{term.topic.name}"/>
                 </p:column>
                 <p:column style="text-align:center">
+                    <h:selectBooleanCheckbox value="#{term.enabled}" disabled="#{!term.topic.enabled}" />
+                </p:column>
+                <p:column style="text-align:center">
                     <p:commandButton title="Edit" icon="fa fa-edit"
                         oncomplete="PF('termEditDialog').show()" update=":termDetailForm:termEditDialog :msg">
                         <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
-                    </p:commandButton>
-                    <p:commandButton title="Delete" icon="fa fa-trash"
-                        action="#{termDetailController.doDeleteTerm}" onsuccess="PF('termTable').filter()"
-                        update=":termListForm:termTable :msg">
-                        <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
-                        <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this term? This cannot be undone." />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>

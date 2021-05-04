@@ -25,6 +25,7 @@
 
                     <p:submenu icon="fa fa-cogs" label="&nbsp;Administration&nbsp;" rendered="#{isManager}">
                         <p:menuitem icon="fa fa-globe" value="&nbsp;Terms and Topics&nbsp;" url="/manager/terms.xhtml" rendered="#{isManager}"/>
+                        <p:menuitem icon="fa fa-check-square-o" value="&nbsp;Manage Topics&nbsp;" url="/manager/topics.xhtml" rendered="#{isManager}"/>
                         <p:menuitem icon="fa fa-cubes" value="&nbsp;Games&nbsp;" url="/manager/games.xhtml" rendered="#{!isAdmin}"/>
                         <p:menuitem icon="fa fa-history" value="&nbsp;Games&nbsp;" url="/admin/games.xhtml" rendered="#{isAdmin}"/>
                         <p:menuitem icon="fa fa-users" value="&nbsp;Users&nbsp;" url="/admin/users.xhtml" rendered="#{isAdmin}"/>
