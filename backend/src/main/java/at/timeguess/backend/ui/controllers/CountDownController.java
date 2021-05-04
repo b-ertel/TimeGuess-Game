@@ -54,7 +54,7 @@ public class CountDownController {
 		setMin(cubeFace.getTime());
 		setSec(0);
 
-		for(Team t : gameService.getTeams(game)){
+		for(Team t : game.getTeams()){
 			addMembersPerGame(game, t.getTeamMembers());
 		}
 		ActionListener task = new ActionListener() {

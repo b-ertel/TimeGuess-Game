@@ -1,7 +1,8 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,7 @@ public class UserListController implements Serializable {
      *
      * @return
      */
-    public Collection<User> getUsers() {
+    public List<User> getUsers() {
         return userService.getAllUsers();
     }
 
@@ -37,7 +38,7 @@ public class UserListController implements Serializable {
      *
      * @return
      */
-    public Collection<User> getAllPlayers() {
+    public List<User> getAllPlayers() {
         return userService.getAllPlayers();
     }
 

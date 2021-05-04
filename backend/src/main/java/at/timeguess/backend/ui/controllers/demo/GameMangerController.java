@@ -41,7 +41,7 @@ import java.util.function.Consumer;
 @Controller
 @Scope("application")
 @CDIContextRelated
-public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> {
+public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 	@Autowired
 	private NewGameBean newGameBean;
 	@Autowired
@@ -67,19 +67,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     @PostConstruct
     public void setup() {
     	configuredfacetsEventListener.subscribe(this);
-    	newGameBean.setGameName("TestGame");
- 		newGameBean.setMaxPoints(10);
- 		newGameBean.setTopic(topicRepo.findById((long) 1).get());
- 		newGameBean.createGame();
- 		Game testgame = gameService.loadGame((long) 8);
- 		testgame.setTeams(gameService.loadGame((long) 1).getTeams());
- 		testgame.getTeams().addAll(gameService.loadGame((long) 2).getTeams());
- 		testgame.setRoundNr(0);
-
- 		List<User> users = new ArrayList<>();
- 		List<String> usernames = new ArrayList<>();
- 		testgame.getActualTeams().stream().forEach(team -> users.addAll(team.getTeamMembers()));
- 		users.stream().forEach(user -> usernames.add(user.getUsername()));
+ 		Game testgame = gameService.loadGame((long) 1);
  		Cube cube = cubeService.getByMacAddress("56:23:89:34:56");
  		
  		listOfGames.put(cube, testgame);
@@ -110,7 +98,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
      */
     public void startNewRound(Game currentGame, CubeFace cubeFace) {
     	this.currentRound.put(currentGame, gameLogic.startNewRound(currentGame, cubeFace));
-    	this.websocketManager.getNewRoundChannel().send("newRound", getAllUsernamesOfGameTeams(currentGame.getActualTeams()));
+    	this.websocketManager.getNewRoundChannel().send("newRound", getAllUsernamesOfGameTeams(currentGame.getTeams()));
     	countDownController.startCountDown(cubeFace, currentGame);
     }
 
@@ -133,7 +121,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
     	Round round = new Round();
    
     	for(Map.Entry<Game, Round> e : currentRound.entrySet()) {
-    		for(Team t : e.getKey().getActualTeams()) {
+    		for(Team t : e.getKey().getTeams()) {
     			if(t.getTeamMembers().contains(user)) {
     				round = e.getValue();
     			}
@@ -147,7 +135,7 @@ public class WebSocketGameController implements Consumer<ConfiguredFacetsEvent> 
 	 * @param listOfTeams
 	 * @return list of usernames
 	 */
-	private List<String> getAllUsernamesOfGameTeams(List<Team> listOfTeams){
+	private List<String> getAllUsernamesOfGameTeams(Set<Team> listOfTeams){
 		List<String> usernames = new ArrayList<>();
 		List<User> users = new ArrayList<>();
 		for(Team team : listOfTeams) {

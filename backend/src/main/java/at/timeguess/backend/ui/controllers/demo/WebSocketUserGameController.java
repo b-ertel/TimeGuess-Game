@@ -20,7 +20,7 @@ public class WebSocketUserGameController {
     @Autowired
     private SessionInfoBean sessionInfoBean;
     @Autowired
-    private WebSocketGameController webSocketGameController;
+    private GameMangerController webSocketGameController;
     
     private Round currentRound;
 
