@@ -3,6 +3,7 @@ package at.timeguess.backend.ui.controllers;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static at.timeguess.backend.utils.TestSetup.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,14 +16,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
 import at.timeguess.backend.services.UserService;
 import at.timeguess.backend.ui.beans.MessageBean;
-import at.timeguess.backend.utils.TestUtils;
 
 /**
  * Tests for {@link UserDetailController}.
@@ -43,8 +42,7 @@ public class UserDetailControllerTest {
     private PasswordEncoder passwordEncoder;
 
     @ParameterizedTest
-    @ValueSource(longs = { 1, 2, 3, 40, 444 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @ValueSource(longs = { 1, 40, 444 })
     public void testGetSetUserRoles(Long userId) {
         Collection<UserRole> allroles = userDetailController.getAllUserRoles();
         assertEquals(allroles, UserRole.getUserRoles());
@@ -65,8 +63,7 @@ public class UserDetailControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(longs = { 1, 2, 3, 40, 444 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @ValueSource(longs = { 1, 40, 444 })
     public void testDoReloadUser(Long userId) {
         assertMockUser(userId, false);
 
@@ -77,8 +74,7 @@ public class UserDetailControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(longs = { 1, 2, 3, 40, 444 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @ValueSource(longs = { 1, 40, 444 })
     public void testDoSaveUser(Long userId) {
         User user = assertMockUser(userId, true);
         when(userService.saveUser(user)).thenReturn(user);
@@ -91,8 +87,7 @@ public class UserDetailControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(longs = { 1, 2, 3, 40, 444 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    @ValueSource(longs = { 1,  40, 444 })
     public void testDoSaveUserChangedPassword(Long userId) {
         String changed = "changed", encoded = "encoded";
         User user = assertMockUser(userId, true);
@@ -110,9 +105,21 @@ public class UserDetailControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(longs = { 1, 2, 3, 40, 444 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testDoSaveUserFailure(Long userId) {
+    @ValueSource(longs = { 11, 22 })
+    public void testDoSaveTermFailure(Long termId) {
+        User user = assertMockUser(termId, true);
+        when(userService.saveUser(user)).thenReturn(null);
+
+        userDetailController.doSaveUser();
+
+        verify(userService).saveUser(user);
+        verifyNoInteractions(messageBean);
+        assertEquals(user, userDetailController.getUser());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 1, 40, 444 })
+    public void testDoSaveUserInvalid(Long userId) {
         assertMockUser(userId, false);
         reset(userService);
 
@@ -126,7 +133,6 @@ public class UserDetailControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 1, 2, 3, 40, 444 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testDoDeleteUser(Long userId) {
         User user = assertMockUser(userId, false);
 
@@ -138,7 +144,6 @@ public class UserDetailControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 1, 2, 3, 40, 444 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testDoValidateUser(Long userId) {
         User user = assertMockUser(userId, false);
 
@@ -154,7 +159,7 @@ public class UserDetailControllerTest {
     }
 
     private User assertMockUser(Long userId, boolean full) {
-        User user = TestUtils.createUser(userId);
+        User user = createUser(userId);
         if (full) {
             user.setUsername("uname");
             user.setPassword("pword");

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.timeguess.backend.services.CubeService;
-import at.timeguess.backend.ui.controllers.StatusController;
+import at.timeguess.backend.ui.controllers.CubeStatusController;
 import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.model.api.StatusResponse;
@@ -21,7 +21,7 @@ public class RaspberryPiController {
     private CubeService cubeService;
     
     @Autowired
-    private StatusController statusController;
+    private CubeStatusController statusController;
 
     /**
      * Process a {@link FacetsMessage}.
