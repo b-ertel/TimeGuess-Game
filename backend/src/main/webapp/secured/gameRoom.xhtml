@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:demo="http://java.sun.com/jsf/composite/demo"
+	template="/WEB-INF/templates/main.xhtml">
+    <ui:define name="content">
+        <!-- see chat.js -->
+        <h:outputScript>			
+            pfContext=PF
+        </h:outputScript>
+
+		<h:form>
+			<p:panel style="font-size:24px !important; width:180px;">
+			<h1>Gameroom</h1>
+			</p:panel>
+		</h:form>
+		
+        <h:form id="countdownForm" style="width:500px; text-align:center; align:right; margin: 0 auto;">
+            <p:panel id="count">
+            <h3>Time to Guess</h3>
+            	<h1 class="p-text-center">
+             		<h:outputText value="#{countDownDisplayController.getCountDown()}" style="font-weight:bold; font-size:40px !important"/> 
+             	</h1>
+            </p:panel>
+      
+         	<o:socket channel="countDownChannel" scope="session"
+         	    user="#{sessionInfoBean.currentUserName}"
+                onmessage="function(m){console.log(m);}">
+                <f:ajax event="countDownUpdate"
+                    render=":countdownForm:count" />
+            </o:socket> 
+		</h:form>
+
+        <h:form id="gameRoomForm">
+            <div class="gameRoomContent">
+      <!--         <h1>Gameroom</h1> -->   
+
+                <p:panelGrid columns="1" style="width: 100%;"
+                        columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
+
+                    <h3>Round</h3>
+                       <p:panel id="roundInfo" header="RoundInformations">
+						<p:outputPanel header="RoundInfo" rendered="#{not empty webSocketUserGameController.currentRound}">
+								<div class="p-grid">
+				                        <div class="p-col-5"><p:outputLabel value="User: " /></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{webSocketUserGameController.currentRound.guessingUser.username}"/></div>
+				                        <div class="p-col-5"><p:outputLabel value="Team: " /></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{webSocketUserGameController.currentRound.guessingTeam.name}"/></div>
+				                        <div class="p-col-5"><p:outputLabel value="Roundnr: " /></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{webSocketUserGameController.currentRound.nr}"/></div>
+				                        <ui:fragment rendered="#{webSocketUserGameController.isGuessingPlayer()}">
+   										<div class="p-col-5"><p:outputLabel value="Term: " /></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{webSocketUserGameController.currentRound.termToGuess.name}"/></div>
+										</ui:fragment>
+				                        <div class="p-col-5"><p:outputLabel value="Points: " /></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{webSocketUserGameController.currentRound.points}"/></div>
+				                        <div class="p-col-5"><p:outputLabel value="Activity: " /></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{webSocketUserGameController.currentRound.activity}"/></div>
+				                     
+				                </div>
+						</p:outputPanel>
+					</p:panel> 
+                </p:panelGrid>
+            </div>
+
+			<o:socket channel="newRoundChannel" scope="session"
+                      onmessage="function(m){console.log(m);}"
+                      user="#{sessionInfoBean.currentUserName}">
+                <f:ajax event="newRound"
+                        render=":gameRoomForm:roundInfo" 
+                        listener="#{webSocketUserGameController.startNewRound()}"
+                        />              <!-- TODO: listener auf gegnerisches Team ändern...  -->
+            </o:socket>
+
+        </h:form>
+        
+    </ui:define>
+</ui:composition>

@@ -25,6 +25,9 @@ public class Round implements Persistable<Long> {
 	@Transient
 	private int nr;
 	
+	@Transient
+	private Activity activity;
+	
 	@ManyToOne
 	@JoinColumn(name="guessing_User", nullable=false)
 	private User guessingUser;
@@ -115,6 +118,14 @@ public class Round implements Persistable<Long> {
 
 	public void setGame(Game game) {
 		this.game = game;
+	}
+	
+	public Activity getActivity() {
+		return activity;
+	}
+
+	public void setActivity(Activity activity) {
+		this.activity = activity;
 	}
 
 	@Override

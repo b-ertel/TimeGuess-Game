@@ -56,9 +56,7 @@ public class GameListController implements Serializable {
      * Returns a list of all current games for the given user.
      */
     public List<Game> getGamesCurrent(User user) {
-        // TODO: use this for production (IMPORTANT!):
-        //return gameService.getByUser(user, true);
-        return gameService.getAllGames();
+        return gameService.getByUser(user, true);
     }
 
     /**
