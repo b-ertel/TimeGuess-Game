@@ -20,32 +20,16 @@
 			</p:panel>
 		</h:form>
 		
-        <h:form id="countdownForm" style="width:500px; text-align:center; align:right; margin: 0 auto;">
-            <p:panel id="count">
-            <h3>Time to Guess</h3>
-            	<h1 class="p-text-center">
-             		<h:outputText value="#{countDownController.getCountDown()}" style="font-weight:bold; font-size:40px !important"/> 
-             	</h1>
-            </p:panel>
-      
-         	<o:socket channel="countDownChannel" scope="session"
-         	    user="#{sessionInfoBean.currentUser.id}"
-                onmessage="function(m){console.log(m);}">
-                <f:ajax event="countDownUpdate"
-                    render=":countdownForm:count"/>
-            </o:socket> 
-		</h:form>
-
-        <h:form id="gameRoomForm" style="width:700px; text-align:center; align:right; margin: 0 auto;">
-            <div class="gameRoomContent">
-      <!--         <h1>Gameroom</h1> -->   
-
+   <h:form id="gameRoomForm" style="width:700px; text-align:center; align:right; margin: 0 auto;">
+            <div class="gameRoomContent">     
                 <p:panelGrid columns="1" style="width: 100%;"
-                        columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel">
-
-        <!--            <h3>Round</h3>   --> 
+                        columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel"> 
                        <p:panel id="roundInfo" header="Round #{userGameController.currentRound.nr}">
 						<p:outputPanel header="RoundInfo" rendered="#{not empty userGameController.currentRound}">
+								<h3>Time to Guess</h3>
+				            	<h1 class="p-text-center" style="border-bottom: double">
+				             		<h:outputText value="#{countDownController.getCountDown()}" style="font-weight:bold; font-size:40px !important"/> 
+				             	</h1>
 								<div class="p-grid">
 				                        <div class="p-col-5"><p:outputLabel value="User: " /></div>
 				                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.guessingUser.username}" style="font-weight:bold;"/></div>
@@ -64,6 +48,14 @@
 					</p:panel> 
                 </p:panelGrid>
             </div>
+            
+            <o:socket channel="countDownChannel" scope="session"
+         	    user="#{sessionInfoBean.currentUser.id}"
+                onmessage="function(m){console.log(m);}">
+                <f:ajax event="countDownUpdate"
+                    render=":gameRoomForm:roundInfo"/>
+            </o:socket> 
+
 
 			<o:socket channel="newRoundChannel" scope="session"   
                 		onmessage="function(m){console.log(m);}"
