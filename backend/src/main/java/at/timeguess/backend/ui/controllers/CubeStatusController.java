@@ -110,11 +110,11 @@ public class CubeStatusController {
      */
     public Cube updateCube(StatusMessage message) {
     	
-		Cube updatedCube = new Cube();
+		Cube updatedCube = new Cube(); 
 		
 		if(cubeService.isMacAddressKnown(message.getIdentifier())) {						// Cube is already in database
 			updatedCube = cubeService.getByMacAddress(message.getIdentifier());
-			LOGGER.info("cube is known...");
+			LOGGER.info("cube is known..."); 
 
 			// delete any existing configurations if a reset of the TimeFlip device is detected
 			if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {
