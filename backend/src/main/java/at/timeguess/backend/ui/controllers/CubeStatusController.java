@@ -54,14 +54,6 @@ public class CubeStatusController {
     private CubeService cubeService;
     @CDIAutowired
     private WebSocketManager websocketManager;
-    
-    public WebSocketManager getWebsocketManager() {
-		return websocketManager;
-	}
-
-	public void setWebsocketManager(WebSocketManager websocketManager) {
-		this.websocketManager = websocketManager;
-	}
 
 	private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
@@ -144,7 +136,7 @@ public class CubeStatusController {
       
 	/**
      * is called in case cube changes its status, updates status in GUI
-     */
+     */  
     public void statusChange(String mac, CubeStatus cubeStatus) {
         this.cubeStatus.get(mac).setStatus(cubeStatus);
         updateSockets();
@@ -244,7 +236,7 @@ public class CubeStatusController {
 	 * @param macAddress of the deleted cube
 	 */
 	public void deleteStatus(String macAddress) {
-		this.cubeStatus.remove(macAddress);
+		this.cubeStatus.remove(macAddress);  
 		updateSockets();
 	}
 	
@@ -261,7 +253,7 @@ public class CubeStatusController {
 	}
 	
 	/**
-	 * check if a cube can be deleted - i.e. if its status is OFFLINE
+	 * check if a cube can be deleted - i.e. if its status is OFFLINE and it has no configuration
 	 * 
 	 * @param mac to check status
 	 * @return true if status is OFFLINE false otherwise
@@ -295,13 +287,15 @@ public class CubeStatusController {
 	 * sends a "connectionCubeUpdate" to all socket listener
 	 */
 	public void updateSockets() {
-		this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
+		if(this.websocketManager != null) {
+			this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
+		}
 	}
 
 	/** updates cube in CubeStatusInfo
 	 * @param cube to update
 	 */
-	public void updateCube(Cube cube) {
+	public void updateCubeInStatus(Cube cube) {
 		this.cubeStatus.get(cube.getMacAddress()).setCube(cube);
 	}
 	
