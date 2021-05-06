@@ -52,7 +52,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 	private GameLogicService gameLogic;
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
-    private Round controllRound;
+    private Map<Game, Boolean> midRound = new ConcurrentHashMap<>();
 
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
@@ -80,8 +80,9 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
  		}
 
  		listOfGames.put(cube, testgame1);
- 		listOfGames.put(cube2, testgame2);
-        this.controllRound = new Round();       
+ 		listOfGames.put(cube2, testgame2); 
+        midRound.put(testgame1, true);
+        midRound.put(testgame2, true);
     }
     
     @PreDestroy
@@ -91,12 +92,19 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 
     /**
      * A method for processing a {@link ConfiguredFacetsEvent}.
-     * Method is called on facet-event, checks to which game it corresponds and calls startNewRound() to initialize new round.
+     * Method is called on facet-event, checks to which game the event belongs and estimates whether a round should start or end
      */
     @Override
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
-        if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) { 
-        	startNewRound(listOfGames.get(configuredFacetsEvent.getCube()), configuredFacetsEvent.getCubeFace()); 
+        if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
+        	Game game = listOfGames.get(configuredFacetsEvent.getCube());
+        	if(midRound.get(game)) {
+        		midRound.put(game, false);
+        		startNewRound(game, configuredFacetsEvent.getCubeFace()); 
+        	} else {
+        		midRound.put(game, true);
+        		this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
+        	}    	
         }
     }
     
@@ -107,13 +115,9 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
      */
     public void startNewRound(Game currentGame, CubeFace cubeFace) {
     	this.currentRound.put(currentGame, gameLogic.startNewRound(currentGame, cubeFace));
-    	this.websocketManager.getNewRoundChannel().send("newRound", getAllUserIdsOfGameTeams(currentGame.getTeams()));
+    	this.websocketManager.getNewRoundChannel().send("startRound", getAllUserIdsOfGameTeams(currentGame.getTeams()));
     }
-
-    public Round getControllRound() {
-        return controllRound;
-    }
-    
+  
     public Round getCurrentRoundOfGame(Game game) {
         return this.currentRound.get(game);
     }

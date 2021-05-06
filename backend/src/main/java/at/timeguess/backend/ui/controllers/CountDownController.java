@@ -55,7 +55,7 @@ public class CountDownController {
 	 * stops countDown
 	 */
 	public void endCountDown() {
-		this.timer.stop();
+		this.timer.stop();	
 	}
 	
 	/**

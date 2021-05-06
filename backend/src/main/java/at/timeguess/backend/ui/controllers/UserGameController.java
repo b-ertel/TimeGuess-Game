@@ -26,15 +26,28 @@ public class UserGameController {
     private CountDownController countDownController;
     
     private Round currentRound;
+    
+    private boolean inRound = false;
 
     
-    public void startNewRound() {
+    public void startRound() {
+    	this.inRound = true;
     	this.currentRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     	this.countDownController.startCountDown(currentRound.getTime(), sessionInfoBean.getCurrentUser());
+    	
+    }
+    
+    public void endRound() {
+    	this.countDownController.endCountDown();
+    	this.inRound = false;
     }
     
     public Round getCurrentRound() {
     	return this.currentRound;
+    }
+    
+    public boolean getInRound() {
+    	return this.inRound;
     }
     
     public boolean isGuessingPlayer() {
