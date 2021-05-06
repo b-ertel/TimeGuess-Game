@@ -34,7 +34,7 @@ public class CountDownController {
     @CDIAutowired
 	private WebSocketManager webSocketManager;
     @Autowired
-    private GameMangerController gameManagerController;
+    private GameManagerController gameManagerController;
     @Autowired
     private SessionInfoBean sessionBean;
 	

@@ -21,7 +21,7 @@ public class UserGameController {
     @Autowired
     private SessionInfoBean sessionInfoBean;
     @Autowired
-    private GameMangerController webSocketGameController;
+    private GameManagerController webSocketGameController;
     @Autowired
     private CountDownController countDownController;
     
