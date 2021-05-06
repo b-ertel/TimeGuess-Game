@@ -72,7 +72,10 @@
                         listener="#{userGameController.startRound()}"/> 
                 <f:ajax event="endRoundViaFlip"
                         render=":gameRoomForm:roundInfo" 
-                        listener="#{userGameController.endRound()}"/>              
+                        listener="#{userGameController.endRound()}"/>    
+                <f:ajax event="endRoundViaCountDown"
+                        render=":gameRoomForm:roundInfo" 
+                        listener="#{userGameController.setInRound(false)}"/>           
             </o:socket>
 
         </h:form>
