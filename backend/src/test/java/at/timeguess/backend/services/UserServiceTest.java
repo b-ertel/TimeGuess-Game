@@ -289,22 +289,22 @@ public class UserServiceTest {
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAvailablePlayers() {
-        List<User> expected = createEntities(TestSetup::createUser, Arrays.asList("admin", "michael"));
+        List<User> expected = createEntities(TestSetup::createUser, Arrays.asList("admin"));
         List<User> result = userService.getAvailablePlayers();
 
         assertListsCompare(expected, result);
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "1|true", "2|false", "3|false", "4|false", "5|true", "6|false", "7|false", "8|false", "9|false", "10|false", "11|false" })
+    @CsvSource(delimiter = '|', value = { "1|true", "2|false", "3|false", "4|false", "5|false", "6|false", "7|false", "8|false", "9|false", "10|false", "11|false" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testIsAvailablePlayer(long userId, boolean expected) {
         assertEquals(expected, userService.isAvailablePlayer(createUser(userId)));
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "admin|", "user1|clemens", "user2|claudia", "michael|felix;lorenz", "felix|michael;lorenz;clemens",
-            "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena", "clemens|user1;felix" })
+    @CsvSource(delimiter = '|', value = { "admin|", "user1|user2;clemens", "user2|user1;claudia", "michael|felix;lorenz", "felix|michael;lorenz;clemens",
+            "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena;clemens", "clemens|user1;felix;claudia" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetTeammates(String username, String usernamesExpected) {
         User user = assertLoadUser(username);
