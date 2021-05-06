@@ -11,8 +11,7 @@ public enum UserRole {
 
     ADMIN,
     MANAGER,
-    PLAYER,
-    HOST;
+    PLAYER;
 
     private static EnumSet<UserRole> userRoles = EnumSet.allOf(UserRole.class);
 
@@ -45,13 +44,13 @@ public enum UserRole {
     public static Set<UserRole> mapUserRole(UserRole role) {
         Set<UserRole> roles = new HashSet<>();
         switch (role) {
-        case ADMIN:
-            roles.add(UserRole.ADMIN);
-        case MANAGER:
-            roles.add(UserRole.MANAGER);
-            break;
-        default:
-            roles.add(UserRole.PLAYER);
+            case ADMIN:
+                roles.add(UserRole.ADMIN);
+            case MANAGER:
+                roles.add(UserRole.MANAGER);
+                break;
+            default:
+                roles.add(UserRole.PLAYER);
         }
         return roles;
     }

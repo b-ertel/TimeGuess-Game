@@ -1,10 +1,12 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.UserService;
@@ -14,7 +16,7 @@ import at.timeguess.backend.services.UserService;
  *
  */
 @Component
-@Scope("view")
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class UserListController implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,7 +29,7 @@ public class UserListController implements Serializable {
      *
      * @return
      */
-    public Collection<User> getUsers() {
+    public List<User> getUsers() {
         return userService.getAllUsers();
     }
 
@@ -36,7 +38,7 @@ public class UserListController implements Serializable {
      *
      * @return
      */
-    public Collection<User> getAllPlayers() {
+    public List<User> getAllPlayers() {
         return userService.getAllPlayers();
     }
 

@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -30,11 +31,20 @@ public class Topic implements Comparable<Topic>, Persistable<Long>, Serializable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", unique = true)
+    @Column(length = 100, nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.REMOVE)
     private Set<Term> terms;
+
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -44,13 +54,8 @@ public class Topic implements Comparable<Topic>, Persistable<Long>, Serializable
         this.name = name;
     }
 
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
     public Set<Term> getTerms() {
-        return terms;
+        return terms == null ? new HashSet<>() : terms;
     }
 
     public void setTerms(Set<Term> terms) {
@@ -58,32 +63,32 @@ public class Topic implements Comparable<Topic>, Persistable<Long>, Serializable
     }
 
     @Override
-    public boolean isNew() {
-        return this.id == null || this.id == 0L;
+    public int compareTo(Topic o) {
+        return this.name.compareTo(o.getName());
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (this == obj) return true;
+
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        if (!(obj instanceof Topic)) {
-            return false;
-        }
+
         final Topic other = (Topic) obj;
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(getId(), other.getId());
     }
 
     @Override
     public int hashCode() {
-        return (int) Objects.hashCode(this.name) + 42;
+        final int prime = 11;
+        int result = 42;
+        result = prime * result + (this.id == null ? 0 : this.id.hashCode());
+        return result;
     }
 
     @Override
-    public int compareTo(Topic o) {
-        return this.name.compareTo(o.getName());
+    public boolean isNew() {
+        return this.id == null || this.id == 0L;
     }
 }

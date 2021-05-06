@@ -102,8 +102,8 @@
                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userCreateDialog').hide(); }"
                         update="userCreateData :msg" />
                     <p:commandButton value="Reload" action="#{newUserBean.clearFields}"
-                        process="@parent" update=":userCreateForm:userCreateData :msg" resetValues="true" styleClass="left35" />
-                    <p:commandButton value="Abort" onclick="PF('userCreateDialog').hide()" styleClass="left35" />
+                        process="@parent" update=":userCreateForm:userCreateData :msg" resetValues="true" />
+                    <p:commandButton value="Abort" onclick="PF('userCreateDialog').hide()" />
                 </h:panelGrid>
             </p:dialog>
         </h:form>

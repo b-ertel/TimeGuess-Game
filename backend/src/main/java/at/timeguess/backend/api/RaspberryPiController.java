@@ -5,10 +5,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.timeguess.backend.services.FacetsService;
-import at.timeguess.backend.ui.controllers.StatusController;
+import at.timeguess.backend.services.CubeService;
+import at.timeguess.backend.ui.controllers.CubeStatusController;
 import at.timeguess.backend.model.api.FacetsMessage;
-import at.timeguess.backend.model.api.FacetsResponse;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.model.api.StatusResponse;
 
@@ -19,21 +18,19 @@ import at.timeguess.backend.model.api.StatusResponse;
 public class RaspberryPiController {
 
     @Autowired
-    private FacetsService facetsService;
+    private CubeService cubeService;
     
     @Autowired
-    private StatusController statusController;
+    private CubeStatusController statusController;
 
     /**
-     * Process messages from a TimeFlip device signaling
-     * a change of the facets characteristic.
+     * Process a {@link FacetsMessage}.
      * 
      * @param message the message
-     * @return the response
      */
     @PostMapping("/api/facets")
-    private FacetsResponse processFacets(@RequestBody FacetsMessage message) {
-        return facetsService.processFacets(message);
+    private void processFacetsMessage(@RequestBody FacetsMessage message) {
+        cubeService.processFacetsMessage(message);
     }
     
     /**

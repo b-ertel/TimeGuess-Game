@@ -1,12 +1,13 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.UserService;
@@ -15,7 +16,7 @@ import at.timeguess.backend.services.UserService;
  * Controller for the user profile view.
  */
 @Component
-@Scope("view")
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class UserProfileController implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,7 +58,7 @@ public class UserProfileController implements Serializable {
      * Returns a list of all users being team mates of the current user (i.e. belonging to the same teams).
      * @return
      */
-    public Collection<User> getTeammates() {
+    public List<User> getTeammates() {
         return userService.getTeammates(user);
     }
 

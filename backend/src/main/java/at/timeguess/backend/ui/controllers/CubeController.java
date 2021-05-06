@@ -2,8 +2,6 @@ package at.timeguess.backend.ui.controllers;
 
 import java.util.List;
 
-import javax.faces.application.FacesMessage;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +22,7 @@ public class CubeController {
     @Autowired
     private CubeService cubeService;
     @Autowired
-    private StatusController statusController;
+    private CubeStatusController statusController;
     @Autowired
     private MessageBean message;
 
@@ -78,8 +76,14 @@ public class CubeController {
      */
     public void deleteCube() {
     	cubeService.deleteCube(this.cube);
+        statusController.updateSockets();
     	statusController.deleteStatus(this.cube.getMacAddress());
         message.alertInformation("CubeManagment", "Cube " + this.cube.getId() + " deleted");
+    }
+    
+    public void deleteConfigurations() {
+        cubeService.deleteConfigurations(cube);
+        message.alertInformation("CubeManagment", "Configurations for cube " + this.cube.getId() + " deleted");
     }
     
     public Cube getCube() {

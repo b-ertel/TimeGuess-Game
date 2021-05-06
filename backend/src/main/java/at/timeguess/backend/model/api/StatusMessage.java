@@ -1,7 +1,19 @@
 package at.timeguess.backend.model.api;
 
 /**
- * A class that represents the regular status messages sent by a Raspberry Pi.
+ * A class that represents the messages from a Raspberry Pi
+ * that has established a connection with a TimeFlip device
+ * containing various status information.
+ * <p>
+ * Example:
+ * <pre>
+ * {
+ *   "identifier": "56:23:89:34:56",
+ *   "calibrationVersion": 0,
+ *   "batteryLevel": 90,
+ *   "rssi": -50
+ * }
+ * </pre>
  */
 public class StatusMessage {
     

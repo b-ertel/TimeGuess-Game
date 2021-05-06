@@ -21,8 +21,6 @@ import tinyb.BluetoothGattCharacteristic;
 import tinyb.BluetoothGattService;
 import tinyb.BluetoothManager;
 
-import kong.unirest.Unirest;
-
 /**
  * Entry point for program to search for Bluetooth devices and communicate with them
  */
@@ -225,7 +223,7 @@ public final class Main {
         statusMessageSender.start();
 
         logger.info("Enable facets messages ...");
-        facetsCharacteristic.enableValueNotifications(new FacetsMessageSender(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, calibrationVersionHelper));
+        facetsCharacteristic.enableValueNotifications(new FacetsMessageSender(TIMEFLIP_MAC_ADDRESS, BACKEND_URL));
 
         Lock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
