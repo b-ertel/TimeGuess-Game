@@ -52,6 +52,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 	private GameLogicService gameLogic;
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
+    private Map<Game, Boolean> midRound = new ConcurrentHashMap<>();
     private Round controllRound;
 
     private Map<Cube, Game> listOfGames = new HashMap<>();
@@ -81,7 +82,9 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 
  		listOfGames.put(cube, testgame1);
  		listOfGames.put(cube2, testgame2);
-        this.controllRound = new Round();       
+        this.controllRound = null; 
+        midRound.put(testgame1, true);
+        midRound.put(testgame2, true);
     }
     
     @PreDestroy
@@ -95,8 +98,16 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
      */
     @Override
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
-        if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) { 
-        	startNewRound(listOfGames.get(configuredFacetsEvent.getCube()), configuredFacetsEvent.getCubeFace()); 
+        if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
+        	Game game = listOfGames.get(configuredFacetsEvent.getCube());
+        	if(midRound.get(game)) {
+        		midRound.put(game, false);
+        		startNewRound(game, configuredFacetsEvent.getCubeFace()); 
+        	} else {
+        		midRound.put(game, true);
+        		this.websocketManager.getNewRoundChannel().send("endRound", getAllUserIdsOfGameTeams(game.getTeams()));
+        	}
+        	
         }
     }
     
@@ -107,7 +118,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
      */
     public void startNewRound(Game currentGame, CubeFace cubeFace) {
     	this.currentRound.put(currentGame, gameLogic.startNewRound(currentGame, cubeFace));
-    	this.websocketManager.getNewRoundChannel().send("newRound", getAllUserIdsOfGameTeams(currentGame.getTeams()));
+    	this.websocketManager.getNewRoundChannel().send("startRound", getAllUserIdsOfGameTeams(currentGame.getTeams()));
     }
 
     public Round getControllRound() {

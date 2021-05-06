@@ -60,9 +60,12 @@
 			<o:socket channel="newRoundChannel" scope="session"   
                 		onmessage="function(m){console.log(m);}"
                       user="#{sessionInfoBean.currentUser.id}">
-                <f:ajax event="newRound"
+                <f:ajax event="startRound"
                         render=":gameRoomForm:roundInfo" 
-                        listener="#{userGameController.startNewRound()}"/>             
+                        listener="#{userGameController.startRound()}"/> 
+                <f:ajax event="endRound"
+                        render=":gameRoomForm:roundInfo" 
+                        listener="#{userGameController.endRound()}"/>              
             </o:socket>
 
         </h:form>

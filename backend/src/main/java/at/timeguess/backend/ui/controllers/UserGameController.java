@@ -26,11 +26,17 @@ public class UserGameController {
     private CountDownController countDownController;
     
     private Round currentRound;
+    
+    private boolean midRound = true;
 
     
-    public void startNewRound() {
+    public void startRound() {
     	this.currentRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     	this.countDownController.startCountDown(currentRound.getTime(), sessionInfoBean.getCurrentUser());
+    }
+    
+    public void endRound() {
+    	this.countDownController.endCountDown();
     }
     
     public Round getCurrentRound() {
