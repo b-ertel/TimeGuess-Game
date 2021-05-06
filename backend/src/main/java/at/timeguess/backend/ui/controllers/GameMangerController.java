@@ -53,7 +53,6 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
     private Map<Game, Boolean> midRound = new ConcurrentHashMap<>();
-    private Round controllRound;
 
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
@@ -81,8 +80,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
  		}
 
  		listOfGames.put(cube, testgame1);
- 		listOfGames.put(cube2, testgame2);
-        this.controllRound = null; 
+ 		listOfGames.put(cube2, testgame2); 
         midRound.put(testgame1, true);
         midRound.put(testgame2, true);
     }
@@ -94,7 +92,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 
     /**
      * A method for processing a {@link ConfiguredFacetsEvent}.
-     * Method is called on facet-event, checks to which game it corresponds and calls startNewRound() to initialize new round.
+     * Method is called on facet-event, checks to which game the event belongs and estimates whether a round should start or end
      */
     @Override
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
@@ -105,7 +103,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
         		startNewRound(game, configuredFacetsEvent.getCubeFace()); 
         	} else {
         		midRound.put(game, true);
-        		this.websocketManager.getNewRoundChannel().send("endRound", getAllUserIdsOfGameTeams(game.getTeams()));
+        		this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
         	}
         	
         }
@@ -120,11 +118,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
     	this.currentRound.put(currentGame, gameLogic.startNewRound(currentGame, cubeFace));
     	this.websocketManager.getNewRoundChannel().send("startRound", getAllUserIdsOfGameTeams(currentGame.getTeams()));
     }
-
-    public Round getControllRound() {
-        return controllRound;
-    }
-    
+  
     public Round getCurrentRoundOfGame(Game game) {
         return this.currentRound.get(game);
     }

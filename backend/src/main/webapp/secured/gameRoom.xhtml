@@ -25,7 +25,14 @@
                 <p:panelGrid columns="1" style="width: 100%;"
                         columnClasses="lobbyStatisticGeneralPanel,lobbyStatisticTopicPanel"> 
                        <p:panel id="roundInfo" header="Round #{userGameController.currentRound.nr}">
-						<p:outputPanel header="RoundInfo" rendered="#{not empty userGameController.currentRound}">
+                       
+                       <p:outputPanel rendered="#{!userGameController.inRound}">
+								<p:outputLabel value="Flip your cube to start the fun ;-D" rendered="#{empty userGameController.currentRound}" style="font-weight:bold;"/>
+								<p:outputLabel value="Did #{userGameController.currentRound.guessingUser.username} guess #{userGameController.currentRound.termToGuess.name} correct?" 
+											   rendered="#{not empty userGameController.currentRound}" style="font-weight:bold;"/>
+						</p:outputPanel>
+						
+						<p:outputPanel header="RoundInfo" rendered="#{userGameController.inRound}">
 								<h3>Time to Guess</h3>
 				            	<h1 class="p-text-center" style="border-bottom: double">
 				             		<h:outputText value="#{countDownController.getCountDown()}" style="font-weight:bold; font-size:40px !important"/> 
@@ -44,8 +51,8 @@
 				                        <div class="p-col-5"><p:outputLabel value="Activity: " /></div>
 				                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.activity}" style="font-weight:bold;"/></div>
 				                </div>
-						</p:outputPanel>
-					</p:panel> 
+						</p:outputPanel> 
+						</p:panel>
                 </p:panelGrid>
             </div>
             
@@ -63,7 +70,7 @@
                 <f:ajax event="startRound"
                         render=":gameRoomForm:roundInfo" 
                         listener="#{userGameController.startRound()}"/> 
-                <f:ajax event="endRound"
+                <f:ajax event="endRoundViaFlip"
                         render=":gameRoomForm:roundInfo" 
                         listener="#{userGameController.endRound()}"/>              
             </o:socket>
