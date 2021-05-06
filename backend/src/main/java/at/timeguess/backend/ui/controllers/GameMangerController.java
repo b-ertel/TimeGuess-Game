@@ -104,8 +104,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
         	} else {
         		midRound.put(game, true);
         		this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
-        	}
-        	
+        	}    	
         }
     }
     
