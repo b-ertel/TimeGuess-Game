@@ -1,4 +1,4 @@
-package at.timeguess.backend.ui.controllers.demo;
+package at.timeguess.backend.ui.controllers;
 
 import at.timeguess.backend.events.ConfiguredFacetsEvent;
 import at.timeguess.backend.events.ConfiguredFacetsEventListener;
@@ -8,12 +8,9 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
-import at.timeguess.backend.repositories.TopicRepository;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
-import at.timeguess.backend.ui.beans.NewGameBean;
-import at.timeguess.backend.ui.controllers.CountDownController;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -42,12 +39,7 @@ import java.util.function.Consumer;
 @Scope("application")
 @CDIContextRelated
 public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
-	@Autowired
-	private NewGameBean newGameBean;
-	@Autowired
-	private TopicRepository topicRepo;
-    @Autowired
-    private CountDownController countDownController;
+
     @Autowired
     private GameService gameService;
     @Autowired
@@ -67,10 +59,28 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
     @PostConstruct
     public void setup() {
     	configuredfacetsEventListener.subscribe(this);
- 		Game testgame = gameService.loadGame((long) 1);
+ 		Game testgame1 = gameService.loadGame(8L);
  		Cube cube = cubeService.getByMacAddress("56:23:89:34:56");
  		
- 		listOfGames.put(cube, testgame);
+ 		System.out.println("players for testgame 1:");
+ 		for(Team t : testgame1.getTeams()) {
+ 			for(User u : t.getTeamMembers()) {
+ 				System.out.println(u.getUsername());
+ 			}
+ 		}
+ 				
+ 		Game testgame2 = gameService.loadGame(9L);
+ 		Cube cube2 = cubeService.getByMacAddress("22:23:89:90:56");
+ 			
+ 		System.out.println("players for testgame 2:");
+ 		for(Team t : testgame2.getTeams()) {
+ 			for(User u : t.getTeamMembers()) {
+ 				System.out.println(u.getUsername());
+ 			}
+ 		}
+
+ 		listOfGames.put(cube, testgame1);
+ 		listOfGames.put(cube2, testgame2);
         this.controllRound = new Round();       
     }
     
@@ -79,7 +89,6 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
         configuredfacetsEventListener.unsubscribe(this);
     }
 
-   
     /**
      * A method for processing a {@link ConfiguredFacetsEvent}.
      * Method is called on facet-event, checks to which game it corresponds and calls startNewRound() to initialize new round.
@@ -98,8 +107,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
      */
     public void startNewRound(Game currentGame, CubeFace cubeFace) {
     	this.currentRound.put(currentGame, gameLogic.startNewRound(currentGame, cubeFace));
-    	this.websocketManager.getNewRoundChannel().send("newRound", getAllUsernamesOfGameTeams(currentGame.getTeams()));
-    	countDownController.startCountDown(cubeFace, currentGame);
+    	this.websocketManager.getNewRoundChannel().send("newRound", getAllUserIdsOfGameTeams(currentGame.getTeams()));
     }
 
     public Round getControllRound() {
@@ -111,7 +119,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
     }
     
     /**
-     * method to get the current round for a given user, called by {@link WebSocketUserGameController}
+     * method to get the current round for a given user, called by {@link UserGameController}
      * 
      * @param user to find current round
      * @return current round
@@ -135,14 +143,14 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 	 * @param listOfTeams
 	 * @return list of usernames
 	 */
-	private List<String> getAllUsernamesOfGameTeams(Set<Team> listOfTeams){
-		List<String> usernames = new ArrayList<>();
+	private List<Long> getAllUserIdsOfGameTeams(Set<Team> listOfTeams){
+		List<Long> userIds = new ArrayList<>();
 		List<User> users = new ArrayList<>();
 		for(Team team : listOfTeams) {
 			users.addAll(team.getTeamMembers());
 		}
-		users.stream().forEach(user -> usernames.add(user.getUsername()));
-		return usernames;
+		users.stream().forEach(user -> userIds.add(user.getId()));
+		return userIds;
 	}
 	
 }

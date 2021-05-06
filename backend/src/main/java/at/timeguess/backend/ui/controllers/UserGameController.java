@@ -1,4 +1,4 @@
-package at.timeguess.backend.ui.controllers.demo;
+package at.timeguess.backend.ui.controllers;
 
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
@@ -16,17 +16,21 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @Scope("session")
-public class WebSocketUserGameController {
+public class UserGameController {
+	
     @Autowired
     private SessionInfoBean sessionInfoBean;
     @Autowired
     private GameMangerController webSocketGameController;
+    @Autowired
+    private CountDownController countDownController;
     
     private Round currentRound;
 
     
     public void startNewRound() {
     	this.currentRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
+    	this.countDownController.startCountDown(currentRound.getTime(), sessionInfoBean.getCurrentUser());
     }
     
     public Round getCurrentRound() {

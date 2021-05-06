@@ -65,7 +65,7 @@ public class GameLogicService {
         Set<Term> usedTerms = usedTerms(game);
         usedTerms.stream().forEach(term -> terms.remove(term));
         Random rand = new Random();
-        return terms.get(rand.nextInt(terms.size()));
+        return terms.get(Math.abs(rand.nextInt(terms.size())));
     }
 
     public Team getNextTeam(Game game) {
@@ -87,7 +87,7 @@ public class GameLogicService {
         }
         else {
             Random rand = new Random();
-            return teams.get(rand.nextInt(teams.size()));
+            return teams.get(Math.abs(rand.nextInt(teams.size())));
         }
     }
 
@@ -128,6 +128,7 @@ public class GameLogicService {
 		nextRound.setTermToGuess(nextTerm(game));
 		nextRound.setActivity(cubeFace.getActivity());
 		nextRound.setGame(game);
+		nextRound.setTime(cubeFace.getTime());
 		game.getRounds().add(nextRound);
 		game.setRoundNr(game.getRoundNr()+1);
 		LOGGER.info("New Round nr '{}', with team '{}' and user '{}' was created", nextRound.getNr(), nextRound.getGuessingTeam().getName(), nextRound.getGuessingUser().getUsername());

@@ -26,7 +26,9 @@
                         <p:menuitem icon="fa fa-users" value="&nbsp;Users&nbsp;" url="/admin/users.xhtml" rendered="#{isAdmin}"/>
                         <p:menuitem icon="fa fa-cubes" value="&nbsp;Timeflip Cubes&nbsp;" url="/admin/cubeManagement.xhtml" rendered="#{isAdmin}"/>
                     </p:submenu>
-                    
+
+                   	<p:menuitem icon="fa fa-cubes" value="&nbsp;Game Room&nbsp;" url="/secured/gameRoom.xhtml" rendered="#{isLoggedIn}"/>
+
                     <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login&nbsp;" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
                     <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout&nbsp;" url="/logout" rendered="#{isLoggedIn}"/>
 
