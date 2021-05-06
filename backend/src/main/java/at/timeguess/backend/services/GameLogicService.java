@@ -121,12 +121,15 @@ public class GameLogicService {
     public Round startNewRound(Game game, CubeFace cubeFace) {
 		Round nextRound = new Round();
 		nextRound.setNr(game.getRounds().size()+1);
-		nextRound.setPoints(cubeFace.getPoints());
+		nextRound.setActivity(cubeFace.getActivity());
 		Team nextTeam = getNextTeam(game);
 		nextRound.setGuessingUser(nextUser(game, nextTeam));
 		nextRound.setGuessingTeam(nextTeam);
+		Set<Team> verifiyingTeams = game.getTeams();
+		verifiyingTeams.remove(nextTeam);
+		nextRound.setVerifyingTeams(verifiyingTeams);
+		nextRound.setPoints(cubeFace.getPoints());
 		nextRound.setTermToGuess(nextTerm(game));
-		nextRound.setActivity(cubeFace.getActivity());
 		nextRound.setGame(game);
 		nextRound.setTime(cubeFace.getTime());
 		game.getRounds().add(nextRound);

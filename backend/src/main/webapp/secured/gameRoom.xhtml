@@ -42,10 +42,10 @@
 				                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.guessingUser.username}" style="font-weight:bold;"/></div>
 				                        <div class="p-col-5"><p:outputLabel value="Team: " /></div>
 				                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.guessingTeam.name}" style="font-weight:bold;"/></div>
-				                        <ui:fragment rendered="#{webSocketUserGameController.isGuessingPlayer()}">
-   										<div class="p-col-5" ><p:outputLabel value="Term: " /></div>
-				                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.termToGuess.name}" style="font-weight:bold;"/></div>
-										</ui:fragment>
+				                        <ui:fragment rendered="#{!userGameController.inGuessingTeam}">
+				                        <div class="p-col-5" ><p:outputLabel value="Term: "/></div>
+				                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.termToGuess.name}" style="font-weight:bold;"/></div>				                
+				                        </ui:fragment>
 				                        <div class="p-col-5"><p:outputLabel value="Points: " /></div>
 				                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.points}" style="font-weight:bold;"/></div>
 				                        <div class="p-col-5"><p:outputLabel value="Activity: " /></div>

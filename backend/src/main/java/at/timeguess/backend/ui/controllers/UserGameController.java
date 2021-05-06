@@ -28,13 +28,15 @@ public class UserGameController {
     private Round currentRound;
     
     private boolean inRound = false;
+    
+    private boolean inGuessingTeam = false;
 
     
     public void startRound() {
     	this.inRound = true;
     	this.currentRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     	this.countDownController.startCountDown(currentRound.getTime(), sessionInfoBean.getCurrentUser());
-    	
+    	this.inGuessingTeam = currentRound.getGuessingTeam().getTeamMembers().contains(sessionInfoBean.getCurrentUser());
     }
     
     public void endRound() {
@@ -50,8 +52,16 @@ public class UserGameController {
     	return this.inRound;
     }
     
-    public boolean isGuessingPlayer() {
-    	return !webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser()).getGuessingUser().getUsername().equals(sessionInfoBean.getCurrentUserName());
+    public void setInGuessingTeam(boolean bool) {
+    	this.inGuessingTeam=bool;
     }
+
+	public boolean isInGuessingTeam() {
+		return inGuessingTeam;
+	}
+    
+    
+    
+    
 
 }
