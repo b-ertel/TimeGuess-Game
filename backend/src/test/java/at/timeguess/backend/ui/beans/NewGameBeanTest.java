@@ -189,6 +189,13 @@ public class NewGameBeanTest {
         verifyNoInteractions(gameService);
     }
 
+    @Test
+    public void testMessageBeanNoContext() {
+        MessageBean bean = new MessageBean();
+        assertDoesNotThrow(() -> bean.alertInformation("header", "text"));
+        assertDoesNotThrow(() -> bean.alertErrorFailValidation("header", "text"));
+    }
+
     private String fillBean() {
         String foo = "foobarbat";
 

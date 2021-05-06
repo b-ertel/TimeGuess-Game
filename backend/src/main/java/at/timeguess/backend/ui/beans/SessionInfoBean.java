@@ -91,7 +91,7 @@ public class SessionInfoBean implements Serializable {
     public boolean isLoggedIn() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
-            return auth.isAuthenticated() && !auth.getName().equals("anonymousUser");
+            return auth.isAuthenticated() && !auth.getName().equals("anonymous");
         } else {
             return false;
         }
