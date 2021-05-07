@@ -68,6 +68,14 @@ public class UserGameController {
     	webSocketGameController.validateRoundOfGame(game, Validation.CORRECT);
     }
     
+    public void incorrectRound() {
+    	Game game = webSocketGameController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
+    	webSocketGameController.validateRoundOfGame(game, Validation.INCORRECT);
+    }
     
+    public void cheatedRound() {
+    	Game game = webSocketGameController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
+    	webSocketGameController.validateRoundOfGame(game, Validation.CHEATED);
+    }
 
 }

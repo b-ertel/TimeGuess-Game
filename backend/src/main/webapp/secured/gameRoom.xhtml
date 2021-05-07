@@ -20,7 +20,7 @@
 			</p:panel>
 		</h:form>
 		
-   <h:form id="gameRoomForm" style="width:700px; text-align:center; align:right; margin: 0 auto;">
+   <h:form id="gameRoundForm" style="width:700px; text-align:center; align:right; margin: 0 auto;">
             <div class="gameRoomContent">      
                 <p:panel id="roundInfo" header="Round #{userGameController.currentRound.nr}">
 				
@@ -46,34 +46,13 @@
 				</p:outputPanel> 
 				</p:panel>
             </div>
-            
-            <o:socket channel="countDownChannel" scope="session"
-         	    user="#{sessionInfoBean.currentUser.id}"
-                onmessage="function(m){console.log(m);}">
-                <f:ajax event="countDownUpdate"
-                    render=":gameRoomForm:roundInfo"/>
-            </o:socket> 
-
-
-			<o:socket channel="newRoundChannel" scope="session"   
-                		onmessage="function(m){console.log(m);}"
-                      user="#{sessionInfoBean.currentUser.id}">
-                <f:ajax event="startRound"
-                        render=":gameRoomForm:roundInfo" 
-                        listener="#{userGameController.startRound()}"/> 
-                <f:ajax event="endRoundViaFlip"
-                        render=":gameRoomForm:roundInfo :roundValidationForm:roundValidationDialog" 
-                        listener="#{userGameController.endRound()}"
-                        onevent="PF('roundValidationDialog').show()"/>
-                <f:ajax event="validatedRound"
-                        render=":gameRoomForm:roundInfo" 
-                        onevent="PF('roundValidationDialog').hide()"/>                 
-            </o:socket>
-        </h:form>
-        
-        <h:form id="roundValidationForm">
-        
-        	<p:dialog id="roundValidationDialog" header="Round Validation"
+      </h:form>
+      
+      
+      
+      
+      <h:form id="roundValidationForm">
+      		<p:dialog id="roundValidationDialog" header="Round Validation"
         			  widgetVar="roundValidationDialog" closable="true" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="true" showEffect="fade"
 					  hideEffect="fade" responsive="true">
@@ -81,19 +60,40 @@
 							   rendered="#{not empty userGameController.currentRound}" style="font-weight:bold"/>
 							   
 				<h:panelGrid columns="3" rendered="#{!userGameController.inGuessingTeam}">
-                     <p:commandButton value="Correct" action="#{userGameController.correctRound()}" onclick="PF('roundValidationDialog').hide()"/>
-                     <p:commandButton value="Incorrect" onclick="PF('roundValidationDialog').hide()"/>
-                     <p:commandButton value="Cheated" onclick="PF('roundValidationDialog').hide()"/>
+                     <p:commandButton value="Correct" action="#{userGameController.correctRound()}" />
+                     <p:commandButton value="Incorrect" action="#{userGameController.incorrectRound()}" />
+                     <p:commandButton value="Cheated" action="#{userGameController.cheatedRound()}"/>
                 </h:panelGrid>
         	</p:dialog>
+      </h:form>
+            
+            
+            
+            
+            
+            <o:socket channel="countDownChannel" scope="session"
+         	    user="#{sessionInfoBean.currentUser.id}"
+                onmessage="function(m){console.log(m);}">
+                <p:ajax event="countDownUpdate"
+                    update=":gameRoundForm:roundInfo"/>
+            </o:socket> 
+
+
+			<o:socket channel="newRoundChannel" scope="session"   
+                		onmessage="function(m){console.log(m);}"
+                      user="#{sessionInfoBean.currentUser.id}">
+                <p:ajax event="startRound"
+                        update=":gameRoundForm:roundInfo" 
+                        listener="#{userGameController.startRound()}"/> 
+                <p:ajax event="endRoundViaFlip"
+                        update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" 
+                        listener="#{userGameController.endRound()}"
+                        oncomplete="PF('roundValidationDialog').show()"/>
+                <p:ajax event="validatedRound"
+                        onstart="PF('roundValidationDialog').hide()"/>                 
+            </o:socket>
         
-        
-        
-        
-        
-        
-        </h:form>
-        
+ 
         
     </ui:define>
 </ui:composition>
