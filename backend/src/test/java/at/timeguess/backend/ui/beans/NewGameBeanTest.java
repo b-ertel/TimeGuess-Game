@@ -205,10 +205,16 @@ public class NewGameBeanTest {
     }
 
     @Test
-    public void testMessageBeanNoContext() {
+    public void testMessageBeanAlertNoContext() {
         MessageBean bean = new MessageBean();
         assertDoesNotThrow(() -> bean.alertInformation("header", "text"));
         assertDoesNotThrow(() -> bean.alertErrorFailValidation("header", "text"));
+    }
+
+    @Test
+    public void testMessageBeanRedirectNoContext() {
+        MessageBean bean = new MessageBean();
+        assertDoesNotThrow(() -> bean.redirect("somewhere"));
     }
 
     private String fillBean() {

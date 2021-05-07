@@ -6,12 +6,13 @@ import static javax.faces.application.FacesMessage.SEVERITY_WARN;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.util.function.BiConsumer;
 
 import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import org.junit.jupiter.api.Test;
@@ -62,8 +63,34 @@ public class MessageBeanTest {
         assertDoesNotThrow(() -> bean.alertErrorFailValidation("header", "text"));
     }
 
-    private void assertAlert(BiConsumer<String, String> alert, FacesMessage.Severity expected,
-            boolean assertValidationFailed) {
+    @Test
+    public void testRedirect() {
+        assertRedirect(false);
+    }
+
+    @Test
+    public void testRedirectFailure() {
+        assertRedirect(true);
+    }
+
+    private void assertRedirect(boolean success) {
+        assertDoesNotThrow(() -> {
+            String expected = "somewhere";
+            FacesContext context = ContextMocker.mockFacesContext();
+            ExternalContext external = mock(ExternalContext.class);
+            when(context.getExternalContext()).thenReturn(external);
+
+            if (success) doNothing().when(external).redirect(expected);
+            else doThrow(IOException.class).when(external).redirect(expected);
+
+            messageBean.redirect(expected);
+
+            verify(context).getExternalContext();
+            verify(external).redirect(expected);
+        });
+    }
+
+    private void assertAlert(BiConsumer<String, String> alert, FacesMessage.Severity expected, boolean assertValidationFailed) {
         String header = "header", text = "text";
         FacesContext context = ContextMocker.mockFacesContext();
         ArgumentCaptor<FacesMessage> arg = ArgumentCaptor.forClass(FacesMessage.class);

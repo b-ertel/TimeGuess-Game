@@ -157,80 +157,11 @@ public class UserServiceTest {
         });
     }
 
-    @Test
-    public void testUnauthenticatedLoadUsers() {
-        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> {
-            for (User user : userService.getAllUsers()) {
-                fail(String.format("Call to userService.getAllUsers should not work without proper authorization, but found %s", user));
-            }
-        });
-    }
-
-    @Test
-    @WithMockUser(username = "user", authorities = { "PLAYER" })
-    public void testUnauthorizedLoadUsers() {
-        assertThrows(org.springframework.security.access.AccessDeniedException.class, () -> {
-            for (User user : userService.getAllUsers()) {
-                fail(String.format("Call to userService.getAllUsers should not work without proper authorization, but found %s", user));
-            }
-        });
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "admin", "user1", "user2" })
-    @WithMockUser(username = "user1", authorities = { "MANAGER" })
-    public void testUnauthorizedLoadUser(String username) {
-        assertThrows(AccessDeniedException.class, () -> {
-            User user = userService.loadUser("admin");
-            fail(String.format("Call to userService.loadUser should not work without proper authorization for other users than the authenticated one, but found %s", user));
-        });
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "admin", "user1", "user2" })
-    @WithMockUser(username = "user1", authorities = { "PLAYER" })
-    public void testAuthorizedLoadUser(String username) {
-        assertLoadUser(username);
-    }
-
-    @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "1|admin", "2|user1", "3|user2", "4|elvis" })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testAuthorizedLoadUserById(Long userId, String usernameExpected) {
-        User user = userService.loadUser(userId);
-        assertEquals(usernameExpected, user.getUsername());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "user2" })
-    @DirtiesContext
-    @WithMockUser(username = "user1", authorities = { "PLAYER" })
-    public void testUnauthorizedSaveUserFailure(String username) {
-        assertThrows(AccessDeniedException.class, () -> {
-            User user = assertLoadUser(username);
-            userService.saveUser(user);
-        }, "PLAYER should not be able to save another user, but was");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "foo", "bar", "bat" })
-    @DirtiesContext
-    @WithAnonymousUser
-    public void testUnauthorizedSaveUserSuccess(String username) {
-        assertDoesNotThrow(() -> {
-            User expected = createUser(username);
-            expected.setPassword("pword");
-            
-            User result = userService.saveUser(expected);
-            assertEquals(expected.getUsername(), result.getUsername());
-        }, "Anonymous user should be able to self-register, but wasn't");
-    }
-
     @ParameterizedTest
     @ValueSource(strings = { "user2" })
     @DirtiesContext
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
-    public void testAuthorizedSaveUser(String username) {
+    public void testSaveUserAuthorized(String username) {
         assertDoesNotThrow(() -> {
             User user = assertLoadUser(username);
             user.setEmail("email");
@@ -242,22 +173,79 @@ public class UserServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "elvis" })
+    @ValueSource(strings = { "user2" })
     @DirtiesContext
     @WithMockUser(username = "user1", authorities = { "PLAYER" })
-    public void testUnauthorizedDeleteUser(String username) {
+    public void testSaveUserUnauthorizedFailure(String username) {
         assertThrows(AccessDeniedException.class, () -> {
             User user = assertLoadUser(username);
-            userService.deleteUser(user);
-        }, "PLAYER should not be able to delete another user, but was");
-        assertTrue(userService.hasUser(username));
+            userService.saveUser(user);
+        }, "PLAYER should not be able to save another user, but was");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "foo", "bar", "bat" })
+    @DirtiesContext
+    @WithAnonymousUser
+    public void testSaveUserUnauthorizedSuccess(String username) {
+        assertDoesNotThrow(() -> {
+            User expected = createUser(username);
+            expected.setPassword("pword");
+            
+            User result = userService.saveUser(expected);
+            assertEquals(expected.getUsername(), result.getUsername());
+        }, "Anonymous user should be able to self-register, but wasn't");
+    }
+
+    @Test
+    public void testLoadUsersUnauthenticated() {
+        assertThrows(AuthenticationCredentialsNotFoundException.class, () -> {
+            for (User user : userService.getAllUsers()) {
+                fail(String.format("Call to userService.getAllUsers should not work without proper authorization, but found %s", user));
+            }
+        });
+    }
+
+    @Test
+    @WithMockUser(username = "user", authorities = { "PLAYER" })
+    public void testLoadUsersUnauthorized() {
+        assertThrows(org.springframework.security.access.AccessDeniedException.class, () -> {
+            for (User user : userService.getAllUsers()) {
+                fail(String.format("Call to userService.getAllUsers should not work without proper authorization, but found %s", user));
+            }
+        });
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "admin", "user1", "user2" })
+    @WithMockUser(username = "user1", authorities = { "MANAGER" })
+    public void testLoadUserUnauthorized(String username) {
+        assertThrows(AccessDeniedException.class, () -> {
+            User user = userService.loadUser("admin");
+            fail(String.format("Call to userService.loadUser should not work without proper authorization for other users than the authenticated one, but found %s", user));
+        });
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "admin", "user1", "user2" })
+    @WithMockUser(username = "user1", authorities = { "PLAYER" })
+    public void testLoadUserAuthorized(String username) {
+        assertLoadUser(username);
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = { "1|admin", "2|user1", "3|user2", "4|elvis" })
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    public void testLoadUserByIdAuthorized(Long userId, String usernameExpected) {
+        User user = userService.loadUser(userId);
+        assertEquals(usernameExpected, user.getUsername());
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "elvis" })
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testAuthorizedDeleteUser(String username) {
+    public void testDeleteUserAuthorized(String username) {
         assertDoesNotThrow(() -> {
             User user = assertLoadUser(username);
             userService.deleteUser(user);
@@ -268,13 +256,25 @@ public class UserServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testAuthorizedDeleteUserSelf() throws NoSuchMethodException, SecurityException {
-        String username = UserServiceTest.class.getMethod("testAuthorizedDeleteUserSelf").getAnnotation(WithMockUser.class).username();
+    public void testDeleteUserSelfAuthorized() throws NoSuchMethodException, SecurityException {
+        String username = UserServiceTest.class.getMethod("testDeleteUserSelfAuthorized").getAnnotation(WithMockUser.class).username();
         assertDoesNotThrow(() -> {
             User user = assertLoadUser(username);
             userService.deleteUser(user);
         });
         assertTrue(userService.hasUser(username), "User should not be able to delete himself, but was");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "elvis" })
+    @DirtiesContext
+    @WithMockUser(username = "user1", authorities = { "PLAYER" })
+    public void testDeleteUserUnauthorized(String username) {
+        assertThrows(AccessDeniedException.class, () -> {
+            User user = assertLoadUser(username);
+            userService.deleteUser(user);
+        }, "PLAYER should not be able to delete another user, but was");
+        assertTrue(userService.hasUser(username));
     }
 
     @Test
