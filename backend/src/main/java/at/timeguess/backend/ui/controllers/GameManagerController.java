@@ -38,7 +38,7 @@ import java.util.function.Consumer;
 @Controller
 @Scope("application")
 @CDIContextRelated
-public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
+public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 
     @Autowired
     private GameService gameService;
@@ -52,7 +52,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 	private GameLogicService gameLogic;
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
-    private Map<Game, Boolean> midRound = new ConcurrentHashMap<>();
+    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>();     // indicated if there is played a round currently in the game
 
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
@@ -81,8 +81,8 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 
  		listOfGames.put(cube, testgame1);
  		listOfGames.put(cube2, testgame2); 
-        midRound.put(testgame1, true);
-        midRound.put(testgame2, true);
+        activeRound.put(testgame1, false);
+        activeRound.put(testgame2, false);
     }
     
     @PreDestroy
@@ -98,11 +98,11 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
         	Game game = listOfGames.get(configuredFacetsEvent.getCube());
-        	if(midRound.get(game)) {
-        		midRound.put(game, false);
+        	if(!activeRound.get(game)) {
+        		activeRound.put(game, true);
         		startNewRound(game, configuredFacetsEvent.getCubeFace()); 
         	} else {
-        		midRound.put(game, true);
+        		activeRound.put(game, false);
         		this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
         	}    	
         }
@@ -140,7 +140,27 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
     		}
     	}
     	return round;
-    }
+    }  
+    
+    /**
+     * find the game in which a given user is currently playing, called by{@link CouuntDownController}
+     * 
+     * @param user to find current game
+     * @return current game
+     */
+    public Game getCurrentGameForUser(User user) {
+    	
+    	Game game = new Game();
+   
+    	for(Map.Entry<Game, Round> e : currentRound.entrySet()) {
+    		for(Team t : e.getKey().getTeams()) {
+    			if(t.getTeamMembers().contains(user)) {
+    				game = e.getKey();
+    			}
+    		}
+    	}
+    	return game;
+    }  
 
 	/**
 	 * A method to put all usernames of players, that are online, into a list
@@ -155,6 +175,10 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 		}
 		users.stream().forEach(user -> userIds.add(user.getId()));
 		return userIds;
+	}
+
+	public void setActiveRoundFalse(Game game) {
+		this.activeRound.put(game,false);
 	}
 	
 }
