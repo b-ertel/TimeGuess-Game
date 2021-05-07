@@ -15,7 +15,7 @@
         </h:outputScript>
 
 		<h:form>
-			<p:panel style="font-size:24px !important; width:180px;">
+			<p:panel style="font-size:24px !important; width:180px; text-align:center;">
 			<h1>Gameroom</h1>
 			</p:panel>
 		</h:form>
@@ -53,12 +53,13 @@
       
       <h:form id="roundValidationForm">
       		<p:dialog id="roundValidationDialog" header="Round Validation"
-        			  widgetVar="roundValidationDialog" closable="true" dynamic="true" modal="true"
+        			  widgetVar="roundValidationDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="true" showEffect="fade"
 					  hideEffect="fade" responsive="true">
-        		<p:outputLabel value="Did #{userGameController.currentRound.guessingUser.username} guess #{userGameController.currentRound.termToGuess.name} correct?" 
-							   rendered="#{not empty userGameController.currentRound}" style="font-weight:bold"/>
-							   
+        		<p:outputLabel value="Did #{userGameController.currentRound.guessingUser.username} guess #{userGameController.currentRound.termToGuess.name} correct? (First click comes first)" 
+							   rendered="#{not empty userGameController.currentRound and !userGameController.inGuessingTeam}" style="font-weight:bold"/>
+				<p:outputLabel value="Please wait until your counterparties have valuated your round..." 
+							   rendered="#{not empty userGameController.currentRound and userGameController.inGuessingTeam}" style="font-weight:bold"/>			   
 				<h:panelGrid columns="3" rendered="#{!userGameController.inGuessingTeam}">
                      <p:commandButton value="Correct" action="#{userGameController.correctRound()}" />
                      <p:commandButton value="Incorrect" action="#{userGameController.incorrectRound()}" />

@@ -44,7 +44,6 @@ public class UserGameController {
     public void endRound() {
     	this.countDownController.endCountDown();
     	this.inRound = false;
-    	this.inGuessingTeam = false;
     }
     
     public Round getCurrentRound() {
@@ -75,7 +74,7 @@ public class UserGameController {
     
     public void cheatedRound() {
     	Game game = webSocketGameController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
-    	webSocketGameController.validateRoundOfGame(game, Validation.CHEATED);
+    	webSocketGameController.validateRoundOfGame(game, Validation.CHEATED);    
     }
 
 }
