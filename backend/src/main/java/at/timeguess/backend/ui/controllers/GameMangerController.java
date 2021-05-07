@@ -8,6 +8,7 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
+import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
@@ -22,6 +23,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -53,7 +55,6 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
     private Map<Game, Boolean> midRound = new ConcurrentHashMap<>();
-
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
     @PostConstruct
@@ -155,6 +156,34 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 		}
 		users.stream().forEach(user -> userIds.add(user.getId()));
 		return userIds;
+	}
+	
+	
+	public Game getCurrentGameForUser(User user) {
+		for(Game g : this.listOfGames.values()) {
+			for(Team t : g.getTeams()) {
+				if(t.getTeamMembers().contains(user)) {
+					return g;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public void validateRoundOfGame(Game game, Validation v) {
+		gameLogic.saveLastRound(game, v);
+		this.listOfGames.put(getCubeByGame(game), game);	
+		this.websocketManager.getNewRoundChannel().send("validatedRound", getAllUserIdsOfGameTeams(game.getTeams()));
+	}
+	
+	
+	private Cube getCubeByGame(Game game) {
+		for(Entry<Cube, Game> e : this.listOfGames.entrySet()) {
+			if(e.getValue().equals(game)) {
+				return e.getKey();
+			}
+		}
+		return null;
 	}
 	
 }

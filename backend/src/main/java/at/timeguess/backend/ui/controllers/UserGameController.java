@@ -1,6 +1,8 @@
 package at.timeguess.backend.ui.controllers;
 
+import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
+import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +63,10 @@ public class UserGameController {
 		return inGuessingTeam;
 	}
     
-    
+    public void correctRound() {
+    	Game game = webSocketGameController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
+    	webSocketGameController.validateRoundOfGame(game, Validation.CORRECT);
+    }
     
     
 

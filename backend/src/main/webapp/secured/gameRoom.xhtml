@@ -23,12 +23,6 @@
    <h:form id="gameRoomForm" style="width:700px; text-align:center; align:right; margin: 0 auto;">
             <div class="gameRoomContent">      
                 <p:panel id="roundInfo" header="Round #{userGameController.currentRound.nr}">
-                   
-                <p:outputPanel rendered="#{!userGameController.inRound}">
-					<p:outputLabel value="Flip your cube to start the fun ;-D" rendered="#{empty userGameController.currentRound}" style="font-weight:bold;"/>
-					<p:outputLabel value="Did #{userGameController.currentRound.guessingUser.username} guess #{userGameController.currentRound.termToGuess.name} correct?" 
-							   rendered="#{not empty userGameController.currentRound}" style="font-weight:bold;"/>
-				</p:outputPanel>
 				
 				<p:outputPanel header="RoundInfo" rendered="#{userGameController.inRound}">
 						<h3>Time to Guess</h3>
@@ -68,11 +62,38 @@
                         render=":gameRoomForm:roundInfo" 
                         listener="#{userGameController.startRound()}"/> 
                 <f:ajax event="endRoundViaFlip"
+                        render=":gameRoomForm:roundInfo :roundValidationForm:roundValidationDialog" 
+                        listener="#{userGameController.endRound()}"
+                        onevent="PF('roundValidationDialog').show()"/>
+                <f:ajax event="validatedRound"
                         render=":gameRoomForm:roundInfo" 
-                        listener="#{userGameController.endRound()}"/>              
+                        onevent="PF('roundValidationDialog').hide()"/>                 
             </o:socket>
-
         </h:form>
+        
+        <h:form id="roundValidationForm">
+        
+        	<p:dialog id="roundValidationDialog" header="Round Validation"
+        			  widgetVar="roundValidationDialog" closable="true" dynamic="true" modal="true"
+					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  hideEffect="fade" responsive="true">
+        		<p:outputLabel value="Did #{userGameController.currentRound.guessingUser.username} guess #{userGameController.currentRound.termToGuess.name} correct?" 
+							   rendered="#{not empty userGameController.currentRound}" style="font-weight:bold"/>
+							   
+				<h:panelGrid columns="3" rendered="#{!userGameController.inGuessingTeam}">
+                     <p:commandButton value="Correct" action="#{userGameController.correctRound()}" onclick="PF('roundValidationDialog').hide()"/>
+                     <p:commandButton value="Incorrect" onclick="PF('roundValidationDialog').hide()"/>
+                     <p:commandButton value="Cheated" onclick="PF('roundValidationDialog').hide()"/>
+                </h:panelGrid>
+        	</p:dialog>
+        
+        
+        
+        
+        
+        
+        </h:form>
+        
         
     </ui:define>
 </ui:composition>
