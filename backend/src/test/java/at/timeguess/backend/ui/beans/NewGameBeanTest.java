@@ -31,7 +31,7 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
-import at.timeguess.backend.ui.controllers.GameMangerController;
+import at.timeguess.backend.ui.controllers.GameManagerController;
 import at.timeguess.backend.utils.TestSetup;
 
 /**
@@ -50,7 +50,7 @@ public class NewGameBeanTest {
     @Mock
     private TeamService teamService;
     @Mock
-    private GameMangerController gameManagerController;
+    private GameManagerController gameManagerController;
     @Mock
     private MessageBean messageBean;
 

@@ -49,7 +49,7 @@ public class CubeController {
      */
     public void saveCube() {
         this.cube=cubeService.saveCube(this.cube);
-        statusController.updateCube(this.cube);
+        statusController.updateCubeInStatus(this.cube);
         statusController.updateSockets();
         message.alertInformation("CubeManagment", "Cube saved");
     }

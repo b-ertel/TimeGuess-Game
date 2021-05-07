@@ -8,6 +8,8 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
+
+import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
@@ -22,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -29,10 +32,11 @@ import java.util.stream.Collectors;
 /**
  * This controller is responsible for showing a term in the game window with websockets.
  */
+
 @Controller
 @Scope("application")
 @CDIContextRelated
-public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
+public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 
     @Autowired
     private GameService gameService;
@@ -46,8 +50,7 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
     private GameLogicService gameLogic;
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
-    private Round controllRound;
-
+    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>(); // indicated if there is played a round currently in the game
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
     @PostConstruct
@@ -75,7 +78,8 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
 
         listOfGames.put(cube, testgame1);
         listOfGames.put(cube2, testgame2);
-        this.controllRound = new Round();
+        activeRound.put(testgame1, false);
+        activeRound.put(testgame2, false);
     }
 
     @PreDestroy
@@ -84,18 +88,22 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
     }
 
     /**
-     * A method for processing a {@link ConfiguredFacetsEvent}.
-     * Method is called on facet-event, checks to which game it corresponds and calls startNewRound() to initialize new round.
+     * A method for processing a {@link ConfiguredFacetsEvent}. Method is called on facet-event,
+     * checks to which game the event belongs and estimates whether a round should start or end
      */
     @Override
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
-            startNewRound(listOfGames.get(configuredFacetsEvent.getCube()), configuredFacetsEvent.getCubeFace());
+            Game game = listOfGames.get(configuredFacetsEvent.getCube());
+            if (!activeRound.get(game)) {
+                activeRound.put(game, true);
+                startNewRound(game, configuredFacetsEvent.getCubeFace());
+            }
+            else {
+                activeRound.put(game, false);
+                this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
+            }
         }
-    }
-
-    public Round getControllRound() {
-        return controllRound;
     }
 
     public Round getCurrentRoundOfGame(Game game) {
@@ -136,6 +144,35 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
     }
 
     /**
+     * find the game in which a given user is currently playing, called by{@link CouuntDownController}
+     * @param user to find current game
+     * @return current game
+     */
+    public Game getCurrentGameForUser(User user) {
+        for (Game g : this.listOfGames.values()) {
+            for (Team t : g.getTeams()) {
+                if (t.getTeamMembers().contains(user)) {
+                    return g;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Cube getCubeByGame(Game game) {
+        for (Entry<Cube, Game> e : this.listOfGames.entrySet()) {
+            if (e.getValue().equals(game)) {
+                return e.getKey();
+            }
+        }
+        return null;
+    }
+
+    public void setActiveRoundFalse(Game game) {
+        this.activeRound.put(game, false);
+    }
+
+    /**
      * Method to add a newly created game to the saved list of currently available games
      * and send notifications to all participating team members, except the game creator.
      * @param game
@@ -154,13 +191,18 @@ public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
     }
 
     /**
-     * Method that starts a new Round for a game. It initializes a new round
-     * and also calls a method to start the countdown.
+     * Method that starts a new Round for a game. It initializes a new round and also calls a method to start the countdown.
      * @param currentGame, game for which round should be started
      * @param cubeFace,    face that sets round parameter
      */
     public void startNewRound(Game currentGame, CubeFace cubeFace) {
         this.currentRound.put(currentGame, gameLogic.startNewRound(currentGame, cubeFace));
-        this.websocketManager.getNewRoundChannel().send("newRound", getAllUserIdsOfGameTeams(currentGame.getTeams()));
+        this.websocketManager.getNewRoundChannel().send("startRound", getAllUserIdsOfGameTeams(currentGame.getTeams()));
+    }
+
+    public void validateRoundOfGame(Game game, Validation v) {
+        gameLogic.saveLastRound(game, v);
+        this.listOfGames.put(getCubeByGame(game), game);
+        this.websocketManager.getNewRoundChannel().send("validatedRound", getAllUserIdsOfGameTeams(game.getTeams()));
     }
 }

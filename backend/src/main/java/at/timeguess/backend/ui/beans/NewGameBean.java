@@ -18,7 +18,7 @@ import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
-import at.timeguess.backend.ui.controllers.GameMangerController;
+import at.timeguess.backend.ui.controllers.GameManagerController;
 
 /**
  * Bean for creating a new game.
@@ -39,7 +39,7 @@ public class NewGameBean implements Serializable {
     @Autowired
     private TeamService teamService;
     @Autowired
-    private GameMangerController gameManagerController;
+    private GameManagerController gameManagerController;
 
     @Autowired
     private MessageBean messageBean;
