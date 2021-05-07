@@ -1,9 +1,12 @@
 package at.timeguess.backend.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
@@ -19,6 +22,7 @@ import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.User;
+import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
 
 @Component
@@ -121,12 +125,15 @@ public class GameLogicService {
     public Round startNewRound(Game game, CubeFace cubeFace) {
 		Round nextRound = new Round();
 		nextRound.setNr(game.getRounds().size()+1);
-		nextRound.setPoints(cubeFace.getPoints());
+		nextRound.setActivity(cubeFace.getActivity());
 		Team nextTeam = getNextTeam(game);
 		nextRound.setGuessingUser(nextUser(game, nextTeam));
 		nextRound.setGuessingTeam(nextTeam);
+		Set<Team> verifiyingTeams = game.getTeams();
+		verifiyingTeams.remove(nextTeam);
+		nextRound.setVerifyingTeams(verifiyingTeams);
+		nextRound.setPoints(cubeFace.getPoints());
 		nextRound.setTermToGuess(nextTerm(game));
-		nextRound.setActivity(cubeFace.getActivity());
 		nextRound.setGame(game);
 		nextRound.setTime(cubeFace.getTime());
 		game.getRounds().add(nextRound);
@@ -134,10 +141,8 @@ public class GameLogicService {
 		LOGGER.info("New Round nr '{}', with team '{}' and user '{}' was created", nextRound.getNr(), nextRound.getGuessingTeam().getName(), nextRound.getGuessingUser().getUsername());
 		return nextRound;
 	}
-
-
     
-    public void saveLastRound(Game game) {
+    public void saveLastRound(Game game, Validation v) {
         Set<Round> rounds = game.getRounds();
         Round lastRound = null;
         Iterator<Round> ite = rounds.iterator();
@@ -150,9 +155,18 @@ public class GameLogicService {
             }
         }
         if (lastRound != null) {
+        	game.getRounds().remove(lastRound);
+        	if(v == Validation.CORRECT) {
+        		lastRound.setCorrectAnswer(true);
+        	} else if (v == Validation.INCORRECT) {
+        		lastRound.setPoints(0);
+        	} else if (v == Validation.CHEATED) {
+        		lastRound.setPoints(-1);
+        	}
+        	game.getRounds().add(lastRound);
             roundService.saveRound(lastRound);
-            LOGGER.info("Round nr '{}', with team '{}' was saved, gamerounds '{}'", lastRound.getNr(),
-                    lastRound.getGuessingTeam().getName(), game.getRounds().size());
+            LOGGER.info("Round nr '{}', with team '{}' was saved, gamerounds '{}', points '{}'", lastRound.getNr(),
+                    lastRound.getGuessingTeam().getName(), game.getRounds().size(), lastRound.getPoints());
         }
     }
 }

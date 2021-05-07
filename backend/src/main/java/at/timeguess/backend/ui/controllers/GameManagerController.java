@@ -8,6 +8,8 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
+
+import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
@@ -22,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -52,8 +55,7 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 	private GameLogicService gameLogic;
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
-    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>();     // indicated if there is played a round currently in the game
-
+    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>();		// indicated if there is played a round currently in the game
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
     @PostConstruct
@@ -140,27 +142,7 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
     		}
     	}
     	return round;
-    }  
-    
-    /**
-     * find the game in which a given user is currently playing, called by{@link CouuntDownController}
-     * 
-     * @param user to find current game
-     * @return current game
-     */
-    public Game getCurrentGameForUser(User user) {
-    	
-    	Game game = new Game();
-   
-    	for(Map.Entry<Game, Round> e : currentRound.entrySet()) {
-    		for(Team t : e.getKey().getTeams()) {
-    			if(t.getTeamMembers().contains(user)) {
-    				game = e.getKey();
-    			}
-    		}
-    	}
-    	return game;
-    }  
+    }
 
 	/**
 	 * A method to put all usernames of players, that are online, into a list
@@ -176,9 +158,45 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 		users.stream().forEach(user -> userIds.add(user.getId()));
 		return userIds;
 	}
-
+	
+	   
+    /**
+     * find the game in which a given user is currently playing, called by{@link CouuntDownController}
+     * 
+     * @param user to find current game
+     * @return current game
+     */
+	public Game getCurrentGameForUser(User user) {
+		for(Game g : this.listOfGames.values()) {
+			for(Team t : g.getTeams()) {
+				if(t.getTeamMembers().contains(user)) {
+					return g;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public void validateRoundOfGame(Game game, Validation v) {
+		gameLogic.saveLastRound(game, v);
+		this.listOfGames.put(getCubeByGame(game), game);	
+		this.websocketManager.getNewRoundChannel().send("validatedRound", getAllUserIdsOfGameTeams(game.getTeams()));
+	}
+	
+	
+	private Cube getCubeByGame(Game game) {
+		for(Entry<Cube, Game> e : this.listOfGames.entrySet()) {
+			if(e.getValue().equals(game)) {
+				return e.getKey();
+			}
+		}
+		return null;
+	}
+	
+	
 	public void setActiveRoundFalse(Game game) {
 		this.activeRound.put(game,false);
 	}
+
 	
 }
