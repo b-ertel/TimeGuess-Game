@@ -12,9 +12,6 @@ import org.springframework.data.domain.Persistable;
 @Entity
 public class GameTeam implements Serializable, Persistable<GameTeamId>{
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 6862225865089517788L;
 
     @EmbeddedId

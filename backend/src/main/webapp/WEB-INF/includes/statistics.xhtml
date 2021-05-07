@@ -11,13 +11,24 @@
             <h:form id="statForm">
                 <p:panel header="Statistics" toggleable="true" closable="false" toggleSpeed="500"
                     closeSpeed="500" widgetVar="statistics">
-                    <p:panelGrid columns="2" style="width: 100%;">
-                        <p:panel header="General" style="border: none; width: 400px">
-                            <p><h:outputText value="Number of players: #{topicStatisticController.numberOfPlayers}" /></p>
-                            <p><h:outputText value="Number of terms: #{topicStatisticController.numberOfTerms}" /></p>
-                            <p><h:outputText value="Number of topics: #{topicStatisticController.numberOfTopics}"/></p>
-                            <p><h:outputText value="Most used topic: #{topicStatisticController.mostUsedTopic.name}"/></p>
-                            <p><h:outputText value="Least used topic: #{topicStatisticController.leastUsedTopic.name}"/></p>
+                    <p:panelGrid columns="2">
+                        <p:panel header="General" style="border:none; width:400px">
+                            <p:panelGrid columns="2" style="width:100%; line-height:32px">
+                                <h:outputText value="Number of players: " />
+                                <h:outputText value="#{topicStatisticController.numberOfPlayers}" styleClass="rightm10" />
+
+                                <h:outputText value="Number of terms: " />
+                                <h:outputText value="#{topicStatisticController.numberOfTerms}" styleClass="rightm10" />
+
+                                <h:outputText value="Number of topics: " />
+                                <h:outputText value="#{topicStatisticController.numberOfTopics}" styleClass="rightm10" />
+
+                                <h:outputText value="Most used topic: " />
+                                <h:outputText value="#{topicStatisticController.mostUsedTopic.name}" styleClass="rightm10" />
+
+                                <h:outputText value="Least used topic: " />
+                                <h:outputText value="#{topicStatisticController.leastUsedTopic.name}" styleClass="rightm10" />
+                            </p:panelGrid>
                         </p:panel>
 
                         <p:panel header="Topics" style=" border: none;">
@@ -39,30 +50,35 @@
                     <p:outputPanel id="topicData" rendered="#{not empty topicStatisticController.topic}">
                         <div class="p-grid">
                             <div class="p-col-5"><p:outputLabel value="Name: " /></div>
-                            <div class="p-col-7"><p:outputLabel value="#{topicStatisticController.topic.name}" disabled="true"/></div>
+                            <div class="p-col-7"><p:outputLabel value="#{topicStatisticController.topic.name}" styleClass="rightm10"/></div>
                         </div>
                         <p:separator style="margin-bottom:16px" />
                         <ui:fragment rendered="#{topicStatisticController.playedWithTopic}">
-                        <div class="p-grid">
-                            <div class="p-col-7"><p:outputLabel value="Games played: "/></div>
-                            <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.gamesPlayedWithTopic}"/></div>
-                            <div class="p-col-7"><p:outputLabel value="Correct Rounds: " /></div>
-                            <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.correctRounds}"/></div>
-                            <div class="p-col-7"><p:outputLabel value="Incorrect Rounds: " /></div>
-                            <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.incorrectRounds}"/></div>
-                            <div class="p-col-7"><p:outputLabel value="Number of terms: " /></div>
-                            <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.nrOfTermsPerTopic}"/></div>
-                        </div>
-                        <p:separator style="margin-bottom:16px" />
-                        <div class="p-grid">
-                            <div class="p-col-7"><p:outputLabel value="User with most wins: " /></div>
-                            <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.mostSuccessfullUser.username}" /></div>
-                        </div>
+                            <div class="p-grid">
+                                <div class="p-col-7"><p:outputLabel value="Games played: "/></div>
+                                <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.gamesPlayedWithTopic}" styleClass="rightm10"/></div>
+                                <div class="p-col-7"><p:outputLabel value="Correct Rounds: " /></div>
+                                <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.correctRounds}" styleClass="rightm10"/></div>
+                                <div class="p-col-7"><p:outputLabel value="Incorrect Rounds: " /></div>
+                                <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.incorrectRounds}" styleClass="rightm10"/></div>
+                                <div class="p-col-7"><p:outputLabel value="Number of terms: " /></div>
+                                <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.nrOfTermsPerTopic}" styleClass="rightm10"/></div>
+                            </div>
+                            <p:separator style="margin-bottom:16px" />
+                            <div class="p-grid">
+                                <div class="p-col-7"><p:outputLabel value="User with most wins: " /></div>
+                                <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.mostSuccessfullUser.username}" styleClass="rightm10"/></div>
+                            </div>
                         </ui:fragment>
                         <ui:fragment rendered="#{!topicStatisticController.playedWithTopic}">
                             <div><p:outputLabel value="Topic has not been used in any game yet! Be the first to use it ;-)"/></div>
                         </ui:fragment>
                     </p:outputPanel>
+                    <p:separator style="margin:11px 0px 12px" />
+
+                    <h:panelGrid columns="1">
+                        <p:commandButton value="Abort" onclick="PF('topicStatDialog').hide()" />
+                    </h:panelGrid>
                 </p:dialog>
             </h:form>
         </ui:composition>

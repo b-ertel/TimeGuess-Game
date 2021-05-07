@@ -33,6 +33,10 @@ public class GameService {
     @Autowired
     private MessageBean messageBean;
 
+    /**
+     * Returns a list of all games.
+     * @return
+     */
     public List<Game> getAllGames() {
         return gameRepo.findAll();
     }
@@ -55,8 +59,8 @@ public class GameService {
     }
 
     /**
-     * Returns a list of all games the given user is associated to,
-     * optionally restricted to games currently in setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
+     * Returns a list of all games the given user is associated to, optionally restricted to games
+     * currently in setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
      * @param user
      * @param current
      * @return
@@ -158,7 +162,7 @@ public class GameService {
      */
     public boolean disabledConfirmation(User user, Game game) {
         // game confirmation generally disabled or user not invited?
-        return disabledConfirmation(game) || !gameRepo.getIsNeededConfirmation(user, game);
+        return disabledConfirmation(game) || !gameRepo.getIsPlayerInGame(user, game);
     }
 
     /**
@@ -167,7 +171,13 @@ public class GameService {
      * @return true if participation confirmation is disabled, false otherwise.
      */
     public boolean disabledConfirmation(Game game) {
-        GameState status = game.getStatus();
-        return !(status == GameState.SETUP || status == GameState.VALID_SETUP);
+        switch (game.getStatus()) {
+            case SETUP:
+            case VALID_SETUP:
+            case PLAYED:
+                return false;
+            default:
+                return true;
+        }
     }
 }

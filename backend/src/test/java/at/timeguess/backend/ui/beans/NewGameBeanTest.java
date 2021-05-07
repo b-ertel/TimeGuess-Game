@@ -9,10 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +31,7 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
+import at.timeguess.backend.ui.controllers.GameMangerController;
 import at.timeguess.backend.utils.TestSetup;
 
 /**
@@ -51,6 +49,8 @@ public class NewGameBeanTest {
     private GameService gameService;
     @Mock
     private TeamService teamService;
+    @Mock
+    private GameMangerController gameManagerController;
     @Mock
     private MessageBean messageBean;
 
@@ -133,8 +133,23 @@ public class NewGameBeanTest {
         Game result = newGameBean.createGame();
 
         verify(gameService).saveGame(any(Game.class));
-        verifyNoInteractions(messageBean);
+        verify(gameManagerController).addGame(any(Game.class));
+        verify(messageBean).redirect(anyString());
+        verify(messageBean, times(0)).alertErrorFailValidation(anyString(), anyString());
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void testCreateGameFailureSave() {
+        fillBean();
+        when(gameService.saveGame(any(Game.class))).thenReturn(null);
+
+        Game result = newGameBean.createGame();
+
+        verify(gameService).saveGame(any(Game.class));
+        verifyNoInteractions(gameManagerController);
+        verifyNoInteractions(messageBean);
+        assertNull(result);
     }
 
     @Test

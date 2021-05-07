@@ -17,7 +17,7 @@ import at.timeguess.backend.services.GameService;
  * Controller for the game list view.
  */
 @Component
-@Scope(WebApplicationContext.SCOPE_SESSION)
+@Scope(WebApplicationContext.SCOPE_REQUEST)
 public class GameListController implements Serializable {
 
     private static final long serialVersionUID = 1L;

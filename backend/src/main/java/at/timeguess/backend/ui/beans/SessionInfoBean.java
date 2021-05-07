@@ -14,14 +14,12 @@ import at.timeguess.backend.services.UserService;
 
 /**
  * Session information bean to retrieve session-specific parameters.
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
  */
 @Component
 @Scope("session")
 public class SessionInfoBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Autowired
     private UserService userService;
@@ -32,9 +30,7 @@ public class SessionInfoBean implements Serializable {
     private User currentUser;
 
     /**
-     * Returns the currently logged on user, null if no user is authenticated
-     * for this session.
-     *
+     * Returns the currently logged on user, null if no user is authenticated for this session.
      * @return
      */
     public User getCurrentUser() {
@@ -49,9 +45,8 @@ public class SessionInfoBean implements Serializable {
     }
 
     /**
-     * Returns the username of the user for this session, empty string if no
-     * user has been authenticated for this session.
-     *
+     * Returns the username of the user for this session, empty string if no user has been authenticated for this
+     * session.
      * @return
      */
     public String getCurrentUserName() {
@@ -59,14 +54,13 @@ public class SessionInfoBean implements Serializable {
             return "";
         }
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String name = auth.getName(); //get logged in username
+        String name = auth.getName(); // get logged in username
         return name;
     }
 
     /**
-     * Returns the roles of the user for this session as space-separated list,
-     * empty string if no user has been authenticated for this session-
-     *
+     * Returns the roles of the user for this session as space-separated list, empty string if no user has been
+     * authenticated for this session-
      * @return
      */
     public String getCurrentUserRoles() {
@@ -84,26 +78,22 @@ public class SessionInfoBean implements Serializable {
 
     /**
      * Checks if a user is authenticated for this session.
-     *
-     * @return true if a non-anonymous user has been authenticated, false
-     * otherwise
+     * @return true if a non-anonymous user has been authenticated, false otherwise
      */
     public boolean isLoggedIn() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
             return auth.isAuthenticated() && !auth.getName().equals("anonymous");
-        } else {
+        }
+        else {
             return false;
         }
     }
 
     /**
-     * Checks if the user for this session has the given role (c.f.
-     * {@link UserRole}).
-     *
+     * Checks if the user for this session has the given role (c.f. {@link UserRole}).
      * @param role the role to check for as string
-     * @return true if a user is authenticated and the current user has the
-     * given role, false otherwise
+     * @return true if a user is authenticated and the current user has the given role, false otherwise
      */
     public boolean hasRole(String role) {
         if (role == null || role.isEmpty() || !isLoggedIn()) {
@@ -117,5 +107,4 @@ public class SessionInfoBean implements Serializable {
         }
         return false;
     }
-
 }

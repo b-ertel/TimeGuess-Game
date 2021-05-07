@@ -49,8 +49,7 @@
                         <p:selectOneMenu id="cubeCreate" value="#{newGameBean.cube}" converter="omnifaces.SelectItemsConverter"
                            required="true" requiredMessage="#{cubeMsg}">
                            <f:selectItem itemLabel="Select" />
-                           <f:selectItems value="#{cubeController.allCubes}" var="cu"
-                               itemDisabled="#{not statusController.isReady(cu)}"/>
+                           <f:selectItems value="#{cubeController.allCubes}" var="cu" itemDisabled="#{not statusController.isReady(cu)}"/>
                         </p:selectOneMenu>
 
                         <h:outputLabel for="teamsCreate" value="Teams: " />
@@ -65,32 +64,35 @@
                 </p:outputPanel>
                 <p:separator style="margin:9px 0px 16px" />
 
-                <p:outputPanel id="teamCreateData">
-                    <p:menubar id="newteamCreate" style="margin-bottom:18px">
-                        <p:menuitem value="&nbsp;Create Team&nbsp;" icon="fa fa-plus"
-                            actionListener="#{newGameBean.addNewTeam(newTeamBean.createTeam())}"
-                            process="teamnameCreate playersCreate @this" update="gameCreateData teamCreateData :msg" validateClient="true" />
-                    </p:menubar>
+                <p:panel header="Add new Teams" toggleable="true" collapsed="true" closable="false" toggleSpeed="500"
+                    closeSpeed="500" widgetVar="statistics">
+                    <p:outputPanel id="teamCreateData">
+                        <p:menubar id="newteamCreate" style="margin-bottom:18px">
+                            <p:menuitem value="&nbsp;Create Team&nbsp;" icon="fa fa-plus"
+                                actionListener="#{newGameBean.addNewTeam(newTeamBean.createTeam())}"
+                                process="teamnameCreate playersCreate @this" update="gameCreateData teamCreateData :msg" validateClient="true" />
+                        </p:menubar>
 
-                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
-                        columnClasses="p-col-4, p-col-8" contentStyleClass="ui-fluid">
-                        
-                        <p:outputLabel for="teamnameCreate" value="Name: "/>
-                        <p:inputText id="teamnameCreate" value="#{newTeamBean.teamName}" required="true" maxlength="100" />
-                        <p:separator style="margin:6px 0px 16px" />
-                    </p:panelGrid>
+                        <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                            columnClasses="p-col-4, p-col-8" contentStyleClass="ui-fluid">
 
-                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
-                        columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
-                        <h:outputLabel for="playersCreate" value="Players: " />
-                        <p:selectCheckboxMenu id="playersCreate" value="#{newTeamBean.players}" label="#{sel2Label}"
-                            required="true" requiredMessage="Players: Select at least 2 players" converter="omnifaces.SelectItemsConverter"
-                            multiple="true" filter="true" filterMatchMode="contains">
-                            <f:selectItems value="#{newTeamBean.allPlayers}" var="p" itemLabel="#{p.username}"
-                                itemDisabled="#{not newTeamBean.isAvailablePlayer(p)}" />
-                        </p:selectCheckboxMenu>
-                    </p:panelGrid>
-                </p:outputPanel>
+                            <p:outputLabel for="teamnameCreate" value="Name: "/>
+                            <p:inputText id="teamnameCreate" value="#{newTeamBean.teamName}" required="true" maxlength="100" />
+                            <p:separator style="margin:6px 0px 16px" />
+                        </p:panelGrid>
+
+                        <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
+                            columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
+                            <h:outputLabel for="playersCreate" value="Players: " />
+                            <p:selectCheckboxMenu id="playersCreate" value="#{newTeamBean.players}" label="#{sel2Label}"
+                                required="true" requiredMessage="Players: Select at least 2 players" converter="omnifaces.SelectItemsConverter"
+                                multiple="true" filter="true" filterMatchMode="contains">
+                                <f:selectItems value="#{newTeamBean.allPlayers}" var="p" itemLabel="#{p.username}"
+                                    itemDisabled="#{not newTeamBean.isAvailablePlayer(p)}" />
+                            </p:selectCheckboxMenu>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:panel>
                 <p:separator style="margin:9px 0px 12px" />
 
                 <h:panelGrid columns="3">
