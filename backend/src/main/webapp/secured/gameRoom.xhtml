@@ -58,12 +58,29 @@
 					  hideEffect="fade" responsive="true">
         		<p:outputLabel value="Did #{userGameController.currentRound.guessingUser.username} guess #{userGameController.currentRound.termToGuess.name} correct? (First click comes first)" 
 							   rendered="#{not empty userGameController.currentRound and !userGameController.inGuessingTeam}" style="font-weight:bold"/>
-				<p:outputLabel value="Please wait until your counterparties have valuated your round..." 
+				<p:outputLabel value="You gave your best shot, your fate is now in the hands of your rivals. Please wait until they have valuated your round..." 
 							   rendered="#{not empty userGameController.currentRound and userGameController.inGuessingTeam}" style="font-weight:bold"/>			   
 				<h:panelGrid columns="3" rendered="#{!userGameController.inGuessingTeam}">
-                     <p:commandButton value="Correct" action="#{userGameController.correctRound()}" />
-                     <p:commandButton value="Incorrect" action="#{userGameController.incorrectRound()}" />
-                     <p:commandButton value="Cheated" action="#{userGameController.cheatedRound()}"/>
+                     <p:commandButton value="Correct" action="#{userGameController.correctRound()}" update=":gameRoundForm"/>
+                     <p:commandButton value="Incorrect" action="#{userGameController.incorrectRound()}" update=":gameRoundForm"/>
+                     <p:commandButton value="Cheated" action="#{userGameController.cheatedRound()}" update=":gameRoundForm"/>
+                </h:panelGrid>
+        	</p:dialog>
+      </h:form>
+      
+      
+      <h:form id="roundTimesUpForm">
+      		<p:dialog id="roundTimesUpDialog" header="Time is up"
+        			  widgetVar="roundTimesUpDialog" dynamic="true" modal="true"
+					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  hideEffect="fade" responsive="true">
+        		<p:outputLabel value="Seems like #{userGameController.currentRound.guessingUser.username} did not guess #{userGameController.currentRound.termToGuess.name} within the time?" 
+							   rendered="#{not empty userGameController.currentRound and !userGameController.inGuessingTeam}" style="font-weight:bold"/>	
+				<p:outputLabel value="That took a bit long. Your rivals will decide whether you were quick enough...." 
+							   rendered="#{not empty userGameController.currentRound and userGameController.inGuessingTeam}" style="font-weight:bold"/>		   
+				<h:panelGrid columns="2" rendered="#{!userGameController.inGuessingTeam}">
+                     <p:commandButton value="Too slow" action="#{userGameController.endRoundThroughCountDown()}" update=":gameRoundForm"/>
+                     <p:commandButton value="Replay"/>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>
@@ -91,7 +108,12 @@
                         listener="#{userGameController.endRound()}"
                         oncomplete="PF('roundValidationDialog').show()"/>
                 <p:ajax event="validatedRound"
-                        onstart="PF('roundValidationDialog').hide()"/>                 
+                        onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "/>                 
+                <p:ajax event="endRoundViaCountDown"
+                        render=":gameRoundForm:roundInfo :roundTimesUpForm:roundTimesUpDialog"
+                        listener="#{userGameController.setInRound(false)}"
+                        oncomplete="PF('roundTimesUpDialog').show()" 
+                        />           
             </o:socket>
         
  

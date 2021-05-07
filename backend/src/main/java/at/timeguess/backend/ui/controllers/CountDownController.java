@@ -5,10 +5,13 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.User;
+import at.timeguess.backend.ui.beans.SessionInfoBean;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -30,6 +33,10 @@ public class CountDownController {
 	
     @CDIAutowired
 	private WebSocketManager webSocketManager;
+    @Autowired
+    private GameManagerController gameManagerController;
+    @Autowired
+    private SessionInfoBean sessionBean;
 	
 	/**
 	 * starts countDown with given time and for given user
@@ -83,6 +90,10 @@ public class CountDownController {
 		}
 		else {
 			endCountDown();
+			webSocketManager.getNewRoundChannel().send("endRoundViaCountDown", user.getId());
+			 // put the round inactive to enable starting a new round via flip
+			Game currentGame = gameManagerController.getCurrentGameForUser(sessionBean.getCurrentUser());
+			gameManagerController.setActiveRoundFalse(currentGame);
 		}
 		webSocketManager.getCountDownChannel().send("countDownUpdate", user.getId());  
 	}

@@ -8,6 +8,7 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
+
 import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
@@ -54,7 +55,7 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 	private GameLogicService gameLogic;
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
-    private Map<Game, Boolean> midRound = new ConcurrentHashMap<>();
+    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>();		// indicated if there is played a round currently in the game
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
     @PostConstruct
@@ -82,8 +83,8 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 
  		listOfGames.put(cube, testgame1);
  		listOfGames.put(cube2, testgame2); 
-        midRound.put(testgame1, true);
-        midRound.put(testgame2, true);
+        activeRound.put(testgame1, false);
+        activeRound.put(testgame2, false);
     }
     
     @PreDestroy
@@ -99,11 +100,11 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
     public synchronized void accept(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
         	Game game = listOfGames.get(configuredFacetsEvent.getCube());
-        	if(midRound.get(game)) {
-        		midRound.put(game, false);
+        	if(!activeRound.get(game)) {
+        		activeRound.put(game, true);
         		startNewRound(game, configuredFacetsEvent.getCubeFace()); 
         	} else {
-        		midRound.put(game, true);
+        		activeRound.put(game, false);
         		this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
         	}    	
         }
@@ -158,7 +159,13 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 		return userIds;
 	}
 	
-	
+	   
+    /**
+     * find the game in which a given user is currently playing, called by{@link CouuntDownController}
+     * 
+     * @param user to find current game
+     * @return current game
+     */
 	public Game getCurrentGameForUser(User user) {
 		for(Game g : this.listOfGames.values()) {
 			for(Team t : g.getTeams()) {
@@ -185,5 +192,11 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 		}
 		return null;
 	}
+	
+	
+	public void setActiveRoundFalse(Game game) {
+		this.activeRound.put(game,false);
+	}
+
 	
 }

@@ -43,14 +43,23 @@ public class UserGameController {
     
     public void endRound() {
     	this.countDownController.endCountDown();
-    	this.inRound = false;
+    	setInRound(false);
+    }
+    
+    public void endRoundThroughCountDown() {
+    	incorrectRound();
+    	setInRound(false);
     }
     
     public Round getCurrentRound() {
     	return this.currentRound;
     }
     
-    public boolean getInRound() {
+    public void setInRound(boolean inRound) {
+		this.inRound = inRound;
+	}
+
+	public boolean getInRound() {
     	return this.inRound;
     }
     
