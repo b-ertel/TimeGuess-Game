@@ -40,7 +40,7 @@ import java.util.function.Consumer;
 @Controller
 @Scope("application")
 @CDIContextRelated
-public class GameMangerController implements Consumer<ConfiguredFacetsEvent> {
+public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 
     @Autowired
     private GameService gameService;
