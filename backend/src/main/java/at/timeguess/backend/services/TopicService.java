@@ -33,7 +33,7 @@ public class TopicService {
      * Returns a list of all topics.
      * @return list of all topics
      */
-    @PreAuthorize("hasAuthority('PLAYER')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER') OR hasAuthority('PLAYER')")
     public List<Topic> getAllTopics() {
         return topicRepository.findAll();
     }
@@ -43,12 +43,12 @@ public class TopicService {
      * @param name the name of the topic to load
      * @return a single Topic
      */
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
     public Topic loadTopic(String name) {
         return topicRepository.findByName(name);
     }
 
-    @PreAuthorize("hasAuthority('MANAGER') ")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
     public Topic loadTopicId(Long topicId) {
         return topicRepository.findById(topicId).get();
     }
@@ -58,7 +58,7 @@ public class TopicService {
      * @param topic the topic to save
      * @return the new topic
      */
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
     public Topic saveTopic(Topic topic) {
         Topic ret = null;
         try {

@@ -139,7 +139,7 @@ public class UserService {
      * @param id the id to search for
      * @return the user with the given id
      */
-    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #username")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.id eq #id")
     public User loadUser(Long id) {
         return userRepository.findById(id).get();
     }
