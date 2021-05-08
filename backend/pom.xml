@@ -96,12 +96,14 @@
             <version>3.5</version>
             <scope>test</scope>
         </dependency>
+
         <!-- Font Awesome -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
             <version>5.15.2</version>
-        </dependency>        
+        </dependency>   
+		               
     </dependencies>
 
     <build>

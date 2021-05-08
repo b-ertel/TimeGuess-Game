@@ -2,8 +2,9 @@ package at.timeguess.backend.ui.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static at.timeguess.backend.utils.TestSetup.*;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -16,12 +17,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.UserService;
-import at.timeguess.backend.utils.TestUtils;
+import at.timeguess.backend.utils.TestSetup;
 
 /**
  * Tests for {@link UserProfileController}.
@@ -39,7 +39,6 @@ public class UserProfileControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 4, 5, 6, 89, 888 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testDoReloadUser(Long userId) {
         assertMockUser(userId);
 
@@ -51,13 +50,12 @@ public class UserProfileControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 4, 5, 6, 89, 888 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testGetTeammates(Long userId) {
-        Collection<User> users = TestUtils.createUsers(10);
+        List<User> users = createEntities(TestSetup::createUser, 10);
         User user = assertMockUser(userId);
         when(userService.getTeammates(user)).thenReturn(users);
 
-        Collection<User> result = userProfileController.getTeammates();
+        List<User> result = userProfileController.getTeammates();
 
         verify(userService).getTeammates(user);
         assertEquals(users, result);
@@ -65,7 +63,6 @@ public class UserProfileControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 4, 5, 6, 89, 888 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testGetTotalGames(Long userId) {
         int expected = 25;
         User user = assertMockUser(userId);
@@ -79,7 +76,6 @@ public class UserProfileControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 4, 5, 6, 89, 888 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testGetTotalGamesLost(Long userId) {
         int expected = 9;
         User user = assertMockUser(userId);
@@ -93,7 +89,6 @@ public class UserProfileControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 4, 5, 6, 89, 888 })
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testGetTotalGamesWon(Long userId) {
         int expected = 16;
         User user = assertMockUser(userId);
@@ -107,9 +102,8 @@ public class UserProfileControllerTest {
 
     @ParameterizedTest
     @MethodSource("provideWonByTopic")
-    @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testGetTotalGamesWonByTopic(String username, Map<String, Integer> totalsExpected) {
-        User user = assertMockUser(TestUtils.createUser(username));
+        User user = assertMockUser(createUser(username));
         when(userService.getTotalGamesWonByTopic(user)).thenReturn(totalsExpected);
 
         Map<String, Integer> result = userProfileController.getTotalGamesWonByTopic();
@@ -119,7 +113,7 @@ public class UserProfileControllerTest {
     }
 
     private User assertMockUser(Long userId) {
-        return assertMockUser(TestUtils.createUser(userId));
+        return assertMockUser(createUser(userId));
     }
 
     private User assertMockUser(User user) {
@@ -133,6 +127,6 @@ public class UserProfileControllerTest {
     }
 
     private static Stream<Arguments> provideWonByTopic() {
-        return TestUtils.USER_TOTALWINSBYTOPIC.stream();
+        return USER_TOTALWINSBYTOPIC.stream();
     }
 }

@@ -1,20 +1,20 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
 import java.util.Collections;
-import java.util.HashSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 import at.timeguess.backend.services.CubeService;
@@ -26,6 +26,8 @@ import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.CubeStatusInfo;
 import at.timeguess.backend.model.HealthStatus;
+import at.timeguess.backend.model.IntervalType;
+import at.timeguess.backend.model.ThresholdType;
 import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.model.api.StatusResponse;
 
@@ -35,20 +37,26 @@ import at.timeguess.backend.model.api.StatusResponse;
 @Controller
 @Scope("application")
 @CDIContextRelated
-public class StatusController {
+public class CubeStatusController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StatusController.class);
+    // the value of the calibration version characteristic after
+    // a reset of the TimeFlip device
+    private static final int CALIBRATION_VERSION_AFTER_RESET = 0;
+    // the value of the calibration version characteristic to be written
+    // to a TimeFlip device after it has successfully established
+    // a connection with the backend
+    private static final int CALIBRATION_VERSION_AFTER_CONNECTION = 1;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CubeStatusController.class);
+    private final DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
 	
     @Autowired
     private CubeService cubeService;
-    
     @CDIAutowired
     private WebSocketManager websocketManager;
-    
-    private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
 
+	private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
-    private int interval;   // in sec
     
     /**
      * creates a status for each Cube in the database
@@ -76,12 +84,12 @@ public class StatusController {
     	else {
     		LOGGER.info("cube is onboarding.....");
     		this.healthStatus.put(message.getIdentifier(), new HealthStatus(LocalDateTime.now(), message.getBatteryLevel(), message.getRssi(), message.getIdentifier()));
-    		setInterval(10);
+    		updateCube(message); 
     	}
-		updateCube(message);    	
-    	
+   	
         StatusResponse response = new StatusResponse();
-        response.setReportingInterval(this.interval);
+        response.setReportingInterval(cubeService.queryInterval(IntervalType.REPORTING_INTERVAL));
+        response.setCalibrationVersion(CALIBRATION_VERSION_AFTER_CONNECTION);
         return response;
     }
     
@@ -94,11 +102,17 @@ public class StatusController {
      */
     public Cube updateCube(StatusMessage message) {
     	
-		Cube updatedCube = new Cube();
+		Cube updatedCube = new Cube(); 
 		
 		if(cubeService.isMacAddressKnown(message.getIdentifier())) {						// Cube is already in database
 			updatedCube = cubeService.getByMacAddress(message.getIdentifier());
-			LOGGER.info("cube is known...");
+			LOGGER.info("cube is known..."); 
+
+			// delete any existing configurations if a reset of the TimeFlip device is detected
+			if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {
+			    LOGGER.info("calibration version is 0 --> cube lost configuration");
+				cubeService.deleteConfigurations(updatedCube);
+			}
 			
 			if(cubeService.isConfigured(updatedCube)){										// Cube is configured and ready
 				statusChange(updatedCube.getMacAddress(), CubeStatus.READY);
@@ -122,7 +136,7 @@ public class StatusController {
       
 	/**
      * is called in case cube changes its status, updates status in GUI
-     */
+     */  
     public void statusChange(String mac, CubeStatus cubeStatus) {
         this.cubeStatus.get(mac).setStatus(cubeStatus);
         updateSockets();
@@ -135,20 +149,6 @@ public class StatusController {
         return Collections.unmodifiableCollection(this.cubeStatus.values());
     }  
     
-    /**
-     * returns cubes with status {@link CubeStatus.READY} 
-     */
-    public Set<Cube> getReadyCubes() {
-    	
-    	Set<Cube> readyCubes = new HashSet<>();
-    	
-    	for(Map.Entry<String, CubeStatusInfo> s : this.cubeStatus.entrySet()) {
-    		if(s.getValue().getStatus().equals(CubeStatus.READY))
-    			readyCubes.add(s.getValue().getCube());
-    	}
-    	return readyCubes;
-    }
-
 	/**
 	 * @return health status of all online cubes i.e. with status 
 	 * {@link CubeStatus.READY, CubeStatus.LIVE or CubeStatus.IN_CONFIGURATION}
@@ -199,6 +199,21 @@ public class StatusController {
 	}
 	
 	/**
+	 * gets status of a given cube
+	 * 
+	 * @param macAddress of cube to get its status
+	 * @return CubeStatus
+	 */
+	public CubeStatus getStatus(String macAddress) {
+		if(this.cubeStatus.get(macAddress) != null)
+			return this.cubeStatus.get(macAddress).getStatus();
+		else {
+			return null;
+		}
+			
+	}
+	
+	/**
 	 * checks if a Cube is configured i.e. if there is any entry for it in the Configuration Table
 	 * 
 	 * @return true if it has a Configuration, false otherwise
@@ -206,26 +221,22 @@ public class StatusController {
 	public boolean isConfigured(Cube cube) {
 		return cubeService.isConfigured(cube);
 	}
-
-	/**
-	 * @return interval of reporting period of the cube
-	 */
-	public int getInterval() {
-		return interval;
-	}
-
-	/** sets reporting interval for the cube
-	 * @param intervall
-	 */
-	public void setInterval(int intervall) {
-		this.interval = intervall;
-	}
+    
+    /**
+     * checks if a Cube has status {@link CubeStatus.READY}
+     * 
+     * @param cube cube to get its ready status
+     * @return true if has status {@link CubeStatus.READY}, false otherwise
+     */
+    public boolean isReady(Cube cube) {
+        return this.cubeStatus.get(cube.getMacAddress()).getStatus() == CubeStatus.READY;
+    }
 
 	/** remove status of a deleted user, called by {@link CubeController} if a cube is deleted via UI
 	 * @param macAddress of the deleted cube
 	 */
 	public void deleteStatus(String macAddress) {
-		this.cubeStatus.remove(macAddress);
+		this.cubeStatus.remove(macAddress);  
 		updateSockets();
 	}
 	
@@ -242,14 +253,14 @@ public class StatusController {
 	}
 	
 	/**
-	 * check if a cube can be deleted - i.e. if its status is OFFLINE
+	 * check if a cube can be deleted - i.e. if its status is OFFLINE and it has no configuration
 	 * 
 	 * @param mac to check status
 	 * @return true if status is OFFLINE false otherwise
 	 */
-	public boolean checkDeletion(String mac) {
-		if(cubeStatus.get(mac) != null) {
-			if(cubeStatus.get(mac).getStatus().equals(CubeStatus.OFFLINE)) {
+	public boolean checkDeletion(Cube cube) {
+		if(cubeStatus.get(cube.getMacAddress()) != null) {
+			if(cubeStatus.get(cube.getMacAddress()).getStatus().equals(CubeStatus.OFFLINE) && !isConfigured(cube)) {
 				return true;
 			}
 		}
@@ -276,14 +287,41 @@ public class StatusController {
 	 * sends a "connectionCubeUpdate" to all socket listener
 	 */
 	public void updateSockets() {
-		this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
+		if(this.websocketManager != null) {
+			this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
+		}
 	}
 
 	/** updates cube in CubeStatusInfo
 	 * @param cube to update
 	 */
-	public void updateCube(Cube cube) {
+	public void updateCubeInStatus(Cube cube) {
 		this.cubeStatus.get(cube.getMacAddress()).setCube(cube);
 	}
 	
+	/**
+	 * scheduled task which checks in a fixed interval which cubes are online; 
+	 * if online cubes are not reporting in the given reporting interval (set by admin) 
+	 * their status is set to OFFLINE and their healthStatus is removed
+	 */
+	@Scheduled(fixedRate = 5000) 		// 5000 means every 5 seconds
+    public void updateHealthStatus() {
+                           		
+		for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) {   
+			if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
+				LOGGER.info("[{}] cube with mac {} lost connection", LocalDateTime.now().format(myFormat), m.getKey());
+				setOffline(m.getKey());
+				LOGGER.info("[{}] cube with mac {} changed to status OFFLINE", LocalDateTime.now().format(myFormat), m.getKey());
+			}              
+			else {                 
+				if(m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {
+					LOGGER.info("[{}] cube with mac {} has low battery (level at {})", LocalDateTime.now().format(myFormat), m.getKey(), m.getValue().getBatteryLevel());                
+				}
+				if(m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {
+					LOGGER.info("[{}] cube with mac {} reported rssi level at {}", LocalDateTime.now().format(myFormat),  m.getKey(), m.getValue().getRssi());                
+				}
+			}
+		}
+	}
+
 }
