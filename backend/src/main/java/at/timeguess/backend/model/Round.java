@@ -1,5 +1,6 @@
 package at.timeguess.backend.model;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -15,140 +16,139 @@ import javax.persistence.Transient;
 import org.springframework.data.domain.Persistable;
 
 @Entity
-@SequenceGenerator(name="seq", initialValue=30, allocationSize=100)
-public class Round implements Persistable<Long> {
+@SequenceGenerator(name = "seq", initialValue = 30, allocationSize = 100)
+public class Round implements Serializable, Persistable<Long> {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
-	private Long id;
-	
-	@Transient
-	private int nr;
-	
-	@Transient
-	private Activity activity;
-	
-	@ManyToOne
-	@JoinColumn(name="guessing_User", nullable=false)
-	private User guessingUser;
-	
-	@ManyToOne
-	@JoinColumn(name="guessing_Team", nullable=false)
-	private Team guessingTeam;
-	
-	@Transient
-	private Set<Team> verifyingTeams;
+    private static final long serialVersionUID = 1L;
 
-	@Column(nullable = false)
-	private boolean correctAnswer = false;
-	
-	private int points = 0;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
+    private Long id;
 
-	@ManyToOne
-	@JoinColumn(name="termId", nullable=false)
-	private Term termToGuess;
+    @Transient
+    private int nr;
 
-	@ManyToOne
-	@JoinColumn(name="gameId", nullable=false)
-	private Game game;
-	
-	@Transient
-	private int time;
-	
-	public int getTime() {
-		return time;
-	}
+    @Transient
+    private Activity activity;
 
-	public void setTime(int time) {
-		this.time = time;
-	}
+    @ManyToOne
+    @JoinColumn(name = "guessing_User", nullable = false)
+    private User guessingUser;
 
-	public int getPoints() {
-		return this.points;
-	}
-	
-	public void setPoints(int points) {
-		this.points = points;
-	}
-	
-	public int getNr() {
-		return nr;
-	}
+    @ManyToOne
+    @JoinColumn(name = "guessing_Team", nullable = false)
+    private Team guessingTeam;
 
-	public void setNr(int nr) {
-		this.nr = nr;
-	}
+    @Transient
+    private Set<Team> verifyingTeams;
 
-	public User getGuessingUser() {
-		return guessingUser;
-	}
+    @Column(nullable = false)
+    private boolean correctAnswer = false;
 
-	public void setGuessingUser(User guessingUser) {
-		this.guessingUser = guessingUser;
-	}
+    private int points = 0;
 
-	public Team getGuessingTeam() {
-		return guessingTeam;
-	}
+    @ManyToOne
+    @JoinColumn(name = "termId", nullable = false)
+    private Term termToGuess;
 
-	public void setGuessingTeam(Team guessingTeam) {
-		this.guessingTeam = guessingTeam;
-	}
+    @ManyToOne
+    @JoinColumn(name = "gameId", nullable = false)
+    private Game game;
 
-	public boolean isCorrectAnswer() {
-		return correctAnswer;
-	}
+    @Transient
+    private int time;
 
-	public void setCorrectAnswer(boolean correctAnswer) {
-		this.correctAnswer = correctAnswer;
-	}
-	
-	public Term getTermToGuess() {
-		return termToGuess;
-	}
+    @Override
+    public Long getId() {
+        return this.id;
+    }
 
-	public void setTermToGuess(Term termToGuess) {
-		this.termToGuess = termToGuess;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public int getTime() {
+        return time;
+    }
 
-	public Set<Team> getVerifyingTeams() {
-		return verifyingTeams;
-	}
+    public void setTime(int time) {
+        this.time = time;
+    }
 
-	public void setVerifyingTeams(Set<Team> verifyingTeams) {
-		this.verifyingTeams = verifyingTeams;
-	}
+    public int getPoints() {
+        return this.points;
+    }
 
-	public Game getGame() {
-		return game;
-	}
+    public void setPoints(int points) {
+        this.points = points;
+    }
 
-	public void setGame(Game game) {
-		this.game = game;
-	}
-	
-	public Activity getActivity() {
-		return activity;
-	}
+    public int getNr() {
+        return nr;
+    }
 
-	public void setActivity(Activity activity) {
-		this.activity = activity;
-	}
+    public void setNr(int nr) {
+        this.nr = nr;
+    }
 
-	@Override
-	public Long getId() {
-		// TODO Auto-generated method stub
-		return this.id;
-	}
+    public User getGuessingUser() {
+        return guessingUser;
+    }
 
-	@Override
-	public boolean isNew() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    public void setGuessingUser(User guessingUser) {
+        this.guessingUser = guessingUser;
+    }
 
+    public Team getGuessingTeam() {
+        return guessingTeam;
+    }
+
+    public void setGuessingTeam(Team guessingTeam) {
+        this.guessingTeam = guessingTeam;
+    }
+
+    public boolean isCorrectAnswer() {
+        return correctAnswer;
+    }
+
+    public void setCorrectAnswer(boolean correctAnswer) {
+        this.correctAnswer = correctAnswer;
+    }
+
+    public Term getTermToGuess() {
+        return termToGuess;
+    }
+
+    public void setTermToGuess(Term termToGuess) {
+        this.termToGuess = termToGuess;
+    }
+
+    public Set<Team> getVerifyingTeams() {
+        return verifyingTeams;
+    }
+
+    public void setVerifyingTeams(Set<Team> verifyingTeams) {
+        this.verifyingTeams = verifyingTeams;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
+    @Override
+    public boolean isNew() {
+        return this.id == null || this.id == 0L;
+    }
 }

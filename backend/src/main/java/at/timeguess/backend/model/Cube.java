@@ -1,5 +1,6 @@
 package at.timeguess.backend.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +14,9 @@ import javax.persistence.OneToMany;
 import org.springframework.data.domain.Persistable;
 
 @Entity
-public class Cube implements Comparable<Cube>, Persistable<Long> {
+public class Cube implements Serializable, Comparable<Cube>, Persistable<Long> {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

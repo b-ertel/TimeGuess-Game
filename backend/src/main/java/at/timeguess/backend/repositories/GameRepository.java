@@ -1,9 +1,7 @@
 package at.timeguess.backend.repositories;
 
 import java.util.List;
-import java.util.Optional;
 
-import at.timeguess.backend.model.Term;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,7 +12,7 @@ import at.timeguess.backend.model.utils.GroupingHelper;
 
 public interface GameRepository extends AbstractRepository<Game, Long> {
 
-        /**
+    /**
      * to find open games (GameState.VALID_SETUP), active (GameState.PLAYED), finished (GameState.FINISHED)
      * @param status
      * @return
@@ -47,20 +45,21 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     List<Game> findByUserAll(User user);
 
     /**
-     * Returns a list of all games the given user is associated to, which are currently in setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
+     * Returns a list of all games the given user is associated to, which are currently in
+     * setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
      * @return
      */
     @Query("SELECT g FROM Game g JOIN g.teams t JOIN t.team.teamMembers u WHERE u = ?1 AND g.status IN (0, 1)")
     List<Game> findByUserCurrent(User user);
 
     /**
-     * Checks is confirmation is needed from given user for given game.
+     * Checks if given user is participating in given game.
      * @param user
      * @param game
      * @return
      */
-    @Query("SELECT CASE WHEN COUNT(g) > 0 THEN true ELSE false END FROM Game g JOIN g.teams t JOIN t.team.teamMembers u WHERE u = ?1 AND g = ?2 AND g.status IN (0, 1) AND ?1 NOT MEMBER OF g.confirmedUsers")
-    boolean getIsNeededConfirmation(User user, Game game);
+    @Query("SELECT CASE WHEN COUNT(g) > 0 THEN true ELSE false END FROM Game g JOIN g.teams t JOIN t.team.teamMembers u WHERE u = ?1 AND g = ?2")
+    boolean getIsPlayerInGame(User user, Game game);
 
     /**
      * Returns a map of game ids with maximum points reached.

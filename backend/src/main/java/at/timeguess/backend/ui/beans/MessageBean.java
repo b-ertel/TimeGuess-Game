@@ -4,6 +4,8 @@ import javax.annotation.ManagedBean;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
+
+import java.io.IOException;
 import java.io.Serializable;
 
 /**
@@ -16,33 +18,53 @@ public class MessageBean implements Serializable {
 
     /**
      * Show information message
-     * @param header Header to be displayed.
-     * @param text   Text to be displayed.
+     * @param header header to be displayed
+     * @param text   text to be displayed
      */
     public void alertInformation(String header, String text) {
         alert(FacesMessage.SEVERITY_INFO, header, text);
     }
 
     /**
-     * Show warning message
-     * @param header Header to be displayed.
-     * @param text   Text to be displayed.
+     * Shows warning message.
+     * @param header header to be displayed
+     * @param text   text to be displayed
      */
     public void alertWarning(String header, String text) {
         alert(FacesMessage.SEVERITY_WARN, header, text);
     }
 
     /**
-     * Show error message
-     * @param header Header to be displayed.
-     * @param text   Text to be displayed.
+     * Shows error message.
+     * @param header header to be displayed
+     * @param text   text to be displayed
      */
     public void alertError(String header, String text) {
         alertError(header, text, false);
     }
 
+    /**
+     * Shows error message and marks context with validation error.
+     * @param header header to be displayed
+     * @param text   text to be displayed
+     */
     public void alertErrorFailValidation(String header, String text) {
         alertError(header, text, true);
+    }
+
+    /**
+     * Redirects user to given page.
+     * @param toPage
+     */
+    public void redirect(String toPage) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (context != null) try {
+            context.getExternalContext().redirect(toPage);
+        }
+        catch (IOException e) {
+            alertError(toPage, "Redirection failed");
+            e.printStackTrace();
+        }
     }
 
     private void alertError(String header, String text, boolean failValidation) {

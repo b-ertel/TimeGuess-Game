@@ -27,15 +27,10 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-
+import java.util.stream.Collectors;
 
 /**
- * This controller is responsible for showing a term in the game window with websockets
- *
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
+ * This controller is responsible for showing a term in the game window with websockets.
  */
 
 @Controller
@@ -46,7 +41,7 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
     @Autowired
     private GameService gameService;
     @Autowired
-	private CubeService cubeService;
+    private CubeService cubeService;
     @CDIAutowired
     private WebSocketManager websocketManager;
     @Autowired
@@ -125,8 +120,7 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
     }
     
     /**
-     * method to get the current round for a given user, called by {@link GameRoundController}
-     * 
+     * method to get the current round for a given user, called by {@link UserGameController}
      * @param user to find current round
      * @return current round
      */
@@ -176,6 +170,25 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 		}
 		return null;
 	}
+	
+	/**
+     * Method to add a newly created game to the saved list of currently available games
+     * and send notifications to all participating team members, except the game creator.
+     * @param game
+     */
+    public void addGame(Game game) {
+        if (game == null) throw new NullPointerException("startGame was called with null game");
+
+        // add game to map
+        listOfGames.put(game.getCube(), game);
+
+        // send invitation to all contained team members except host
+        final User host = game.getCreator();
+        Set<Long> invited = game.getTeams().stream()
+                .flatMap(t -> t.getTeamMembers().stream().filter(u -> u != host).map(User::getId)).collect(Collectors.toSet());
+        websocketManager.getMessageChannel().send(Map.of("type", "gameInvitation", "name", game.getName(), "id", game.getId()), invited);
+    }
+
 	
 	public void validateRoundOfGame(Game game, Validation v) {
 		gameLogic.saveLastRound(game, v);
