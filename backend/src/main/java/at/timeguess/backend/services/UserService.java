@@ -1,5 +1,6 @@
 package at.timeguess.backend.services;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -139,9 +140,9 @@ public class UserService {
      * @param id the id to search for
      * @return the user with the given id
      */
-    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.id eq #id")
-    public User loadUser(Long id) {
-        return userRepository.findById(id).get();
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #user.username")
+    public User loadUser(User user) {
+        return userRepository.findById(user.getId()).get();
     }
 
     /**

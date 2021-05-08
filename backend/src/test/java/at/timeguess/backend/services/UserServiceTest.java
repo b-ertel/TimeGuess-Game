@@ -237,7 +237,7 @@ public class UserServiceTest {
     @CsvSource(delimiter = '|', value = { "1|admin", "2|user1", "3|user2", "4|elvis" })
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testLoadUserByIdAuthorized(Long userId, String usernameExpected) {
-        User user = userService.loadUser(userId);
+        User user = userService.loadUser(createUser(userId));
         assertEquals(usernameExpected, user.getUsername());
     }
 

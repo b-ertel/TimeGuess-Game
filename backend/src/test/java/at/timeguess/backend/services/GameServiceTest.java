@@ -276,12 +276,12 @@ public class GameServiceTest {
         Game game6 = assertLoadGame(6L, true, "Game '%s' could not be loaded from test data source");
 
         // game in SETUP state, invited user
-        User user3 = userService.loadUser(3L);
+        User user3 = userService.loadUser(createUser(3L));
         assertDoesNotThrow(() -> gameService.confirm(user3, game6));
         assertTrue(game6.getConfirmedUsers().contains(user3), "User with id=3 is expected to be in game with id=6, but isn't");
 
         // game in SETUP state, not invited user
-        User user1 = userService.loadUser(1L);
+        User user1 = userService.loadUser(createUser(1L));
         assertDoesNotThrow(() -> gameService.confirm(user1, game6));
         assertFalse(game6.getConfirmedUsers().contains(user1), "User with id=1 is not expected to be in game with id=6, but is");
         
