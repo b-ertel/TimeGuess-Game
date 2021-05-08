@@ -15,6 +15,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -36,6 +38,19 @@ public class MessageBeanTest {
     @InjectMocks
     private MessageBean messageBean;
 
+    private static FacesContext facesContext;
+    
+    @BeforeAll
+    public static void setup() {
+        facesContext = ContextMocker.mockFacesContext();
+    }
+    
+    @AfterAll
+    public static void release() {
+        facesContext.release();
+        facesContext = null;
+    }
+    
     @Test
     public void testAlertInformation() {
         assertAlert((h, t) -> messageBean.alertInformation(h, t), SEVERITY_INFO, false);
@@ -76,34 +91,33 @@ public class MessageBeanTest {
     private void assertRedirect(boolean success) {
         assertDoesNotThrow(() -> {
             String expected = "somewhere";
-            FacesContext context = ContextMocker.mockFacesContext();
             ExternalContext external = mock(ExternalContext.class);
-            when(context.getExternalContext()).thenReturn(external);
+            when(facesContext.getExternalContext()).thenReturn(external);
 
             if (success) doNothing().when(external).redirect(expected);
             else doThrow(IOException.class).when(external).redirect(expected);
 
             messageBean.redirect(expected);
 
-            verify(context).getExternalContext();
+            verify(facesContext).getExternalContext();
             verify(external).redirect(expected);
         });
     }
 
     private void assertAlert(BiConsumer<String, String> alert, FacesMessage.Severity expected, boolean assertValidationFailed) {
         String header = "header", text = "text";
-        FacesContext context = ContextMocker.mockFacesContext();
+        reset(facesContext);
         ArgumentCaptor<FacesMessage> arg = ArgumentCaptor.forClass(FacesMessage.class);
 
         alert.accept(header, text);
 
-        verify(context).addMessage(nullable(String.class), arg.capture());
+        verify(facesContext).addMessage(nullable(String.class), arg.capture());
         FacesMessage result = arg.getValue();
         assertEquals(expected, result.getSeverity());
         assertEquals(header, result.getSummary());
         assertEquals(text, result.getDetail());
 
-        if (assertValidationFailed) verify(context).validationFailed();
-        else verifyNoMoreInteractions(context);
+        if (assertValidationFailed) verify(facesContext).validationFailed();
+        else verifyNoMoreInteractions(facesContext);
     }
 }
