@@ -1,6 +1,5 @@
 package at.timeguess.backend.services;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -195,7 +194,7 @@ public class UserService {
             String msg = "Saving user failed";
             if (e.getMessage().contains("USER(USERNAME)"))
                 msg += String.format(": user named '%s' already exists", user.getUsername());
-            messageBean.alertError(user.getUsername(), msg);
+            messageBean.alertErrorFailValidation(user.getUsername(), msg);
 
             LOGGER.info("Saving user '{}' (id={}) failed, stack trace:", user.getUsername(), user.getId());
             e.printStackTrace();
@@ -220,7 +219,7 @@ public class UserService {
                     auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
-            messageBean.alertError(user.getUsername(), "Deleting user failed");
+            messageBean.alertErrorFailValidation(user.getUsername(), "Deleting user failed");
             LOGGER.info("Deleting user '{}' (id={}) failed, stack trace:", user.getUsername(), user.getId());
             e.printStackTrace();
         }

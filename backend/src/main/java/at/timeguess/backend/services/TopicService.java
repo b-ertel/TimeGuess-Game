@@ -75,7 +75,7 @@ public class TopicService {
             String msg = "Saving topic failed";
             if (e.getMessage().contains("TOPIC(NAME)"))
                 msg += String.format(": topic named '%s' already exists", topic.getName());
-            messageBean.alertError(topic.getName(), msg);
+            messageBean.alertErrorFailValidation(topic.getName(), msg);
 
             LOGGER.info("Saving topic '{}' (id={}) failed, stack trace:", topic.getName(), topic.getId());
             e.printStackTrace();

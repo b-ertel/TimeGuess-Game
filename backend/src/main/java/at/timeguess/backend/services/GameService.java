@@ -104,7 +104,7 @@ public class GameService {
             String msg = "Saving game failed";
             if (e.getMessage().contains("GAME(NAME)"))
                 msg += String.format(": game named '%s' already exists", game.getName());
-            messageBean.alertError(game.getName(), msg);
+            messageBean.alertErrorFailValidation(game.getName(), msg);
 
             LOGGER.info("Saving game '{}' (id={}) failed, stack trace:", game.getName(), game.getId());
             e.printStackTrace();
@@ -130,7 +130,7 @@ public class GameService {
         }
         catch (Exception e) {
             String name = game == null ? "Unknown" : game.getName();
-            messageBean.alertError(name, "Deleting game failed");
+            messageBean.alertErrorFailValidation(name, "Deleting game failed");
             LOGGER.info("Deleting game '{}' (id={}) failed, stack trace:", name, game == null ? "null" : game.getId());
             e.printStackTrace();
         }
