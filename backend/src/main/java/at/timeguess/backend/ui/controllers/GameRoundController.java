@@ -18,7 +18,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @Scope("session")
-public class UserGameController {
+public class GameRoundController {
 	
     @Autowired
     private SessionInfoBean sessionInfoBean;
