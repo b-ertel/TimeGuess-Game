@@ -4,6 +4,7 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Validation;
+import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.RoundService;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
 
@@ -32,6 +33,8 @@ public class GameLeaderBoardController {
     private GameManagerController webSocketGameController;
     @Autowired
     private RoundService roundService;
+    @Autowired
+    private GameLogicService gameLogic;
     
     private List<Team> teamsInGame;
     
@@ -55,5 +58,17 @@ public class GameLeaderBoardController {
 	
     public Integer calculatePointsOfTeam(Team team) {
     	return roundService.getPointsOfTeamInGame(currentGame, team);
+    }
+
+	public Game getCurrentGame() {
+		return currentGame;
+	}
+
+	public void setCurrentGame(Game currentGame) {
+		this.currentGame = currentGame;
+	}
+    
+    public Team computeWinningTeam() {
+    	return gameLogic.getTeamWithMostPoints(currentGame);
     }
 }

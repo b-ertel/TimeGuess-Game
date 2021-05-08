@@ -88,7 +88,7 @@
       		<p:dialog id="roundTimesUpDialog" header="Time is up"
         			  widgetVar="roundTimesUpDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="true" showEffect="fade"
-					  hideEffect="fade" responsive="true">
+					  hideEffect="fade" responsive="true" closeable="false">
         		<p:outputLabel value="Seems like #{gameRoundController.currentRound.guessingUser.username} did not guess #{gameRoundController.currentRound.termToGuess.name} within the time?" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>	
 				<p:outputLabel value="That took a bit long. Your rivals will decide whether you were quick enough...." 
@@ -100,9 +100,32 @@
         	</p:dialog>
       </h:form>
             
+        <h:form id="gameOverform">
+      		<p:dialog id="gameOverDialog" header="Game Over"
+        			  widgetVar="gameOverDialog" dynamic="true" modal="true"
+					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  hideEffect="fade" responsive="true" closeable="false">
+        		<p:outputLabel value="Congratulations to #{gameRoundController.currentRound.guessingTeam.name} on winning #{gameLeaderBoardController.currentGame.name}" 
+							   style="font-weight:bold"/>			   
+				<h:panelGrid columns="1">
+                     <p:commandButton value="Quit"/>
+                </h:panelGrid>
+        	</p:dialog>
+      </h:form>     
             
-            
-            
+       <h:form id="termOverform">
+      		<p:dialog id="termOverDialog" header="Terms Over"
+        			  widgetVar="termOverDialog" dynamic="true" modal="true"
+					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  hideEffect="fade" responsive="true" closeable="false">
+        		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameLeaderBoardController.computeWinningTeam().name} on winning #{gameLeaderBoardController.currentGame.name}" 
+							   style="font-weight:bold"/>			   
+				<h:panelGrid columns="1">
+                     <p:commandButton value="Quit"/>
+                </h:panelGrid>
+        	</p:dialog>
+      </h:form>     
+                 
             
             <o:socket channel="countDownChannel" scope="session"
          	    user="#{sessionInfoBean.currentUser.id}"
@@ -129,7 +152,15 @@
                         render=":gameRoundForm:roundInfo :roundTimesUpForm:roundTimesUpDialog"
                         listener="#{gameRoundController.setInRound(false)}"
                         oncomplete="PF('roundTimesUpDialog').show()" 
-                        />           
+                        />   
+                <p:ajax event="gameOver"
+                        render=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog"
+                        oncomplete="PF('gameOverDialog').show()" 
+                        />  
+               	<p:ajax event="termsOver"
+                        render=":gameRoundForm:roundInfo :termOverForm:termOverDialog"
+                        oncomplete="PF('termOverDialog').show()" 
+                        />      
             </o:socket>
         
  
