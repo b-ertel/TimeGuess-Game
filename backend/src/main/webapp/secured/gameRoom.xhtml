@@ -35,7 +35,10 @@
    <h:form id="gameRoundForm" style="width:700px; text-align:center; align:right; margin: 0 auto;">
             <div class="gameRoomContent">      
                 <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
-				
+				<p:outputLabel value="Flip your cube to start the first round! May the best team win!" 
+							   rendered="#{empty gameRoundController.currentRound}" style="font-weight:bold"/>
+				<p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round" 
+							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound}" style="font-weight:bold"/>
 				<p:outputPanel header="RoundInfo" rendered="#{gameRoundController.inRound}">
 						<h3>Time to Guess</h3>
 		            	<h1 class="p-text-center" style="border-bottom: double">
