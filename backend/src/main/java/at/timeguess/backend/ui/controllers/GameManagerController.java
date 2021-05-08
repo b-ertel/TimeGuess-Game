@@ -125,7 +125,7 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
     }
     
     /**
-     * method to get the current round for a given user, called by {@link UserGameController}
+     * method to get the current round for a given user, called by {@link GameRoundController}
      * 
      * @param user to find current round
      * @return current round
