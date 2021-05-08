@@ -17,7 +17,7 @@ import at.timeguess.backend.services.GameService;
  * Controller for the game list view.
  */
 @Component
-@Scope(WebApplicationContext.SCOPE_SESSION)
+@Scope(WebApplicationContext.SCOPE_REQUEST)
 public class GameListController implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -56,9 +56,7 @@ public class GameListController implements Serializable {
      * Returns a list of all current games for the given user.
      */
     public List<Game> getGamesCurrent(User user) {
-        // TODO: use this for production (IMPORTANT!):
-        //return gameService.getByUser(user, true);
-        return gameService.getAllGames();
+        return gameService.getByUser(user, true);
     }
 
     /**
