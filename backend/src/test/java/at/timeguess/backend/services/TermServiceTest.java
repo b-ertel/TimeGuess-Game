@@ -26,7 +26,6 @@ import at.timeguess.backend.model.Term;
 
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.exceptions.TermAlreadyExistsException;
-import org.hibernate.mapping.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
@@ -38,6 +37,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Term;
+import at.timeguess.backend.services;
 import at.timeguess.backend.utils.TestSetup;
 
 /**
@@ -46,8 +46,9 @@ import at.timeguess.backend.utils.TestSetup;
 @SpringBootTest
 @WebAppConfiguration
 public class TermServiceTest {
+
     @Autowired
-    TermService termService;
+    private TermService termService;
 
     @Autowired
     TopicService topicService;
@@ -130,11 +131,6 @@ public class TermServiceTest {
     }
 
 
-
-
-
-    @Autowired
-    private TermService termService;
 
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = { "1|AFRICA", "2|MOUNTAIN", "3|LAKE", "4|RIVER", "5|MEXICO",
