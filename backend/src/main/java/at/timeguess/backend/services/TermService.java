@@ -37,7 +37,7 @@ public class TermService {
      * Returns a list of all terms.
      * @return list of all terms
      */
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER')")
     public List<Term> getAllTerms() {
         return termRepository.findAll();
     }
@@ -47,7 +47,6 @@ public class TermService {
      * @param topic the topic whose terms are returned
      * @return list of terms
      */
-    @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER')")
     public List<Term> getAllTermsOfTopic(Topic topic) {
         return termRepository.findByTopic(topic);
     }

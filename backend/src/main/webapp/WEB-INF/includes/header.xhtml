@@ -32,13 +32,14 @@
                         <p:menuitem icon="fa fa-cubes" value="&nbsp;Timeflip Cubes&nbsp;" url="/admin/cubeManagement.xhtml" rendered="#{isAdmin}"/>
                     </p:submenu>
                     
+                   	<p:menuitem icon="fa fa-cubes" value="&nbsp;Game Room&nbsp;" url="/secured/gameRoom.xhtml" rendered="#{isLoggedIn}"/>
+                    
                     <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login&nbsp;" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
                     <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout&nbsp;" url="/logout" rendered="#{isLoggedIn}"/>
 
                     <p:submenu label="Development" rendered="#{isLoggedIn}">
                         <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
                         <p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>
-                        <p:menuitem value="Create New Round Demo" url="/secured/rounddemo.xhtml"/>
                         <p:menuitem value="Websockets-term" url="/secured/demos/webSocketRoom.xhtml"/>
                         <p:menuitem value="H2 Console" url="/h2-console/"/>
                     </p:submenu>

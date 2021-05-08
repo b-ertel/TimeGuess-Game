@@ -1,9 +1,12 @@
 package at.timeguess.backend.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
@@ -13,11 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.User;
+import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
 
 @Component
@@ -59,17 +64,12 @@ public class GameLogicService {
      * @return term to guess
      * @throws AllTermsUsedInGameException, if every term has been played
      */
-    public Term nextTerm(Game game) throws AllTermsUsedInGameException {
-        if (stillTermsAvailable(game)) {
-            List<Term> terms = termService.getAllTermsOfTopic(game.getTopic());
-            Set<Term> usedTerms = usedTerms(game);
-            usedTerms.stream().forEach(term -> terms.remove(term));
-            Random rand = new Random();
-            return terms.get(rand.nextInt(terms.size()));
-        }
-        else {
-            throw new AllTermsUsedInGameException();
-        }
+    public Term nextTerm(Game game) {
+        List<Term> terms = termService.getAllTermsOfTopic(game.getTopic());
+        Set<Term> usedTerms = usedTerms(game);
+        usedTerms.stream().forEach(term -> terms.remove(term));
+        Random rand = new Random();
+        return terms.get(Math.abs(rand.nextInt(terms.size())));
     }
 
     public Team getNextTeam(Game game) {
@@ -91,7 +91,7 @@ public class GameLogicService {
         }
         else {
             Random rand = new Random();
-            return teams.get(rand.nextInt(teams.size()));
+            return teams.get(Math.abs(rand.nextInt(teams.size())));
         }
     }
 
@@ -122,23 +122,27 @@ public class GameLogicService {
         }
     }
 
-    public Game startNewRound(Game game) throws AllTermsUsedInGameException {
-        Round nextRound = new Round();
-        nextRound.setNr(game.getRounds().size() + 1);
-        Team nextTeam = getNextTeam(game);
-        nextRound.setGuessingUser(nextUser(game, nextTeam));
-        nextRound.setGuessingTeam(nextTeam);
-        nextRound.setTermToGuess(nextTerm(game));
-        nextRound.setGame(game);
-        game.getRounds().add(nextRound);
-        game.setRoundNr(game.getRounds().size());
-
-        LOGGER.info("New Round nr '{}', with team '{}' and user '{}' was created", nextRound.getNr(),
-                nextRound.getGuessingTeam().getName(), nextRound.getGuessingUser().getUsername());
-        return game;
-    }
-
-    public void saveLastRound(Game game) {
+    public Round startNewRound(Game game, CubeFace cubeFace) {
+		Round nextRound = new Round();
+		nextRound.setNr(game.getRounds().size()+1);
+		nextRound.setActivity(cubeFace.getActivity());
+		Team nextTeam = getNextTeam(game);
+		nextRound.setGuessingUser(nextUser(game, nextTeam));
+		nextRound.setGuessingTeam(nextTeam);
+		Set<Team> verifiyingTeams = game.getTeams();
+		verifiyingTeams.remove(nextTeam);
+		nextRound.setVerifyingTeams(verifiyingTeams);
+		nextRound.setPoints(cubeFace.getPoints());
+		nextRound.setTermToGuess(nextTerm(game));
+		nextRound.setGame(game);
+		nextRound.setTime(cubeFace.getTime());
+		game.getRounds().add(nextRound);
+		game.setRoundNr(game.getRoundNr()+1);
+		LOGGER.info("New Round nr '{}', with team '{}' and user '{}' was created", nextRound.getNr(), nextRound.getGuessingTeam().getName(), nextRound.getGuessingUser().getUsername());
+		return nextRound;
+	}
+    
+    public void saveLastRound(Game game, Validation v) {
         Set<Round> rounds = game.getRounds();
         Round lastRound = null;
         Iterator<Round> ite = rounds.iterator();
@@ -151,9 +155,18 @@ public class GameLogicService {
             }
         }
         if (lastRound != null) {
+        	game.getRounds().remove(lastRound);
+        	if(v == Validation.CORRECT) {
+        		lastRound.setCorrectAnswer(true);
+        	} else if (v == Validation.INCORRECT) {
+        		lastRound.setPoints(0);
+        	} else if (v == Validation.CHEATED) {
+        		lastRound.setPoints(-1);
+        	}
+        	game.getRounds().add(lastRound);
             roundService.saveRound(lastRound);
-            LOGGER.info("Round nr '{}', with team '{}' was saved, gamerounds '{}'", lastRound.getNr(),
-                    lastRound.getGuessingTeam().getName(), game.getRounds().size());
+            LOGGER.info("Round nr '{}', with team '{}' was saved, gamerounds '{}', points '{}'", lastRound.getNr(),
+                    lastRound.getGuessingTeam().getName(), game.getRounds().size(), lastRound.getPoints());
         }
     }
 }

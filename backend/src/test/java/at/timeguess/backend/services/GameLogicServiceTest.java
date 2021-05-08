@@ -80,21 +80,4 @@ public class GameLogicServiceTest {
             Assertions.assertTrue(gameLogicService.usedTerms(game).contains(termUsed));
         }
     }
-
-    @DirtiesContext
-    @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    public void testNextTerm() throws AllTermsUsedInGameException {
-        Game game = gameService.loadGame((long) 1);
-        Term termNotUsed = termRepo.findById((long) 5).get();
-        Assertions.assertEquals(termNotUsed.getName(), gameLogicService.nextTerm(game).getName());
-
-        game = gameLogicService.startNewRound(game);
-        try {
-            gameLogicService.nextTerm(game);
-        }
-        catch (AllTermsUsedInGameException e) {
-            Assertions.assertEquals("All terms have been used in previous rounds", e.getMessage());
-        }
-    }
 }
