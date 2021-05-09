@@ -44,7 +44,9 @@ public class GameLeaderBoardController {
     
     @PostConstruct
     private void setup() {
-    	this.currentGame = this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
+    	if(this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser())!=null) {
+    		this.currentGame = this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
+    	}
     	this.teamsInGame = List.copyOf(currentGame.getTeams());
     }
 
