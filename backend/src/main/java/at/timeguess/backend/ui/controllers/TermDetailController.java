@@ -69,6 +69,10 @@ public class TermDetailController implements Serializable {
             messageBean.alertErrorFailValidation("Saving term failed", "Input fields are invalid");
     }
 
+    public void doSaveTerm(Term selectedTerm) {
+        this.termService.saveTerm(selectedTerm);
+    }
+
     /**
      * Action to delete the currently displayed term.
      */

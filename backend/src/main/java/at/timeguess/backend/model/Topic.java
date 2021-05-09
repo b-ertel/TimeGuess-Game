@@ -60,12 +60,8 @@ public class Topic implements Comparable<Topic>, Persistable<Long>, Serializable
         return enabled;
     }
 
-    public void enable() {
-        this.enabled = true;
-    }
-
-    public void disable() {
-        this.enabled = false;
+    public void setEnabled(boolean enable) {
+        this.enabled = enable;
     }
 
     public Set<Term> getTerms() {

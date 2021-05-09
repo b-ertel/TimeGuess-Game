@@ -17,20 +17,25 @@
     <ui:define name ="content">
         <h:form id="topicsForm">
             <ui:remove>show all terms</ui:remove>
-            <p:dataTable id="topicTable" widgetVar="topicTable" var="term" value="#{topicListController.topics}" filteredValue="#{topicListController.filterTopics}"
-                rowKey="#{topic.id}" selection="#{topicListController.selectedTopic}" selectionMode="single">
+            <p:dataTable id="topicTable" widgetVar="topicTable" var="topic" value="#{topicListController.topics}" >
                 <p:columnGroup type="header">
                     <p:row>
-                        <p:column headerText="Topic" sortBy="#{term.topic}" filterBy="#{term.topic.name}" filterMatchMode="contains" />
+                        <p:column headerText="Topic"/>
+                        <p:column headerText="Number of Terms" style="width:20%" />
                         <p:column headerText="Enable Topic" style="width:10%"/>
                     </p:row>
                 </p:columnGroup>
 
-                <p:column>
+                <p:column style="text-align:center">
                     <h:outputText value="#{topic.name}"/>
                 </p:column>
                 <p:column style="text-align:center">
-                    <h:selectBooleanCheckbox value="#{topic.enabled}" />
+                    <h:outputText value="#{topicDetailController.getNumberOfTerms(topic)}"/>
+                </p:column>
+                <p:column style="text-align:center">
+                    <p:selectBooleanCheckbox value="#{topic.enabled}">
+                        <p:ajax listener="#{topicDetailController.doSaveTopic(topic)}" />
+                    </p:selectBooleanCheckbox>
                 </p:column>
             </p:dataTable>
         </h:form>

@@ -32,14 +32,16 @@
                     </p:row>
                 </p:columnGroup>
 
-                <p:column>
+                <p:column style="text-align:center">
                     <h:outputText value="#{term.name}"/>
                 </p:column>
-                <p:column>
+                <p:column style="text-align:center">
                     <h:outputText value="#{term.topic.name}"/>
                 </p:column>
                 <p:column style="text-align:center">
-                    <h:selectBooleanCheckbox value="#{term.enabled}" disabled="#{!term.topic.enabled}" />
+                    <p:selectBooleanCheckbox value="#{term.enabled}" disabled="#{!term.topic.enabled}">
+                        <p:ajax listener="#{termDetailController.doSaveTerm(term)}" />
+                    </p:selectBooleanCheckbox>
                 </p:column>
                 <p:column style="text-align:center">
                     <p:commandButton title="Edit" icon="fa fa-edit"
