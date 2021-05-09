@@ -82,4 +82,3 @@ public class CubeTestController implements Consumer<ConfiguredFacetsEvent> {
     }
 
 }
-

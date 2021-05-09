@@ -1,7 +1,7 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,14 +51,14 @@ public class UserProfileController implements Serializable {
      * Action to force a reload of the currently displayed user.
      */
     public void doReloadUser() {
-        user = userService.loadUser(user.getId());
+        user = userService.loadUser(user);
     }
 
     /**
      * Returns a list of all users being team mates of the current user (i.e. belonging to the same teams).
      * @return
      */
-    public Collection<User> getTeammates() {
+    public List<User> getTeammates() {
         return userService.getTeammates(user);
     }
 

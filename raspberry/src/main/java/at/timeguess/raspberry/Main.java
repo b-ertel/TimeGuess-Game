@@ -16,21 +16,20 @@ import java.io.InputStream;
 import java.time.Duration;
 
 import tinyb.BluetoothDevice;
-import tinyb.BluetoothException;
 import tinyb.BluetoothGattCharacteristic;
 import tinyb.BluetoothGattService;
 import tinyb.BluetoothManager;
 
-import kong.unirest.Unirest;
-
 /**
- * Entry point for program to search for Bluetooth devices and communicate with them
+ * The class that contains the "main" method of the program
+ * running on the Raspberry Pi.
  */
 public final class Main {
 
-    private static final String LOG_FILE = "log.txt";
+    // the name of the configuration file
     private static final String CONFIG_FILE = "config.txt";
 
+    // timeouts for finding devices, services and characteristics
     private static final Long DEVICE_DISCOVERY_TIMEOUT = 10L;
     private static final Long SERVICE_DISCOVERY_TIMEOUT = 10L;
     private static final Long CHARACTERISTIC_DISCOVERY_TIMEOUT = 10L;
@@ -38,8 +37,8 @@ public final class Main {
     // default password for TimeFlip device
     private static final byte[] PASSWORD = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30};
 
-    private static String TIMEFLIP_MAC_ADDRESS;
-    private static String BACKEND_URL;
+    private static String timeflipMacAddress;
+    private static String backendUrl;
 
     static boolean running = true;
 
@@ -47,34 +46,29 @@ public final class Main {
     }
 
     /**
-     * This program should connect to TimeFlip devices and read the facet characteristic exposed by the devices
-     * over Bluetooth Low Energy.
-     *
-     * @throws InterruptedException
-     * @see <a href="https://github.com/DI-GROUP/TimeFlip.Docs/blob/master/Hardware/BLE_device_commutication_protocol_v3.0_en.md" target="_top">BLE device communication protocol v3.0</a>
+     * The "main" method of the program running on the Raspberry Pi.
+     * <p>
+     * In order to run, a configuration file named "config.txt" is
+     * required specifying the MAC address of the TimeFlip device and the
+     * URL of the backend.
+     * <p>
+     * The program searches for the TimeFlip device with the MAC address
+     * specified in the configuration file. If found, an attempt is made to
+     * connect to it and to find the battery level, facets and configuration version
+     * characteristics. It is then starting a thread to send regular status
+     * messages to the backend and process the response received. It is also listening
+     * for changes of the facets characteristic, which also trigger messages to be
+     * sent to the backend.
+     * <p>
+     * The program runs indefinitely but can be interrupted with Ctrl+C.
      */
     public static void main(String[] args) throws InterruptedException {
 
-        // set up logging
         Logger logger = Logger.getLogger("at.timeguess.raspberry");
         ConsoleHandler consoleHandler = new ConsoleHandler();
         logger.addHandler(consoleHandler);
         logger.setUseParentHandlers(false);
-        try {
-            FileHandler filehandler = new FileHandler(LOG_FILE);
-            filehandler.setFormatter(new XMLFormatter());
-            logger.addHandler(filehandler);
-            System.out.println("***");
-            System.out.println("Logs will be written to standard error and to the file \"log.txt\" in this folder.");
-            System.out.println("***");
-        }
-        catch (IOException e) {
-            System.out.println("***");
-            System.out.println("Logs will be written to standard error only since the file \"log.txt\" in this folder could not be opened.");
-            System.out.println("***");
-        }
 
-        // read from configuration file
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(CONFIG_FILE);
@@ -83,6 +77,7 @@ public final class Main {
             logger.severe("Configuration file not found!");
             System.exit(-1);
         }
+
         Properties properties = new Properties();
         try {
             properties.load(inputStream);
@@ -91,13 +86,15 @@ public final class Main {
             logger.severe("Error while reading from configuration file!");
             System.exit(-1);
         }
-        TIMEFLIP_MAC_ADDRESS = properties.getProperty("TIMEFLIP_MAC_ADDRESS");
-        if (TIMEFLIP_MAC_ADDRESS == null || TIMEFLIP_MAC_ADDRESS.isEmpty()) {
+
+        timeflipMacAddress = properties.getProperty("TIMEFLIP_MAC_ADDRESS");
+        if (timeflipMacAddress == null || timeflipMacAddress.isEmpty()) {
             logger.severe("MAC address of TimeFlip device not given in configuration file!");
             System.exit(-1);
         }
-        BACKEND_URL = properties.getProperty("BACKEND_URL");
-        if (BACKEND_URL == null || BACKEND_URL.isEmpty()) {
+
+        backendUrl = properties.getProperty("BACKEND_URL");
+        if (backendUrl == null || backendUrl.isEmpty()) {
             logger.severe("URL of backend not given in configuration file!");
             System.exit(-1);
         }
@@ -105,35 +102,25 @@ public final class Main {
         BluetoothManager manager = BluetoothManager.getBluetoothManager();
 
         logger.info("Starting device discovery ...");
-        try {
-            if (manager.startDiscovery()) {
-                logger.info("Device discovery successfully started.");
-            }
-            else {
-                logger.severe("Device discovery could not be started.");
-                System.exit(-1);
-            }
+        if (manager.startDiscovery()) {
+            logger.info("Device discovery successfully started.");
         }
-        catch (BluetoothException e) {
+        else {
             logger.severe("Device discovery could not be started.");
             System.exit(-1);
         }
 
-        logger.info("Searching for TimeFlip device with MAC address " + TIMEFLIP_MAC_ADDRESS + " ...");
-        BluetoothDevice timeflip = manager.find(null, TIMEFLIP_MAC_ADDRESS, null, Duration.ofSeconds(DEVICE_DISCOVERY_TIMEOUT));
+        logger.info("Searching for TimeFlip device with MAC address " + timeflipMacAddress + " ...");
+        BluetoothDevice timeflip = manager.find(null, timeflipMacAddress, null, Duration.ofSeconds(DEVICE_DISCOVERY_TIMEOUT));
         if (timeflip != null) {
-            logger.info("TimeFlip device with MAC address " + TIMEFLIP_MAC_ADDRESS + " found.");
+            logger.info("TimeFlip device with MAC address " + timeflipMacAddress + " found.");
         }
         else {
-            logger.severe("TimeFlip device with MAC address " + TIMEFLIP_MAC_ADDRESS + " not found.");
+            logger.severe("TimeFlip device with MAC address " + timeflipMacAddress + " not found.");
             System.exit(-1);
         }
 
-        if (manager.getDiscovering()) {
-            logger.warning("Device discovery is still on after the device has been found.");
-        }
-
-        logger.info("Connecting to TimeFlip device with MAC address " + TIMEFLIP_MAC_ADDRESS + " ...");
+        logger.info("Connecting to TimeFlip device with MAC address " + timeflipMacAddress + " ...");
         if (timeflip.connect()) {
             logger.info("Connection established.");
         }
@@ -221,11 +208,11 @@ public final class Main {
         CalibrationVersionHelper calibrationVersionHelper = new CalibrationVersionHelper(calibrationVersionCharacteristic);
 
         logger.info("Enable status messages ...");
-        StatusMessageSender statusMessageSender = new StatusMessageSender(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, calibrationVersionHelper, batteryLevelCharacteristic, timeflip);
+        StatusMessageSender statusMessageSender = new StatusMessageSender(timeflipMacAddress, backendUrl, calibrationVersionHelper, batteryLevelCharacteristic, timeflip);
         statusMessageSender.start();
 
         logger.info("Enable facets messages ...");
-        facetsCharacteristic.enableValueNotifications(new FacetsMessageSender(TIMEFLIP_MAC_ADDRESS, BACKEND_URL, calibrationVersionHelper));
+        facetsCharacteristic.enableValueNotifications(new FacetsMessageSender(timeflipMacAddress, backendUrl));
 
         Lock lock = new ReentrantLock();
         Condition condition = lock.newCondition();
@@ -255,6 +242,7 @@ public final class Main {
         }
 
         timeflip.disconnect();
+
     }
 
 }

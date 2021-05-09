@@ -17,7 +17,18 @@
         </h:outputScript>
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
 
-        <h:form id="ChatRoomForm">
+        <h:form id="toolbarForm">
+            <p:menubar id="toolbar">
+                <p:menuitem value="&nbsp;Edit intervals&nbsp;" icon="fa fa-cogs"
+                            oncomplete="PF('editIntervalDialog').show()"
+                            update=":editIntervalForm:editIntervalDialog :toolbarForm:toolbar"/>
+                <p:menuitem value="&nbsp;Edit thresholds&nbsp;" icon="fa fa-cogs"
+                            oncomplete="PF('editThresholdDialog').show()"
+                            update=":editThresholdForm:editThresholdDialog :toolbarForm:toolbar"/>
+            </p:menubar>
+        </h:form>
+
+        <h:form id="CubeStatusForm">
             <div class="chatRoomContent">
                 <h1>Cube Management</h1>
 
@@ -33,7 +44,7 @@
                                 widgetVar="onlineInfoWidget">
                          
                          <ui:repeat var="cubeStatusInfo"
-                                value="#{statusController.cubeStatusInfos}">
+                                value="#{cubeStatusController.cubeStatusInfos}">
                             <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
                          </ui:repeat>
                      </p:scrollPanel>
@@ -47,8 +58,7 @@
                				<f:selectItem itemLabel="Select" itemValue="" noSelectionOption="true"/>
                				<f:selectItems value="#{cubeController.allCubes}" var="cube" itemLabel="#{cube.id}"/>
                			</p:selectOneMenu>
-                        <p:commandButton value="OK" oncomplete="PF('cubeUseDialog').show()" update=":cubeDetailForm:cubeUseDialog :msg">  
-              			</p:commandButton>
+                        <p:commandButton value="OK" oncomplete="PF('cubeUseDialog').show()" update=":cubeDetailForm:cubeUseDialog :msg" /> 
 	   				</h:panelGrid> 
 
              	</p:panel>
@@ -73,39 +83,48 @@
                         <p:inputText id="name" value="#{curr.name}"/>
                     </h:panelGrid>
                     <p:separator />
-                      <h:panelGrid columns="4">
+                      <h:panelGrid columns="6">
                         <p:commandButton value="Save" action="#{cubeController.saveCube()}" oncomplete="{PF('cubeUseDialog').hide()}" 
                         					update=":cubeDetailForm:cubeUseDialog :msg" />
 						<p:commandButton value="Configure"
 							oncomplete="PF('cubeConfigurationDialog').show()"
 							update="cubeConfigurationForm:cubeConfigurationDialog :msg"
-							rendered="true">
-							<f:actionListener
-								binding="#{statusController.setInConfig(curr.macAddress)}" />
-							<f:actionListener
-								binding="#{cubeConfigurationController.prepareForNewConfiguration(curr)}" />
+							rendered="#{cubeStatusController.checkConfiguration(curr.macAddress) and !cubeStatusController.isConfigured(curr)}" >
+							<f:actionListener binding="#{cubeStatusController.setInConfig(curr.macAddress)}" />
+							<f:actionListener binding="#{cubeConfigurationController.prepareForNewConfiguration(curr)}" />
 						</p:commandButton>
 						<p:commandButton value="Test"
 							oncomplete="PF('cubeTestDialog').show()"
-							update="cubeTestForm:cubeTestDialog :msg" rendered="true">
+							update="cubeTestForm:cubeTestDialog :msg" rendered="#{cubeStatusController.getStatus(curr.macAddress) eq 'READY'}">
 							<f:actionListener
 								binding="#{cubeTestController.prepareForNewTest(curr)}" />
 						</p:commandButton>
 						<p:commandButton value="Delete configuration"
-							action="#{cubeController.deleteConfigurations()}" rendered="true"
-							update=":cubeDetailForm:cubeUseDialog :msg" />
-                        <p:commandButton value="Delete" action="#{cubeController.deleteCube()}" oncomplete="PF('cubeUseDialog').hide()" rendered="#{statusController.checkDeletion(curr.macAddress)}"
-                        						update=":cubeDetailForm:cubeUseDialog :msg"/>
+							action="#{cubeController.deleteConfigurations()}"
+							update=":cubeDetailForm:cubeUseDialog :msg"
+							rendered="#{cubeStatusController.isConfigured(curr)}">
+							<p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this configuration? This cannot be undone." />
+							<f:actionListener binding="#{cubeStatusController.changeStatus(curr.macAddress)}" />
+						</p:commandButton>
+                        <p:commandButton value="Delete Cube" action="#{cubeController.deleteCube()}" oncomplete="PF('cubeUseDialog').hide()" 
+                        	rendered="#{cubeStatusController.checkDeletion(curr)}" update=":cubeDetailForm:cubeUseDialog :msg :CubeStatusForm:onlineCube">
+                        	<p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this cube? This cannot be undone." />
+                        </p:commandButton>
                         <p:commandButton value="Abort" onclick="PF('cubeUseDialog').hide()" update=":cubeDetailForm:cubeUseDialog :msg" /> 
 
                     </h:panelGrid> 
                 </p:outputPanel> 
              </p:dialog>   
              
+             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="300">
+             	<p:commandButton value="No" type="button" icon="fa fa-close" styleClass="ui-confirmdialog-no"/>
+             	<p:commandButton value="Yes" type="button" icon="fa fa-check" styleClass="ui-confirmdialog-yes" />
+        	 </p:confirmDialog>
+             
            <o:socket channel="cubeChannel" scope="application"
                 onmessage="function(m){console.log(m);}">
                 <f:ajax event="connectionCubeUpdate"
-                    render="ChatRoomForm" />
+                    render="CubeStatusForm" />
             </o:socket>
 
 		</h:form>	
@@ -113,8 +132,8 @@
 		<h:form id="cubeConfigurationForm">
 			<p:dialog header="Cube Configuration" id="cubeConfigurationDialog"
 				widgetVar="cubeConfigurationDialog" dynamic="true" modal="true"
-				resizable="false" closeOnEscape="true" showEffect="fade"
-				hideEffect="fade" responsive="true">
+				resizable="false" closeOnEscape="false" showEffect="fade"
+				hideEffect="fade" responsive="true" closable="false">
 
 				<p:outputPanel id="cubeConfigurationOutputPanel">
 					<p:panel header="MAC address of cube">
@@ -166,7 +185,10 @@
 							disabled="#{!cubeConfigurationController.isConfigured()}"
 							onclick="PF('cubeConfigurationDialog').hide()"
 							oncomplete="PF('cubeUseDialog').show()"
-							update=":cubeDetailForm:cubeUseDialog :msg" />
+							update=":cubeDetailForm:cubeUseDialog :msg">
+							<f:actionListener binding="#{cubeStatusController.setReady(curr.macAddress)}" />
+						</p:commandButton>
+						<p:commandButton value="Abort" action="#{cubeStatusController.setLive(curr.macAddress)}" onclick="PF('cubeConfigurationDialog').hide()" />
 					</p:panel>
 				</p:outputPanel>
 
@@ -221,5 +243,100 @@
 			</p:dialog>
 		</h:form>
 
+		<h:form id="editIntervalForm">
+			<p:dialog header="Edit Intervals" id="editIntervalDialog"
+				widgetVar="editIntervalDialog" dynamic="true" modal="true"
+				resizable="false" closeOnEscape="true" showEffect="fade"
+				hideEffect="fade" responsive="true">
+
+				<p:outputPanel id="editIntervalOutputPanel">
+					<p:panel header="What can you do here?">
+						<h:outputText value="Here it is possible to change the reporting interval (i.e., the interval in seconds at which we expect to recieve status messages and which is communicated via the status response) and the expiration interval (i.e., the interval in seconds after which we change the status to offline if no status message was recieved) for TimeFlip devices." />
+					</p:panel>
+
+					<p:spacer height="5" />
+
+					<h:panelGrid columns="4">
+						<p:outputLabel for="reportingInterval"
+							value="Reporting Interval: "
+							title=""/>
+						<p:inputText disabled="true"
+							value="#{intervalController.savedReportingInterval}"
+							size="5" />
+						<p:inputNumber id="reportingInterval"
+							value="#{intervalController.reportingInterval}"
+							decimalPlaces="0"
+							thousandSeparator=""
+							required="true"
+							size="5" />
+						<p:commandButton value="Submit change"
+							action="#{intervalController.doUpdateReportingInterval()}"
+							update="editIntervalOutputPanel :msg" />
+
+						<p:outputLabel for="expirationInterval" value="Expiration Interval: " />
+						<p:inputText disabled="true"
+							value="#{intervalController.savedExpirationInterval}"
+							size="5" />
+						<p:inputNumber id="expirationInterval"
+							value="#{intervalController.expirationInterval}"
+							decimalPlaces="0"
+							thousandSeparator=""
+							required="true"
+							size="5" />
+						<p:commandButton value="Submit change"
+							action="#{intervalController.doUpdateExpirationInterval()}"
+							update="editIntervalOutputPanel :msg" />
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+		</h:form>
+
+		<h:form id="editThresholdForm">
+			<p:dialog header="Edit Thresholds" id="editThresholdDialog"
+				widgetVar="editThresholdDialog" dynamic="true" modal="true"
+				resizable="false" closeOnEscape="true" showEffect="fade"
+				hideEffect="fade" responsive="true">
+
+				<p:outputPanel id="editThresholdOutputPanel">
+					<p:panel header="What can you do here?">
+						<h:outputText value="Here it is possible to change the battery level threshold (i.e., the minimum allowable value of the battery level characteristic) and the RSSI threshold (i.e., the minimum allowable value of the RSSI property) for TimeFlip devices." />
+					</p:panel>
+
+					<p:spacer height="5" />
+
+					<h:panelGrid columns="4">
+						<p:outputLabel for="batteryLevelThreshold" value="Battery Level Threshold: " />
+						<p:inputText disabled="true"
+							value="#{thresholdController.savedBatteryLevelThreshold}"
+							size="5" />
+						<p:inputNumber id="batteryLevelThreshold"
+							value="#{thresholdController.batteryLevelThreshold}"
+							decimalPlaces="0"
+							thousandSeparator=""
+							required="true"
+							size="5"
+							minValue="0"
+							maxValue="100" />
+						<p:commandButton value="Submit change"
+							action="#{thresholdController.doUpdateBatteryLevelThreshold()}"
+							update="editThresholdOutputPanel :msg" />
+
+						<p:outputLabel for="rssiThreshold" value="RSSI Threshold: " />
+						<p:inputText disabled="true"
+							value="#{thresholdController.savedRssiThreshold}"
+							size="5" />
+						<p:inputNumber id="rssiThreshold"
+							value="#{thresholdController.rssiThreshold}"
+							decimalPlaces="0"
+							thousandSeparator=""
+							required="true"
+							size="5" />
+						<p:commandButton value="Submit change"
+							action="#{thresholdController.doUpdateRssiThreshold()}"
+							update="editThresholdOutputPanel :msg" />
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+		</h:form>
     </ui:define>
 </ui:composition>

@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <body>
+        <ui:composition>
+            <h:form id="gameDetailForm" prependId="false">
+                <ui:remove>edit game</ui:remove>
+                <p:dialog header="Edit Game" id="gameEditDialog" widgetVar="gameEditDialog" dynamic="true"
+                    modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
+                    <p:ajax event="close" update="gameData" process="@parent" resetValues="true" />
+
+                    <p:outputPanel id="gameData" rendered="#{not empty curr}">
+                        <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                            columnClasses="p-col-4, p-col-8" contentStyleClass="ui-fluid">
+                            
+                            <p:outputLabel for="name" value="Name: " />
+                            <p:inputText id="name" value="#{curr.name}" required="true" maxlength="100" />
+                            
+                            <p:outputLabel for="maxPoints" value="Maximum Points: " />
+                            <p:spinner id="maxPoints" value="#{curr.maxPoints}" required="true" min="1"
+                                disabled="#{gameDetailController.lockedMaxPoints}" />
+                            
+                            <h:outputLabel for="topic" value="Topic: " />
+                            <p:selectOneMenu id="topic" value="#{curr.topic}" converter="omnifaces.SelectItemsConverter"
+                                required="true" requiredMessage="#{topicMsg}"
+                                disabled="#{gameDetailController.lockedTopic}">
+                                <p:ajax event="change" process="@this" />
+                                <f:selectItem itemLabel="Select" />
+                                <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
+                            </p:selectOneMenu>
+                        </p:panelGrid>
+                        <p:separator style="margin:12px 0px 16px" />
+
+                        <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
+                            columnClasses="p-col-6, p-col-6" contentStyleClass="ui-fluid">
+                            <p:outputLabel for="createUser" value="Creator: " />
+                            <p:outputLabel id="createUser" value="#{curr.creator.firstName} (#{curr.creator.firstName} #{curr.creator.lastName})" />
+                            
+                            <h:outputLabel for="state" value="State: " />
+                            <p:selectOneMenu id="state" value="#{curr.status}">
+                                <f:selectItems value="#{gameDetailController.allGameStates}" var="state"
+                                    itemDisabled="#{not gameDetailController.canTraverse(state)}"/>
+                            </p:selectOneMenu>
+
+                            <h:outputLabel for="cube" value="Cube: " />
+                            <p:selectOneMenu id="cube" value="#{curr.cube}" converter="omnifaces.SelectItemsConverter"
+                               required="true" requiredMessage="#{cubeMsg}"
+                               disabled="#{gameDetailController.lockedCube}">
+                               <f:selectItem itemLabel="Select" />
+                               <f:selectItems value="#{cubeController.allCubes}" var="cu"
+                                   itemDisabled="#{not statusController.isReady(cu)}"/>
+                            </p:selectOneMenu>
+                        </p:panelGrid>
+                        <p:separator style="margin:12px 0px 20px" />
+
+                        <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
+                            columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
+                            <h:outputLabel for="teams" value="Teams: " />
+                            <p:selectCheckboxMenu id="teams" value="#{curr.teams}" label="#{sel2Label}"
+                                required="true" requiredMessage="#{teamsMsg}"
+                                disabled="#{gameDetailController.lockedTopic}"
+                                multiple="true" filter="true" filterMatchMode="contains">
+                                <!-- have to use all teams, otherwise list doesn't work -->
+                                <f:selectItems value="#{gameDetailController.allTeams}" var="t" itemLabel="#{t.name}"
+                                   itemDisabled="#{not gameDetailController.isAvailableTeam(t)}" />
+                            </p:selectCheckboxMenu>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                    <p:separator style="margin:11px 0px 12px" />
+
+                    <h:panelGrid columns="3">
+                        <p:commandButton value="Save" action="#{gameDetailController.doSaveGame}"
+                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameEditDialog').hide(); PF('gameTable').filter(); }"
+                            update=":gameListForm:gameTable :gameInfoForm:gameInfoData gameData :msg" />
+                        <p:commandButton value="Reload" action="#{gameDetailController.doReloadGame}"
+                            process="@parent" update=":gameDetailForm:gameData :msg" resetValues="true"/>
+                        <p:commandButton value="Abort" onsuccess="PF('gameEditDialog').hide()"/>
+                    </h:panelGrid>
+                </p:dialog>
+            </h:form>
+       </ui:composition>
+    </body>
+</html>
+

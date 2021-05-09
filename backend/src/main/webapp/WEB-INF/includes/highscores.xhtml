@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition>
+            <h:form id="scoreForm" style="margin-bottom:40px !important">
+                <p:panel header="Highscores" toggleable="true" closable="false" toggleSpeed="500"
+                    closeSpeed="500" widgetVar="highscores">
+                    <p:dataTable id="scores" var="userScore" value="#{highscoreController.highscoresOnGamesWon}"
+                        rowIndexVar="index">
+                        <p:column headerText="Rank" style="text-align:center">
+                            <h:outputText value="#{index + 1}" />
+                        </p:column>
+                        <p:column headerText="Username">
+                            <h:outputText value="#{userScore.user.username}" />
+                        </p:column>
+                        <p:column headerText="Games Won" style="text-align:center">
+                            <h:outputText value="#{userScore.gamesWon}" />
+                        </p:column>
+                        <p:column headerText="Terms Correct" style="text-align:center">
+                            <h:outputText value="#{userScore.termsCorrect}" />
+                        </p:column>
+                        <p:column headerText="Terms Wrong" style="text-align:center">
+                            <h:outputText value="#{userScore.termsWrong}" />
+                        </p:column>
+                        <p:column headerText="% terms correct" style="text-align:end;width:19%">
+                            <h:outputText value="#{userScore.percentage * 100}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:composition>
+    </body>
+</html>

@@ -1,11 +1,42 @@
 package at.timeguess.backend.model;
 
+import java.util.EnumSet;
+
 public enum GameState {
-    SETUP, // just created, contains invalid settings
-    VALID_SETUP, // ready to start (game starts when all teams are ready)
-    PLAYED, // during active game play (changing most settings is blocked)
-    HALTED, // game play can not continue until reconfigured (thing timeflip getting lost,
-            // too many players disconnect, topic can not change)
-    FINISHED, // game is done (changing settings is blocked)
-    CANCELED // game was aborted (will not be used for statistics)
+
+    /**
+     * Game is being created, settings are not valid yet
+     */
+    SETUP,
+    /**
+     * Game is ready to start as soon as enough teams are ready
+     */
+    VALID_SETUP,
+    /**
+     * Game is currently played: changing of most settings is blocked
+     */
+    PLAYED,
+    /**
+     * Game cannot continue until it is reconfigured, e.g. timeflip got lost, too many players disconnected, topic
+     * cannot change
+     */
+    HALTED,
+    /**
+     * Game is done: changing settings is blocked
+     */
+    FINISHED,
+    /**
+     * Game was aborted: will not be used for statistics
+     */
+    CANCELED;
+
+    private static EnumSet<GameState> gameStates = EnumSet.allOf(GameState.class);
+
+    /**
+     * Returns a set containing all available game states.
+     * @return
+     */
+    public static EnumSet<GameState> getGameStates() {
+        return gameStates;
+    }
 }

@@ -5,14 +5,16 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
 import javax.persistence.*;
+
 import org.springframework.data.domain.Persistable;
 
 /**
  * Entity representing users.
  */
 @Entity
-public class User implements Persistable<Long>, Serializable, Comparable<User> {
+public class User implements Serializable, Comparable<User>, Persistable<Long> {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,14 +56,6 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
             foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
             inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<Team> teams;
-
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Game.class)
-    @JoinTable(name = "game_user",
-            joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
-            inverseJoinColumns = @JoinColumn(name = "game_id", nullable = false, updatable = false),
-            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
-    private Set<Game> confirmedGames;
 
     @Override
     public Long getId() {
@@ -161,12 +155,8 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 7;
-        int result = 59;
-        result = prime * result + (this.id == null ? 0 : this.id.hashCode());
-        result = prime * result + Objects.hashCode(this.username);
-        return result;
+    public int compareTo(User o) {
+        return this.username.compareTo(o.getUsername());
     }
 
     @Override
@@ -179,21 +169,24 @@ public class User implements Persistable<Long>, Serializable, Comparable<User> {
         }
 
         final User other = (User)obj;
-        return Objects.equals(getId(), other.getId()) && Objects.equals(getUsername(), other.getUsername());
+        return Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 7;
+        int result = 59;
+        result = prime * result + (this.id == null ? 0 : this.id.hashCode());
+        return result;
     }
 
     @Override
     public String toString() {
-        return String.format("at.timeguess.backend.model.User[ id=%d, username=%s ]", id, username);
+        return String.format("%s[id=%d, username=%s]", getClass().getSimpleName(), id, username);
     }
 
     @Override
     public boolean isNew() {
-        return (null == createDate);
-    }
-
-    @Override
-    public int compareTo(User o) {
-        return this.username.compareTo(o.getUsername());
+        return this.id == null || this.id == 0L;
     }
 }

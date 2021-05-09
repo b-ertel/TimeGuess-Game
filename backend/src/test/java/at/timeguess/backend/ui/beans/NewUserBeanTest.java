@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static at.timeguess.backend.utils.TestSetup.*;
 
 import java.util.Collection;
 
@@ -22,7 +23,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
 import at.timeguess.backend.services.UserService;
-import at.timeguess.backend.utils.TestUtils;
 
 /**
  * Tests for {@link NewUserBean}.
@@ -60,7 +60,7 @@ public class NewUserBeanTest {
     @ParameterizedTest
     @ValueSource(ints = { 1, 2, 3 })
     public void testClearFields(Integer roleNr) {
-        UserRole role = TestUtils.USERROLES.get(roleNr);
+        UserRole role = USERROLES.get(roleNr);
         String foo = fillBean(true);
         newUserBean.setUserRole(role);
         newUserBean.setEnabled(false);
@@ -101,7 +101,7 @@ public class NewUserBeanTest {
     @ValueSource(ints = { 1, 2, 3 })
     public void testCreateUserAdmin(Integer roleNr) {
         String foo = fillBean(true);
-        newUserBean.setUserRole(TestUtils.USERROLES.get(roleNr));
+        newUserBean.setUserRole(USERROLES.get(roleNr));
 
         newUserBean.createUserAdmin();
 

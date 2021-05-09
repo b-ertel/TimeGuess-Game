@@ -17,11 +17,7 @@
 
                     <p:menuitem icon="fa fa-users" value="&nbsp;User Profiles&nbsp;" url="/secured/users.xhtml" rendered="#{isPlayer}"/>
 
-                    <p:submenu icon="fa fa-cube" label="&nbsp;Virtual Lobby&nbsp;" rendered="#{isPlayer}">
-	                    <p:menuitem icon="fa fa-cubes" value="&nbsp;Current Games&nbsp;" url="/secured/games.xhtml" rendered="#{isPlayer}"/>
-                        <p:menuitem icon="fa fa-bar-chart-o" value="&nbsp;General Statistics&nbsp;" url="/secured/statistics.xhtml"/>
-                        <p:menuitem icon="fa fa-trophy" value="&nbsp;Highscores&nbsp;" url="/secured/highscores.xhtml"/>
-                    </p:submenu>
+                    <p:menuitem icon="fa fa-cube" value="&nbsp;Virtual Lobby&nbsp;" url="/secured/games.xhtml" rendered="#{isPlayer}"/>
 
                     <p:submenu icon="fa fa-cogs" label="&nbsp;Administration&nbsp;" rendered="#{isManager}">
                         <p:menuitem icon="fa fa-globe" value="&nbsp;Terms and Topics&nbsp;" url="/manager/terms.xhtml" rendered="#{isManager}"/>
@@ -30,14 +26,15 @@
                         <p:menuitem icon="fa fa-users" value="&nbsp;Users&nbsp;" url="/admin/users.xhtml" rendered="#{isAdmin}"/>
                         <p:menuitem icon="fa fa-cubes" value="&nbsp;Timeflip Cubes&nbsp;" url="/admin/cubeManagement.xhtml" rendered="#{isAdmin}"/>
                     </p:submenu>
-                    
+
+                   	<p:menuitem icon="fa fa-cubes" value="&nbsp;Game Room&nbsp;" url="/secured/gameRoom.xhtml" rendered="#{isPlayer}"/>
+
                     <p:menuitem icon="fa fa-sign-in" value="&nbsp;Login&nbsp;" url="/login.xhtml" rendered="#{!isLoggedIn}"/>
                     <p:menuitem icon="fa fa-sign-out" value="&nbsp;Logout&nbsp;" url="/logout" rendered="#{isLoggedIn}"/>
 
                     <p:submenu label="Development" rendered="#{isLoggedIn}">
                         <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
                         <p:menuitem value="Websockets" url="/secured/demos/chatRoom.xhtml"/>
-                        <p:menuitem value="Create New Round Demo" url="/secured/rounddemo.xhtml"/>
                         <p:menuitem value="Websockets-term" url="/secured/demos/webSocketRoom.xhtml"/>
                         <p:menuitem value="H2 Console" url="/h2-console/"/>
                     </p:submenu>

@@ -1,6 +1,8 @@
 package at.timeguess.backend.repositories;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static at.timeguess.backend.utils.TestSetup.*;
+import static at.timeguess.backend.utils.TestUtils.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +20,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
-import at.timeguess.backend.utils.TestUtils;
 
 @SpringBootTest
 @WebAppConfiguration
@@ -54,8 +55,8 @@ public class UserRepositoryTest {
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = { "1|admin;elvis", "2|admin;user1;elvis;manger", "3|admin;user1;user2;michael;felix;lorenz;verena;claudia;clemens" })
     public void testFindByRoleExisting(final Integer userRole, final String usernamesExpected) {
-        UserRole role = TestUtils.USERROLES.get(userRole);
-        TestUtils.assertResultList(userRepository.findByRole(role),
+        UserRole role = USERROLES.get(userRole);
+        assertResultList(userRepository.findByRole(role),
             String.format("found users roles should contain %s but doesn't", role), true, u -> u.getRoles().contains(role));
     }
 
@@ -63,18 +64,18 @@ public class UserRepositoryTest {
     @CsvSource(delimiter = '|', value = { "1|user1;user2;michael;felix;lorenz;verena;claudia;clemens;manger",
             "2|user2;michael;felix;lorenz;verena;claudia;clemens", "3|elvis;manger" })
     public void testFindByRoleNotExisting(final Integer userRole, final String usernamesExpected) {
-        UserRole role = TestUtils.USERROLES.get(userRole);
-        TestUtils.assertResultList(userRepository.findByRole(role),
+        UserRole role = USERROLES.get(userRole);
+        assertResultList(userRepository.findByRole(role),
                 String.format("found users roles should not contain %s but does", role), true,
                 u -> !usernamesExpected.contains(u.getUsername()));
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "admin|", "user1|clemens", "user2|claudia", "michael|felix;lorenz", "felix|michael;lorenz;clemens",
-            "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena", "clemens|user1;felix" })
+    @CsvSource(delimiter = '|', value = { "admin|", "user1|user2;clemens", "user2|user1;claudia", "michael|felix;lorenz", "felix|michael;lorenz;clemens",
+            "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena;clemens", "clemens|user1;felix;claudia" })
     public void testFindByTeams(final String username, final String usernamesExpected) {
         User user = assertLoadUser(username);
-        TestUtils.assertResultList(userRepository.findByTeams(user), "found user list should not contain %s but does",
+        assertResultList(userRepository.findByTeams(user), "found user list should not contain %s but does",
                 usernamesExpected != null && usernamesExpected.length() > 0, u -> usernamesExpected.contains(u.getUsername()));
     }
 
@@ -91,7 +92,7 @@ public class UserRepositoryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "admin|0", "user1|2", "user2|1", "elvis|0", "michael|3", "felix|3", "lorenz|4", "verena|3", "claudia|2", "clemens|3" })
+    @CsvSource(delimiter = '|', value = { "admin|0", "user1|1", "user2|1", "elvis|0", "michael|3", "felix|3", "lorenz|3", "verena|2", "claudia|2", "clemens|2" })
     public void testGetTotalGames(final String username, final Integer totalExpected) {
         User user = assertLoadUser(username);
         int result = userRepository.getTotalGames(user);

@@ -1,9 +1,16 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-    xmlns:ui="http://java.sun.com/jsf/facelets">
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="/WEB-INF/templates/main.xhtml">
 
-    <ui:include src="/WEB-INF/templates/gamesTable.xhtml">
-        <ui:param name="isAdminAccess" value="#{true}" />
-    </ui:include>
+    <ui:define name ="content">
+
+        <ui:include src="/WEB-INF/includes/gamesTable.xhtml">
+            <ui:param name="isAdminAccess" value="#{true}" />
+        </ui:include>
+        
+        <ui:include src="/WEB-INF/includes/gameDetails.xhtml" />
+
+    </ui:define>
 </ui:composition>

@@ -1,6 +1,5 @@
 package at.timeguess.backend.services;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
@@ -28,7 +27,7 @@ import at.timeguess.backend.ui.beans.NewUserBean;
  * Service for accessing and manipulating user data.
  */
 @Component
-@Scope("application")
+@Scope(WebApplicationContext.SCOPE_APPLICATION)
 public class UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
@@ -42,21 +41,30 @@ public class UserService {
     private MessageBean messageBean;
 
     /**
-     * Returns a collection of all users.
+     * Returns a list of all users.
      * @return
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Collection<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     /**
-     * Returns a collection of all users with role 'PLAYER'.
+     * Returns a list of all users with role 'PLAYER'.
      * @return
      */
     @PreAuthorize("hasAuthority('PLAYER')")
-    public Collection<User> getAllPlayers() {
+    public List<User> getAllPlayers() {
         return userRepository.findByRole(UserRole.PLAYER);
+    }
+
+    /**
+     * Returns a list of all users with role 'PLAYER', which are not currently playing.
+     * @return
+     */
+    @PreAuthorize("hasAuthority('PLAYER')")
+    public List<User> getAvailablePlayers() {
+        return userRepository.findAvailablePlayers();
     }
 
     /**
@@ -64,7 +72,7 @@ public class UserService {
      * @return
      */
     @PreAuthorize("hasAuthority('PLAYER')")
-    public Collection<User> getTeammates(User user) {
+    public List<User> getTeammates(User user) {
         return userRepository.findByTeams(user);
     }
 
@@ -118,13 +126,22 @@ public class UserService {
     }
 
     /**
+     * Checks if the given user is currently playing or not.
+     * @return
+     */
+    @PreAuthorize("hasAuthority('PLAYER')")
+    public boolean isAvailablePlayer(User user) {
+        return userRepository.getIsAvailablePlayer(user);
+    }
+
+    /**
      * Loads a single user identified by its id.
      * @param id the id to search for
      * @return the user with the given id
      */
-    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #username")
-    public User loadUser(Long id) {
-        return userRepository.findById(id).get();
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #user.username")
+    public User loadUser(User user) {
+        return userRepository.findById(user.getId()).get();
     }
 
     /**
@@ -140,37 +157,48 @@ public class UserService {
     /**
      * Saves the user.
      * This method will also set {@link User#createDate} for new entities or {@link User#updateDate} for updated entities.
-     * The user requesting this operation will also be stored as {@link User#createDate} or {@link User#updateUser} respectively.
+     * The user requesting this operation will also be stored as {@link User#createUser} or {@link User#updateUser} respectively.
      * @param user the user to save
      * @return the saved user
      */
     @Target(NewUserBean.class)
-    @PostAuthorize("hasAuthority('ADMIN') OR #user.id == null OR principal.username eq #user.username")
+    @PreAuthorize("hasAuthority('ADMIN') OR #user.id == null OR principal.username eq #user.username")
     public User saveUser(User user) {
-        // for self registration get any admin user as creator
-        // null would work also (setting the property to optional in User class)
-        // but demo.UserStatusController.afterStatusChange throws an exception then
-        User auth = getAuthenticatedUser();
-        if (auth == null) auth = this.getAdminUser();
+        User ret = null;
+        try {
+            // for self registration get any admin user as creator
+            // null would work also (setting the property to optional in User class)
+            // but demo.UserStatusController.afterStatusChange throws an exception then
+            User auth = getAuthenticatedUser();
+            if (auth == null) auth = this.getAdminUser();
 
-        boolean isNew = user.isNew();
-        if (isNew) {
-            user.setCreateDate(new Date());
-            user.setCreateUser(auth);
+            boolean isNew = user.isNew();
+            if (isNew) {
+                user.setCreateDate(new Date());
+                user.setCreateUser(auth);
+            }
+            else {
+                user.setUpdateDate(new Date());
+                user.setUpdateUser(auth);
+            }
+            ret = userRepository.save(user);
+
+            // show ui message and log
+            messageBean.alertInformation(ret.getUsername(), isNew ? "New user created" : "User updated");
+
+            if (auth == null) auth = ret;
+            LOGGER.info("User '{}' (id={}) was {} by User '{}' (id={})", ret.getUsername(), ret.getId(),
+                    isNew ? "created" : "updated", auth.getUsername(), auth.getId());
         }
-        else {
-            user.setUpdateDate(new Date());
-            user.setUpdateUser(auth);
+        catch (Exception e) {
+            String msg = "Saving user failed";
+            if (e.getMessage().contains("USER(USERNAME)"))
+                msg += String.format(": user named '%s' already exists", user.getUsername());
+            messageBean.alertErrorFailValidation(user.getUsername(), msg);
+
+            LOGGER.info("Saving user '{}' (id={}) failed, stack trace:", user.getUsername(), user.getId());
+            e.printStackTrace();
         }
-        User ret = userRepository.save(user);
-
-        // show ui message and log
-        messageBean.alertInformation(ret.getUsername(), isNew ? "New user created" : "User updated");
-
-        if (auth == null) auth = ret;
-        LOGGER.info("User '{}' (id={}) was {} by User '{}' (id={})", ret.getUsername(), ret.getId(),
-                isNew ? "created" : "updated", auth.getUsername(), auth.getId());
-
         return ret;
     }
 
@@ -191,17 +219,21 @@ public class UserService {
                     auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
-            messageBean.alertError(user.getUsername(), "Deleting user failed");
+            messageBean.alertErrorFailValidation(user.getUsername(), "Deleting user failed");
             LOGGER.info("Deleting user '{}' (id={}) failed, stack trace:", user.getUsername(), user.getId());
             e.printStackTrace();
         }
     }
 
+    /**
+     * Returns the user representing the currently authenticated principal.
+     * @return
+     */
     User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findFirstByUsername(auth.getName());
     }
-    
+
     private User getAdminUser() {
         List<User> admins = userRepository.findByRole(UserRole.ADMIN);
         return admins.size() > 0 ? admins.get(0) : null;

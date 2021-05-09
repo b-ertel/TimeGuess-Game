@@ -131,24 +131,25 @@ public class NewUserBean implements Serializable {
 
     /**
      * Creates a new user with the role of player.
-     * @apiNote shows a ui message if input field are invalid.
+     * @apiNote shows a ui message if input fields are invalid.
      */
-    public void createUser() {
-        this.createUserFromFields(false, user -> user.setRoles(UserRole.mapUserRole(UserRole.PLAYER)));
+    public User createUser() {
+        return this.createUserFromFields(false, user -> user.setRoles(UserRole.mapUserRole(UserRole.PLAYER)));
     }
 
     /**
      * Creates a new user with the set role.
-     * @apiNote shows a ui message if input field are invalid.
+     * @apiNote shows a ui message if input fields are invalid.
      */
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void createUserAdmin() {
-        this.createUserFromFields(true, user -> user.setRoles(UserRole.mapUserRole(this.getUserRole())));
+    public User createUserAdmin() {
+        return this.createUserFromFields(true, user -> user.setRoles(UserRole.mapUserRole(this.getUserRole())));
     }
 
     /**
      * Checks if all fields contain valid values.
-     * @param isAdmin true when registering via administrative interface, false when registering via user registration interface
+     * @param isAdmin true when registering via administrative interface,
+     *        false when registering via user registration interface
      * @return true if all necessary fields contain valid values, false otherwise
      */
     public boolean validateInput(boolean isAdminAccess) {
@@ -171,7 +172,7 @@ public class NewUserBean implements Serializable {
     /**
      * Creates a new user instance, sets its fields from set values (excepts roles) and saves it to the database.
      */
-    private void createUserFromFields(boolean isAdmin, Consumer<User> consumer) {
+    private User createUserFromFields(boolean isAdmin, Consumer<User> consumer) {
         if (this.validateInput(isAdmin)) {
             User user = new User();
             user.setUsername(getUsername());
@@ -182,11 +183,14 @@ public class NewUserBean implements Serializable {
             user.setPassword(passwordEncoder.encode(getPassword()));
             consumer.accept(user);
 
-            this.userService.saveUser(user);
+            user = this.userService.saveUser(user);
             this.clearFields();
+
+            return user;
         }
         else {
             messageBean.alertErrorFailValidation("User creation failed", "Input fields are invalid");
         }
+        return null;
     }
 }
