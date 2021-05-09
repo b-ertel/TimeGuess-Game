@@ -72,7 +72,7 @@ public class IntervalController {
             messageBean.alertInformation("Intervals", "Reporting interval successfully updated.");
         }
         catch (IllegalArgumentException e) {
-            messageBean.alertError("Intervals", e.getMessage());
+            messageBean.alertErrorFailValidation("Intervals", e.getMessage());
         }
     }
 
@@ -85,7 +85,7 @@ public class IntervalController {
             messageBean.alertInformation("Intervals", "Expiration interval successfully updated.");
         }
         catch (IllegalArgumentException e) {
-            messageBean.alertError("Intervals", e.getMessage());
+            messageBean.alertErrorFailValidation("Intervals", e.getMessage());
         }
     }
 

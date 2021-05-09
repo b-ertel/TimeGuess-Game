@@ -20,28 +20,43 @@
 			</p:panel>
 		</h:form>
 		
+		
+	<h:form id="gameTableForm">
+		<p:dataTable id="leaderbord" var="team" value="#{gameLeaderBoardController.teamsInGame}">
+				            <p:column headerText="Name">
+				                <h:outputText value="#{team.name}" />
+				            </p:column>
+				            <p:column headerText="Points">
+				                <h:outputText value="#{gameLeaderBoardController.calculatePointsOfTeam(team)}" />
+				            </p:column>
+				        </p:dataTable> 
+	</h:form>
+		
    <h:form id="gameRoundForm" style="width:700px; text-align:center; align:right; margin: 0 auto;">
             <div class="gameRoomContent">      
-                <p:panel id="roundInfo" header="Round #{userGameController.currentRound.nr}">
-				
-				<p:outputPanel header="RoundInfo" rendered="#{userGameController.inRound}">
+                <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
+				<p:outputLabel value="Flip your cube to start the first round! May the best team win!" 
+							   rendered="#{empty gameRoundController.currentRound}" style="font-weight:bold"/>
+				<p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round" 
+							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound}" style="font-weight:bold"/>
+				<p:outputPanel header="RoundInfo" rendered="#{gameRoundController.inRound}">
 						<h3>Time to Guess</h3>
 		            	<h1 class="p-text-center" style="border-bottom: double">
 		             		<h:outputText value="#{countDownController.getCountDown()}" style="font-weight:bold; font-size:40px !important"/> 
 		             	</h1>
 						<div class="p-grid">
 		                        <div class="p-col-5"><p:outputLabel value="User: " /></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.guessingUser.username}" style="font-weight:bold;"/></div>
+		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username}" style="font-weight:bold;"/></div>
 		                        <div class="p-col-5"><p:outputLabel value="Team: " /></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.guessingTeam.name}" style="font-weight:bold;"/></div>
-		                        <ui:fragment rendered="#{!userGameController.inGuessingTeam}">
+		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name}" style="font-weight:bold;"/></div>
+		                        <ui:fragment rendered="#{!gameRoundController.inGuessingTeam}">
 		                        <div class="p-col-5" ><p:outputLabel value="Term: "/></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.termToGuess.name}" style="font-weight:bold;"/></div>				                
+		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.termToGuess.name}" style="font-weight:bold;"/></div>				                
 		                        </ui:fragment>
 		                        <div class="p-col-5"><p:outputLabel value="Points: " /></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.points}" style="font-weight:bold;"/></div>
+		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.points}" style="font-weight:bold;"/></div>
 		                        <div class="p-col-5"><p:outputLabel value="Activity: " /></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{userGameController.currentRound.activity}" style="font-weight:bold;"/></div>
+		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.activity}" style="font-weight:bold;"/></div>
 		                </div>
 				</p:outputPanel> 
 				</p:panel>
@@ -56,14 +71,14 @@
         			  widgetVar="roundValidationDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="true" showEffect="fade"
 					  hideEffect="fade" responsive="true">
-        		<p:outputLabel value="Did #{userGameController.currentRound.guessingUser.username} guess #{userGameController.currentRound.termToGuess.name} correct? (First click comes first)" 
-							   rendered="#{not empty userGameController.currentRound and !userGameController.inGuessingTeam}" style="font-weight:bold"/>
+        		<p:outputLabel value="Did #{gameRoundController.currentRound.guessingUser.username} guess #{gameRoundController.currentRound.termToGuess.name} correct? (First click comes first)" 
+							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>
 				<p:outputLabel value="You gave your best shot, your fate is now in the hands of your rivals. Please wait until they have valuated your round..." 
-							   rendered="#{not empty userGameController.currentRound and userGameController.inGuessingTeam}" style="font-weight:bold"/>			   
-				<h:panelGrid columns="3" rendered="#{!userGameController.inGuessingTeam}">
-                     <p:commandButton value="Correct" action="#{userGameController.correctRound()}" update=":gameRoundForm"/>
-                     <p:commandButton value="Incorrect" action="#{userGameController.incorrectRound()}" update=":gameRoundForm"/>
-                     <p:commandButton value="Cheated" action="#{userGameController.cheatedRound()}" update=":gameRoundForm"/>
+							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>			   
+				<h:panelGrid columns="3" rendered="#{!gameRoundController.inGuessingTeam}">
+                     <p:commandButton value="Correct" action="#{gameRoundController.correctRound()}" update=":gameRoundForm :gameTableForm"/>
+                     <p:commandButton value="Incorrect" action="#{gameRoundController.incorrectRound()}" update=":gameRoundForm :gameTableForm"/>
+                     <p:commandButton value="Cheated" action="#{gameRoundController.cheatedRound()}" update=":gameRoundForm :gameTableForm"/>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>
@@ -73,21 +88,44 @@
       		<p:dialog id="roundTimesUpDialog" header="Time is up"
         			  widgetVar="roundTimesUpDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="true" showEffect="fade"
-					  hideEffect="fade" responsive="true">
-        		<p:outputLabel value="Seems like #{userGameController.currentRound.guessingUser.username} did not guess #{userGameController.currentRound.termToGuess.name} within the time?" 
-							   rendered="#{not empty userGameController.currentRound and !userGameController.inGuessingTeam}" style="font-weight:bold"/>	
+					  hideEffect="fade" responsive="true" closeable="false">
+        		<p:outputLabel value="Seems like #{gameRoundController.currentRound.guessingUser.username} did not guess #{gameRoundController.currentRound.termToGuess.name} within the time?" 
+							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>	
 				<p:outputLabel value="That took a bit long. Your rivals will decide whether you were quick enough...." 
-							   rendered="#{not empty userGameController.currentRound and userGameController.inGuessingTeam}" style="font-weight:bold"/>		   
-				<h:panelGrid columns="2" rendered="#{!userGameController.inGuessingTeam}">
-                     <p:commandButton value="Too slow" action="#{userGameController.endRoundThroughCountDown()}" update=":gameRoundForm"/>
+							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>		   
+				<h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
+                     <p:commandButton value="Too slow" action="#{gameRoundController.endRoundThroughCountDown()}" update=":gameRoundForm :gameTableForm"/>
                      <p:commandButton value="Replay"/>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>
             
+        <h:form id="gameOverform">
+      		<p:dialog id="gameOverDialog" header="Game Over"
+        			  widgetVar="gameOverDialog" dynamic="true" modal="true"
+					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  hideEffect="fade" responsive="true" closeable="false">
+        		<p:outputLabel value="Congratulations to #{gameRoundController.currentRound.guessingTeam.name} on winning #{gameLeaderBoardController.currentGame.name}" 
+							   style="font-weight:bold"/>			   
+				<h:panelGrid columns="1">
+                     <p:commandButton value="Quit"/>
+                </h:panelGrid>
+        	</p:dialog>
+      </h:form>     
             
-            
-            
+       <h:form id="termOverform">
+      		<p:dialog id="termOverDialog" header="Terms Over"
+        			  widgetVar="termOverDialog" dynamic="true" modal="true"
+					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  hideEffect="fade" responsive="true" closeable="false">
+        		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameLeaderBoardController.computeWinningTeam().name} on winning #{gameLeaderBoardController.currentGame.name}" 
+							   style="font-weight:bold"/>			   
+				<h:panelGrid columns="1">
+                     <p:commandButton value="Quit"/>
+                </h:panelGrid>
+        	</p:dialog>
+      </h:form>     
+                 
             
             <o:socket channel="countDownChannel" scope="session"
          	    user="#{sessionInfoBean.currentUser.id}"
@@ -102,18 +140,27 @@
                       user="#{sessionInfoBean.currentUser.id}">
                 <p:ajax event="startRound"
                         update=":gameRoundForm:roundInfo" 
-                        listener="#{userGameController.startRound()}"/> 
+                        listener="#{gameRoundController.startRound()}"/> 
                 <p:ajax event="endRoundViaFlip"
                         update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" 
-                        listener="#{userGameController.endRound()}"
+                        listener="#{gameRoundController.endRound()}"
                         oncomplete="PF('roundValidationDialog').show()"/>
                 <p:ajax event="validatedRound"
-                        onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "/>                 
+                        onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "
+                        update=":gameTableForm"/>                 
                 <p:ajax event="endRoundViaCountDown"
                         render=":gameRoundForm:roundInfo :roundTimesUpForm:roundTimesUpDialog"
-                        listener="#{userGameController.setInRound(false)}"
+                        listener="#{gameRoundController.setInRound(false)}"
                         oncomplete="PF('roundTimesUpDialog').show()" 
-                        />           
+                        />   
+                <p:ajax event="gameOver"
+                        render=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog"
+                        oncomplete="PF('gameOverDialog').show()" 
+                        />  
+               	<p:ajax event="termsOver"
+                        render=":gameRoundForm:roundInfo :termOverForm:termOverDialog"
+                        oncomplete="PF('termOverDialog').show()" 
+                        />      
             </o:socket>
         
  

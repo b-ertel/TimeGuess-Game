@@ -57,14 +57,6 @@ public class User implements Serializable, Comparable<User>, Persistable<Long> {
             inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<Team> teams;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Game.class)
-    @JoinTable(name = "game_user",
-            joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
-            inverseJoinColumns = @JoinColumn(name = "game_id", nullable = false, updatable = false),
-            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
-    private Set<Game> confirmedGames;
-
     @Override
     public Long getId() {
         return id;

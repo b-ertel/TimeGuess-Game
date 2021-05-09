@@ -56,7 +56,7 @@ public class TermService {
      * @param id the id of the term to load
      * @return a single Term
      */
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
     public Term loadTerm(Long id) {
         return termRepository.findById(id).get();
     }
@@ -66,7 +66,7 @@ public class TermService {
      * @param term the term to save
      * @return the new term
      */
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
     public Term saveTerm(Term term) {
         Term ret = null;
         try {
@@ -83,7 +83,7 @@ public class TermService {
             String msg = "Saving term failed";
             if (e.getMessage().contains("TERM(TOPIC, NAME)"))
                 msg += String.format(": term named '%s' already exists", term.getName());
-            messageBean.alertError(term.getName(), msg);
+            messageBean.alertErrorFailValidation(term.getName(), msg);
 
             LOGGER.info("Saving term '{}' (id={}) failed, stack trace:", term.getName(), term.getId());
             e.printStackTrace();
@@ -95,7 +95,7 @@ public class TermService {
      * Deletes the term.
      * @param term the term to delete
      */
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
     public void deleteTerm(Term term) {
         try {
             termRepository.delete(term);
@@ -109,7 +109,7 @@ public class TermService {
         }
         catch (Exception e) {
             String name = term == null ? "Unknown" : term.getName();
-            messageBean.alertError(name, "Deleting term failed");
+            messageBean.alertErrorFailValidation(name, "Deleting term failed");
             LOGGER.info("Deleting term '{}' (id={}) failed, stack trace:", name, term == null ? "null" : term.getId());
             e.printStackTrace();
         }

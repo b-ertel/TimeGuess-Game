@@ -109,7 +109,7 @@ public class TopicListController implements Serializable {
                     });
                 }
                 else
-                    messageBean.alertError(topicName, "Importing terms failed: could not find or create topic");
+                    messageBean.alertErrorFailValidation(topicName, "Importing terms failed: could not find or create topic");
             });
             return true;
         }

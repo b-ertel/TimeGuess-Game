@@ -46,8 +46,6 @@ public class Team implements Serializable, Comparable<Team>, Persistable<Long> {
             inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<User> teamMembers;
 
-    private TeamState state;
-
     @Override
     public Long getId() {
         return id;
@@ -85,14 +83,6 @@ public class Team implements Serializable, Comparable<Team>, Persistable<Long> {
      */
     public void setTeamMembers(Set<User> teamMembers) {
         this.teamMembers = teamMembers;
-    }
-
-    public TeamState getState() {
-        return state;
-    }
-
-    public void setState(TeamState state) {
-        this.state = state;
     }
 
     @Override

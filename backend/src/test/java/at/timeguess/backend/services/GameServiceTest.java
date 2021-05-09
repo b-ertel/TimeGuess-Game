@@ -276,12 +276,12 @@ public class GameServiceTest {
         Game game6 = assertLoadGame(6L, true, "Game '%s' could not be loaded from test data source");
 
         // game in SETUP state, invited user
-        User user3 = userService.loadUser(3L);
+        User user3 = userService.loadUser(createUser(3L));
         assertDoesNotThrow(() -> gameService.confirm(user3, game6));
         assertTrue(game6.getConfirmedUsers().contains(user3), "User with id=3 is expected to be in game with id=6, but isn't");
 
         // game in SETUP state, not invited user
-        User user1 = userService.loadUser(1L);
+        User user1 = userService.loadUser(createUser(1L));
         assertDoesNotThrow(() -> gameService.confirm(user1, game6));
         assertFalse(game6.getConfirmedUsers().contains(user1), "User with id=1 is not expected to be in game with id=6, but is");
         
@@ -306,7 +306,7 @@ public class GameServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "0|6;7", "1|", "2|5", "3|", "4|1;2;3;4", "5|" })
+    @CsvSource(delimiter = '|', value = { "0|6;7", "1|", "2|5;8;9", "3|", "4|1;2;3;4", "5|" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetByStatus(int gameState, final String gameIdsExpected) {
         List<Game> expected = createEntities(TestSetup::createGame, gameIdsExpected);
@@ -316,7 +316,7 @@ public class GameServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "1|", "2|4;5", "3|4;6", "4|", "5|1;2;3", "6|1;2;3;6", "7|1;2;3;5", "8|1;3;5", "9|1;4;6", "10|2;4;5;6" })
+    @CsvSource(delimiter = '|', value = { "1|", "2|4;5;9", "3|4;6;9", "4|", "5|1;2;3;8", "6|1;2;3;6;8", "7|1;2;3;5;8", "8|1;3;5;8", "9|1;4;6;9", "10|2;4;5;6;9" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetByUserAll(long userId, String gamesIdsExpected) {
         List<Game> expected = createEntities(TestSetup::createGame, gamesIdsExpected);

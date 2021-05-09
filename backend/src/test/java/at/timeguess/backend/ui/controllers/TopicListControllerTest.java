@@ -109,7 +109,7 @@ public class TopicListControllerTest {
         verify(uploadedFile).getInputStream();
         verify(topicService).getAllTopics();
         verify(topicService).saveTopic(any(Topic.class));
-        verify(messageBean, times(2)).alertErrorFailValidation(anyString(), anyString());
+        verify(messageBean, times(3)).alertErrorFailValidation(anyString(), anyString());
     }
 
     @Test
