@@ -171,14 +171,15 @@ public class NewGameBean implements Serializable {
             game.setStatus(GameState.SETUP);
 
             game = gameService.saveGame(game);
-            this.clearFields();
-
+            
             if (game != null) {
                 gameManagerController.addGame(game);
 
                 // redirect host to game room
                 messageBean.redirect("/secured/gameRoom.xhtml");
             }
+
+            this.clearFields();
             return game;
         }
         else {
