@@ -71,6 +71,11 @@ public class TermDetailController implements Serializable {
 
     public void doSaveTerm(Term selectedTerm) {
         this.termService.saveTerm(selectedTerm);
+        if (selectedTerm.isEnabled()) {
+            messageBean.alertInformation("Successfully enabled", String.format("Term %s enabled.", selectedTerm.getName()));
+        } else {
+            messageBean.alertInformation("Successfully disabled", String.format("Term %s disabled.", selectedTerm.getName()));
+        }
     }
 
     /**

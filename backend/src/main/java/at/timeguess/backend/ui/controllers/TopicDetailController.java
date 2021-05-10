@@ -1,18 +1,16 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
-import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.services.TermService;
 import at.timeguess.backend.services.TopicService;
 import at.timeguess.backend.services.TopicStatisticService;
+import at.timeguess.backend.ui.beans.MessageBean;
 
 @Component
 @Scope(WebApplicationContext.SCOPE_SESSION)
@@ -25,6 +23,9 @@ public class TopicDetailController implements Serializable {
 
     @Autowired
     private TopicStatisticService topicStatisticService;
+
+    @Autowired
+    private MessageBean messageBean;
 
     /**
      * Attribute to cache the currently displayed Topic
@@ -54,6 +55,11 @@ public class TopicDetailController implements Serializable {
 
     public void doSaveTopic(Topic selectedTopic) {
         this.topicService.saveTopic(selectedTopic);
+        if (selectedTopic.isEnabled()) {
+            messageBean.alertInformation("Successfully enabled", String.format("Topic %s enabled.", selectedTopic.getName()));
+        } else {
+            messageBean.alertInformation("Successfully disabled", String.format("Topic %s disabled.", selectedTopic.getName()));
+        }
     }
 
     /**
