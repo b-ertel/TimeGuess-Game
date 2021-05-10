@@ -139,9 +139,9 @@ public class UserService {
      * @param id the id to search for
      * @return the user with the given id
      */
-    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #username")
-    public User loadUser(Long id) {
-        return userRepository.findById(id).get();
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #user.username")
+    public User loadUser(User user) {
+        return userRepository.findById(user.getId()).get();
     }
 
     /**
@@ -194,7 +194,7 @@ public class UserService {
             String msg = "Saving user failed";
             if (e.getMessage().contains("USER(USERNAME)"))
                 msg += String.format(": user named '%s' already exists", user.getUsername());
-            messageBean.alertError(user.getUsername(), msg);
+            messageBean.alertErrorFailValidation(user.getUsername(), msg);
 
             LOGGER.info("Saving user '{}' (id={}) failed, stack trace:", user.getUsername(), user.getId());
             e.printStackTrace();
@@ -219,7 +219,7 @@ public class UserService {
                     auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
-            messageBean.alertError(user.getUsername(), "Deleting user failed");
+            messageBean.alertErrorFailValidation(user.getUsername(), "Deleting user failed");
             LOGGER.info("Deleting user '{}' (id={}) failed, stack trace:", user.getUsername(), user.getId());
             e.printStackTrace();
         }

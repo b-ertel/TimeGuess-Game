@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.services.CubeService;
@@ -16,8 +15,8 @@ import at.timeguess.backend.model.Cube;
  *
  */
 @Component
-@Scope("view")
-public class CubeController {
+@Scope("session")
+public class CubeController {  
 
     @Autowired
     private CubeService cubeService;
@@ -29,27 +28,13 @@ public class CubeController {
     private Cube cube;
 
     /**
-     * @param cube to register -> i.e. which has to be saved in the database
-     * @return registered Cube
-     */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Cube registerCube(Cube cube) {
-
-        this.cube = new Cube();
-        this.cube.setId(cube.getId());
-        this.cube.setMacAddress(cube.getMacAddress());
-        this.cube.setName(cube.getName());
-        saveCube();
-
-        return this.cube;
-    }
-
-    /**
-     * saves cube into the database
+     * saves cube into the database and updates properties in its {@link CubeStatus}
+     * and updates current display of {@link CubeStatus} through websockets
+     * 
      */
     public void saveCube() {
         this.cube=cubeService.saveCube(this.cube);
-        statusController.updateCube(this.cube);
+        statusController.updateCubeInStatus(this.cube);
         statusController.updateSockets();
         message.alertInformation("CubeManagment", "Cube saved");
     }
@@ -81,6 +66,9 @@ public class CubeController {
         message.alertInformation("CubeManagment", "Cube " + this.cube.getId() + " deleted");
     }
     
+    /**
+     * deletes configuration of cube
+     */
     public void deleteConfigurations() {
         cubeService.deleteConfigurations(cube);
         message.alertInformation("CubeManagment", "Configurations for cube " + this.cube.getId() + " deleted");

@@ -13,11 +13,6 @@ import org.junit.jupiter.api.Test;
 public class EqualsImplementationTest {
 
     @Test
-    public void testActivityEqualsContract() {
-        EqualsVerifier.forClass(Activity.class).verify();
-    }
-
-    @Test
     public void testCubeEqualsContract() {
         Cube cube1 = createCube(1L);
         Cube cube2 = createCube(2L);
@@ -52,8 +47,17 @@ public class EqualsImplementationTest {
     }
 
     @Test
-    public void testGameStateEqualsContract() {
-        EqualsVerifier.forClass(GameState.class).verify();
+    public void testGameTeamEqualsContract() {
+        GameTeamId gt1 = new GameTeamId(1L, 2L);
+        GameTeamId gt2 = new GameTeamId(2L, 1L);
+        Game game1 = createGame(1L);
+        Game game2 = createGame(2L);
+        Team team1 = createTeam(1L);
+        Team team2 = createTeam(2L);
+        EqualsVerifier.forClass(GameTeamId.class).withPrefabValues(GameTeamId.class, gt1, gt2)
+                .withPrefabValues(Game.class, game1, game2)
+                .withPrefabValues(Team.class, team1, team2)
+                .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
     }
 
     @Test
@@ -101,6 +105,21 @@ public class EqualsImplementationTest {
             .withPrefabValues(Team.class, team1, team2)
             .withPrefabValues(Game.class, game1, game2)
             .suppress(Warning.STRICT_INHERITANCE, Warning.ALL_FIELDS_SHOULD_BE_USED).verify();
+    }
+
+    @Test
+    public void testActivityEqualsContract() {
+        EqualsVerifier.forClass(Activity.class).verify();
+    }
+
+    @Test
+    public void testCubeStatusEqualsContract() {
+        EqualsVerifier.forClass(CubeStatus.class).verify();
+    }
+
+    @Test
+    public void testGameStateEqualsContract() {
+        EqualsVerifier.forClass(GameState.class).verify();
     }
 
     @Test

@@ -49,12 +49,12 @@ public class TeamServiceTest {
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAllTeams() {
-        List<Team> expected = createEntities(TestSetup::createTeam, LongStream.rangeClosed(1, 8).boxed());
+        List<Team> expected = createEntities(TestSetup::createTeam, LongStream.rangeClosed(1, 12).boxed());
         List<Team> result = teamService.getAllTeams();
 
         assertLists(expected, result);
         
-        expected = createEntities(id -> teamService.findById(id).get(), LongStream.rangeClosed(1, 8).boxed());
+        expected = createEntities(id -> teamService.findById(id).get(), LongStream.rangeClosed(1, 12).boxed());
         assertListsCompare(expected, result);
     }
 
