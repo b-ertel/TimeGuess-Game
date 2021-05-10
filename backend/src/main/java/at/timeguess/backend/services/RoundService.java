@@ -61,4 +61,11 @@ public class RoundService {
     public boolean teamPlayedRoundsInGame(Game game, Team team) {
     	return (roundRepository.getRoundOfGameWithTeam(game, team).size()!=0);
     }
+    
+    public Integer getPointsOfTeamInGame(Game game, Team team) {
+    	if(roundRepository.getPointsOfTeamInGame(game, team)==null)
+    		return 0;
+    	return roundRepository.getPointsOfTeamInGame(game, team);
+    }
+
 }

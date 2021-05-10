@@ -88,7 +88,7 @@ public class UserDetailController implements Serializable {
      * Action to force a reload of the currently displayed user.
      */
     public void doReloadUser() {
-        user = userService.loadUser(user.getId());
+        user = userService.loadUser(user);
         orgPassword = user.getPassword();
     }
 
@@ -99,10 +99,16 @@ public class UserDetailController implements Serializable {
         if (this.doValidateUser()) {
             this.checkPasswordChange();
 
-            User ret = this.userService.saveUser(user);
-            if (ret != null) {
-                user = ret;
-                orgPassword = user.getPassword();
+            User ret = null;
+            try {
+                ret = this.userService.saveUser(user);
+                if (ret != null) {
+                    user = ret;
+                    orgPassword = user.getPassword();
+                }
+            }
+            catch (Exception e) {
+                messageBean.alertErrorFailValidation("Saving user failed", e.getMessage());
             }
         }
         else messageBean.alertErrorFailValidation("Saving user failed", "Input fields are invalid");

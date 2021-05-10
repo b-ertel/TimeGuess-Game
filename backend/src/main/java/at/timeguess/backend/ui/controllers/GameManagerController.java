@@ -5,6 +5,7 @@ import at.timeguess.backend.events.ConfiguredFacetsEventListener;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
@@ -13,6 +14,7 @@ import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
+import at.timeguess.backend.services.RoundService;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -27,15 +29,10 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-
+import java.util.stream.Collectors;
 
 /**
- * This controller is responsible for showing a term in the game window with websockets
- *
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
+ * This controller is responsible for showing a term in the game window with websockets.
  */
 
 @Controller
@@ -46,7 +43,9 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
     @Autowired
     private GameService gameService;
     @Autowired
-	private CubeService cubeService;
+    private RoundService roundService;
+    @Autowired
+    private CubeService cubeService;
     @CDIAutowired
     private WebSocketManager websocketManager;
     @Autowired
@@ -80,7 +79,7 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
  				System.out.println(u.getUsername());
  			}
  		}
-
+ 		System.out.println(testgame1.getMaxPoints());
  		listOfGames.put(cube, testgame1);
  		listOfGames.put(cube2, testgame2); 
         activeRound.put(testgame1, false);
@@ -126,7 +125,6 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
     
     /**
      * method to get the current round for a given user, called by {@link UserGameController}
-     * 
      * @param user to find current round
      * @return current round
      */
@@ -177,10 +175,43 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 		return null;
 	}
 	
+	/**
+     * Method to add a newly created game to the saved list of currently available games
+     * and send notifications to all participating team members, except the game creator.
+     * @param game
+     */
+    public void addGame(Game game) {
+        if (game == null) throw new NullPointerException("startGame was called with null game");
+
+        // add game to map
+        listOfGames.put(game.getCube(), game);
+
+        // send invitation to all contained team members except host
+        final User host = game.getCreator();
+        Set<Long> invited = game.getTeams().stream()
+                .flatMap(t -> t.getTeamMembers().stream().filter(u -> u != host).map(User::getId)).collect(Collectors.toSet());
+        websocketManager.getMessageChannel().send(Map.of("type", "gameInvitation", "name", game.getName(), "id", game.getId()), invited);
+    }
+
+	
 	public void validateRoundOfGame(Game game, Validation v) {
 		gameLogic.saveLastRound(game, v);
-		this.listOfGames.put(getCubeByGame(game), game);	
-		this.websocketManager.getNewRoundChannel().send("validatedRound", getAllUserIdsOfGameTeams(game.getTeams()));
+		this.listOfGames.put(getCubeByGame(game), game);
+		if(gameLogic.stillTermsAvailable(game)) {
+			if(gameLogic.teamReachedMaxPoints(game, this.currentRound.get(game).getGuessingTeam())) {
+				endGame(game);
+				this.websocketManager.getNewRoundChannel().send("gameOver", getAllUserIdsOfGameTeams(game.getTeams()));
+			} else {
+				this.websocketManager.getNewRoundChannel().send("validatedRound", getAllUserIdsOfGameTeams(game.getTeams()));
+			}
+			
+		} else {
+			Team winningTeam = gameLogic.getTeamWithMostPoints(game);
+			game.setMaxPoints(roundService.getPointsOfTeamInGame(game, winningTeam));
+			endGame(game);
+			this.websocketManager.getNewRoundChannel().send("termsOver", getAllUserIdsOfGameTeams(game.getTeams()));
+		}
+		
 	}
 	
 	
@@ -196,6 +227,14 @@ public class GameManagerController implements Consumer<ConfiguredFacetsEvent> {
 	
 	public void setActiveRoundFalse(Game game) {
 		this.activeRound.put(game,false);
+	}
+	
+	public void endGame(Game game) {
+		game.setStatus(GameState.FINISHED);
+		gameService.saveGame(game);
+		this.listOfGames.remove(getCubeByGame(game));
+		this.currentRound.remove(game);
+		this.activeRound.remove(game);
 	}
 
 	

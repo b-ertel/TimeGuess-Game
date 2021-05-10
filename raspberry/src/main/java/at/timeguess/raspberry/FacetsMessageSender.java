@@ -3,6 +3,7 @@ package at.timeguess.raspberry;
 import java.util.logging.*;
 
 import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 
 import tinyb.BluetoothNotification;
 
@@ -24,15 +25,27 @@ public class FacetsMessageSender implements BluetoothNotification<byte[]> {
         this.backendUrl = backendUrl;
     }
 
+    @SuppressWarnings("unchecked")
     public void run(byte[] facetRaw) {
-        logger.info("Sending facets message to backend ...");
-        String body = String.format("{\"identifier\": \"%s\", \"facet\": %d}",
-                timeflipMacAddress,
-                facetRaw[0]);
-        Unirest.post(backendUrl + API_PATH)
-                .header("Content-Type", "application/json")
-                .body(body)
-                .asEmpty();
+        try {
+            logger.info("Sending facets message to backend ...");
+            String body = String.format("{\"identifier\": \"%s\", \"facet\": %d}",
+                    timeflipMacAddress,
+                    facetRaw[0]);
+            Unirest.post(backendUrl + API_PATH)
+                    .header("Content-Type", "application/json")
+                    .body(body)
+                    .asEmpty()
+                    .ifSuccess(response -> {
+                        logger.info("Facets message successfully processed by backend.");
+                    })
+                    .ifFailure(response -> {
+                        logger.warning("Facets message not successfully processed by backend!");
+                    });
+        }
+        catch (UnirestException e) {
+            logger.warning("Could not connect to backend!");
+        }
     }
 
 }

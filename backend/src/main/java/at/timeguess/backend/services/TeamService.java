@@ -104,7 +104,7 @@ public class TeamService {
             String msg = "Saving team failed";
             if (e.getMessage().contains("TEAM(NAME)"))
                 msg += String.format(": team named '%s' already exists", team.getName());
-            messageBean.alertError(team.getName(), msg);
+            messageBean.alertErrorFailValidation(team.getName(), msg);
 
             LOGGER.info("Saving team '{}' (id={}) failed, stack trace:", team.getName(), team.getId());
             e.printStackTrace();

@@ -13,3 +13,12 @@ function showPassword(button, id = '') {
         span.addClass("fa fa-eye");
     }
 }
+
+function socketListener(message, channel, event) {
+    window[message.type](message.name, message.id);
+    console.log(message);
+}
+
+function gameInvitation(name, id) {
+    $("#gameInvitation").click();
+}

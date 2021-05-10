@@ -32,4 +32,7 @@ public interface RoundRepository extends AbstractRepository<Round, Long> {
 	
 	@Query("SELECT r FROM Round r WHERE r.game=:game AND r.guessingTeam=:team")
 	List<Round> getRoundOfGameWithTeam(@Param("game") Game game, @Param("team") Team team);
+	
+	@Query("SELECT SUM(r.points) FROM Round r WHERE r.game=:game AND r.guessingTeam=:team")
+	Integer getPointsOfTeamInGame(@Param("game") Game game, @Param("team") Team team);
 }

@@ -71,8 +71,8 @@ public class UserRepositoryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "admin|", "user1|clemens", "user2|claudia", "michael|felix;lorenz", "felix|michael;lorenz;clemens",
-            "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena", "clemens|user1;felix" })
+    @CsvSource(delimiter = '|', value = { "admin|", "user1|user2;clemens", "user2|user1;claudia", "michael|felix;lorenz", "felix|michael;lorenz;clemens",
+            "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena;clemens", "clemens|user1;felix;claudia" })
     public void testFindByTeams(final String username, final String usernamesExpected) {
         User user = assertLoadUser(username);
         assertResultList(userRepository.findByTeams(user), "found user list should not contain %s but does",

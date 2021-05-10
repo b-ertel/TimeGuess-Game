@@ -40,11 +40,11 @@ public class UserProfileControllerTest {
     @ParameterizedTest
     @ValueSource(longs = { 4, 5, 6, 89, 888 })
     public void testDoReloadUser(Long userId) {
-        assertMockUser(userId);
+        User user = assertMockUser(userId);
 
         userProfileController.doReloadUser();
 
-        verify(userService, times(2)).loadUser(userId);
+        verify(userService, times(2)).loadUser(user);
         assertEquals(userId, userProfileController.getUser().getId());
     }
 
@@ -117,11 +117,11 @@ public class UserProfileControllerTest {
     }
 
     private User assertMockUser(User user) {
-        when(userService.loadUser(user.getId())).thenReturn(user);
+        when(userService.loadUser(user)).thenReturn(user);
 
         userProfileController.setUser(user);
 
-        verify(userService).loadUser(user.getId());
+        verify(userService).loadUser(user);
         assertEquals(user.getId(), userProfileController.getUser().getId());
         return user;
     }
