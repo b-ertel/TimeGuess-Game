@@ -30,40 +30,22 @@ public class GameLeaderBoardController {
     private RoundService roundService;
     @Autowired
     private GameLogicService gameLogic;
+    
+	public List<Team> getTeamsInGame() {
+		return List.copyOf(currentGame().getTeams());
+	}
 
-    private List<Team> teamsInGame;
-
-    private Game currentGame;
-
-    @PostConstruct
-    private void setup() {
-        this.currentGame = this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
-        if (this.currentGame != null) {
-            this.teamsInGame = List.copyOf(currentGame.getTeams());
-        }
-    }
-
-    public List<Team> getTeamsInGame() {
-        return teamsInGame;
-    }
-
-    public void setTeamsInGame(List<Team> teamsInGame) {
-        this.teamsInGame = teamsInGame;
-    }
-
+	
     public Integer calculatePointsOfTeam(Team team) {
-        return roundService.getPointsOfTeamInGame(currentGame, team);
+    	return roundService.getPointsOfTeamInGame(currentGame(), team);
     }
 
-    public Game getCurrentGame() {
-        return currentGame;
-    }
+	public Game currentGame() {
+		return this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
+	}
 
-    public void setCurrentGame(Game currentGame) {
-        this.currentGame = currentGame;
-    }
-
+    
     public Team computeWinningTeam() {
-        return gameLogic.getTeamWithMostPoints(currentGame);
+    	return gameLogic.getTeamWithMostPoints(currentGame());
     }
 }
