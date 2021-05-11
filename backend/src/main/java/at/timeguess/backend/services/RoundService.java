@@ -67,4 +67,5 @@ public class RoundService {
     		return 0;
     	return roundRepository.getPointsOfTeamInGame(game, team);
     }
+
 }

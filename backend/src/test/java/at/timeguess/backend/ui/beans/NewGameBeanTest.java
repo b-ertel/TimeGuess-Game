@@ -137,8 +137,7 @@ public class NewGameBeanTest {
 
         verify(gameService).saveGame(any(Game.class));
         verify(gameManagerController).addGame(any(Game.class));
-        verify(messageBean).redirect(anyString());
-        verify(messageBean, times(0)).alertErrorFailValidation(anyString(), anyString());
+        verifyNoInteractions(messageBean);
         assertEquals(expected, result);
     }
 

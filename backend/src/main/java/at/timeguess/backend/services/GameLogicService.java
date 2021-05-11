@@ -1,12 +1,9 @@
 package at.timeguess.backend.services;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
@@ -42,9 +39,28 @@ public class GameLogicService {
      * @param game
      * @return boolean whether there a still terms available or not
      */
-    private boolean stillTermsAvailable(Game game) {
+    public boolean stillTermsAvailable(Game game) {
         if (usedTerms(game).size() == termService.getAllTermsOfTopic(game.getTopic()).size()) return false;
         else return true;
+    }
+    
+    public boolean teamReachedMaxPoints(Game game, Team team) {
+    	if(game.getMaxPoints()<=roundService.getPointsOfTeamInGame(game, team)) {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public Team getTeamWithMostPoints(Game game) {
+    	Integer points = 0;
+    	Team team = null;
+    	for(Team t : game.getTeams()) {
+    		if(roundService.getPointsOfTeamInGame(game, t)>points) {
+    			team = t;
+    			points = roundService.getPointsOfTeamInGame(game, t);
+    		}
+    	}
+    	return team;
     }
 
     /**
