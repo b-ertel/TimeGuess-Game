@@ -141,7 +141,7 @@ public class TestSetup {
      * @return
      */
     public static Topic createTopic(Long topicId) {
-        return createEntity(Topic::new, e -> e.setId(topicId));
+        return createEntity(Topic::new, e -> {e.setId(topicId); e.setEnabled(true);});
     }
 
     /**
