@@ -25,7 +25,6 @@ import org.springframework.security.access.AccessDeniedException;
 import at.timeguess.backend.model.Term;
 
 import at.timeguess.backend.model.Topic;
-import at.timeguess.backend.model.exceptions.TermAlreadyExistsException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
@@ -115,19 +114,7 @@ public class TermServiceTest {
         //term = termService.updateTerm(term);
     }
 
-    @DirtiesContext
-    @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    public void canSaveAndLoadTerm() throws TermAlreadyExistsException {
-        for (long id = 0; id < 5; id++){
-            Term term = new Term();
-            term.setTopic(topicService.loadTopicId(1L));
-            term.setName("TEST");
-            //TODO: when ready...
-            //termService.saveTerm(term);
-            //Assertions.assertEquals(term, termService.loadTerm(term.getId()));
-        }
-    }
+
 
 
 

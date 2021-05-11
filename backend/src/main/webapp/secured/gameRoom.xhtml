@@ -95,7 +95,6 @@
 							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>		   
 				<h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
                      <p:commandButton value="Too slow" action="#{gameRoundController.endRoundThroughCountDown()}" update=":gameRoundForm :gameTableForm"/>
-                     <p:commandButton value="Replay"/>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>
@@ -118,7 +117,7 @@
         			  widgetVar="termOverDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="true" showEffect="fade"
 					  hideEffect="fade" responsive="true" closeable="false">
-        		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameLeaderBoardController.computeWinningTeam().name} on winning #{gameLeaderBoardController.currentGame.name}" 
+        		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameLeaderBoardController.computeWinningTeam().name} on winning #{gameLeaderBoardController.currentGame().name}" 
 							   style="font-weight:bold"/>			   
 				<h:panelGrid columns="1">
                      <p:commandButton value="Quit"/>
