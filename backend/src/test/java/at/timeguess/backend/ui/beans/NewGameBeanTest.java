@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -14,6 +15,8 @@ import static org.mockito.Mockito.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.faces.context.FacesContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -134,8 +137,7 @@ public class NewGameBeanTest {
 
         verify(gameService).saveGame(any(Game.class));
         verify(gameManagerController).addGame(any(Game.class));
-        verify(messageBean).redirect(anyString());
-        verify(messageBean, times(0)).alertErrorFailValidation(anyString(), anyString());
+        verifyNoInteractions(messageBean);
         assertEquals(expected, result);
     }
 
@@ -214,7 +216,10 @@ public class NewGameBeanTest {
     @Test
     public void testMessageBeanRedirectNoContext() {
         MessageBean bean = new MessageBean();
-        assertDoesNotThrow(() -> bean.redirect("somewhere"));
+        if (FacesContext.getCurrentInstance() == null)
+            assertDoesNotThrow(() -> bean.redirect("somewhere"));
+        else
+            assertThrows(NullPointerException.class, () -> bean.redirect("somewhere"));
     }
 
     private String fillBean() {

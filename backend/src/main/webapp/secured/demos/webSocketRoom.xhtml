@@ -45,21 +45,23 @@
                         </ui:repeat>
                     </p:panel>
                     <h:commandButton id="faceBtn" value="roooollTheeeDiiiiceee"
--                                    action="#{webSocketCubeFace.cubeChange}">
--                   </h:commandButton>
+                                    action="#{webSocketCubeFace.cubeChange}">
+                   </h:commandButton>
 
                 </p:panelGrid>
             </div>
 
 
-            <o:socket channel="termChannel" scope="application"
+            <o:socket channel="termChannel"
+                      user="#{sessionInfoBean.currentUser.id}"
                       onmessage="function(m){console.log(m);}">
                 <f:ajax event="termUpdate"
                         render="termInfo"
                         listener="#{userChatController.synchronizeRecipients()}" />              <!-- TODO: listener auf gegnerisches Team ändern...  -->
             </o:socket>
 
-            <o:socket channel="cubeFaceChannel" scope="application"
+            <o:socket channel="cubeFaceChannel"
+                      user="#{sessionInfoBean.currentUser.id}"
                       onmessage="function(m){console.log(m);}">
                 <f:ajax event="cubeFaceChange"
                         render="cubeFace"
