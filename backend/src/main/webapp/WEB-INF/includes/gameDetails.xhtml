@@ -76,8 +76,8 @@
 
                     <h:panelGrid columns="3">
                         <p:commandButton value="Save" action="#{gameDetailController.doSaveGame}"
-                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameEditDialog').hide(); PF('gameTable').filter(); }"
-                            update=":gameListForm:gameTable :gameInfoForm:gameInfoData gameData :msg" />
+                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameEditDialog').hide(); }"
+                            update=":gameInfoForm:gameInfoData gameData :msg" />
                         <p:commandButton value="Reload" action="#{gameDetailController.doReloadGame}"
                             process="@parent" update=":gameDetailForm:gameData :msg" resetValues="true"/>
                         <p:commandButton value="Abort" onsuccess="PF('gameEditDialog').hide()"/>

@@ -22,3 +22,7 @@ function socketListener(message, channel, event) {
 function gameInvitation(name, id) {
     $("#gameInvitation").click();
 }
+
+function gameUpdate(name, id) {
+    $("#gameUpdate").click();
+}

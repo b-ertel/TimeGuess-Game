@@ -370,6 +370,10 @@ td.ui-panelgrid-cell {
     margin-bottom: 10px;
 }
 
+.hidden {
+    display: none;
+}
+
 pre code {
     font-family: monospace;
     font-size: smaller !important;

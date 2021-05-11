@@ -97,7 +97,7 @@
 
                 <h:panelGrid columns="3">
                     <p:commandButton value="Save" action="#{newGameBean.createGame()}"
-                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); PF('gameTable').filter(); }"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); }"
                         process="nameCreate maxPointsCreate cubeCreate topicCreate teamsCreate @this"
                         update="gameCreateData :gameListForm :gameInfoForm:gameInfoData :msg" validateClient="true" />
                     <p:commandButton value="Reload" action="#{newGameBean.clearFields}"
@@ -107,5 +107,6 @@
             </p:dialog>
         </h:form>
 
+        <p:commandButton id="gameUpdate" styleClass="hidden" process="@all" update=":gameListForm:gameCurrent" />
     </ui:define>
 </ui:composition>
