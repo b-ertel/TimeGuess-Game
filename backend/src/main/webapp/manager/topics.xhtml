@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+<style type="text/css">
+    pre code {
+        background-color: #eee;
+        border: 1px solid #999;
+        display: block;
+        padding: 20px;
+    }
+</style>
+    <ui:define name ="content">
+        <h:form id="topicsForm">
+            <ui:remove>show all terms</ui:remove>
+            <p:dataTable id="topicTable" widgetVar="topicTable" var="topic" value="#{topicListController.topics}" >
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column headerText="Topic"/>
+                        <p:column headerText="Number of Terms" style="width:20%" />
+                        <p:column headerText="Enable Topic" style="width:10%"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <p:column style="text-align:center">
+                    <h:outputText value="#{topic.name}"/>
+                </p:column>
+                <p:column style="text-align:center">
+                    <h:outputText value="#{topicDetailController.getNumberOfTerms(topic)}"/>
+                </p:column>
+                <p:column style="text-align:center">
+                    <p:selectBooleanCheckbox value="#{topic.enabled}">
+                        <p:ajax listener="#{topicDetailController.doSaveTopic(topic)}" />
+                    </p:selectBooleanCheckbox>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>

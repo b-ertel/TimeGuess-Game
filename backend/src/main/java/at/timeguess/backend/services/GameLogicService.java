@@ -40,7 +40,15 @@ public class GameLogicService {
      * @return boolean whether there a still terms available or not
      */
     public boolean stillTermsAvailable(Game game) {
-        if (usedTerms(game).size() == termService.getAllTermsOfTopic(game.getTopic()).size()) return false;
+        List<Term> availableTerms = termService.getAllTermsOfTopic(game.getTopic());
+        Set<Term> usedTerms = usedTerms(game);
+        usedTerms.stream().forEach(term -> availableTerms.remove(term));
+        for (Term term : availableTerms) {
+            if (!term.isEnabled()) {
+                availableTerms.remove(term);
+            }
+        }
+        if (availableTerms.isEmpty()) return false;
         else return true;
     }
     
@@ -85,7 +93,12 @@ public class GameLogicService {
         Set<Term> usedTerms = usedTerms(game);
         usedTerms.stream().forEach(term -> terms.remove(term));
         Random rand = new Random();
-        return terms.get(Math.abs(rand.nextInt(terms.size())));
+        Term next = terms.get(Math.abs(rand.nextInt(terms.size())));
+        while (!next.isEnabled()) {
+            Random newRand = new Random();
+            next = terms.get(Math.abs(newRand.nextInt(terms.size())));
+        }
+        return next;
     }
 
     public Team getNextTeam(Game game) {

@@ -38,7 +38,7 @@
                             required="true" requiredMessage="#{topicMsg}">
                             <p:ajax event="change" process="@this" />
                             <f:selectItem itemLabel="Select" />
-                            <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
+                            <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" itemDisabled="#{!topval.enabled}" />
                         </p:selectOneMenu>
                         <p:separator style="margin:7px 0px 15px" />
                     </p:panelGrid>

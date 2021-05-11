@@ -191,7 +191,7 @@ public class NewGameBean implements Serializable {
         if (Strings.isBlank(gameName)) return false;
         if (maxPoints <= 0) return false;
         if (cube == null || cube.isNew()) return false;
-        if (topic == null) return false;
+        if (topic == null || !topic.isEnabled()) return false;
         if (teams == null || teams.size() < 2) return false;
         return true;
     }

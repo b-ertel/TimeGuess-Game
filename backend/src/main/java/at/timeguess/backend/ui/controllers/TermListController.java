@@ -51,8 +51,8 @@ public class TermListController implements Serializable {
         return filterTerms;
     }
 
-    public void setFilterTerms(Collection<Term> games) {
-        filterTerms = games;
+    public void setFilterTerms(Collection<Term> terms) {
+        filterTerms = terms;
     }
 
     /**
