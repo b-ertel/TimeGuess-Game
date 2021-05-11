@@ -1,9 +1,17 @@
 package at.timeguess.backend.ui.controllers;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static at.timeguess.backend.utils.TestSetup.createUser;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-import static at.timeguess.backend.utils.TestSetup.*;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.List;
@@ -126,6 +134,22 @@ public class UserDetailControllerTest {
         userDetailController.doSaveUser();
 
         verifyNoInteractions(userService);
+        verifyNoInteractions(passwordEncoder);
+        verify(messageBean).alertErrorFailValidation(anyString(), anyString());
+        assertEquals(userId, userDetailController.getUser().getId());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 1, 40, 444 })
+    public void testDoSaveUserSaveThrows(Long userId) {
+        String expectedMsg = "exception";
+        User user = assertMockUser(userId, true);
+        reset(userService);
+        when(userService.saveUser(user)).thenThrow(new RuntimeException(expectedMsg));
+
+        userDetailController.doSaveUser();
+
+        verify(userService).saveUser(user);
         verifyNoInteractions(passwordEncoder);
         verify(messageBean).alertErrorFailValidation(anyString(), anyString());
         assertEquals(userId, userDetailController.getUser().getId());

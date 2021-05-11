@@ -54,8 +54,8 @@
                                 <h:outputText value="Maximum points: #{game.maxPoints}" styleClass="game-points" />
                                 <p:linkButton  title="Confirm" value="Confirm" icon="fa fa-sign-in"
                                     href="/secured/gameRoom.xhtml" includeViewParams="true"
-                                    onclick="#{gameListController.doConfirm(sessionInfoBean.currentUser, game)}"
                                     disabled="#{gameListController.isDisabledConfirmation(sessionInfoBean.currentUser, game)}">
+                                    <!-- onclick="#{gameListController.doConfirm(sessionInfoBean.currentUser, game)}" -->
                                     <f:param name="id" value="#{game.id}"/>
                                 </p:linkButton>
                             </div>
@@ -78,8 +78,8 @@
                             <div class="game-list-action">
                                 <p:linkButton  title="Confirm" value="Confirm" icon="fa fa-sign-in"
                                     href="/secured/gameRoom.xhtml" includeViewParams="true"
-                                    onclick="#{gameListController.doConfirm(sessionInfoBean.currentUser, game)}"
                                     disabled="#{gameListController.isDisabledConfirmation(sessionInfoBean.currentUser, game)}">
+                                    <!-- onclick="#{gameListController.doConfirm(sessionInfoBean.currentUser, game)}" -->
                                     <f:param name="id" value="#{game.id}"/>
                                 </p:linkButton>
                                 <span class="game-badge #{game.status}">#{game.status}</span>
