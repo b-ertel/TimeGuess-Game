@@ -136,13 +136,6 @@
 				hideEffect="fade" responsive="true" closable="false">
 
 				<p:outputPanel id="cubeConfigurationOutputPanel">
-					<p:panel header="MAC address of cube">
-						<h:outputText
-							value="#{cubeConfigurationController.cube.macAddress}" />
-					</p:panel>
-
-					<p:spacer height="5" />
-
 					<p:panel header="Instructions">
 						<h:outputText value="#{cubeConfigurationController.instruction}" />
 					</p:panel>
@@ -207,12 +200,6 @@
 				hideEffect="fade" responsive="true">
 
 				<p:outputPanel id="cubeTestOutputPanel">
-					<p:panel header="MAC address of cube">
-						<h:outputText value="#{cubeTestController.cube.macAddress}" />
-					</p:panel>
-
-					<p:spacer height="5" />
-
 					<p:panel header="Instructions">
 						<h:outputText
 							value="Turn the cube and check if the cube faces displayed below are correct!" />
