@@ -3,6 +3,7 @@ package at.timeguess.backend.services;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,6 @@ import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Interval;
 import at.timeguess.backend.model.IntervalType;
 import at.timeguess.backend.model.api.FacetsMessage;
-import at.timeguess.backend.model.api.StatusMessage;
 import at.timeguess.backend.repositories.ConfigurationRepository;
 import at.timeguess.backend.repositories.IntervalRepository;
 import at.timeguess.backend.repositories.ThresholdRepository;
@@ -52,29 +52,21 @@ public class CubeService {
     private UnconfiguredFacetsEventPublisher unconfiguredFacetsEventPublisher;
     @Autowired
     private ConfiguredFacetsEventPublisher configuredFacetsEventPublisher;
-
-
+    
     /**
-     * @param cube: the cube to save
-     */
-    public Cube saveCube(Cube cube) {
-        return cubeRepo.save(cube);
-    }
-
-    /**
-     * method to create a new entry for a cube device in the database
+     * Save a new or existing cube to the database.
      * 
-     * @param message from the new Cube which contains attributes for the new Cube
-     * @return new Cube
+     * @param cube the cube to save
+     * @throws IllegalArgumentException
      */
-    public Cube createCube(StatusMessage message) {
-        Cube newCube = new Cube();
-        newCube.setMacAddress(message.getIdentifier());
-        newCube = saveCube(newCube);
-
-        LOGGER.info("new Cube createt with mac {}", newCube.getMacAddress());
-
-        return newCube;
+    // @PreAuthorize("hasAuthority('ADMIN')")
+    public Cube saveCube(Cube cube) throws IllegalArgumentException {
+        try {
+            return cubeRepo.save(cube);
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException("There was a problem saving the given cube, e.g., because a different cube with the same MAC address already exists in the database.");
+        }
     }
 
     /**
@@ -83,18 +75,15 @@ public class CubeService {
     public List<Cube> allCubes(){		
         return cubeRepo.findAll();
     }
-
+    
     /**
+     * Check if a cube with a given MAC address exists in the database.
+     * 
      * @param cube to find out if mac address is already known
      * @return true if mac address is known, false otherwise
      */
     public boolean isMacAddressKnown(String macAddress) {
-        if(cubeRepo.findByMacAddress(macAddress)==null){
-            return false;
-        }
-        else {
-            return true;
-        }
+        return cubeRepo.findByMacAddress(macAddress) != null;
     }
 
     /**
@@ -106,13 +95,21 @@ public class CubeService {
     public Cube getByMacAddress(String identifier) {
         return cubeRepo.findByMacAddress(identifier);
     }
-
-    /** deletes a cube
-     * @param cube to delete
+    
+    /**
+     * Delete a given cube from the database.
+     * 
+     * @param cube the cube to delete
+     * @throws IllegalArgumentException
      */
-    public void deleteCube(Cube cube) {
-        cubeRepo.delete(cube);
-
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void deleteCube(Cube cube) throws IllegalArgumentException{
+        try {
+            cubeRepo.delete(cube);
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException("There was a problem deleting the given cube, e.g., because there are relationships involving the given cube.");
+        }
     }
 
     /**
@@ -123,11 +120,16 @@ public class CubeService {
     }
 
     /**
-     * Checks if a given cube has already been configured.
+     * Checks if a given cube has already been configured, i.e., if there
+     * exist configurations for it.
+     * <p>
+     * Note that if this method returns true this does not necessarily mean
+     * that the configuration actually works!
      * 
      * @param cube the cube
      * @return a boolean indicating if the cube is configured
      */
+    @PreAuthorize("hasAuthority('ADMIN')")
     public boolean isConfigured(Cube cube){
         return !configurationRepository.findByCube(cube).isEmpty();
     }
@@ -137,20 +139,32 @@ public class CubeService {
      *  
      * @param cube the cube
      */
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteConfigurations(Cube cube) {
         for (Configuration configuration : configurationRepository.findByCube(cube)) {
             configurationRepository.delete(configuration);
         }
     }
-        
+    
     /**
      * Save a new set of new configurations for a given cube.
+     * <p>
+     * Note that the correctness of the mapping is not checked, so the
+     * fact that this method does not throw an exception does not mean that
+     * the configuration will actually work!
      * 
      * @param cube the cube
      * @param mapping a mapping of Cube faces to facet numbers
+     * @throws IllegalArgumentException
      */
-    public void saveMappingForCube(Cube cube, Map<CubeFace, Integer> mapping) {
-        deleteConfigurations(cube);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void saveMappingForCube(Cube cube, Map<CubeFace, Integer> mapping) throws IllegalArgumentException {
+        if (!isMacAddressKnown(cube.getMacAddress())) {
+            throw new IllegalArgumentException("The given cube does not exist!");
+        }
+        if (isConfigured(cube)) {
+            throw new IllegalArgumentException("An existing configuration already exists for the given cube and has to be deleted first!");
+        }
         for (Entry<CubeFace, Integer> entry : mapping.entrySet()) {
             Configuration configuration = new Configuration();
             configuration.setCube(cube);
@@ -160,12 +174,17 @@ public class CubeService {
         }
     }
     
-    private CubeFace getMappedCubeFace(Cube cube, Integer facet) {
-        List<Configuration> configurations = configurationRepository.findByCube(cube);
-        for (Configuration configuration : configurations) {
-            if (configuration.getFacet().equals(facet)) {
-                return configuration.getCubeface();
-            }
+    /**
+     * Find the mapped cube face for a given cube and facet number. 
+     * 
+     * @param cube the cube
+     * @param facet the facet number
+     * @return the mapped cube face if this uniquely (!) exists or null otherwise
+     */
+    public CubeFace getMappedCubeFace(Cube cube, Integer facet) {
+        List<Configuration> matchingConfigurations = configurationRepository.findByCube(cube).stream().filter(c -> c.getFacet() == facet).collect(Collectors.toList());
+        if (matchingConfigurations.size() == 1) {
+            return matchingConfigurations.get(0).getCubeface();
         }
         return null;
     }
