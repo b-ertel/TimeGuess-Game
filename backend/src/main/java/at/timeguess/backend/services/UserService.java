@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -235,6 +236,11 @@ public class UserService {
     public void deleteUser(User user) {
         try {
             userRepository.delete(user);
+            
+            // very weird behaviour: the following kind of exception should be thrown
+            // but instead just nothing happens... so do-it-yourself
+            if (this.hasUser(user.getUsername()))
+                    throw new DataIntegrityViolationException("Delete failed without throwing an exception");
 
             // fill ui message, send update and log
             messageBean.alertInformation(user.getUsername(), "User was deleted");

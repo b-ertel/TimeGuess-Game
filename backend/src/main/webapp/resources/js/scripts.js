@@ -50,6 +50,7 @@ function topicUpdate(name, id) {
 function userUpdate(name, id) {
     clickIfExists("lobbyUpdate");
     clickIfExists("profileUpdate");
+    clickIfExists("usersUpdate");
 }
 
 function connectionCubeUpdate(name, id) {

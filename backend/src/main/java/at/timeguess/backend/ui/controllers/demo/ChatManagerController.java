@@ -51,8 +51,10 @@ public class ChatManagerController {
      */
     public void onLogin(String username) {
         User user = this.userRepository.findFirstByUsername(username);
-        this.possibleRecipients.add(user);
-        this.chats.put(username, new LinkedList<>());
+        if (user != null) {
+            this.possibleRecipients.add(user);
+            this.chats.put(username, new LinkedList<>());
+        }
     }
 
     /**
@@ -64,8 +66,10 @@ public class ChatManagerController {
      */
     public void onLogout(String username) {
         User user = this.userRepository.findFirstByUsername(username);
-        this.possibleRecipients.remove(user);
-        this.chats.remove(user.getUsername());
+        if (user != null) {
+            this.possibleRecipients.remove(user);
+            this.chats.remove(user.getUsername());
+        }
     }
 
     /**
