@@ -49,7 +49,7 @@ public class CubeStatusController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CubeStatusController.class);
     private final DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
-	
+
     @Autowired
     private CubeService cubeService;
     @CDIAutowired
@@ -123,8 +123,9 @@ public class CubeStatusController {
 		}
 		else {
 			LOGGER.info("cube is not known...new cube is created");
-			updatedCube = cubeService.createCube(message);									// Cube is new and has to be created
-
+			updatedCube.setMacAddress(message.getIdentifier());
+			updatedCube = cubeService.saveCube(updatedCube);
+			LOGGER.info("new Cube createt with mac {}", updatedCube.getMacAddress());
 			this.cubeStatus.put(updatedCube.getMacAddress(), new CubeStatusInfo(updatedCube));
 			statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);
 		}
