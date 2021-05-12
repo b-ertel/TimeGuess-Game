@@ -33,10 +33,15 @@ public class CubeController {
      * 
      */
     public void saveCube() {
-        this.cube=cubeService.saveCube(this.cube);
-        statusController.updateCubeInStatus(this.cube);
-        statusController.updateSockets();
-        message.alertInformation("CubeManagment", "Cube saved");
+        try {
+            this.cube=cubeService.saveCube(this.cube);
+            statusController.updateCubeInStatus(this.cube);
+            statusController.updateSockets();
+            message.alertInformation("CubeManagment", "Cube saved");
+        }
+        catch (IllegalArgumentException e) {
+            message.alertErrorFailValidation("CubeManagement", e.getMessage());
+        }
     }
 
     /**
@@ -60,10 +65,15 @@ public class CubeController {
      * deletes cube and removes its status
      */
     public void deleteCube() {
-    	cubeService.deleteCube(this.cube);
-        statusController.updateSockets();
-    	statusController.deleteStatus(this.cube.getMacAddress());
-        message.alertInformation("CubeManagment", "Cube " + this.cube.getId() + " deleted");
+        try {
+            cubeService.deleteCube(this.cube);
+            statusController.updateSockets();
+            statusController.deleteStatus(this.cube.getMacAddress());
+            message.alertInformation("CubeManagment", "Cube " + this.cube.getId() + " deleted");
+        }
+        catch (IllegalArgumentException e) {
+            message.alertErrorFailValidation("CubeManagement", e.getMessage());
+        }
     }
     
     /**
