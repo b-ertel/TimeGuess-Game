@@ -36,11 +36,15 @@ function teamUpdate(name, id) {
 function termUpdate(name, id) {
     clickIfExists("lobbyUpdate");
     clickIfExists("profileUpdate");
+    clickIfExists("termsUpdate");
+    clickIfExists("topicsUpdate");
 }
 
 function topicUpdate(name, id) {
     clickIfExists("lobbyUpdate");
     clickIfExists("profileUpdate");
+    clickIfExists("termsUpdate");
+    clickIfExists("topicsUpdate");
 }
 
 function userUpdate(name, id) {
