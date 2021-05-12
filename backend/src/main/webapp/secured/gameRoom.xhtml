@@ -35,10 +35,14 @@
    <h:form id="gameRoundForm" style="width:700px; text-align:center; align:right; margin: 0 auto;">
             <div class="gameRoomContent">      
                 <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
-				<p:outputLabel value="Flip your cube to start the first round! May the best team win!" 
-							   rendered="#{empty gameRoundController.currentRound}" style="font-weight:bold"/>
-				<p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round" 
-							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound}" style="font-weight:bold"/>
+				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to guess #{gameRoundController.nextRound.termToGuess.name}. " 
+							   rendered="#{empty gameRoundController.currentRound and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
+				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to guess first. " 
+							   rendered="#{empty gameRoundController.currentRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
+				<p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to guess #{gameRoundController.nextRound.termToGuess.name} during next round. Flip the cube and try your best!" 
+							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
+				<p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to guess during next round. Flip the cube and try your best!" 
+							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>			  
 				<p:outputPanel header="RoundInfo" rendered="#{gameRoundController.inRound}">
 						<h3>Time to Guess</h3>
 		            	<h1 class="p-text-center" style="border-bottom: double">
@@ -146,7 +150,8 @@
                         oncomplete="PF('roundValidationDialog').show()"/>
                 <p:ajax event="validatedRound"
                         onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "
-                        update=":gameTableForm"/>                 
+                        listener="#{gameRoundController.getNextRoundInfos()}"
+                        update=":gameTableForm :gameRoundForm"/>                 
                 <p:ajax event="endRoundViaCountDown"
                         render=":gameRoundForm:roundInfo :roundTimesUpForm:roundTimesUpDialog"
                         listener="#{gameRoundController.setInRound(false)}"

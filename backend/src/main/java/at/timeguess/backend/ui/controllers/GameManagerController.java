@@ -96,7 +96,7 @@ public class GameManagerController {
             Game game = listOfGames.get(configuredFacetsEvent.getCube());
             if (!activeRound.get(game)) {
                 activeRound.put(game, true);
-                startNewRound(game, configuredFacetsEvent.getCubeFace());
+                startRoundByCube(game, currentRound.get(game), configuredFacetsEvent.getCubeFace());
             }
             else {
                 activeRound.put(game, false);
@@ -140,9 +140,13 @@ public class GameManagerController {
      * @param currentGame, game for which round should be started
      * @param cubeFace,    face that sets round parameter
      */
-    public void startNewRound(Game currentGame, CubeFace cubeFace) {
-        this.currentRound.put(currentGame, gameLogic.startNewRound(currentGame, cubeFace));
-        this.websocketManager.getNewRoundChannel().send("startRound", getAllUserIdsOfGameTeams(currentGame.getTeams()));
+    public void startRoundByCube(Game game, Round round, CubeFace cubeFace) {
+        this.currentRound.put(game, gameLogic.getCubeInfosIntoRound(round, cubeFace));
+        this.websocketManager.getNewRoundChannel().send("startRound", getAllUserIdsOfGameTeams(game.getTeams()));
+    }
+    
+    public void getNextRoundInfo(Game game) {
+    	this.currentRound.put(game, gameLogic.getNextRound(game));
     }
 
     public Round getCurrentRoundOfGame(Game game) {
@@ -232,8 +236,8 @@ public class GameManagerController {
             if (gameLogic.teamReachedMaxPoints(game, this.currentRound.get(game).getGuessingTeam())) {
                 endGame(game);
                 this.websocketManager.getNewRoundChannel().send("gameOver", getAllUserIdsOfGameTeams(game.getTeams()));
-            }
-            else {
+            } else { 
+            	getNextRoundInfo(this.listOfGames.get(getCubeByGame(game)));
                 this.websocketManager.getNewRoundChannel().send("validatedRound", getAllUserIdsOfGameTeams(game.getTeams()));
             }
 
@@ -293,5 +297,7 @@ public class GameManagerController {
         listOfGames.put(cube2, testgame2);
         activeRound.put(testgame1, false);
         activeRound.put(testgame2, false);
+        getNextRoundInfo(testgame1);
+        getNextRoundInfo(testgame2);
     }
 }
