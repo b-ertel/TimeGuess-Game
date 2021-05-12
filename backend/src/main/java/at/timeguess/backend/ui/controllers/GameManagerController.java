@@ -70,6 +70,7 @@ public class GameManagerController {
             (cpEvent) -> GameManagerController.this.onChannelPresenceEvent(cpEvent);
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
+    private Map<Game, Boolean> midValidation = new ConcurrentHashMap<>();
     private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>(); // indicated if there is played a round currently in the game
     private Map<Cube, Game> listOfGames = new HashMap<>();
 
@@ -94,14 +95,17 @@ public class GameManagerController {
     public synchronized void onConfiguredFacetsEvent(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
             Game game = listOfGames.get(configuredFacetsEvent.getCube());
-            if (!activeRound.get(game)) {
-                activeRound.put(game, true);
-                startRoundByCube(game, currentRound.get(game), configuredFacetsEvent.getCubeFace());
-            }
-            else {
-                activeRound.put(game, false);
-                this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
-            }
+            if(!midValidation.get(game)) {
+            	if (!activeRound.get(game)) {
+                    activeRound.put(game, true);
+                    startRoundByCube(game, currentRound.get(game), configuredFacetsEvent.getCubeFace());
+                }
+                else {
+                    activeRound.put(game, false);
+                    midValidation.put(game, true);
+                    this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
+                }
+            }    
         }
     }
 
@@ -220,6 +224,7 @@ public class GameManagerController {
             // add game to map
             listOfGames.put(game.getCube(), game);
             activeRound.put(game, false);
+            midValidation.put(game, false);
 
             // send invitation to all contained team members
             Set<Long> invited = game.getTeams().stream().flatMap(t -> t.getTeamMembers().stream().map(User::getId))
@@ -232,6 +237,7 @@ public class GameManagerController {
     public void validateRoundOfGame(Game game, Validation v) {
         gameLogic.saveLastRound(game, v);
         this.listOfGames.put(getCubeByGame(game), game);
+        midValidation.put(game, false);
         if (gameLogic.teamReachedMaxPoints(game, this.currentRound.get(game).getGuessingTeam())) {
             endGame(game);
             this.websocketManager.getNewRoundChannel().send("gameOver", getAllUserIdsOfGameTeams(game.getTeams()));
@@ -260,6 +266,10 @@ public class GameManagerController {
 
     public void setActiveRoundFalse(Game game) {
         this.activeRound.put(game, false);
+    }
+    
+    public void setMidValidationTrue(Game game) {
+    	this.midValidation.put(game, true);
     }
 
     public void endGame(Game game) {
@@ -295,6 +305,8 @@ public class GameManagerController {
         listOfGames.put(cube2, testgame2);
         activeRound.put(testgame1, false);
         activeRound.put(testgame2, false);
+        midValidation.put(testgame1, false);
+        midValidation.put(testgame2, false);
         getNextRoundInfo(testgame1);
         getNextRoundInfo(testgame2);
     }
