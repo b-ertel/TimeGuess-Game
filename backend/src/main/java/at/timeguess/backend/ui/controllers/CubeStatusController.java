@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import at.timeguess.backend.utils.CDIContextRelated;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.CubeStatusInfo;
+import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.HealthStatus;
 import at.timeguess.backend.model.IntervalType;
 import at.timeguess.backend.model.ThresholdType;
@@ -54,6 +56,8 @@ public class CubeStatusController {
     private CubeService cubeService;
     @CDIAutowired
     private WebSocketManager websocketManager;
+    @Autowired
+    private GameManagerController gameManagerController;
 
 	private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
@@ -313,6 +317,15 @@ public class CubeStatusController {
 				LOGGER.info("[{}] cube with mac {} lost connection", LocalDateTime.now().format(myFormat), m.getKey());
 				setOffline(m.getKey());
 				LOGGER.info("[{}] cube with mac {} changed to status OFFLINE", LocalDateTime.now().format(myFormat), m.getKey());
+				
+				Cube cube = cubeService.getByMacAddress(m.getKey());
+				System.out.println(cube);
+				Game game = gameManagerController.getCurrentGameForCube(cube);
+				System.out.println(game);
+				List<Long> usersToNotify = gameManagerController.getAllUserIdsOfGameTeams(game.getTeams());
+				System.out.println(usersToNotify);
+				websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
+				
 			}              
 			else {                 
 				if(m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {

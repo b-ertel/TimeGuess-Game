@@ -123,7 +123,20 @@
                      <p:commandButton value="Quit"/>
                 </h:panelGrid>
         	</p:dialog>
-      </h:form>     
+      </h:form> 
+      
+      <h:form id="healthStatusForm">
+      		<p:dialog id="healthStatusDialog" header="Cube Health Status"
+        			  widgetVar="healthStatusDialog" dynamic="true" modal="true"
+					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  hideEffect="fade" responsive="true" closeable="false">
+        		<p:outputLabel value="Cube is offline!!" 
+							   style="font-weight:bold"/>			   
+				<h:panelGrid columns="1">
+                     <p:commandButton value="Ok" action="PF('healthStatusDialog').close()" update=":gameRoundForm :gameTableForm"/>
+                </h:panelGrid>
+        	</p:dialog>
+      </h:form>         
                  
             
             <o:socket channel="countDownChannel" scope="session"
@@ -159,7 +172,11 @@
                	<p:ajax event="termsOver"
                         render=":gameRoundForm:roundInfo :termOverForm:termOverDialog"
                         oncomplete="PF('termOverDialog').show()" 
-                        />      
+                        />  
+                <p:ajax event="healthMessage"
+                        render=":gameRoundForm:roundInfo :healthStatusForm:healthStatusDialog"
+                        oncomplete="PF('healthStatusDialog').show()" 
+                        />          
             </o:socket>
         
  

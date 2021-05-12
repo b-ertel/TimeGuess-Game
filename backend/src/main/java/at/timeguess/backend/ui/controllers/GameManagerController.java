@@ -54,8 +54,8 @@ public class GameManagerController {
     private CubeService cubeService;
     @Autowired
     private GameLogicService gameLogic;
-    @Autowired
-    private CubeStatusController cubeStatusController;
+  //  @Autowired
+ //   private CubeStatusController cubeStatusController;
     @CDIAutowired
     private WebSocketManager websocketManager;
     @Autowired
@@ -171,7 +171,7 @@ public class GameManagerController {
      * @param listOfTeams
      * @return list of usernames
      */
-    private List<Long> getAllUserIdsOfGameTeams(Set<Team> listOfTeams) {
+    public List<Long> getAllUserIdsOfGameTeams(Set<Team> listOfTeams) {
         List<Long> userIds = new ArrayList<>();
         List<User> users = new ArrayList<>();
         for (Team team : listOfTeams) {
@@ -206,7 +206,7 @@ public class GameManagerController {
         if (game == null) throw new NullPointerException("startGame was called with null game");
 
         // change cube status
-        cubeStatusController.setInGame(game.getCube().getMacAddress());
+//        cubeStatusController.setInGame(game.getCube().getMacAddress());
 
         // change game status
         game.setStatus(GameState.VALID_SETUP);
@@ -294,4 +294,14 @@ public class GameManagerController {
         activeRound.put(testgame1, false);
         activeRound.put(testgame2, false);
     }
+
+	/**
+	 * finds a game with a given cube
+	 * 
+	 * @param cube to find the game
+	 * @return the game
+	 */
+	public Game getCurrentGameForCube(Cube cube) {
+		return this.listOfGames.get(cube);
+	}
 }
