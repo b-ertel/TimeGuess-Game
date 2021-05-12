@@ -9,4 +9,5 @@ COPY Vagrantfile /tmp/
 WORKDIR /tmp/
 EXPOSE 8080
 
+RUN mvn dependency:go-offline
 CMD ["mvn", "spring-boot:run"]
