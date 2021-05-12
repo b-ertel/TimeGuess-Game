@@ -1,15 +1,15 @@
 This folder was initialized with the [Skeleton project template](https://git.uibk.ac.at/informatik/qe/skeleton).
 See the original readme in [SKELETON_README.md](SKELETON_README.md).
 
+## Docker deploy
+To build the docker container run `docker run --rm -d  -p 8080:8080/tcp backend:latest` in your terminal. Then run the application by executing `docker run --rm -d  -p 8080:8080/tcp backend:latest`.
+
 ## Code
 The project utilizes Spring Boot and is configured as maven web application with:
 - all relevant Spring Framework features enabled
 - embedded Tomcat with support for JSF2
 - embedded H2 in-memory database (including H2 console)
 - support for PrimeFaces
-  ??Stimmt das so??
-  
-
 
 ## Running the project
  Execute  `mvn spring-boot:run` to start the skeleton project
@@ -21,11 +21,3 @@ Logins:
   - `user1:passwd`
   - `user2:passwd`
   - `elvis:passwd`
-  
-### Employee Submenu
-
-doesn't appear to do anything. Is this correct?
-
-### Websocket chat
-
-To get the chat app working at least two different users need to be logged in.
