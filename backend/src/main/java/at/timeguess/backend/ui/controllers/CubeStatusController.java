@@ -325,4 +325,36 @@ public class CubeStatusController {
 		}
 	}
 
+	/**
+	 * Get the latest reported value of the battery level characteristic for a given cube.
+	 * 
+	 * @param cube the cube
+	 * @return the battery level
+	 */
+	public Integer getBatteryLevel(Cube cube) {
+	    HealthStatus hs = healthStatus.get(cube.getMacAddress());
+	    if (hs != null) {
+	        return hs.getBatteryLevel();
+	    }
+	    else {
+	        return null;
+	    }
+	}
+
+	/**
+	 * Get the latest reported value of the RSSI for a given cube.
+	 * 
+	 * @param cube the cube
+	 * @return the RSSI
+	 */
+	public Integer getRssi(Cube cube) {
+	    HealthStatus hs = healthStatus.get(cube.getMacAddress());
+            if (hs != null) {
+                return hs.getRssi();
+            }
+            else {
+                return null;
+            }
+	}
+
 }
