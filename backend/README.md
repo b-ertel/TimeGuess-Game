@@ -2,7 +2,7 @@ This folder was initialized with the [Skeleton project template](https://git.uib
 See the original readme in [SKELETON_README.md](SKELETON_README.md).
 
 ## Docker deployment
-To build the docker container run `docker build --pull --rm -f "Dockerfile" -t backend:latest "."` in your terminal. Then run the application by executing `docker run --rm -d  -p 8080:8080/tcp backend:latest`.
+To build the docker container run `docker build --pull --rm -f "Dockerfile" -t backend:latest "."` in your terminal from inside the `backend`-directory (where the Dockerfile and this readme are saved). Then run the application by executing `docker run --rm -d  -p 8080:8080/tcp backend:latest`.
 
 ## Code
 The project utilizes Spring Boot and is configured as maven web application with:
