@@ -59,6 +59,7 @@ public class CubeService {
      * @param cube the cube to save
      * @throws IllegalArgumentException
      */
+    // TODO: access control
     // @PreAuthorize("hasAuthority('ADMIN')")
     public Cube saveCube(Cube cube) throws IllegalArgumentException {
         try {
