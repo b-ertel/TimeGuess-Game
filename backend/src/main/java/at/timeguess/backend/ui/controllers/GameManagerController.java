@@ -232,23 +232,21 @@ public class GameManagerController {
     public void validateRoundOfGame(Game game, Validation v) {
         gameLogic.saveLastRound(game, v);
         this.listOfGames.put(getCubeByGame(game), game);
-        if (gameLogic.stillTermsAvailable(game)) {
-            if (gameLogic.teamReachedMaxPoints(game, this.currentRound.get(game).getGuessingTeam())) {
+        if (gameLogic.teamReachedMaxPoints(game, this.currentRound.get(game).getGuessingTeam())) {
+            endGame(game);
+            this.websocketManager.getNewRoundChannel().send("gameOver", getAllUserIdsOfGameTeams(game.getTeams()));
+        } else { 
+        	if (!gameLogic.stillTermsAvailable(game)) {
+        		Team winningTeam = gameLogic.getTeamWithMostPoints(game);
+                game.setMaxPoints(roundService.getPointsOfTeamInGame(game, winningTeam));
                 endGame(game);
-                this.websocketManager.getNewRoundChannel().send("gameOver", getAllUserIdsOfGameTeams(game.getTeams()));
-            } else { 
+                this.websocketManager.getNewRoundChannel().send("termsOver", getAllUserIdsOfGameTeams(game.getTeams()));
+        	} else {
             	getNextRoundInfo(this.listOfGames.get(getCubeByGame(game)));
                 this.websocketManager.getNewRoundChannel().send("validatedRound", getAllUserIdsOfGameTeams(game.getTeams()));
             }
 
         }
-        else {
-            Team winningTeam = gameLogic.getTeamWithMostPoints(game);
-            game.setMaxPoints(roundService.getPointsOfTeamInGame(game, winningTeam));
-            endGame(game);
-            this.websocketManager.getNewRoundChannel().send("termsOver", getAllUserIdsOfGameTeams(game.getTeams()));
-        }
-
     }
 
     private Cube getCubeByGame(Game game) {
