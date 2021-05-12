@@ -130,7 +130,8 @@ public class CubeService {
      * @param cube the cube
      * @return a boolean indicating if the cube is configured
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    // TODO: access control
+    // @PreAuthorize("hasAuthority('ADMIN')")
     public boolean isConfigured(Cube cube){
         return !configurationRepository.findByCube(cube).isEmpty();
     }
@@ -140,7 +141,8 @@ public class CubeService {
      *  
      * @param cube the cube
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    // TODO: access control
+    // @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteConfigurations(Cube cube) {
         for (Configuration configuration : configurationRepository.findByCube(cube)) {
             configurationRepository.delete(configuration);
