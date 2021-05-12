@@ -326,6 +326,7 @@ tr.ui-widget-content {
 
 td.ui-panelgrid-cell {
     border: none !important;
+    vertical-align: top;
 }
 
 .ui-button-icon-left {
@@ -364,6 +365,11 @@ td.ui-panelgrid-cell {
     float: right;
     text-align: right;
     margin-right: 20px;
+}
+
+.findial {
+    margin-top:7px;
+    margin-bottom: 5px !important;
 }
 
 .pagemenu {

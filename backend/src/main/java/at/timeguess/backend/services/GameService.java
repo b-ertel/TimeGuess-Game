@@ -42,15 +42,15 @@ public class GameService {
     private MessageBean messageBean;
 
     @CDIAutowired
-    private WebSocketManager webSocketManager;
+    private WebSocketManager websocketManager;
 
     /**
      * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
      * and {@link PostConstruct} is not invoked, so autowiring is done manually
      */
     public GameService() {
-        if (webSocketManager == null) {
-            new CDIAwareBeanPostProcessor().postProcessAfterInitialization(this, "webSocketManager");
+        if (websocketManager == null) {
+            new CDIAwareBeanPostProcessor().postProcessAfterInitialization(this, "websocketManager");
         }
     }
 
@@ -101,7 +101,7 @@ public class GameService {
 
     /**
      * Saves the game. If the game is new the user requesting this operation will be stored as {@link Game#creator}.
-     * Additionally fills gui message with success or failure info and triggers an update in the message channel.
+     * Additionally fills gui message with success or failure info and triggers a push update.
      * @param game the game to save
      * @return the saved game
      * @apiNote Message handling ist done here, because this is the central place for saving games.
@@ -118,9 +118,9 @@ public class GameService {
 
             // fill ui message, send update and log
             messageBean.alertInformation(ret.getName(), isNew ? "New game created" : "Game updated");
-            
-            if (webSocketManager != null)
-                webSocketManager.getUserRegistrationChannel().send(
+
+            if (websocketManager != null)
+                websocketManager.getUserRegistrationChannel().send(
                         Map.of("type", "gameUpdate", "name", game.getName(), "id", game.getId()));
 
             User auth = userService.getAuthenticatedUser();
@@ -141,7 +141,7 @@ public class GameService {
 
     /**
      * Deletes the game.
-     * Additionally fills gui message with success or failure info and triggers an update in the message channel.
+     * Additionally fills gui message with success or failure info and triggers a push update.
      * @param game the game to delete
      */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER') or hasAuthority('ADMIN')")
@@ -152,8 +152,8 @@ public class GameService {
             // fill ui message, send update and log
             messageBean.alertInformation(game.getName(), "Game was deleted");
 
-            if (webSocketManager != null)
-                webSocketManager.getUserRegistrationChannel()
+            if (websocketManager != null)
+                websocketManager.getUserRegistrationChannel()
                     .send(Map.of("type", "gameUpdate", "name", game.getName(), "id", game.getId()));
 
             User auth = userService.getAuthenticatedUser();

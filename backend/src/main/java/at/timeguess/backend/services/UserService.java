@@ -20,14 +20,19 @@ import at.timeguess.backend.model.UserRole;
 import at.timeguess.backend.model.utils.GroupingHelper;
 import at.timeguess.backend.repositories.GameRepository;
 import at.timeguess.backend.repositories.UserRepository;
+import at.timeguess.backend.spring.CDIAwareBeanPostProcessor;
 import at.timeguess.backend.ui.beans.MessageBean;
 import at.timeguess.backend.ui.beans.NewUserBean;
+import at.timeguess.backend.ui.websockets.WebSocketManager;
+import at.timeguess.backend.utils.CDIAutowired;
+import at.timeguess.backend.utils.CDIContextRelated;
 
 /**
  * Service for accessing and manipulating user data.
  */
 @Component
 @Scope(WebApplicationContext.SCOPE_APPLICATION)
+@CDIContextRelated
 public class UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
@@ -39,6 +44,19 @@ public class UserService {
 
     @Autowired
     private MessageBean messageBean;
+
+    @CDIAutowired
+    private WebSocketManager websocketManager;
+
+    /**
+     * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
+     * and {@link PostConstruct} is not invoked, so autowiring is done manually
+     */
+    public UserService() {
+        if (websocketManager == null) {
+            new CDIAwareBeanPostProcessor().postProcessAfterInitialization(this, "websocketManager");
+        }
+    }
 
     /**
      * Returns a list of all users.
@@ -158,8 +176,10 @@ public class UserService {
      * Saves the user.
      * This method will also set {@link User#createDate} for new entities or {@link User#updateDate} for updated entities.
      * The user requesting this operation will also be stored as {@link User#createUser} or {@link User#updateUser} respectively.
+     * Additionally fills gui message with success or failure info and triggers a push update.
      * @param user the user to save
      * @return the saved user
+     * @apiNote Message handling ist done here, because this is the central place for saving users.
      */
     @Target(NewUserBean.class)
     @PreAuthorize("hasAuthority('ADMIN') OR #user.id == null OR principal.username eq #user.username")
@@ -183,8 +203,12 @@ public class UserService {
             }
             ret = userRepository.save(user);
 
-            // show ui message and log
+            // fill ui message, send update and log
             messageBean.alertInformation(ret.getUsername(), isNew ? "New user created" : "User updated");
+
+            if (websocketManager != null)
+                websocketManager.getUserRegistrationChannel().send(
+                        Map.of("type", "userUpdate", "name", user.getUsername(), "id", user.getId()));
 
             if (auth == null) auth = ret;
             LOGGER.info("User '{}' (id={}) was {} by User '{}' (id={})", ret.getUsername(), ret.getId(),
@@ -204,6 +228,7 @@ public class UserService {
 
     /**
      * Deletes the user.
+     * Additionally fills gui message with success or failure info and triggers a push update.
      * @param user the user to delete
      */
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -211,8 +236,12 @@ public class UserService {
         try {
             userRepository.delete(user);
 
-            // show ui message and log
+            // fill ui message, send update and log
             messageBean.alertInformation(user.getUsername(), "User was deleted");
+
+            if (websocketManager != null)
+                websocketManager.getUserRegistrationChannel()
+                    .send(Map.of("type", "userUpdate", "name", user.getUsername(), "id", user.getId()));
 
             User auth = getAuthenticatedUser();
             LOGGER.info("User '{}' (id={}) was deleted by User '{}' (id={})", user.getUsername(), user.getId(),

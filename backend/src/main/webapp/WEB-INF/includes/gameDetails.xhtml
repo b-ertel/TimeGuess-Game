@@ -32,7 +32,7 @@
                                 disabled="#{gameDetailController.lockedTopic}">
                                 <p:ajax event="change" process="@this" />
                                 <f:selectItem itemLabel="Select" />
-                                <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
+                                <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" itemDisabled="#{!topval.enabled}" />
                             </p:selectOneMenu>
                         </p:panelGrid>
                         <p:separator style="margin:12px 0px 16px" />
@@ -50,11 +50,9 @@
 
                             <h:outputLabel for="cube" value="Cube: " />
                             <p:selectOneMenu id="cube" value="#{curr.cube}" converter="omnifaces.SelectItemsConverter"
-                               required="true" requiredMessage="#{cubeMsg}"
-                               disabled="#{gameDetailController.lockedCube}">
+                               required="true" requiredMessage="#{cubeMsg}" disabled="#{gameDetailController.lockedCube}">
                                <f:selectItem itemLabel="Select" />
-                               <f:selectItems value="#{cubeController.allCubes}" var="cu"
-                                   itemDisabled="#{not statusController.isReady(cu)}"/>
+                               <f:selectItems value="#{cubeController.allCubes}" var="cu" itemDisabled="#{not cubeStatusController.isReady(cu)}" />
                             </p:selectOneMenu>
                         </p:panelGrid>
                         <p:separator style="margin:12px 0px 20px" />

@@ -24,5 +24,21 @@ function gameInvitation(name, id) {
 }
 
 function gameUpdate(name, id) {
-    $("#gameUpdate").click();
+    $("#lobbyUpdate").click();
+}
+
+function termUpdate(name, id) {
+    $("#lobbyUpdate").click();
+}
+
+function topicUpdate(name, id) {
+    $("#lobbyUpdate").click();
+}
+
+function userUpdate(name, id) {
+    $("#lobbyUpdate").click();
+}
+
+function connectionCubeUpdate(name, id) {
+    $("#lobbyUpdate").click();
 }

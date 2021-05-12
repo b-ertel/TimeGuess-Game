@@ -54,8 +54,6 @@ public class GameManagerController {
     private CubeService cubeService;
     @Autowired
     private GameLogicService gameLogic;
-    @Autowired
-    private CubeStatusController cubeStatusController;
     @CDIAutowired
     private WebSocketManager websocketManager;
     @Autowired
@@ -204,9 +202,6 @@ public class GameManagerController {
      */
     public void addGame(Game game) {
         if (game == null) throw new NullPointerException("startGame was called with null game");
-
-        // change cube status
-        cubeStatusController.setInGame(game.getCube().getMacAddress());
 
         // change game status
         game.setStatus(GameState.VALID_SETUP);
