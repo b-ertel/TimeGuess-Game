@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PostConstruct;
 
@@ -63,7 +64,7 @@ public class CubeStatusController {
 
 	private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
-	private List<String> healthMessage = new ArrayList<>();
+	private List<String> healthMessage = new CopyOnWriteArrayList<>();
     
     /**
      * creates a status for each Cube in the database
@@ -321,10 +322,7 @@ public class CubeStatusController {
 			
 			if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
 				
-				/*
-				 * sets status offline 
-				 * TODO -> there should be a trigger which puts game to HALTED
-				 */
+				// sets status offline
 				setOffline(m.getKey());
 				
 				// message for current game that cube is offline
