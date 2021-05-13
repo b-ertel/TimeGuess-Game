@@ -61,6 +61,7 @@ public class GameManagerController {
     @Autowired
     private ChannelPresenceEventListener channelPresenceEventListener;
 
+
     // cannot implement two different Consumers!
     private Consumer<ConfiguredFacetsEvent> consumerConfiguredFacetsEvent =
             (cfEvent) -> GameManagerController.this.onConfiguredFacetsEvent(cfEvent);
@@ -177,7 +178,7 @@ public class GameManagerController {
      * @param listOfTeams
      * @return list of usernames
      */
-    private List<Long> getAllUserIdsOfGameTeams(Set<Team> listOfTeams) {
+    public List<Long> getAllUserIdsOfGameTeams(Set<Team> listOfTeams) {
         List<Long> userIds = new ArrayList<>();
         List<User> users = new ArrayList<>();
         for (Team team : listOfTeams) {
@@ -305,4 +306,32 @@ public class GameManagerController {
         getNextRoundInfo(testgame1);
         getNextRoundInfo(testgame2);
     }
+
+	/**
+	 * finds a game with a given cube
+	 * 
+	 * @param cube to find the game
+	 * @return the game
+	 */
+	public Game getCurrentGameForCube(Cube cube) {
+		return this.listOfGames.get(cube);
+	}
+	
+	/**
+	 * called by {@link CubeStatusController} if there is a health status to report i.e. low battery, no connection
+	 * puts current game on halted if cube is OFFLINE
+	 * 
+	 * @param cube to to report to the current game
+	 */
+	public void healthNotification(Cube cube) {
+
+		Game game = getCurrentGameForCube(cube);
+		List<Long> usersToNotify = getAllUserIdsOfGameTeams(game.getTeams());
+		
+		if(websocketManager != null) {
+			websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
+		}
+	}
+	
+
 }

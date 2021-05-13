@@ -13,7 +13,9 @@
         <h:outputScript>			
             pfContext=PF
         </h:outputScript>
-
+        
+		<p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true" sticky="true" value="Multiple"/>
+		
 		<h:form>
 			<p:panel style="font-size:24px !important; width:180px; text-align:center;">
 			<h1>Gameroom</h1>
@@ -66,10 +68,7 @@
 				</p:panel>
             </div>
       </h:form>
-      
-      
-      
-      
+       
       <h:form id="roundValidationForm">
       		<p:dialog id="roundValidationDialog" header="Round Validation"
         			  widgetVar="roundValidationDialog" dynamic="true" modal="true"
@@ -86,7 +85,6 @@
                 </h:panelGrid>
         	</p:dialog>
       </h:form>
-      
       
       <h:form id="roundTimesUpForm">
       		<p:dialog id="roundTimesUpDialog" header="Time is up"
@@ -127,16 +125,14 @@
                      <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true"/>
                 </h:panelGrid>
         	</p:dialog>
-      </h:form>     
+      </h:form> 
                  
-            
             <o:socket channel="countDownChannel" scope="session"
          	    user="#{sessionInfoBean.currentUser.id}"
                 onmessage="function(m){console.log(m);}">
                 <p:ajax event="countDownUpdate"
                     update=":gameRoundForm:roundInfo"/>
             </o:socket> 
-
 
 			<o:socket channel="newRoundChannel" scope="session"   
                 		onmessage="function(m){console.log(m);}"
@@ -166,7 +162,11 @@
                         render=":gameRoundForm:roundInfo :termOverForm:termOverDialog"
                         onevent="PF('roundValidationDialog').hide()) PF('roundTimesUpDialog').hide()"
                         oncomplete="PF('termOverDialog').show()" 
-                        />      
+                        />  
+                <p:ajax event="healthMessage"
+                		listener="#{cubeStatusController.displayHealthMessage()}"  
+                		update="msg"
+                        />       
             </o:socket>
         
  
