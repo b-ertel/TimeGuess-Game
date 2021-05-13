@@ -34,7 +34,7 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
      * Returns a list of all games currently in setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
      * @return
      */
-    @Query("SELECT g FROM Game g WHERE g.status IN (0, 1)")
+    @Query("SELECT g FROM Game g WHERE g.status IN (2, 3)")
     List<Game> findAllCurrent();
 
     /**
