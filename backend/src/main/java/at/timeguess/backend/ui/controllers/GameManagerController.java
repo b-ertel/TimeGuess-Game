@@ -299,4 +299,32 @@ public class GameManagerController {
         this.activeRound.remove(game);
     }
 
+
+	/**
+	 * finds a game with a given cube
+	 * 
+	 * @param cube to find the game
+	 * @return the game
+	 */
+	public Game getCurrentGameForCube(Cube cube) {
+		return this.listOfGames.get(cube);
+	}
+	
+	/**
+	 * called by {@link CubeStatusController} if there is a health status to report i.e. low battery, no connection
+	 * puts current game on halted if cube is OFFLINE
+	 * 
+	 * @param cube to to report to the current game
+	 */
+	public void healthNotification(Cube cube) {
+
+		Game game = getCurrentGameForCube(cube);
+		List<Long> usersToNotify = getAllUserIdsOfGameTeams(game.getTeams());
+		
+		if(websocketManager != null) {
+			websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
+		}
+	}
+	
+
 }
