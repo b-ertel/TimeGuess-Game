@@ -5,8 +5,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.stereotype.Component;
 
-import at.timeguess.backend.ui.controllers.demo.ChatManagerController;
-import at.timeguess.backend.ui.controllers.demo.UserStatusController;
+
+import at.timeguess.backend.ui.controllers.UserStatusController;
 
 /**
  * This handler is triggered after a login is performed.
@@ -21,14 +21,10 @@ public class LoginSuccessHandler implements ApplicationListener<InteractiveAuthe
 
     @Autowired
     private UserStatusController userStatusController;
-    @Autowired
-    private ChatManagerController chatManagerController;
 
     @Override
     public void onApplicationEvent(InteractiveAuthenticationSuccessEvent event) {
         String username = event.getAuthentication().getName();
-        // update chat-manager
-        this.chatManagerController.onLogin(username);
         // update online-status
         this.userStatusController.afterLogin(username);
     }
