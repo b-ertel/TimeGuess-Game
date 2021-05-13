@@ -5,28 +5,24 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
-<style type="text/css">
-    pre code {
-        background-color: #eee;
-        border: 1px solid #999;
-        display: block;
-        padding: 20px;
-    }
-</style>
+
     <ui:define name ="content">
+        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+
         <h:form id="topicsForm">
-            <ui:remove>show all terms</ui:remove>
+            <ui:remove>show all topics</ui:remove>
             <p:dataTable id="topicTable" widgetVar="topicTable" var="topic" value="#{topicListController.topics}" >
                 <p:columnGroup type="header">
                     <p:row>
-                        <p:column headerText="Topic"/>
+                        <p:column headerText="Topic" sortBy="#{topic.name}"/>
                         <p:column headerText="Number of Terms" style="width:20%" />
-                        <p:column headerText="Enable Topic" style="width:10%"/>
+                        <p:column headerText="Enable Topic" sortBy="#{topic.enabled}" style="width:15%"/>
                     </p:row>
                 </p:columnGroup>
 
-                <p:column style="text-align:center">
+                <p:column style="padding-left:16px">
                     <h:outputText value="#{topic.name}"/>
                 </p:column>
                 <p:column style="text-align:center">
@@ -34,10 +30,15 @@
                 </p:column>
                 <p:column style="text-align:center">
                     <p:selectBooleanCheckbox value="#{topic.enabled}">
-                        <p:ajax listener="#{topicDetailController.doSaveTopic(topic)}" />
+                        <p:ajax listener="#{topicDetailController.doSaveTopic(topic)}" update=":msg" />
                     </p:selectBooleanCheckbox>
                 </p:column>
             </p:dataTable>
         </h:form>
+
+        <p:commandButton id="topicsUpdate" styleClass="hidden" process="@all"
+            onsuccess="PF('topicTable').filter()" update=":topicsForm:topicTable" />
+        <o:socket channel="userRegistrationChannel" scope="application" onmessage="socketListener" />
+
     </ui:define>
 </ui:composition>

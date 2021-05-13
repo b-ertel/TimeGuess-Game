@@ -20,5 +20,44 @@ function socketListener(message, channel, event) {
 }
 
 function gameInvitation(name, id) {
-    $("#gameInvitation").click();
+    clickIfExists("gameInvitation");
+}
+
+function gameUpdate(name, id) {
+    clickIfExists("lobbyUpdate");
+    clickIfExists("profileUpdate");
+}
+
+function teamUpdate(name, id) {
+    clickIfExists("lobbyUpdate");
+    clickIfExists("profileUpdate");
+}
+
+function termUpdate(name, id) {
+    clickIfExists("lobbyUpdate");
+    clickIfExists("profileUpdate");
+    clickIfExists("termsUpdate");
+    clickIfExists("topicsUpdate");
+}
+
+function topicUpdate(name, id) {
+    clickIfExists("lobbyUpdate");
+    clickIfExists("profileUpdate");
+    clickIfExists("termsUpdate");
+    clickIfExists("topicsUpdate");
+}
+
+function userUpdate(name, id) {
+    clickIfExists("lobbyUpdate");
+    clickIfExists("profileUpdate");
+    clickIfExists("usersUpdate");
+}
+
+function connectionCubeUpdate(name, id) {
+    clickIfExists("lobbyUpdate");
+}
+
+function clickIfExists(id) {
+    var btn = $('#' + id);
+    if (btn != null) btn.click();
 }
