@@ -30,7 +30,7 @@ import org.omnifaces.cdi.PushContext;
 @ApplicationScoped
 public class WebSocketManager implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3952769739621112699L;
 
     /**
      * Two legacy channels from skeleton reused: userRegistrationChannel (used with scope application) for updates
@@ -63,6 +63,7 @@ public class WebSocketManager implements Serializable {
     /**
      * Channels for running games
      */
+    @Inject
     @Push(channel = "countDownChannel")
     private PushContext countDownChannel;
     @Inject
