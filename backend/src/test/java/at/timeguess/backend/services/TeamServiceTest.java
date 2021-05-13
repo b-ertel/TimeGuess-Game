@@ -63,15 +63,14 @@ public class TeamServiceTest {
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAvailableTeams() {
-        List<Team> expected = createEntities(TestSetup::createTeam, LongStream.of(1, 2, 4).boxed());
+        List<Team> expected = createEntities(TestSetup::createTeam, LongStream.of(1, 2, 4, 6).boxed());
         List<Team> result = teamService.getAvailableTeams();
 
         assertLists(expected, result);
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "1|true", "2|true", "3|false", "4|true", "5|false", "6|false", "7|false",
-            "8|false" })
+    @CsvSource(delimiter = '|', value = { "1|true", "2|true", "3|false", "4|true", "5|false", "6|true", "7|false", "8|false" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testIsAvailableTeam(long teamId, boolean expected) {
         assertEquals(expected, teamService.isAvailableTeam(createTeam(teamId)));
@@ -84,7 +83,7 @@ public class TeamServiceTest {
             "3|1|false", "3|2|false", "3|3|false", "3|4|false", "3|5|false", "3|6|true",  "3|7|false",
             "4|1|true",  "4|2|true",  "4|3|true",  "4|4|true",  "4|5|true",  "4|6|true",  "4|7|true",
             "5|1|false", "5|2|false", "5|3|false", "5|4|false", "5|5|true",  "5|6|false", "5|7|false",
-            "6|1|false", "6|2|false", "6|3|false", "6|4|false", "6|5|false", "6|6|false", "6|7|false",
+            "6|1|true",  "6|2|true",  "6|3|true",  "6|4|true",  "6|5|true",  "6|6|true",  "6|7|true",
             "7|1|false", "7|2|false", "7|3|false", "7|4|false", "7|5|true",  "7|6|false", "7|7|false",
             "8|1|false", "8|2|false", "8|3|false", "8|4|false", "8|5|false", "8|6|true",  "8|7|false"
     })
