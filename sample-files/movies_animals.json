@@ -1,0 +1,26 @@
+{
+    "movies": [
+        "StarWars",
+        "Indiana Jones",
+        "James Bond",
+        "Der Schuh des Manitu",
+        "Ocean's 8",
+	"Now You See Me",
+	"Lord of the Rings",
+	"Avengers",
+	"John Wick",
+	"Matrix"
+    ],
+    "animals": [
+        "dog",
+        "cat",
+        "horse",
+        "fish",
+        "snake",
+	"goat",
+	"lion",
+	"tiger",
+	"elefant",
+	"bird"
+    ]
+}
