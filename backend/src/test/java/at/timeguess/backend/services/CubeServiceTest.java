@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Activity;
@@ -24,6 +25,7 @@ import at.timeguess.backend.model.CubeFace;
  */
 @SpringBootTest
 @WebAppConfiguration
+@Sql({ "classpath:deleteAll.sql", "classpath:dataTest.sql" })
 public class CubeServiceTest {
     
     @Autowired

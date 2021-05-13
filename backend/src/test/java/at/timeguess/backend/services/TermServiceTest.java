@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Term;
@@ -30,10 +31,11 @@ import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.utils.TestSetup;
 
 /**
- * Some very basic tests for {@link TermService}.
+ * Tests for {@link TermService}.
  */
 @SpringBootTest
 @WebAppConfiguration
+@Sql({ "classpath:deleteAll.sql", "classpath:dataTest.sql" })
 public class TermServiceTest {
 
     @Autowired

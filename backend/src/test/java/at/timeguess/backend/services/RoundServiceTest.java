@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Game;
@@ -13,10 +14,11 @@ import at.timeguess.backend.model.Team;
 import at.timeguess.backend.repositories.GameRepository;
 
 /**
- * Some very basic tests for {@link RoundService}.
+ * Tests for {@link RoundService}.
  */
 @SpringBootTest
 @WebAppConfiguration
+@Sql({ "classpath:deleteAll.sql", "classpath:dataTest.sql" })
 public class RoundServiceTest {
 
     @Autowired
@@ -72,7 +74,7 @@ public class RoundServiceTest {
         Game gameWithRounds = gameRepo.findById((long) 1).get();
         Team teamWithRounds = gameWithRounds.getTeams().iterator().next();
         Assertions.assertEquals(teamWithRounds.getId(),
-                roundService.getLastRoundOfTeam(gameWithRounds, teamWithRounds).getGuessingTeam().getId());
+            roundService.getLastRoundOfTeam(gameWithRounds, teamWithRounds).getGuessingTeam().getId());
 
         Game gameWithoutRounds = gameRepo.findById((long) 6).get();
         Assertions.assertNull(roundService.getLastRoundOfTeam(gameWithoutRounds, teamWithRounds));

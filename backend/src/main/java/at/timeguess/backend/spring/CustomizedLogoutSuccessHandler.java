@@ -32,11 +32,13 @@ public class CustomizedLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandle
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
                     throws IOException, ServletException {
-        String username = authentication.getName();
-        // update online-status
-        this.userStatusController.afterLogout(username);
-        // continue as expected
-        super.onLogoutSuccess(request, response, authentication);
+        if(authentication != null) { 
+        	String username = authentication.getName();
+        	// update online-status
+        	this.userStatusController.afterLogout(username);
+        	// continue as expected
+        	super.onLogoutSuccess(request, response, authentication);
+        }
     }
 
 }
