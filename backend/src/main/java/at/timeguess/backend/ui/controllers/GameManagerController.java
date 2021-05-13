@@ -328,7 +328,9 @@ public class GameManagerController {
 		Game game = getCurrentGameForCube(cube);
 		List<Long> usersToNotify = getAllUserIdsOfGameTeams(game.getTeams());
 		
-		websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
+		if(websocketManager != null) {
+			websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
+		}
 	}
 	
 
