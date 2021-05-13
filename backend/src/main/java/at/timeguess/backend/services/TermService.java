@@ -68,6 +68,15 @@ public class TermService {
      * @param topic the topic whose terms are returned
      * @return list of terms
      */
+    public List<Term> getAllEnabledTermsOfTopic(Topic topic) {
+        return termRepository.findEnablesByTopic(topic);
+    }
+    
+    /**
+     * Returns a list of all terms from a single topic.
+     * @param topic the topic whose terms are returned
+     * @return list of terms
+     */
     public List<Term> getAllTermsOfTopic(Topic topic) {
         return termRepository.findByTopic(topic);
     }

@@ -2,8 +2,13 @@ package at.timeguess.backend.ui.controllers;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
+import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Validation;
+import at.timeguess.backend.services.GameLogicService;
+import at.timeguess.backend.services.RoundService;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
+
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -28,20 +33,26 @@ public class GameRoundController {
     private GameManagerController webSocketGameController;
     @Autowired
     private CountDownController countDownController;
+    @Autowired
+    private RoundService roundService;
+    @Autowired
+    private GameLogicService gameLogic;
     
     private Round currentRound;
     
     private Round nextRound;
     
+    private Game currentGame;
+    
     private boolean inRound = false;
     
     private boolean inGuessingTeam = false;
     
-    
-    @PostConstruct
+
     public void setup() {
     	this.nextRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     	this.inGuessingTeam = nextRound.getGuessingTeam().getTeamMembers().contains(sessionInfoBean.getCurrentUser());
+    	this.currentGame = this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
     }
 
     public void getNextRoundInfos() {
@@ -104,5 +115,23 @@ public class GameRoundController {
     	Game game = webSocketGameController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
     	webSocketGameController.validateRoundOfGame(game, Validation.CHEATED);    
     }
+      
+    public Game getCurrentGame() {
+    	return this.currentGame;
+    }
+    
+	public List<Team> getTeamsInGame() {
+		return List.copyOf(currentGame.getTeams());
+	}
+
+	
+    public Integer calculatePointsOfTeam(Team team) {
+    	return roundService.getPointsOfTeamInGame(currentGame, team);
+    }
+    
+    public Team computeWinningTeam() {
+    	return gameLogic.getTeamWithMostPoints(currentGame);
+    }
+ 
 
 }

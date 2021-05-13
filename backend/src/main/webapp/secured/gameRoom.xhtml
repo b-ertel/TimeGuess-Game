@@ -19,20 +19,24 @@
 			<h1>Gameroom</h1>
 			</p:panel>
 		</h:form>
+	
+	<h:form id="noGameForm" rendered="#{empty gameRoundController.currentGame}">
+		<p:outputLabel value="Game has not started yet or you are in no game" 
+							   style="font-weight:bold"/>
+	</h:form>	
 		
-		
-	<h:form id="gameTableForm">
-		<p:dataTable id="leaderbord" var="team" value="#{gameLeaderBoardController.teamsInGame}">
+	<h:form id="gameTableForm" rendered="#{not empty gameRoundController.currentGame}">
+		<p:dataTable id="leaderbord" var="team" value="#{gameRoundController.teamsInGame}">
 				            <p:column headerText="Name">
 				                <h:outputText value="#{team.name}" />
 				            </p:column>
 				            <p:column headerText="Points">
-				                <h:outputText value="#{gameLeaderBoardController.calculatePointsOfTeam(team)}" />
+				                <h:outputText value="#{gameRoundController.calculatePointsOfTeam(team)}" />
 				            </p:column>
 				        </p:dataTable> 
 	</h:form>
 		
-   <h:form id="gameRoundForm" style="width:700px; text-align:center; align:right; margin: 0 auto;">
+   <h:form id="gameRoundForm" style="width:700px; text-align:center; align:right; margin: 0 auto;" rendered="#{not empty gameRoundController.currentGame}">
             <div class="gameRoomContent">      
                 <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
 				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to guess #{gameRoundController.nextRound.termToGuess.name}. " 
@@ -73,7 +77,7 @@
       <h:form id="roundValidationForm">
       		<p:dialog id="roundValidationDialog" header="Round Validation"
         			  widgetVar="roundValidationDialog" dynamic="true" modal="true"
-					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  resizable="false" closeOnEscape="false" showEffect="fade"
 					  hideEffect="fade" responsive="true">
         		<p:outputLabel value="Did #{gameRoundController.currentRound.guessingUser.username} guess #{gameRoundController.currentRound.termToGuess.name} correct? (First click comes first)" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>
@@ -91,7 +95,7 @@
       <h:form id="roundTimesUpForm">
       		<p:dialog id="roundTimesUpDialog" header="Time is up"
         			  widgetVar="roundTimesUpDialog" dynamic="true" modal="true"
-					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  resizable="false" closeOnEscape="false" showEffect="fade"
 					  hideEffect="fade" responsive="true" closeable="false">
         		<p:outputLabel value="Seems like #{gameRoundController.currentRound.guessingUser.username} did not guess #{gameRoundController.currentRound.termToGuess.name} within the time?" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>	
@@ -106,7 +110,7 @@
         <h:form id="gameOverform">
       		<p:dialog id="gameOverDialog" header="Game Over"
         			  widgetVar="gameOverDialog" dynamic="true" modal="true"
-					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  resizable="false" closeOnEscape="false" showEffect="fade"
 					  hideEffect="fade" responsive="true" closeable="false">
         		<p:outputLabel value="Congratulations to #{gameRoundController.currentRound.guessingTeam.name} on winning the game" 
 							   style="font-weight:bold"/>			   
@@ -119,9 +123,9 @@
        <h:form id="termOverform">
       		<p:dialog id="termOverDialog" header="Terms Over"
         			  widgetVar="termOverDialog" dynamic="true" modal="true"
-					  resizable="false" closeOnEscape="true" showEffect="fade"
+					  resizable="false" closeOnEscape="false" showEffect="fade"
 					  hideEffect="fade" responsive="true" closeable="false">
-        		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameLeaderBoardController.computeWinningTeam().name} on winning the game!" 
+        		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!" 
 							   style="font-weight:bold"/>			   
 				<h:panelGrid columns="1">
                      <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true"/>
@@ -166,6 +170,10 @@
                         render=":gameRoundForm:roundInfo :termOverForm:termOverDialog"
                         onevent="PF('roundValidationDialog').hide()) PF('roundTimesUpDialog').hide()"
                         oncomplete="PF('termOverDialog').show()" 
+                        /> 
+                <p:ajax event="startGame"
+                        update="@all"
+                        listener="#{gameRoundController.setup()}"
                         />      
             </o:socket>
         

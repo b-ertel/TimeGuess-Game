@@ -76,8 +76,6 @@ public class GameManagerController {
     public void setup() {
         configuredfacetsEventListener.subscribe(consumerConfiguredFacetsEvent);
         channelPresenceEventListener.subscribe("newRoundChannel", consumerChannelPresenceEvent);
-
-        this.start2TestGames();
     }
 
     @PreDestroy
@@ -128,7 +126,10 @@ public class GameManagerController {
             game.setStatus(counter < countTeams
                     ? game.getStatus() == GameState.PLAYED ? GameState.HALTED : GameState.VALID_SETUP
                     : GameState.PLAYED);
-
+            if((game.getStatus() == GameState.PLAYED) && !currentRound.containsKey(game)) {
+            	getNextRoundInfo(game);
+            	this.websocketManager.getNewRoundChannel().send("startGame", getAllUserIdsOfGameTeams(game.getTeams()));
+            }
             // should, but cannot save game here, because authentication is missing from context (event was externally
             // initialized)
             // TODO: save game on next occasion to keep db up-to-date

@@ -40,16 +40,9 @@ public class GameLogicService {
      * @return boolean whether there a still terms available or not
      */
     public boolean stillTermsAvailable(Game game) {
-        List<Term> availableTerms = termService.getAllTermsOfTopic(game.getTopic());
+        List<Term> availableTerms = termService.getAllEnabledTermsOfTopic(game.getTopic());
         Set<Term> usedTerms = usedTerms(game);
-        usedTerms.stream().forEach(term -> availableTerms.remove(term));
-        for (Term term : availableTerms) {
-            if (!term.isEnabled()) {
-                availableTerms.remove(term);
-            }
-        }
-        if (availableTerms.isEmpty()) return false;
-        else return true;
+        return !(availableTerms.size() == usedTerms.size());
     }
     
     public boolean teamReachedMaxPoints(Game game, Team team) {
