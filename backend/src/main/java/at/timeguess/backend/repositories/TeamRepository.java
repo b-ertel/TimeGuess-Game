@@ -16,7 +16,7 @@ public interface TeamRepository extends AbstractRepository<Team, Long> {
      * Returns a list of teams currently not playing.
      * @return
      */
-    @Query("SELECT r FROM Team r WHERE r NOT IN (SELECT t FROM Team t JOIN t.games tg JOIN tg.game g WHERE g.status IN (0, 1, 2, 3))")
+    @Query("SELECT r FROM Team r WHERE r NOT IN (SELECT t FROM Team t JOIN t.games tg JOIN tg.game g WHERE g.status IN (0, 1, 2, 3)) AND r NOT IN (SELECT t2 FROM r.teamMembers tm JOIN tm.teams t2 JOIN t2.games tg2 JOIN tg2.game g2 WHERE g2.status IN (0, 1, 2, 3))")
     List<Team> findAvailableTeams();
 
     /**
@@ -24,7 +24,7 @@ public interface TeamRepository extends AbstractRepository<Team, Long> {
      * @param team
      * @return
      */
-    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Team r WHERE r = ?1 AND r NOT IN (SELECT t FROM Team t JOIN t.games tg JOIN tg.game g WHERE g.status IN (0, 1, 2, 3))")
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Team r WHERE r = ?1 AND r NOT IN (SELECT t FROM Team t JOIN t.games tg JOIN tg.game g WHERE g.status IN (0, 1, 2, 3)) AND r NOT IN (SELECT t2 FROM r.teamMembers tm JOIN tm.teams t2 JOIN t2.games tg2 JOIN tg2.game g2 WHERE g2.status IN (0, 1, 2, 3))")
     boolean getIsAvailableTeam(Team team);
 
     /**
@@ -33,6 +33,6 @@ public interface TeamRepository extends AbstractRepository<Team, Long> {
      * @param game
      * @return
      */
-    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Team r WHERE r = ?1 AND r NOT IN (SELECT t FROM Team t JOIN t.games tg JOIN tg.game g WHERE NOT g IS ?2 AND g.status IN (0, 1, 2, 3))")
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM Team r WHERE r = ?1 AND r NOT IN (SELECT t FROM Team t JOIN t.games tg JOIN tg.game g WHERE NOT g IS ?2 AND g.status IN (0, 1, 2, 3)) AND r NOT IN (SELECT t2 FROM r.teamMembers tm JOIN tm.teams t2 JOIN t2.games tg2 JOIN tg2.game g2 WHERE NOT g2 IS ?2 AND g2.status IN (0, 1, 2, 3))")
     boolean getIsAvailableTeamForGame(Team team, Game game);
 }

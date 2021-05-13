@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -14,6 +15,8 @@ import static org.mockito.Mockito.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.faces.context.FacesContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,8 +32,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
+import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
+import at.timeguess.backend.ui.controllers.CubeStatusController;
 import at.timeguess.backend.ui.controllers.GameManagerController;
 import at.timeguess.backend.utils.TestSetup;
 
@@ -49,6 +54,8 @@ public class NewGameBeanTest {
     private GameService gameService;
     @Mock
     private TeamService teamService;
+    @Mock
+    private CubeStatusController cubeStatusController;
     @Mock
     private GameManagerController gameManagerController;
     @Mock
@@ -132,10 +139,11 @@ public class NewGameBeanTest {
 
         Game result = newGameBean.createGame();
 
+        verify(cubeStatusController).switchCube(nullable(Cube.class), any(Cube.class));
         verify(gameService).saveGame(any(Game.class));
+        verifyNoMoreInteractions(cubeStatusController);
         verify(gameManagerController).addGame(any(Game.class));
-        verify(messageBean).redirect(anyString());
-        verify(messageBean, times(0)).alertErrorFailValidation(anyString(), anyString());
+        verifyNoInteractions(messageBean);
         assertEquals(expected, result);
     }
 
@@ -185,7 +193,11 @@ public class NewGameBeanTest {
         newGameBean.setCube(cube);
         assertFalse(newGameBean.validateInput());
 
-        newGameBean.setTopic(createTopic(3L));
+        Topic topic = createTopic(3L);
+        topic.setEnabled(false);
+        newGameBean.setTopic(topic);
+        assertFalse(newGameBean.validateInput());
+        topic.setEnabled(true);
         assertFalse(newGameBean.validateInput());
 
         Set<Team> teams = null;
@@ -214,7 +226,10 @@ public class NewGameBeanTest {
     @Test
     public void testMessageBeanRedirectNoContext() {
         MessageBean bean = new MessageBean();
-        assertDoesNotThrow(() -> bean.redirect("somewhere"));
+        if (FacesContext.getCurrentInstance() == null)
+            assertDoesNotThrow(() -> bean.redirect("somewhere"));
+        else
+            assertThrows(NullPointerException.class, () -> bean.redirect("somewhere"));
     }
 
     private String fillBean() {

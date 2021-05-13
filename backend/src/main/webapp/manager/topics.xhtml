@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+
+    <ui:define name ="content">
+        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+
+        <h:form id="topicsForm">
+            <ui:remove>show all topics</ui:remove>
+            <p:dataTable id="topicTable" widgetVar="topicTable" var="topic" value="#{topicListController.topics}" >
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column headerText="Topic" sortBy="#{topic.name}"/>
+                        <p:column headerText="Number of Terms" style="width:20%" />
+                        <p:column headerText="Enable Topic" sortBy="#{topic.enabled}" style="width:15%"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <p:column style="padding-left:16px">
+                    <h:outputText value="#{topic.name}"/>
+                </p:column>
+                <p:column style="text-align:center">
+                    <h:outputText value="#{topicDetailController.getNumberOfTerms(topic)}"/>
+                </p:column>
+                <p:column style="text-align:center">
+                    <p:selectBooleanCheckbox value="#{topic.enabled}">
+                        <p:ajax listener="#{topicDetailController.doSaveTopic(topic)}" update=":msg" />
+                    </p:selectBooleanCheckbox>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:commandButton id="topicsUpdate" styleClass="hidden" process="@all"
+            onsuccess="PF('topicTable').filter()" update=":topicsForm:topicTable" />
+        <o:socket channel="userRegistrationChannel" scope="application" onmessage="socketListener" />
+
+    </ui:define>
+</ui:composition>

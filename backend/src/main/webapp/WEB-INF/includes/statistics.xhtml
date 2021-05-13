@@ -37,7 +37,7 @@
                                     <h:outputText value="#{topic.name}" />
                                 </p:column>
                                 <p:column style="width:100px;text-align: center">
-                                    <p:commandButton update=":statForm:topicStatDialog" oncomplete="PF('topicStatDialog').show()" icon="fa fa-edit" title="Edit">
+                                    <p:commandButton update=":topicStatForm" oncomplete="PF('topicStatDialog').show()" icon="fa fa-edit" title="Edit">
                                         <f:setPropertyActionListener value="#{topic}" target="#{topicStatisticController.topic}" />
                                     </p:commandButton>
                                 </p:column>
@@ -45,14 +45,16 @@
                         </p:panel>
                     </p:panelGrid>
                 </p:panel>
+            </h:form>
 
-                <p:dialog header="Topic Statistics" id="topicStatDialog" widgetVar="topicStatDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" responsive="true" width="330">
+            <p:dialog header="Topic Statistics" id="topicStatDialog" widgetVar="topicStatDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false" closeOnEscape="true" responsive="true" width="330">
+                <h:form id="topicStatForm" styleClass="findial">
                     <p:outputPanel id="topicData" rendered="#{not empty topicStatisticController.topic}">
                         <div class="p-grid">
                             <div class="p-col-5"><p:outputLabel value="Name: " /></div>
                             <div class="p-col-7"><p:outputLabel value="#{topicStatisticController.topic.name}" styleClass="rightm10"/></div>
                         </div>
-                        <p:separator style="margin-bottom:16px" />
+                        <p:separator style="margin:5px 0px 11px" />
                         <ui:fragment rendered="#{topicStatisticController.playedWithTopic}">
                             <div class="p-grid">
                                 <div class="p-col-7"><p:outputLabel value="Games played: "/></div>
@@ -64,23 +66,30 @@
                                 <div class="p-col-7"><p:outputLabel value="Number of terms: " /></div>
                                 <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.nrOfTermsPerTopic}" styleClass="rightm10"/></div>
                             </div>
-                            <p:separator style="margin-bottom:16px" />
+                            <p:separator style="margin:5px 0px 11px" />
                             <div class="p-grid">
                                 <div class="p-col-7"><p:outputLabel value="User with most wins: " /></div>
                                 <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.mostSuccessfullUser.username}" styleClass="rightm10"/></div>
                             </div>
                         </ui:fragment>
                         <ui:fragment rendered="#{!topicStatisticController.playedWithTopic}">
-                            <div><p:outputLabel value="Topic has not been used in any game yet! Be the first to use it ;-)"/></div>
+                            <div class="p-grid">
+                                <div class="p-col-7"><p:outputLabel value="Number of terms: " /></div>
+                                <div class="p-col-5"><p:outputLabel value="#{topicStatisticController.nrOfTermsPerTopic}" styleClass="rightm10"/></div>
+                            </div>
+                            <p:separator style="margin:5px 0px 11px" />
+                            <div class="p-grid">
+                                <div class="p-col-12"><p:outputLabel value="Topic has not been used in any game yet! Be the first to use it ;-)"/></div>
+                            </div>
                         </ui:fragment>
                     </p:outputPanel>
-                    <p:separator style="margin:11px 0px 12px" />
+                    <p:separator style="margin:5px 0px 13px" />
 
                     <h:panelGrid columns="1">
                         <p:commandButton value="Abort" onclick="PF('topicStatDialog').hide()" />
                     </h:panelGrid>
-                </p:dialog>
-            </h:form>
+                </h:form>
+            </p:dialog>
         </ui:composition>
     </body>
 </html>

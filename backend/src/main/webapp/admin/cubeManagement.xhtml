@@ -7,8 +7,7 @@
 	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
 	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
     xmlns:c="http://java.sun.com/jsp/jstl/core"
-                
-    xmlns:demo="http://java.sun.com/jsf/composite/demo"
+    xmlns:timeguess="http://java.sun.com/jsf/composite/timeguess"
 	template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
         <!-- see chat.js -->
@@ -45,7 +44,7 @@
                          
                          <ui:repeat var="cubeStatusInfo"
                                 value="#{cubeStatusController.cubeStatusInfos}">
-                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
+                            <timeguess:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
                          </ui:repeat>
                      </p:scrollPanel>
             	     <p:separator/>
@@ -81,6 +80,13 @@
                         <p:inputText id="macAddress" value="#{curr.macAddress}" disabled="true"/>
                         <p:outputLabel for="name" value="Name: "/>
                         <p:inputText id="name" value="#{curr.name}"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="batteryLevel" value="Latest reported Battery Level: " />
+                        <p:inputText id="batteryLevel" value="#{cubeStatusController.getBatteryLevel(curr)}" disabled="true"/>
+                        <p:outputLabel for="rssi" value="Latest reported RSSI: "/>
+                        <p:inputText id="rssi" value="#{cubeStatusController.getRssi(curr)}" disabled="true"/>
                     </h:panelGrid>
                     <p:separator />
                       <h:panelGrid columns="6">
@@ -136,13 +142,6 @@
 				hideEffect="fade" responsive="true" closable="false">
 
 				<p:outputPanel id="cubeConfigurationOutputPanel">
-					<p:panel header="MAC address of cube">
-						<h:outputText
-							value="#{cubeConfigurationController.cube.macAddress}" />
-					</p:panel>
-
-					<p:spacer height="5" />
-
 					<p:panel header="Instructions">
 						<h:outputText value="#{cubeConfigurationController.instruction}" />
 					</p:panel>
@@ -207,12 +206,6 @@
 				hideEffect="fade" responsive="true">
 
 				<p:outputPanel id="cubeTestOutputPanel">
-					<p:panel header="MAC address of cube">
-						<h:outputText value="#{cubeTestController.cube.macAddress}" />
-					</p:panel>
-
-					<p:spacer height="5" />
-
 					<p:panel header="Instructions">
 						<h:outputText
 							value="Turn the cube and check if the cube faces displayed below are correct!" />

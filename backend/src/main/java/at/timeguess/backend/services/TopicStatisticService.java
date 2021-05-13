@@ -50,6 +50,10 @@ public class TopicStatisticService {
         return gameRepository.countByTopicId(topic.getId());
     }
 
+    /**
+     * Method to check which topic has been used the most
+     * @return most used topic
+     */
     public Topic mostUsedTopic() {
         List<Topic> listOfAllTopics = topicRepository.findAll();
         int max = 0;
@@ -63,6 +67,10 @@ public class TopicStatisticService {
         return currentTopic;
     }
 
+    /**
+     * Method to get the least used topic
+     * @return least used topic
+     */
     public Topic leastusedTopic() {
         List<Topic> listOfAllTopics = topicRepository.findAll();
         int min = Integer.MAX_VALUE;
@@ -124,6 +132,11 @@ public class TopicStatisticService {
         return termRepository.nrOfTermPerTopic(topic);
     }
 
+    /**
+     * Method to get the user with the most wins of games with a certain topic
+     * @param topic, topic that has been used
+     * @return user with the most wins
+     */
     public User getMostSuccessfullUserOfTopic(Topic topic) {
         List<User> users = userRepository.findAll();
         User[] mostSuccessfullUser = { null };

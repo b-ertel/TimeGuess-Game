@@ -6,6 +6,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
 
     <ui:define name ="content">
@@ -16,8 +17,7 @@
             <p:menubar id="toolbar" styleClass="pagemenu">
                 <p:menuitem value="&nbsp;Create Term&nbsp;" icon="fa fa-plus"
                     oncomplete="PF('termCreateDialog').show()" update=":termCreateForm:termCreateDialog"/>
-                <p:menuitem icon="fa fa-file-text-o" value="&nbsp;Load new Terms from file&nbsp;"
-                    oncomplete="PF('newTermsDialog').show()" update=":termListForm:termTable"/>
+                <p:menuitem icon="fa fa-file-text-o" value="&nbsp;Load new Terms from file&nbsp;" oncomplete="PF('newTermsDialog').show()" />
             </p:menubar>
 
             <ui:remove>show all terms</ui:remove>
@@ -27,49 +27,48 @@
                     <p:row>
                         <p:column headerText="Term" sortBy="#{term.name}" filterBy="#{term.name}" filterMatchMode="contains" />
                         <p:column headerText="Topic" sortBy="#{term.topic}" filterBy="#{term.topic.name}" filterMatchMode="contains" />
-                        <p:column headerText="Manage Term" style="width:10%"/>
+                        <p:column headerText="Enable Term" sortBy="#{term.enabled}" style="width:10%"/>
+                        <p:column headerText="Edit Term" style="width:10%"/>
                     </p:row>
                 </p:columnGroup>
 
-                <p:column>
+                <p:column style="padding-left:16px">
                     <h:outputText value="#{term.name}"/>
                 </p:column>
-                <p:column>
+                <p:column style="padding-left:16px">
                     <h:outputText value="#{term.topic.name}"/>
                 </p:column>
                 <p:column style="text-align:center">
+                    <p:selectBooleanCheckbox value="#{term.enabled}" disabled="#{!term.topic.enabled}">
+                        <p:ajax listener="#{termDetailController.doSaveTerm(term)}" />
+                    </p:selectBooleanCheckbox>
+                </p:column>
+                <p:column style="text-align:center">
                     <p:commandButton title="Edit" icon="fa fa-edit"
-                        oncomplete="PF('termEditDialog').show()" update=":termDetailForm:termEditDialog :msg">
+                        oncomplete="PF('termEditDialog').show()" update=":termDetailForm :msg">
                         <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
-                    </p:commandButton>
-                    <p:commandButton title="Delete" icon="fa fa-trash"
-                        action="#{termDetailController.doDeleteTerm}" onsuccess="PF('termTable').filter()"
-                        update=":termListForm:termTable :msg">
-                        <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
-                        <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this term? This cannot be undone." />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
 
             <p:contextMenu for="termTable">
                 <p:menuitem value="&nbsp;Edit" icon="fa fa-edit"
-                    oncomplete="PF('termEditDialog').show()" update=":termDetailForm:termEditDialog :msg">
+                    oncomplete="PF('termEditDialog').show()" update=":termDetailForm :msg">
                     <f:setPropertyActionListener value="#{termListController.selectedTerm}" target="#{termDetailController.term}" />
                 </p:menuitem>
-                <p:menuitem value="&nbsp;Delete" icon="fa fa-trash" action="#{termDetailController.doDeleteTerm}"
-                    onsuccess="PF('termTable').filter()" update="termTable :msg">
+                <p:menuitem value="&nbsp;Delete" icon="fa fa-trash" action="#{termDetailController.doDeleteTerm}" update=":msg">
                     <f:setPropertyActionListener value="#{termListController.selectedTerm}" target="#{termDetailController.term}" />
                     <p:confirm header="Confirmation" icon="fa fa-warning" message="Are you sure about deleting this term? This cannot be undone." />
                 </p:menuitem>
             </p:contextMenu>
         </h:form>
 
-        <h:form id="termDetailForm" prependId="false">
-            <ui:remove>edit term</ui:remove>
-            <p:dialog header="Edit Term" id="termEditDialog" widgetVar="termEditDialog" dynamic="true"
-                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
-                <p:ajax event="close" update="termData" process="@parent" resetValues="true" />
-                
+        <ui:remove>edit term</ui:remove>
+        <p:dialog header="Edit Term" id="termEditDialog" widgetVar="termEditDialog" dynamic="true"
+            modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+            <p:ajax event="close" update=":termDetailForm:termData" process="@parent" resetValues="true" />
+
+            <h:form id="termDetailForm" styleClass="findial">
                 <c:set var="curr" value="#{termDetailController.term}" scope="request" />
                 <p:outputPanel id="termData" rendered="#{not empty curr}">
                     <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
@@ -80,20 +79,23 @@
                         
                         <p:outputLabel for="topic" value="Topic: " />
                         <p:inputText id="topic" value="#{curr.topic.name}" disabled="true"/>
-                    </p:panelGrid>
-                    <p:separator style="margin:11px 0px 12px" />
 
-                    <h:panelGrid columns="3">
-                        <p:commandButton value="Save" action="#{termDetailController.doSaveTerm()}"
-                            oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('termEditDialog').hide(); PF('termTable').filter(); }"
-                            update=":termListForm:termTable termData :msg"/>
-                        <p:commandButton value="Reload" action="#{termDetailController.doReloadTerm()}"
-                            process="@parent" update=":termDetailForm:termData :msg" resetValues="true"/>
-                        <p:commandButton value="Abort" onclick="PF('termEditDialog').hide()"/>
-                    </h:panelGrid>
+                        <p:outputLabel for="enabled" value="Enabled: " />
+                        <p:selectBooleanButton id="enabled" value="#{curr.enabled}"
+                            onLabel="Yes" offLabel="No" onIcon="fa fa-check" offIcon="fa fa-times" styleClass="rightm10" style="width:6rem" />
+                    </p:panelGrid>
                 </p:outputPanel>
-            </p:dialog>
-        </h:form>
+                <p:separator style="margin:12px 0px 13px" />
+
+                <h:panelGrid columns="3">
+                    <p:commandButton value="Save" action="#{termDetailController.doSaveTerm()}"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('termEditDialog').hide(); }" update="termData :msg"/>
+                    <p:commandButton value="Reload" action="#{termDetailController.doReloadTerm()}"
+                        process="@parent" update=":termDetailForm:termData :msg" resetValues="true"/>
+                    <p:commandButton value="Abort" onclick="PF('termEditDialog').hide()"/>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
 
         <h:form id="termUploadForm" prependId="false">
             <p:dialog header="Upload new Terms" id="newTermsDialog" widgetVar="newTermsDialog" dynamic="true" modal="true"
@@ -121,8 +123,8 @@
                     </p:panel>
 
                     <p:fileUpload id="termUpload" chooseIcon="fa fa-file-text-o" uploadIcon="fa fa-upload" cancelIcon="fa fa-window-close-o"
-                        listener="#{topicListController.doUploadTerms}" update=":termListForm:termTable :msg"
-                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('newTermsDialog').hide(); PF('termTable').filter(); }"
+                        listener="#{topicListController.doUploadTerms}" update=":msg"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('newTermsDialog').hide(); }"
                         mode="advanced" multiple="true" dragDropSupport="true" sizeLimit="1000000"
                         allowTypes="/(\.|\/)(json)$/i" style="margin:8px 0px 8px" />
                 </p:outputPanel>
@@ -160,8 +162,7 @@
 
                 <h:panelGrid columns="3">
                     <p:commandButton value="Save" action="#{newTermBean.createTerm()}"
-                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('termCreateDialog').hide(); PF('termTable').filter(); }"
-                        update=":termListForm:termTable termCreateData :msg" />
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('termCreateDialog').hide(); }" update="termCreateData :msg" />
                     <p:commandButton value="Reload" action="#{newTermBean.clearFields}"
                         process="@parent" update=":termCreateForm:termCreateData :msg" resetValues="true" />
                     <p:commandButton value="Abort" onclick="PF('termCreateDialog').hide()" />
@@ -177,5 +178,10 @@
             </p:confirmDialog>
             <p:draggable for="deleteTermConfirm"/>
         </h:form>
+
+        <p:commandButton id="termsUpdate" styleClass="hidden" process="@all"
+            onsuccess="PF('termTable').filter()" update=":termListForm:termTable :termDetailForm:termData" />
+        <o:socket channel="userRegistrationChannel" scope="application" onmessage="socketListener" />
+
     </ui:define>
 </ui:composition>

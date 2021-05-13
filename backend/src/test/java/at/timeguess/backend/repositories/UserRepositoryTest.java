@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.User;
@@ -23,6 +24,7 @@ import at.timeguess.backend.model.UserRole;
 
 @SpringBootTest
 @WebAppConfiguration
+@Sql({ "classpath:deleteAll.sql", "classpath:dataTest.sql" })
 public class UserRepositoryTest {
 
     @Autowired
@@ -61,22 +63,20 @@ public class UserRepositoryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "1|user1;user2;michael;felix;lorenz;verena;claudia;clemens;manger",
-            "2|user2;michael;felix;lorenz;verena;claudia;clemens", "3|elvis;manger" })
+    @CsvSource(delimiter = '|', value = { "1|user1;user2;michael;felix;lorenz;verena;claudia;clemens;manger", "2|user2;michael;felix;lorenz;verena;claudia;clemens", "3|elvis;manger" })
     public void testFindByRoleNotExisting(final Integer userRole, final String usernamesExpected) {
         UserRole role = USERROLES.get(userRole);
         assertResultList(userRepository.findByRole(role),
-                String.format("found users roles should not contain %s but does", role), true,
-                u -> !usernamesExpected.contains(u.getUsername()));
+            String.format("found users roles should not contain %s but does", role), true, u -> !usernamesExpected.contains(u.getUsername()));
     }
 
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = { "admin|", "user1|user2;clemens", "user2|user1;claudia", "michael|felix;lorenz", "felix|michael;lorenz;clemens",
-            "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena;clemens", "clemens|user1;felix;claudia" })
+        "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena;clemens", "clemens|user1;felix;claudia" })
     public void testFindByTeams(final String username, final String usernamesExpected) {
         User user = assertLoadUser(username);
         assertResultList(userRepository.findByTeams(user), "found user list should not contain %s but does",
-                usernamesExpected != null && usernamesExpected.length() > 0, u -> usernamesExpected.contains(u.getUsername()));
+            usernamesExpected != null && usernamesExpected.length() > 0, u -> usernamesExpected.contains(u.getUsername()));
     }
 
     @ParameterizedTest

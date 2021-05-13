@@ -1,7 +1,6 @@
 package at.timeguess.backend.services;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,11 @@ public class HighscoreService {
 	@Autowired 
 	RoundRepository roundRepo;
 	
-	
+	/**
+	 * Method, that puts informations about number of games won, correct/incorrect answers of a user into the UserScore-class and
+	 * returns a list of the scores of all users 
+	 * @return list with scores of all users
+	 */
 	public List<UserScores> getUserScores() {
 		List<User> users = userRepo.findAll();
 		List<UserScores> scores = new ArrayList<>();
@@ -38,6 +41,10 @@ public class HighscoreService {
 	}
 	
 	
+	/**
+	 * sorts the list of all userscores by number of total games won and correct terms and sorts it to get a highscore-list
+	 * @return sorted list of userscores
+	 */
 	public List<UserScores> getHighscoresByGamesWon() {
 		List<UserScores>  ls = getUserScores();
 		PlayerGamesComparator comp = new PlayerGamesComparator();

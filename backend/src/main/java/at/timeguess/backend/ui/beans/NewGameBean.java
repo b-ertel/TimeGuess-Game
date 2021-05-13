@@ -18,15 +18,16 @@ import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
+import at.timeguess.backend.ui.controllers.CubeStatusController;
 import at.timeguess.backend.ui.controllers.GameManagerController;
 
 /**
  * Bean for creating a new game.
  * @apiNote Scope is set to session for the view:
- * as the team creation button is in the same dialog (and this is because
- * doing team creation in a separate dialog never updated the teams list)
- * once the new team is created the game fields are emptied because a new
- * instance of both beans is created by the underlying system.
+ * as the team creation button is in the same dialog (and this is
+ * because doing team creation in a separate dialog never updated the teams list)
+ * once the new team is created the game fields are emptied because
+ * a new instance of both beans is created by the underlying system.
  */
 @Component
 @Scope(WebApplicationContext.SCOPE_SESSION)
@@ -38,8 +39,11 @@ public class NewGameBean implements Serializable {
     private GameService gameService;
     @Autowired
     private TeamService teamService;
+
     @Autowired
     private GameManagerController gameManagerController;
+    @Autowired
+    private CubeStatusController cubeStatusController;
 
     @Autowired
     private MessageBean messageBean;
@@ -170,15 +174,15 @@ public class NewGameBean implements Serializable {
             game.setTeams(teams);
             game.setStatus(GameState.SETUP);
 
+            cubeStatusController.switchCube(null, cube);
             game = gameService.saveGame(game);
-            this.clearFields();
 
-            if (game != null) {
+            if (game == null)
+                cubeStatusController.switchCube(cube, null);
+            else
                 gameManagerController.addGame(game);
 
-                // redirect host to game room
-                messageBean.redirect("/secured/gameRoom.xhtml");
-            }
+            this.clearFields();
             return game;
         }
         else {
@@ -195,7 +199,7 @@ public class NewGameBean implements Serializable {
         if (Strings.isBlank(gameName)) return false;
         if (maxPoints <= 0) return false;
         if (cube == null || cube.isNew()) return false;
-        if (topic == null) return false;
+        if (topic == null || !topic.isEnabled()) return false;
         if (teams == null || teams.size() < 2) return false;
         return true;
     }

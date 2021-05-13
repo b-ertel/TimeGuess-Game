@@ -2,13 +2,16 @@ package at.timeguess.backend.ui.controllers;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.PostConstruct;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 import at.timeguess.backend.services.CubeService;
-
+import at.timeguess.backend.ui.beans.MessageBean;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -49,14 +52,19 @@ public class CubeStatusController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CubeStatusController.class);
     private final DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
-	
+
     @Autowired
     private CubeService cubeService;
     @CDIAutowired
     private WebSocketManager websocketManager;
+    @Autowired
+    private GameManagerController gameManagerController;
+    @Autowired
+    private MessageBean messageBean;
 
 	private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
+	private List<String> healthMessage = new CopyOnWriteArrayList<>();
     
     /**
      * creates a status for each Cube in the database
@@ -123,8 +131,9 @@ public class CubeStatusController {
 		}
 		else {
 			LOGGER.info("cube is not known...new cube is created");
-			updatedCube = cubeService.createCube(message);									// Cube is new and has to be created
-
+			updatedCube.setMacAddress(message.getIdentifier());
+			updatedCube = cubeService.saveCube(updatedCube);
+			LOGGER.info("new Cube createt with mac {}", updatedCube.getMacAddress());
 			this.cubeStatus.put(updatedCube.getMacAddress(), new CubeStatusInfo(updatedCube));
 			statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);
 		}
@@ -307,21 +316,111 @@ public class CubeStatusController {
 	@Scheduled(fixedRate = 5000) 		// 5000 means every 5 seconds
     public void updateHealthStatus() {
                            		
-		for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) {   
+		for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) { 
+			
+			Cube cube = cubeService.getByMacAddress(m.getKey());
+			
 			if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
-				LOGGER.info("[{}] cube with mac {} lost connection", LocalDateTime.now().format(myFormat), m.getKey());
+				
+				// sets status offline
 				setOffline(m.getKey());
-				LOGGER.info("[{}] cube with mac {} changed to status OFFLINE", LocalDateTime.now().format(myFormat), m.getKey());
+				
+				// message for current game that cube is offline
+				StringBuilder message = new StringBuilder();
+				message.append("Cube with mac ")
+					.append(m.getKey())
+					.append(" lost connection and is OFFLINE!");	
+				addHealthMessage(message.toString());				
+				gameManagerController.healthNotification(cube);	
 			}              
 			else {                 
 				if(m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {
-					LOGGER.info("[{}] cube with mac {} has low battery (level at {})", LocalDateTime.now().format(myFormat), m.getKey(), m.getValue().getBatteryLevel());                
+					
+					// message for current game that cube is has low battery
+					StringBuilder message = new StringBuilder();
+					message.append("Cube with mac ")
+						.append(m.getKey())
+						.append(" has low battery! Level at ")
+						.append(m.getValue().getBatteryLevel());	
+					
+					addHealthMessage(message.toString());
 				}
-				if(m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {
-					LOGGER.info("[{}] cube with mac {} reported rssi level at {}", LocalDateTime.now().format(myFormat),  m.getKey(), m.getValue().getRssi());                
+				if(m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {   
+					
+					// message for current game that rssi of cube is below threshold
+					StringBuilder message = new StringBuilder();
+					message.append("Cube with mac ")
+						.append(m.getKey())
+						.append(" reported rssi level at ")
+						.append(m.getValue().getRssi());
+					
+					addHealthMessage(message.toString());
 				}
+				gameManagerController.healthNotification(cube);
 			}
 		}
 	}
+	
+	/**
+	 * displays health message(s) in current game
+	 */
+	public void displayHealthMessage() {
+		messageBean.alertError("Health Message", healthMessage);
+		this.healthMessage.clear();
+	}
 
+	/**
+	 * Get the latest reported value of the battery level characteristic for a given cube.
+	 * 
+	 * @param cube the cube
+	 * @return the battery level
+	 */
+	public Integer getBatteryLevel(Cube cube) {
+	    HealthStatus hs = healthStatus.get(cube.getMacAddress());
+	    if (hs != null) {
+	        return hs.getBatteryLevel();
+	    }
+	    else {
+	        return null;
+	    }
+	}
+
+	/**
+	 * Get the latest reported value of the RSSI for a given cube.
+	 * 
+	 * @param cube the cube
+	 * @return the RSSI
+	 */
+	public Integer getRssi(Cube cube) {
+	    HealthStatus hs = healthStatus.get(cube.getMacAddress());
+            if (hs != null) {
+                return hs.getRssi();
+            }
+            else {
+                return null;
+            }
+	}
+
+	public List<String> getHealthMessage() {
+		return healthMessage;
+	}
+
+	public void addHealthMessage(String healthMessage) {
+		this.healthMessage.add(healthMessage);
+	}
+	
+    /**
+     * Changes given fromCube status to READY if it was formerly INGAME, and toCube status to INGAME if it is not null.
+     * @param fromCube
+     * @param toCube
+     */
+    public void switchCube(Cube fromCube, Cube toCube) {
+        // release previous cube if necessary
+        if (!(fromCube == null || fromCube.equals(toCube)) && this.getStatus(fromCube.getMacAddress()) == CubeStatus.IN_GAME)
+            this.setReady(fromCube.getMacAddress());
+
+        // reserve new cube (if it's the same cube, message is resent)
+        if (toCube != null)
+            this.setInGame(toCube.getMacAddress());
+    }
 }

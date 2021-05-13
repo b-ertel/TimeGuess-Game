@@ -54,8 +54,8 @@
                                 <h:outputText value="Maximum points: #{game.maxPoints}" styleClass="game-points" />
                                 <p:linkButton  title="Confirm" value="Confirm" icon="fa fa-sign-in"
                                     href="/secured/gameRoom.xhtml" includeViewParams="true"
-                                    onclick="#{gameListController.doConfirm(sessionInfoBean.currentUser, game)}"
                                     disabled="#{gameListController.isDisabledConfirmation(sessionInfoBean.currentUser, game)}">
+                                    <!-- onclick="#{gameListController.doConfirm(sessionInfoBean.currentUser, game)}" -->
                                     <f:param name="id" value="#{game.id}"/>
                                 </p:linkButton>
                             </div>
@@ -78,8 +78,8 @@
                             <div class="game-list-action">
                                 <p:linkButton  title="Confirm" value="Confirm" icon="fa fa-sign-in"
                                     href="/secured/gameRoom.xhtml" includeViewParams="true"
-                                    onclick="#{gameListController.doConfirm(sessionInfoBean.currentUser, game)}"
                                     disabled="#{gameListController.isDisabledConfirmation(sessionInfoBean.currentUser, game)}">
+                                    <!-- onclick="#{gameListController.doConfirm(sessionInfoBean.currentUser, game)}" -->
                                     <f:param name="id" value="#{game.id}"/>
                                 </p:linkButton>
                                 <span class="game-badge #{game.status}">#{game.status}</span>
@@ -132,7 +132,7 @@
                             actionListener="#{gameDetailController.setGame(game)}">
                         </p:commandButton>
                         <p:commandButton title="Delete" icon="fa fa-trash" disabled="#{(not isAdmin) or gameListController.isLockedDelete(game)}"
-                            action="#{gameDetailController.doDeleteGame}" onsuccess="PF('gameTable').filter()" update=":gameListForm:gameTable :msg"
+                            action="#{gameDetailController.doDeleteGame}" update=":msg"
                             actionListener="#{gameDetailController.setGame(game)}">
                             <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this game? This cannot be undone." />
                         </p:commandButton>
@@ -153,11 +153,10 @@
                     </p:menuitem>
                 </p:contextMenu>
 
-                <p:commandButton id="gameInvitation" process="@all" update=":gameListForm:gameCurrent :msgInvitation"
-                    action="#{messageBean.alertWarning('Game invitation', 'Confirm your participation and enter the game room')}"
-                    style="display:none" />
-                <o:socket channel="messageChannel" scope="session" user="#{sessionInfoBean.currentUser.id}"
-                    onmessage="socketListener" />
+                <p:commandButton id="gameInvitation" styleClass="hidden"
+                    process="@all" update=":gameListForm:gameCurrent :msgInvitation"
+                    action="#{messageBean.alertWarning('Game invitation', 'Confirm your participation and enter the game room')}" />
+                <o:socket channel="messageChannel" scope="session" user="#{sessionInfoBean.currentUser.id}" onmessage="socketListener" />
             </h:form>
 
             <h:form id="gameInfoForm">
@@ -217,6 +216,8 @@
                 </p:confirmDialog>
                 <p:draggable for="deleteGameConfirm"/>
             </h:form>
+            
+            <o:socket channel="userRegistrationChannel" scope="application" onmessage="socketListener" />
         </ui:composition>
     </body>
 </html>

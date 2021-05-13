@@ -56,8 +56,12 @@ public class TopicListController implements Serializable {
             UploadedFile file = event.getFile();
             String filename = file.getFileName();
 
+            termService.setInfoOnSave(false);
+
             if (this.importJSON(filename, file.getInputStream()))
                 messageBean.alertInformation("Terms upload", String.format("%s was successfully imported", filename));
+
+            termService.setInfoOnSave(true);
         }
         catch (Exception e) {
             messageBean.alertErrorFailValidation("Terms upload error", e.getMessage());
@@ -87,6 +91,7 @@ public class TopicListController implements Serializable {
                 if (topic.isEmpty()) {
                     Topic newTopic = new Topic();
                     newTopic.setName(topicName.toUpperCase());
+                    newTopic.setEnabled(true);
                     topic = Optional.ofNullable(topicService.saveTopic(newTopic));
                 }
 
@@ -100,6 +105,7 @@ public class TopicListController implements Serializable {
                         if (!currTopic.getTerms().stream().anyMatch(t -> t.getName().matches(termPattern))) {
                             Term newTerm = new Term();
                             newTerm.setName(termName.toUpperCase());
+                            newTerm.setEnabled(true);
                             newTerm.setTopic(currTopic);
                             if (termService.saveTerm(newTerm) == null)
                                 messageBean.alertErrorFailValidation(termName, "Importing term failed: could not create term");

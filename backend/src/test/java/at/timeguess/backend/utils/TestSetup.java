@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.Arguments;
 
 import at.timeguess.backend.model.Configuration;
 import at.timeguess.backend.model.Cube;
+import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.Round;
@@ -90,6 +91,15 @@ public class TestSetup {
     }
 
     /**
+     * Creates a simple cubeface with the given id only.
+     * @param cubefaceId
+     * @return
+     */
+    public static CubeFace createCubeFace(String cubefaceId) {
+        return createEntity(CubeFace::new, e -> e.setId(cubefaceId));
+    }
+
+    /**
      * Creates a simple game with the given id only.
      * @param gameId
      * @return
@@ -131,7 +141,7 @@ public class TestSetup {
      * @return
      */
     public static Topic createTopic(Long topicId) {
-        return createEntity(Topic::new, e -> e.setId(topicId));
+        return createEntity(Topic::new, e -> {e.setId(topicId); e.setEnabled(true);});
     }
 
     /**

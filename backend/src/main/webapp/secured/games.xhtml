@@ -5,6 +5,7 @@
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:p="http://primefaces.org/ui"
+    xmlns:o="http://omnifaces.org/ui"
     template="/WEB-INF/templates/main.xhtml">
 
     <ui:define name ="content">
@@ -32,24 +33,24 @@
 
                         <p:outputLabel for="maxPointsCreate" value="Maximum Points: "/>
                         <p:spinner id="maxPointsCreate" value="#{newGameBean.maxPoints}" required="true" min="1" />
-                        
+
                         <h:outputLabel for="topicCreate" value="Topic: " />
                         <p:selectOneMenu id="topicCreate" value="#{newGameBean.topic}" converter="omnifaces.SelectItemsConverter"
                             required="true" requiredMessage="#{topicMsg}">
                             <p:ajax event="change" process="@this" />
                             <f:selectItem itemLabel="Select" />
-                            <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" />
+                            <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" itemDisabled="#{!topval.enabled}" />
                         </p:selectOneMenu>
                         <p:separator style="margin:7px 0px 15px" />
                     </p:panelGrid>
 
-                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
+                    <p:panelGrid id="cubeTeamSelection" columns="2" layout="flex" styleClass="ui-panelgrid-blank"
                         columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
                         <h:outputLabel for="cubeCreate" value="Cube: " />
                         <p:selectOneMenu id="cubeCreate" value="#{newGameBean.cube}" converter="omnifaces.SelectItemsConverter"
                            required="true" requiredMessage="#{cubeMsg}">
                            <f:selectItem itemLabel="Select" />
-                           <f:selectItems value="#{cubeController.allCubes}" var="cu" itemDisabled="#{not statusController.isReady(cu)}"/>
+                           <f:selectItems value="#{cubeController.allCubes}" var="cu" itemDisabled="#{not cubeStatusController.isReady(cu)}" />
                         </p:selectOneMenu>
 
                         <h:outputLabel for="teamsCreate" value="Teams: " />
@@ -70,7 +71,7 @@
                         <p:menubar id="newteamCreate" style="margin-bottom:18px">
                             <p:menuitem value="&nbsp;Create Team&nbsp;" icon="fa fa-plus"
                                 actionListener="#{newGameBean.addNewTeam(newTeamBean.createTeam())}"
-                                process="teamnameCreate playersCreate @this" update="gameCreateData teamCreateData :msg" validateClient="true" />
+                                process="teamnameCreate playersCreate @this" update="teamsCreate teamCreateData :msg" validateClient="true" />
                         </p:menubar>
 
                         <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
@@ -81,7 +82,7 @@
                             <p:separator style="margin:6px 0px 16px" />
                         </p:panelGrid>
 
-                        <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank"
+                        <p:panelGrid id="playerSelection" columns="2" layout="flex" styleClass="ui-panelgrid-blank"
                             columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
                             <h:outputLabel for="playersCreate" value="Players: " />
                             <p:selectCheckboxMenu id="playersCreate" value="#{newTeamBean.players}" label="#{sel2Label}"
@@ -97,7 +98,7 @@
 
                 <h:panelGrid columns="3">
                     <p:commandButton value="Save" action="#{newGameBean.createGame()}"
-                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); PF('gameTable').filter(); }"
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); }"
                         process="nameCreate maxPointsCreate cubeCreate topicCreate teamsCreate @this"
                         update="gameCreateData :gameListForm :gameInfoForm:gameInfoData :msg" validateClient="true" />
                     <p:commandButton value="Reload" action="#{newGameBean.clearFields}"
@@ -106,6 +107,10 @@
                 </h:panelGrid>
             </p:dialog>
         </h:form>
+
+        <p:commandButton id="lobbyUpdate" styleClass="hidden" process="@all"
+            update=":gameListForm:gameCurrent :statForm :topicStatForm :scoreForm :gameCreateForm:cubeTeamSelection :gameCreateForm:playerSelection" />
+        <o:socket channel="cubeChannel" scope="application" onmessage="socketListener" />
 
     </ui:define>
 </ui:composition>

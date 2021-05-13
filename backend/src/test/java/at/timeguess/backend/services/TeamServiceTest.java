@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Team;
@@ -23,10 +24,11 @@ import at.timeguess.backend.model.User;
 import at.timeguess.backend.utils.TestSetup;
 
 /**
- * Some very basic tests for {@link TeamService}.
+ * Tests for {@link TeamService}.
  */
 @SpringBootTest
 @WebAppConfiguration
+@Sql({ "classpath:deleteAll.sql", "classpath:dataTest.sql" })
 public class TeamServiceTest {
 
     @Autowired
@@ -53,7 +55,7 @@ public class TeamServiceTest {
         List<Team> result = teamService.getAllTeams();
 
         assertLists(expected, result);
-        
+
         expected = createEntities(id -> teamService.findById(id).get(), LongStream.rangeClosed(1, 12).boxed());
         assertListsCompare(expected, result);
     }
@@ -68,23 +70,22 @@ public class TeamServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "1|true", "2|true", "3|false", "4|true", "5|false", "6|true", "7|false",
-            "8|false" })
+    @CsvSource(delimiter = '|', value = { "1|true", "2|true", "3|false", "4|true", "5|false", "6|true", "7|false", "8|false" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testIsAvailableTeam(long teamId, boolean expected) {
         assertEquals(expected, teamService.isAvailableTeam(createTeam(teamId)));
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { 
+    @CsvSource(delimiter = '|', value = {
             "1|1|true",  "1|2|true",  "1|3|true",  "1|4|true",  "1|5|true",  "1|6|true",  "1|7|true",
             "2|1|true",  "2|2|true",  "2|3|true",  "2|4|true",  "2|5|true",  "2|6|true",  "2|7|true",
             "3|1|false", "3|2|false", "3|3|false", "3|4|false", "3|5|false", "3|6|true",  "3|7|false",
-            "4|1|true",  "4|2|true",  "4|3|true",  "4|4|true",  "4|5|true",  "4|6|true",  "4|7|true", 
+            "4|1|true",  "4|2|true",  "4|3|true",  "4|4|true",  "4|5|true",  "4|6|true",  "4|7|true",
             "5|1|false", "5|2|false", "5|3|false", "5|4|false", "5|5|true",  "5|6|false", "5|7|false",
-            "6|1|true",  "6|2|true",  "6|3|true",  "6|4|true",  "6|5|true",  "6|6|true",  "6|7|true", 
+            "6|1|true",  "6|2|true",  "6|3|true",  "6|4|true",  "6|5|true",  "6|6|true",  "6|7|true",
             "7|1|false", "7|2|false", "7|3|false", "7|4|false", "7|5|true",  "7|6|false", "7|7|false",
-            "8|1|false", "8|2|false", "8|3|false", "8|4|false", "8|5|false", "8|6|true",  "8|7|false",
+            "8|1|false", "8|2|false", "8|3|false", "8|4|false", "8|5|false", "8|6|true",  "8|7|false"
     })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testIsAvailableTeamForGame(long teamId, long gameId, boolean expected) {

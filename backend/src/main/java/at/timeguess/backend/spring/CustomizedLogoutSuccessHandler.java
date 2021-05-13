@@ -12,8 +12,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import at.timeguess.backend.ui.controllers.demo.ChatManagerController;
-import at.timeguess.backend.ui.controllers.demo.UserStatusController;
+import at.timeguess.backend.ui.controllers.UserStatusController;
 
 /**
  * This handler is triggered after a logout is performed.
@@ -28,19 +27,18 @@ public class CustomizedLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandle
 
     @Autowired
     private UserStatusController userStatusController;
-    @Autowired
-    private ChatManagerController chatManagerController;
+
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
                     throws IOException, ServletException {
-        String username = authentication.getName();
-        // update chat-manager
-        this.chatManagerController.onLogout(username);
-        // update online-status
-        this.userStatusController.afterLogout(username);
-        // continue as expected
-        super.onLogoutSuccess(request, response, authentication);
+        if(authentication != null) { 
+        	String username = authentication.getName();
+        	// update online-status
+        	this.userStatusController.afterLogout(username);
+        	// continue as expected
+        	super.onLogoutSuccess(request, response, authentication);
+        }
     }
 
 }
