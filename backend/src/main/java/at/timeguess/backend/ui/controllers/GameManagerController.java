@@ -324,8 +324,11 @@ public class GameManagerController {
 		return this.listOfGames.get(cube);
 	}
 	
+	private String message;
+	
 	public void healthNotification(String message, Cube cube) {
-		messageBean.alertError("Health Message", message);
+		messageBean.alertInformation("Health Message", message);
+		this.message = message;
 		System.out.println(message);
 		Game game = getCurrentGameForCube(cube);
 		System.out.println(game);
@@ -333,5 +336,9 @@ public class GameManagerController {
 		System.out.println(usersToNotify);
 		
 		websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
+	}
+	
+	public void displayMessage() {
+		messageBean.alertInformation("Health Message", message);
 	}
 }

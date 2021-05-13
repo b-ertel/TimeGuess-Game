@@ -135,7 +135,9 @@
         		<p:outputLabel value="Cube is offline!!" 
 							   style="font-weight:bold"/>			   
 				<h:panelGrid columns="1">
-                     <p:commandButton value="Ok" action="PF('healthStatusDialog').close()" update=":gameRoundForm :gameTableForm"/>
+                     <p:commandButton value="Ok" action="#{gameManagerController.displayMessage()}" update=":gameRoundForm :gameTableForm :msg" >
+         <!--           <f:actionListener binding="#{gameManagerController.displayMessage()}" />  -->  
+                     </p:commandButton>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>         
@@ -179,8 +181,10 @@
                         oncomplete="PF('termOverDialog').show()" 
                         />  
                 <p:ajax event="healthMessage"
+                        onevent="#{gameManagerController.displayMessage()}"
                         render="msg"
-                        update=":msg"
+                        update="msg"
+                        oncomplete="PF('healthStatusDialog').show()" 
                         />          
             </o:socket>
         
