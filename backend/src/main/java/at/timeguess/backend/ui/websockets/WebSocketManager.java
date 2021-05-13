@@ -37,6 +37,7 @@ public class WebSocketManager implements Serializable {
      * messageChannel (used with scope session and user.id) for game invitations
      */
     // add other channels here + getter for them
+
     @Inject
     @Push(channel = "userRegistrationChannel")
     private PushContext userRegistrationChannel;

@@ -7,6 +7,7 @@ import javax.faces.context.FacesContext;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Bean to show messages in the faces UI.
@@ -42,6 +43,15 @@ public class MessageBean implements Serializable {
     public void alertError(String header, String text) {
         alertError(header, text, false);
     }
+    
+    /**
+     * Shows multiple error message.
+     * @param header header to be displayed
+     * @param messages   messages to be displayed
+     */
+    public void alertError(String header, List<String> messages) {
+        alertError(header, messages, false);
+    }
 
     /**
      * Shows error message and marks context with validation error.
@@ -73,6 +83,16 @@ public class MessageBean implements Serializable {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, header, text));
 
             if (failValidation) context.validationFailed();
+        }
+    }
+    
+    private void alertError(String header, List<String> messages, boolean failValidation) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (context != null) {
+        	for(String s : messages) {
+        		context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, header, s));
+        		if (failValidation) context.validationFailed();
+        	}
         }
     }
 
