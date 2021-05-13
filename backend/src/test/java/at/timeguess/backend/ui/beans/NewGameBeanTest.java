@@ -32,8 +32,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
+import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
+import at.timeguess.backend.ui.controllers.CubeStatusController;
 import at.timeguess.backend.ui.controllers.GameManagerController;
 import at.timeguess.backend.utils.TestSetup;
 
@@ -52,6 +54,8 @@ public class NewGameBeanTest {
     private GameService gameService;
     @Mock
     private TeamService teamService;
+    @Mock
+    private CubeStatusController cubeStatusController;
     @Mock
     private GameManagerController gameManagerController;
     @Mock
@@ -135,7 +139,9 @@ public class NewGameBeanTest {
 
         Game result = newGameBean.createGame();
 
+        verify(cubeStatusController).switchCube(nullable(Cube.class), any(Cube.class));
         verify(gameService).saveGame(any(Game.class));
+        verifyNoMoreInteractions(cubeStatusController);
         verify(gameManagerController).addGame(any(Game.class));
         verifyNoInteractions(messageBean);
         assertEquals(expected, result);
@@ -187,7 +193,11 @@ public class NewGameBeanTest {
         newGameBean.setCube(cube);
         assertFalse(newGameBean.validateInput());
 
-        newGameBean.setTopic(createTopic(3L));
+        Topic topic = createTopic(3L);
+        topic.setEnabled(false);
+        newGameBean.setTopic(topic);
+        assertFalse(newGameBean.validateInput());
+        topic.setEnabled(true);
         assertFalse(newGameBean.validateInput());
 
         Set<Team> teams = null;

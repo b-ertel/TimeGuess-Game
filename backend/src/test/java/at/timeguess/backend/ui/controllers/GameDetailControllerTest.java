@@ -22,6 +22,7 @@ import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.Team;
+import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
@@ -43,6 +44,8 @@ public class GameDetailControllerTest {
     private GameService gameService;
     @Mock
     private TeamService teamService;
+    @Mock
+    private CubeStatusController cubeStatusController;
     @Mock
     private MessageBean messageBean;
 
@@ -275,6 +278,34 @@ public class GameDetailControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
+    public void testDoSaveGameSetup(Long gameId) {
+        Game game = assertMockGame(gameId, true, false);
+        game.setStatus(GameState.SETUP);
+        when(gameService.saveGame(game)).thenReturn(game);
+
+        gameDetailController.doSaveGame();
+
+        verify(gameService).saveGame(game);
+        assertEquals(gameId, gameDetailController.getGame().getId());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 11, 22 })
+    public void testDoSaveGameSetupCubeSwitched(Long gameId) {
+        Game game = assertMockGame(gameId, true, false);
+        game.setStatus(GameState.SETUP);
+        game.setCube(createCube(15L));
+        when(gameService.saveGame(game)).thenReturn(game);
+
+        gameDetailController.doSaveGame();
+
+        verify(gameService).saveGame(game);
+        verify(cubeStatusController).switchCube(any(Cube.class), any(Cube.class));
+        assertEquals(gameId, gameDetailController.getGame().getId());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 11, 22 })
     public void testDoSaveTermFailure(Long termId) {
         Game game = assertMockGame(termId, true, false);
         when(gameService.saveGame(game)).thenReturn(null);
@@ -334,8 +365,13 @@ public class GameDetailControllerTest {
         game.setCube(cube);
         assertFalse(gameDetailController.doValidateGame());
 
-        game.setTopic(createTopic(5L));
+        Topic topic = createTopic(5L);
+        topic.setEnabled(false);
+        game.setTopic(topic);
         assertFalse(gameDetailController.doValidateGame());
+        topic.setEnabled(true);
+        assertFalse(gameDetailController.doValidateGame());
+
         game.setTeams(Set.of(createTeam(2L)));
         assertFalse(gameDetailController.doValidateGame());
         Set<Team> teams = game.getTeams();

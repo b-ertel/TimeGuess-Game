@@ -1,6 +1,9 @@
 package at.timeguess.backend.services;
 
 import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +17,18 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.repositories.GameRepository;
+import at.timeguess.backend.spring.CDIAwareBeanPostProcessor;
 import at.timeguess.backend.ui.beans.MessageBean;
+import at.timeguess.backend.ui.websockets.WebSocketManager;
+import at.timeguess.backend.utils.CDIAutowired;
+import at.timeguess.backend.utils.CDIContextRelated;
 
 /**
  * Service for accessing and manipulating game data.
  */
 @Component
 @Scope(WebApplicationContext.SCOPE_APPLICATION)
+@CDIContextRelated
 public class GameService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GameService.class);
@@ -32,6 +40,19 @@ public class GameService {
 
     @Autowired
     private MessageBean messageBean;
+
+    @CDIAutowired
+    private WebSocketManager websocketManager;
+
+    /**
+     * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
+     * and {@link PostConstruct} is not invoked, so autowiring is done manually
+     */
+    public GameService() {
+        if (websocketManager == null) {
+            new CDIAwareBeanPostProcessor().postProcessAfterInitialization(this, "websocketManager");
+        }
+    }
 
     /**
      * Returns a list of all games.
@@ -80,8 +101,10 @@ public class GameService {
 
     /**
      * Saves the game. If the game is new the user requesting this operation will be stored as {@link Game#creator}.
+     * Additionally fills gui message with success or failure info and triggers a push update.
      * @param game the game to save
      * @return the saved game
+     * @apiNote Message handling ist done here, because this is the central place for saving games.
      */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('ADMIN')")
     public Game saveGame(Game game) {
@@ -93,8 +116,12 @@ public class GameService {
             }
             ret = gameRepo.save(game);
 
-            // show ui message and log
+            // fill ui message, send update and log
             messageBean.alertInformation(ret.getName(), isNew ? "New game created" : "Game updated");
+
+            if (websocketManager != null)
+                websocketManager.getUserRegistrationChannel().send(
+                        Map.of("type", "gameUpdate", "name", game.getName(), "id", game.getId()));
 
             User auth = userService.getAuthenticatedUser();
             LOGGER.info("Game '{}' (id={}) was {} by User '{}' (id={})", ret.getName(), ret.getId(),
@@ -114,6 +141,7 @@ public class GameService {
 
     /**
      * Deletes the game.
+     * Additionally fills gui message with success or failure info and triggers a push update.
      * @param game the game to delete
      */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('MANAGER') or hasAuthority('ADMIN')")
@@ -121,8 +149,12 @@ public class GameService {
         try {
             gameRepo.delete(game);
 
-            // show ui message and log
+            // fill ui message, send update and log
             messageBean.alertInformation(game.getName(), "Game was deleted");
+
+            if (websocketManager != null)
+                websocketManager.getUserRegistrationChannel()
+                    .send(Map.of("type", "gameUpdate", "name", game.getName(), "id", game.getId()));
 
             User auth = userService.getAuthenticatedUser();
             LOGGER.info("Game '{}' (id={}) was deleted by User '{}' (id={})", game.getName(), game.getId(),

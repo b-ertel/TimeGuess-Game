@@ -6,6 +6,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
 
     <ui:define name ="content">
@@ -33,15 +34,15 @@
                     <h:outputText value="#{user.roles}" />
                 </p:column>
                 <p:column headerText="Enabled">
-                    <h:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
+                    <p:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
                     <p:commandButton title="Edit" icon="fa fa-edit"
-                        oncomplete="PF('userEditDialog').show()" update=":userDetailForm:userEditDialog :msg">
+                        oncomplete="PF('userEditDialog').show()" update=":userDetailForm :msg">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                     </p:commandButton>
                     <p:commandButton title="Delete" icon="fa fa-trash"
-                        action="#{userDetailController.doDeleteUser}" update=":userListForm:userTable :msg">
+                        action="#{userDetailController.doDeleteUser}" update=":msg">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                         <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this user? This cannot be undone." />
                     </p:commandButton>
@@ -49,12 +50,12 @@
             </p:dataTable>
         </h:form>
 
-        <h:form id="userDetailForm" prependId="false">
-            <ui:remove>edit user</ui:remove>
-            <p:dialog header="Edit User" id="userEditDialog" widgetVar="userEditDialog" dynamic="true"
-                modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
-                <p:ajax event="close" update="userData" process="@parent" resetValues="true" />
+        <ui:remove>edit user</ui:remove>
+        <p:dialog header="Edit User" id="userEditDialog" widgetVar="userEditDialog" dynamic="true"
+            modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+            <p:ajax event="close" update="userData" process="@parent" resetValues="true" />
 
+            <h:form id="userDetailForm" styleClass="findial" prependId="false">
                 <c:set var="curr" value="#{userDetailController.user}" scope="request" />
                 <p:outputPanel id="userData" rendered="#{not empty curr}">
                     <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
@@ -106,14 +107,13 @@
 
                 <h:panelGrid columns="3">
                      <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}"
-                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userEditDialog').hide(); PF('userTable').filter(); }"
-                         update=":userListForm:userTable userData :msg"/>
+                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userEditDialog').hide(); }" update=":msg"/>
                      <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}"
                          process="@parent" update=":userDetailForm:userData :msg" resetValues="true"/>
                      <p:commandButton value="Abort" onclick="PF('userEditDialog').hide()"/>
                 </h:panelGrid>
-            </p:dialog>
-        </h:form>
+            </h:form>
+        </p:dialog>
 
         <h:form id="userCreateForm" prependId="false">
             <ui:remove>create new user</ui:remove>
@@ -169,8 +169,7 @@
 
                 <h:panelGrid columns="3">
                     <p:commandButton value="Save" action="#{newUserBean.createUserAdmin}"
-                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userCreateDialog').hide(); PF('userTable').filter(); }"
-                        update=":userListForm:userTable userCreateData :msg" />
+                        oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userCreateDialog').hide(); }" update="userCreateData :msg" />
                     <p:commandButton value="Reload" action="#{newUserBean.clearFields}"
                         process="@parent" update=":userCreateForm:userCreateData :msg" resetValues="true" />
                     <p:commandButton value="Abort" onclick="PF('userCreateDialog').hide()" />
@@ -186,5 +185,10 @@
             </p:confirmDialog>
             <p:draggable for="deleteUserConfirm"/>
         </h:form>
+
+        <p:commandButton id="usersUpdate" styleClass="hidden" process="@all"
+            onsuccess="PF('userTable').filter()" update=":userListForm:userTable :userDetailForm:userData" />
+        <o:socket channel="userRegistrationChannel" scope="application" onmessage="socketListener" />
+
     </ui:define>
 </ui:composition>

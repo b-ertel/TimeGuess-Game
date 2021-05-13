@@ -65,6 +65,7 @@ public class NewTermBean implements Serializable {
 
             term.setName(termname);
             term.setTopic(topic);
+            term.setEnabled(true);
 
             term = termService.saveTerm(term);
             this.clearFields();
