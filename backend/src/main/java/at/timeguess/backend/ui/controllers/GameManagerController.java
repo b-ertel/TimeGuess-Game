@@ -33,6 +33,7 @@ import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.RoundService;
+import at.timeguess.backend.ui.beans.MessageBean;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -62,6 +63,8 @@ public class GameManagerController {
     private ConfiguredFacetsEventListener configuredfacetsEventListener;
     @Autowired
     private ChannelPresenceEventListener channelPresenceEventListener;
+    @Autowired
+    private MessageBean messageBean;
 
     // cannot implement two different Consumers!
     private Consumer<ConfiguredFacetsEvent> consumerConfiguredFacetsEvent =
@@ -319,5 +322,16 @@ public class GameManagerController {
 	 */
 	public Game getCurrentGameForCube(Cube cube) {
 		return this.listOfGames.get(cube);
+	}
+	
+	public void healthNotification(String message, Cube cube) {
+		messageBean.alertError("Health Message", message);
+		System.out.println(message);
+		Game game = getCurrentGameForCube(cube);
+		System.out.println(game);
+		List<Long> usersToNotify = getAllUserIdsOfGameTeams(game.getTeams());
+		System.out.println(usersToNotify);
+		
+		websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
 	}
 }

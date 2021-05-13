@@ -13,7 +13,9 @@
         <h:outputScript>			
             pfContext=PF
         </h:outputScript>
-
+        
+		<p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+		
 		<h:form>
 			<p:panel style="font-size:24px !important; width:180px; text-align:center;">
 			<h1>Gameroom</h1>
@@ -66,10 +68,7 @@
 				</p:panel>
             </div>
       </h:form>
-      
-      
-      
-      
+       
       <h:form id="roundValidationForm">
       		<p:dialog id="roundValidationDialog" header="Round Validation"
         			  widgetVar="roundValidationDialog" dynamic="true" modal="true"
@@ -86,7 +85,6 @@
                 </h:panelGrid>
         	</p:dialog>
       </h:form>
-      
       
       <h:form id="roundTimesUpForm">
       		<p:dialog id="roundTimesUpDialog" header="Time is up"
@@ -181,8 +179,8 @@
                         oncomplete="PF('termOverDialog').show()" 
                         />  
                 <p:ajax event="healthMessage"
-                        render=":gameRoundForm:roundInfo :healthStatusForm:healthStatusDialog"
-                        oncomplete="PF('healthStatusDialog').show()" 
+                        render="msg"
+                        update=":msg"
                         />          
             </o:socket>
         

@@ -26,7 +26,6 @@ import at.timeguess.backend.utils.CDIContextRelated;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeStatus;
 import at.timeguess.backend.model.CubeStatusInfo;
-import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.HealthStatus;
 import at.timeguess.backend.model.IntervalType;
 import at.timeguess.backend.model.ThresholdType;
@@ -312,27 +311,35 @@ public class CubeStatusController {
 	@Scheduled(fixedRate = 5000) 		// 5000 means every 5 seconds
     public void updateHealthStatus() {
                            		
-		for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) {   
+		for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) { 
+			
+			Cube cube = cubeService.getByMacAddress(m.getKey());
+			
 			if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
 				LOGGER.info("[{}] cube with mac {} lost connection", LocalDateTime.now().format(myFormat), m.getKey());
 				setOffline(m.getKey());
 				LOGGER.info("[{}] cube with mac {} changed to status OFFLINE", LocalDateTime.now().format(myFormat), m.getKey());
 				
-				Cube cube = cubeService.getByMacAddress(m.getKey());
-				System.out.println(cube);
-				Game game = gameManagerController.getCurrentGameForCube(cube);
-				System.out.println(game);
-				List<Long> usersToNotify = gameManagerController.getAllUserIdsOfGameTeams(game.getTeams());
-				System.out.println(usersToNotify);
-				websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
+				StringBuilder message = new StringBuilder();
+				message.append("Cube with mac ").append(m.getKey()).append("lost connection and is OFFLINE!");		
+				gameManagerController.healthNotification(message.toString(), cube);
 				
 			}              
 			else {                 
 				if(m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {
-					LOGGER.info("[{}] cube with mac {} has low battery (level at {})", LocalDateTime.now().format(myFormat), m.getKey(), m.getValue().getBatteryLevel());                
+					LOGGER.info("[{}] cube with mac {} has low battery (level at {})", LocalDateTime.now().format(myFormat), m.getKey(), m.getValue().getBatteryLevel());  
+					
+					StringBuilder message = new StringBuilder();
+					message.append("Cube with mac ").append(m.getKey()).append("has low battery! Level at ").append(m.getValue().getBatteryLevel());			
+					gameManagerController.healthNotification(message.toString(), cube);
 				}
 				if(m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {
-					LOGGER.info("[{}] cube with mac {} reported rssi level at {}", LocalDateTime.now().format(myFormat),  m.getKey(), m.getValue().getRssi());                
+					LOGGER.info("[{}] cube with mac {} reported rssi level at {}", LocalDateTime.now().format(myFormat),  m.getKey(), m.getValue().getRssi());   
+					
+					StringBuilder message = new StringBuilder();
+					message.append("Cube with mac ").append(m.getKey()).append("reported rssi level at ").append(m.getValue().getRssi());			
+					gameManagerController.healthNotification(message.toString(), cube);
+					
 				}
 			}
 		}
