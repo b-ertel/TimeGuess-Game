@@ -21,7 +21,7 @@
 		</h:form>
 	
 	<h:form id="noGameForm" rendered="#{empty gameRoundController.currentGame}">
-		<p:outputLabel value="Game has not started yet or you are in no game" 
+		<p:outputLabel value="Game cant be played right now." 
 							   style="font-weight:bold"/>
 	</h:form>	
 		
@@ -174,7 +174,15 @@
                 <p:ajax event="startGame"
                         update="@all"
                         listener="#{gameRoundController.setup()}"
-                        />      
+                        />   
+                <p:ajax event="restartGame"
+                        update="@all"
+                        listener="#{gameRoundController.setup()}"
+                        /> 
+                <p:ajax event="pauseGame"
+                        update="@all"
+                        listener="#{gameRoundController.destroy()}"
+                        />     
             </o:socket>
         
  

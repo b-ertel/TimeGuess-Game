@@ -127,6 +127,12 @@ public class GameManagerController {
             	getNextRoundInfo(game);
             	this.websocketManager.getNewRoundChannel().send("startGame", getAllUserIdsOfGameTeams(game.getTeams()));
             }
+            if(game.getStatus() == GameState.PLAYED) {
+            	this.websocketManager.getNewRoundChannel().send("restartGame", getAllUserIdsOfGameTeams(game.getTeams()));
+            }
+            if(game.getStatus() == GameState.HALTED) {
+            	this.websocketManager.getNewRoundChannel().send("pauseGame", getAllUserIdsOfGameTeams(game.getTeams()));
+            }
             // should, but cannot save game here, because authentication is missing from context (event was externally
             // initialized)
             // TODO: save game on next occasion to keep db up-to-date
