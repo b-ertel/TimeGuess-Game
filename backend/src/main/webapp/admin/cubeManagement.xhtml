@@ -7,8 +7,7 @@
 	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
 	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
     xmlns:c="http://java.sun.com/jsp/jstl/core"
-                
-    xmlns:demo="http://java.sun.com/jsf/composite/demo"
+    xmlns:timeguess="http://java.sun.com/jsf/composite/timeguess"
 	template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
         <!-- see chat.js -->
@@ -45,7 +44,7 @@
                          
                          <ui:repeat var="cubeStatusInfo"
                                 value="#{cubeStatusController.cubeStatusInfos}">
-                            <demo:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
+                            <timeguess:cubeStatusOutput cubeStatusInfo="#{cubeStatusInfo}" />
                          </ui:repeat>
                      </p:scrollPanel>
             	     <p:separator/>

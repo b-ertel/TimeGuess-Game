@@ -29,7 +29,6 @@ import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.Validation;
-import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.RoundService;
@@ -51,8 +50,6 @@ public class GameManagerController {
     @Autowired
     private RoundService roundService;
     @Autowired
-    private CubeService cubeService;
-    @Autowired
     private GameLogicService gameLogic;
     @CDIAutowired
     private WebSocketManager websocketManager;
@@ -60,7 +57,6 @@ public class GameManagerController {
     private ConfiguredFacetsEventListener configuredfacetsEventListener;
     @Autowired
     private ChannelPresenceEventListener channelPresenceEventListener;
-
 
     // cannot implement two different Consumers!
     private Consumer<ConfiguredFacetsEvent> consumerConfiguredFacetsEvent =
@@ -70,15 +66,13 @@ public class GameManagerController {
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
     private Map<Game, Boolean> midValidation = new ConcurrentHashMap<>();
-    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>(); // indicated if there is played a round currently in the game
-    private Map<Cube, Game> listOfGames = new HashMap<>();
+    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>(); // indicates if a round is currently played in a certain game
+    private Map<Cube, Game> listOfGames = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void setup() {
         configuredfacetsEventListener.subscribe(consumerConfiguredFacetsEvent);
         channelPresenceEventListener.subscribe("newRoundChannel", consumerChannelPresenceEvent);
-
-        this.start2TestGames();
     }
 
     @PreDestroy
@@ -94,17 +88,20 @@ public class GameManagerController {
     public synchronized void onConfiguredFacetsEvent(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
             Game game = listOfGames.get(configuredFacetsEvent.getCube());
-            if(!midValidation.get(game)) {
-            	if (!activeRound.get(game)) {
-                    activeRound.put(game, true);
-                    startRoundByCube(game, currentRound.get(game), configuredFacetsEvent.getCubeFace());
-                }
-                else {
-                    activeRound.put(game, false);
-                    midValidation.put(game, true);
-                    this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
-                }
-            }    
+
+            if(game.getStatus().equals(GameState.PLAYED)) {   // checks if game is in state PLAYED otherwise there should not be started a new round
+            	if(!midValidation.get(game)) {
+            		if (!activeRound.get(game)) {
+            			activeRound.put(game, true);
+            			startRoundByCube(game, currentRound.get(game), configuredFacetsEvent.getCubeFace());
+            		}
+            		else {
+                    	activeRound.put(game, false);
+                    	midValidation.put(game, true);
+                    	this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
+                	}
+            	}    
+            }
         }
     }
 
@@ -129,7 +126,16 @@ public class GameManagerController {
             game.setStatus(counter < countTeams
                     ? game.getStatus() == GameState.PLAYED ? GameState.HALTED : GameState.VALID_SETUP
                     : GameState.PLAYED);
-
+            if((game.getStatus() == GameState.PLAYED) && !currentRound.containsKey(game)) {
+            	getNextRoundInfo(game);
+            	this.websocketManager.getNewRoundChannel().send("startGame", getAllUserIdsOfGameTeams(game.getTeams()));
+            }
+            if(game.getStatus() == GameState.PLAYED) {
+            	this.websocketManager.getNewRoundChannel().send("restartGame", getAllUserIdsOfGameTeams(game.getTeams()));
+            }
+            if(game.getStatus() == GameState.HALTED) {
+            	this.websocketManager.getNewRoundChannel().send("pauseGame", getAllUserIdsOfGameTeams(game.getTeams()));
+            }
             // should, but cannot save game here, because authentication is missing from context (event was externally
             // initialized)
             // TODO: save game on next occasion to keep db up-to-date
@@ -138,7 +144,7 @@ public class GameManagerController {
     }
 
     /**
-     * Method that starts a new Round for a game. It initializes a new round and also calls a method to start the
+     * Method that starts a new Round by the cube for a game. It initializes a new round and also calls a method to start the
      * countdown.
      * @param currentGame, game for which round should be started
      * @param cubeFace,    face that sets round parameter
@@ -148,6 +154,10 @@ public class GameManagerController {
         this.websocketManager.getNewRoundChannel().send("startRound", getAllUserIdsOfGameTeams(game.getTeams()));
     }
     
+    /**
+     * Method to get Informations of next round, before cube starts the round
+     * @param game, game for which informations of next round should be estimated
+     */
     public void getNextRoundInfo(Game game) {
     	this.currentRound.put(game, gameLogic.getNextRound(game));
     }
@@ -178,7 +188,7 @@ public class GameManagerController {
      * @param listOfTeams
      * @return list of usernames
      */
-    public List<Long> getAllUserIdsOfGameTeams(Set<Team> listOfTeams) {
+    private List<Long> getAllUserIdsOfGameTeams(Set<Team> listOfTeams) {
         List<Long> userIds = new ArrayList<>();
         List<User> users = new ArrayList<>();
         for (Team team : listOfTeams) {
@@ -230,6 +240,12 @@ public class GameManagerController {
         }
     }
 
+    /**
+     * Method to validate and save a round of a game. Checks if a team reached the maximum of points or if all enabled terms
+     * of topic have been used. Send corresponding message to all users in the game
+     * @param game
+     * @param v, validation of round
+     */
     public void validateRoundOfGame(Game game, Validation v) {
         gameLogic.saveLastRound(game, v);
         this.listOfGames.put(getCubeByGame(game), game);
@@ -251,6 +267,11 @@ public class GameManagerController {
         }
     }
 
+    /**
+     * Method to get the cube that corresponds to a game
+     * @param game, game to find cube of
+     * @return cube of the game
+     */
     private Cube getCubeByGame(Game game) {
         for (Entry<Cube, Game> e : this.listOfGames.entrySet()) {
             if (e.getValue().equals(game)) {
@@ -268,6 +289,11 @@ public class GameManagerController {
     	this.midValidation.put(game, true);
     }
 
+    /**
+     * Method to end the game. Sets status to finished, saves it in the database and removes it from all
+     * maps in controller
+     * @param game, game that finishes
+     */
     public void endGame(Game game) {
         game.setStatus(GameState.FINISHED);
         gameService.saveGame(game);
@@ -276,36 +302,6 @@ public class GameManagerController {
         this.activeRound.remove(game);
     }
 
-    private void start2TestGames() {
-        Game testgame1 = gameService.loadGame(8L);
-        Cube cube = cubeService.getByMacAddress("56:23:89:34:56");
-
-        System.out.println("players for testgame 1:");
-        for (Team t : testgame1.getTeams()) {
-            for (User u : t.getTeamMembers()) {
-                System.out.println(u.getUsername());
-            }
-        }
-
-        Game testgame2 = gameService.loadGame(9L);
-        Cube cube2 = cubeService.getByMacAddress("22:23:89:90:56");
-
-        System.out.println("players for testgame 2:");
-        for (Team t : testgame2.getTeams()) {
-            for (User u : t.getTeamMembers()) {
-                System.out.println(u.getUsername());
-            }
-        }
-        System.out.println(testgame1.getMaxPoints());
-        listOfGames.put(cube, testgame1);
-        listOfGames.put(cube2, testgame2);
-        activeRound.put(testgame1, false);
-        activeRound.put(testgame2, false);
-        midValidation.put(testgame1, false);
-        midValidation.put(testgame2, false);
-        getNextRoundInfo(testgame1);
-        getNextRoundInfo(testgame2);
-    }
 
 	/**
 	 * finds a game with a given cube
@@ -326,10 +322,13 @@ public class GameManagerController {
 	public void healthNotification(Cube cube) {
 
 		Game game = getCurrentGameForCube(cube);
-		List<Long> usersToNotify = getAllUserIdsOfGameTeams(game.getTeams());
+
+		if(game!= null) {
+			List<Long> usersToNotify = getAllUserIdsOfGameTeams(game.getTeams());
 		
 		if(websocketManager != null) {
 			websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
+			}
 		}
 	}
 	

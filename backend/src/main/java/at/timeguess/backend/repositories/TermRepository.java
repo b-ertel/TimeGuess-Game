@@ -23,4 +23,7 @@ public interface TermRepository extends AbstractRepository<Term, Long> {
 
     @Query("SELECT t FROM Term t WHERE t.name=:name AND t.topic=:topic")
     Term findByName(String name, Topic topic);
+    
+    @Query("SELECT t FROM Term t WHERE t.enabled=TRUE AND t.topic=:topic")
+    List<Term> findEnablesByTopic(Topic topic);
 }

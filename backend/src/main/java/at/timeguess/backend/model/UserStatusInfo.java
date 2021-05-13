@@ -1,6 +1,4 @@
-package at.timeguess.backend.model.demo;
-
-import at.timeguess.backend.model.User;
+package at.timeguess.backend.model;
 
 /**
  * Just combines a user and its status.
