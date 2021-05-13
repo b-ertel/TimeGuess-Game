@@ -1,4 +1,4 @@
-package at.timeguess.backend.ui.controllers.demo;
+package at.timeguess.backend.ui.controllers;
 
 import java.util.Collection;
 import java.util.Collections;

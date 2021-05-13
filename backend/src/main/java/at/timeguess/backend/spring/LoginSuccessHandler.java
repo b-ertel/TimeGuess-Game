@@ -6,7 +6,7 @@ import org.springframework.security.authentication.event.InteractiveAuthenticati
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.ui.controllers.demo.ChatManagerController;
-import at.timeguess.backend.ui.controllers.demo.UserStatusController;
+import at.timeguess.backend.ui.controllers.UserStatusController;
 
 /**
  * This handler is triggered after a login is performed.

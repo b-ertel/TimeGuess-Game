@@ -5,7 +5,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import at.timeguess.backend.ui.controllers.demo.UserStatusController;
+import at.timeguess.backend.ui.controllers.UserStatusController;
 
 /**
  * This handler is triggered after the application-context is refreshed, i.e.

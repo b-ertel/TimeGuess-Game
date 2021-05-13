@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuc
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.ui.controllers.demo.ChatManagerController;
-import at.timeguess.backend.ui.controllers.demo.UserStatusController;
+import at.timeguess.backend.ui.controllers.UserStatusController;
 
 /**
  * This handler is triggered after a logout is performed.

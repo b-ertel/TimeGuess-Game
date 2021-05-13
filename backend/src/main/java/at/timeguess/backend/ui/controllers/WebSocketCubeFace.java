@@ -1,4 +1,4 @@
-package at.timeguess.backend.ui.controllers.demo;
+package at.timeguess.backend.ui.controllers;
 import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.ui.websockets.WebSocketManager;

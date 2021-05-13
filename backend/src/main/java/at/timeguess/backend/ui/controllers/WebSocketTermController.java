@@ -1,4 +1,4 @@
-package at.timeguess.backend.ui.controllers.demo;
+package at.timeguess.backend.ui.controllers;
 
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.repositories.UserRepository;
