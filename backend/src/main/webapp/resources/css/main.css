@@ -326,6 +326,7 @@ tr.ui-widget-content {
 
 td.ui-panelgrid-cell {
     border: none !important;
+    vertical-align: top;
 }
 
 .ui-button-icon-left {
@@ -366,8 +367,17 @@ td.ui-panelgrid-cell {
     margin-right: 20px;
 }
 
+.findial {
+    margin-top:7px;
+    margin-bottom: 5px !important;
+}
+
 .pagemenu {
     margin-bottom: 10px;
+}
+
+.hidden {
+    display: none;
 }
 
 pre code {

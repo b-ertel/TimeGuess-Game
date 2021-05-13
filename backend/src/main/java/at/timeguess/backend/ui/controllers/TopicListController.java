@@ -56,8 +56,12 @@ public class TopicListController implements Serializable {
             UploadedFile file = event.getFile();
             String filename = file.getFileName();
 
+            termService.setInfoOnSave(false);
+
             if (this.importJSON(filename, file.getInputStream()))
                 messageBean.alertInformation("Terms upload", String.format("%s was successfully imported", filename));
+
+            termService.setInfoOnSave(true);
         }
         catch (Exception e) {
             messageBean.alertErrorFailValidation("Terms upload error", e.getMessage());

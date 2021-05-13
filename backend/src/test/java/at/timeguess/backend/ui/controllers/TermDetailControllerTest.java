@@ -96,6 +96,28 @@ public class TermDetailControllerTest {
     }
 
     @ParameterizedTest
+    @ValueSource(longs = { 5, 15 })
+    public void testDoSaveTermEnabled(Long termId) {
+        Term term = assertMockTerm(termId, true, false);
+
+        termDetailController.doSaveTerm(term);
+
+        verify(termService).saveTerm(term);
+        verify(messageBean).alertInformation(anyString(), anyString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = { 5, 15 })
+    public void testDoSaveTermDisabled(Long termId) {
+        Term term = assertMockTerm(termId);
+
+        termDetailController.doSaveTerm(term);
+
+        verify(termService).saveTerm(term);
+        verify(messageBean).alertInformation(anyString(), anyString());
+    }
+
+    @ParameterizedTest
     @ValueSource(longs = { 1, 2, 3, 40, 444 })
     public void testDoDeleteTerm(Long termId) {
         Term term = assertMockTerm(termId);
@@ -143,6 +165,7 @@ public class TermDetailControllerTest {
         if (full) {
             term.setName("aterm");
             term.setTopic(createTopic(15L));
+            term.setEnabled(true);
         }
         when(termService.loadTerm(termId)).thenReturn(term);
 

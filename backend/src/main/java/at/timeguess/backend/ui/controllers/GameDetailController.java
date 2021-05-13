@@ -3,6 +3,7 @@ package at.timeguess.backend.ui.controllers;
 import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.logging.log4j.util.Strings;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
+import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.Team;
@@ -34,12 +36,16 @@ public class GameDetailController implements Serializable {
     private TeamService teamService;
 
     @Autowired
+    private CubeStatusController cubeStatusController;
+
+    @Autowired
     private MessageBean messageBean;
 
     /**
      * Attribute to cache the currently displayed game
      */
     private Game game;
+    private Cube orgCube;
 
     /**
      * Sets the currently displayed game and reloads it form db. This game is targeted by any further calls of
@@ -207,15 +213,24 @@ public class GameDetailController implements Serializable {
      */
     public void doReloadGame() {
         game = gameService.loadGame(game.getId());
+        orgCube = game.getCube();
     }
 
     /**
      * Action to save the currently displayed game.
      */
     public void doSaveGame() {
-        if (doValidateGame()) {
+        if (this.doValidateGame()) {
+            this.checkCubeChange(orgCube, game.getCube());
+
             Game ret = this.gameService.saveGame(game);
-            if (ret != null) game = ret;
+            if (ret == null) {
+                this.checkCubeChange(game.getCube(), orgCube);
+            }
+            else {
+                game = ret;
+                orgCube = game.getCube();
+            }
         }
         else messageBean.alertErrorFailValidation("Saving game failed", "Input fields are invalid");
     }
@@ -226,6 +241,7 @@ public class GameDetailController implements Serializable {
     public void doDeleteGame() {
         this.gameService.deleteGame(game);
         game = null;
+        orgCube = null;
     }
 
     /**
@@ -236,8 +252,14 @@ public class GameDetailController implements Serializable {
         if (Strings.isBlank(game.getName())) return false;
         if (game.getMaxPoints() <= 0) return false;
         if (game.getCube() == null || game.getCube().isNew()) return false;
-        if (game.getTopic() == null) return false;
+        if (game.getTopic() == null || !game.getTopic().isEnabled()) return false;
         if (game.getTeamCount() < 2) return false;
         return true;
+    }
+
+    private void checkCubeChange(Cube fromCube, Cube toCube) {
+        if (game.getStatus() == GameState.SETUP && !Objects.equals(fromCube, toCube)) {
+            cubeStatusController.switchCube(fromCube, toCube);
+        }
     }
 }

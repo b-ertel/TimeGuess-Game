@@ -357,4 +357,18 @@ public class CubeStatusController {
             }
 	}
 
+    /**
+     * Changes given fromCube status to READY if it was formerly INGAME, and toCube status to INGAME if it is not null.
+     * @param fromCube
+     * @param toCube
+     */
+    public void switchCube(Cube fromCube, Cube toCube) {
+        // release previous cube if necessary
+        if (!(fromCube == null || fromCube.equals(toCube)) && this.getStatus(fromCube.getMacAddress()) == CubeStatus.IN_GAME)
+            this.setReady(fromCube.getMacAddress());
+
+        // reserve new cube (if it's the same cube, message is resent)
+        if (toCube != null)
+            this.setInGame(toCube.getMacAddress());
+    }
 }
