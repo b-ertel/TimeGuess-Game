@@ -18,16 +18,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.utils.TestSetup;
 
 /**
- * Some very basic tests for {@link TopicService}.
+ * Tests for {@link TopicService}.
  */
 @SpringBootTest
 @WebAppConfiguration
+@Sql({ "classpath:deleteAll.sql", "classpath:dataTest.sql" })
 public class TopicServiceTest {
 
     @Autowired
@@ -57,7 +59,7 @@ public class TopicServiceTest {
         List<Topic> result = topicService.getAllTopics();
 
         assertLists(expected, result);
-        
+
         expected = createEntities(id -> topicService.loadTopicId(id), LongStream.rangeClosed(1, 4).boxed());
         assertListsCompare(expected, result);
     }

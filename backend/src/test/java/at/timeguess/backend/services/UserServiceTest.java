@@ -24,6 +24,7 @@ import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.User;
@@ -35,6 +36,7 @@ import at.timeguess.backend.utils.TestSetup;
  */
 @SpringBootTest
 @WebAppConfiguration
+@Sql({ "classpath:deleteAll.sql", "classpath:dataTest.sql" })
 public class UserServiceTest {
 
     @Autowired
@@ -59,7 +61,7 @@ public class UserServiceTest {
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testDeleteUser(String username, String adminUsername) {
         assertLoadUser(adminUsername, true, "Admin user '%s' could not be loaded from test data source");
-        
+
         User toBeDeletedUser = assertLoadUser(username, true, "User '%s' could not be loaded from test data source");
         int ctBefore = userService.getAllUsers().size();
 
@@ -114,12 +116,12 @@ public class UserServiceTest {
         toBeCreatedUser.setLastName(lName);
         toBeCreatedUser.setEmail(email);
         toBeCreatedUser.setRoles(Set.of(UserRole.PLAYER, UserRole.MANAGER));
-        
+
         toBeCreatedUser.setId(0L);
         assertTrue(toBeCreatedUser.isNew());
         toBeCreatedUser.setId(null);
         assertTrue(toBeCreatedUser.isNew());
-        
+
         userService.saveUser(toBeCreatedUser);
 
         User freshlyCreatedUser = assertLoadUser(username, true, "New user '%s' could not be loaded from test data source after being saved");
@@ -191,7 +193,7 @@ public class UserServiceTest {
         assertDoesNotThrow(() -> {
             User expected = createUser(username);
             expected.setPassword("pword");
-            
+
             User result = userService.saveUser(expected);
             assertEquals(expected.getUsername(), result.getUsername());
         }, "Anonymous user should be able to self-register, but wasn't");
@@ -304,7 +306,7 @@ public class UserServiceTest {
 
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = { "admin|", "user1|user2;clemens", "user2|user1;claudia", "michael|felix;lorenz", "felix|michael;lorenz;clemens",
-            "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena;clemens", "clemens|user1;felix;claudia" })
+        "lorenz|michael;felix;verena", "verena|lorenz;claudia", "claudia|user2;verena;clemens", "clemens|user1;felix;claudia" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetTeammates(String username, String usernamesExpected) {
         User user = assertLoadUser(username);

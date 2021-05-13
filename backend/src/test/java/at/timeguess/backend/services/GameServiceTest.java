@@ -22,6 +22,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Game;
@@ -33,10 +34,11 @@ import at.timeguess.backend.model.User;
 import at.timeguess.backend.utils.TestSetup;
 
 /**
- * Some very basic tests for {@link GameService}.
+ * Tests for {@link GameService}.
  */
 @SpringBootTest
 @WebAppConfiguration
+@Sql({ "classpath:deleteAll.sql", "classpath:dataTest.sql" })
 public class GameServiceTest {
 
     @Autowired
@@ -284,7 +286,7 @@ public class GameServiceTest {
         User user1 = userService.loadUser(createUser(1L));
         assertDoesNotThrow(() -> gameService.confirm(user1, game6));
         assertFalse(game6.getConfirmedUsers().contains(user1), "User with id=1 is not expected to be in game with id=6, but is");
-        
+
         // game in FINISHED state
         Game game1 = assertLoadGame(1L, true, "Game '%s' could not be loaded from test data source");
         assertDoesNotThrow(() -> gameService.confirm(user3, game1));
