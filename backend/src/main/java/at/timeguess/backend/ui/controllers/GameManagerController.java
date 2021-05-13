@@ -322,10 +322,13 @@ public class GameManagerController {
 	public void healthNotification(Cube cube) {
 
 		Game game = getCurrentGameForCube(cube);
-		List<Long> usersToNotify = getAllUserIdsOfGameTeams(game.getTeams());
+
+		if(game!= null) {
+			List<Long> usersToNotify = getAllUserIdsOfGameTeams(game.getTeams());
 		
 		if(websocketManager != null) {
 			websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
+			}
 		}
 	}
 	
