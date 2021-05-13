@@ -85,9 +85,9 @@
                     <p:separator />
                     <h:panelGrid columns="2">
                         <p:outputLabel for="batteryLevel" value="Latest reported Battery Level: " />
-                        <p:inputText id="batteryLevel" value="#{cubeController.batteryLevel}" disabled="true"/>
+                        <p:inputText id="batteryLevel" value="#{cubeStatusController.getBatteryLevel(curr)}" disabled="true"/>
                         <p:outputLabel for="rssi" value="Latest reported RSSI: "/>
-                        <p:inputText id="rssi" value="#{cubeController.rssi}" disabled="true"/>
+                        <p:inputText id="rssi" value="#{cubeStatusController.getRssi(curr)}" disabled="true"/>
                     </h:panelGrid>
                     <p:separator />
                       <h:panelGrid columns="6">

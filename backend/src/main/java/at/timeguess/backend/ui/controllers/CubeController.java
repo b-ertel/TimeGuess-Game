@@ -92,24 +92,6 @@ public class CubeController {
         this.cube = cube;
     }
 
-    /**
-     * Get the latest reported value of the battery level characteristic for the cached cube.
-     * 
-     * @return the battery level
-     */
-    public Integer getBatteryLevel() {
-        return cubeStatusController.getBatteryLevel(cube);
-    }
-
-    /**
-     * Get the latest reported value of the RSSI for the cached cube.
-     * 
-     * @return the RSSI
-     */
-    public Integer getRssi() {
-        return cubeStatusController.getRssi(cube);
-    }
-
 }
 
 
