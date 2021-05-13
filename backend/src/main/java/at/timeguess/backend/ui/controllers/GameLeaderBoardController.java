@@ -31,21 +31,30 @@ public class GameLeaderBoardController {
     @Autowired
     private GameLogicService gameLogic;
     
+    private Game currentGame;
+    
+    @PostConstruct
+    public void setup() {
+    	if(this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser())!=null){
+    		this.currentGame = this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
+    	}
+    }
+    
 	public List<Team> getTeamsInGame() {
-		return List.copyOf(currentGame().getTeams());
+		return List.copyOf(currentGame.getTeams());
 	}
 
 	
     public Integer calculatePointsOfTeam(Team team) {
-    	return roundService.getPointsOfTeamInGame(currentGame(), team);
+    	return roundService.getPointsOfTeamInGame(currentGame, team);
     }
 
-	public Game currentGame() {
-		return this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
+	public Game getCurrentGame() {
+		return this.currentGame;
 	}
 
     
     public Team computeWinningTeam() {
-    	return gameLogic.getTeamWithMostPoints(currentGame());
+    	return gameLogic.getTeamWithMostPoints(currentGame);
     }
 }
