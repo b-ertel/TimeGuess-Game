@@ -41,13 +41,13 @@
    <h:form id="gameRoundForm" style="width:700px; text-align:center; align:right; margin: 0 auto;" rendered="#{not empty gameRoundController.currentGame}">
             <div class="gameRoomContent">      
                 <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
-				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to guess #{gameRoundController.nextRound.termToGuess.name}. " 
+				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name}. " 
 							   rendered="#{empty gameRoundController.currentRound and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to guess first. " 
+				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to describe first. " 
 							   rendered="#{empty gameRoundController.currentRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to guess #{gameRoundController.nextRound.termToGuess.name} during next round. Flip the cube and try your best!" 
+				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name} during next round. Flip the cube and try your best!" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to guess during next round. Flip the cube and try your best!" 
+				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe during next round. Flip the cube and try your best!" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>			  
 				<p:outputPanel header="RoundInfo" rendered="#{gameRoundController.inRound}">
 						<h3>Time to Guess</h3>
@@ -78,7 +78,7 @@
         			  widgetVar="roundValidationDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="false" showEffect="fade"
 					  hideEffect="fade" responsive="true">
-        		<p:outputLabel value="Did #{gameRoundController.currentRound.guessingUser.username} guess #{gameRoundController.currentRound.termToGuess.name} correct? (First click comes first)" 
+        		<p:outputLabel value="Did #{gameRoundController.currentRound.guessingTeam.name} guess #{gameRoundController.currentRound.termToGuess.name} correct? (First click comes first)" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>
 				<p:outputLabel value="You gave your best shot, your fate is now in the hands of your rivals. Please wait until they have valuated your round..." 
 							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>			   
