@@ -66,7 +66,7 @@ public class GameManagerController {
 
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
     private Map<Game, Boolean> midValidation = new ConcurrentHashMap<>();
-    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>(); // indicated if there is played a round currently in the game
+    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>(); // indicates if a round is currently played in a certain game
     private Map<Cube, Game> listOfGames = new ConcurrentHashMap<>();
 
     @PostConstruct
