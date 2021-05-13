@@ -33,7 +33,6 @@ import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.RoundService;
-import at.timeguess.backend.ui.beans.MessageBean;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -55,16 +54,13 @@ public class GameManagerController {
     private CubeService cubeService;
     @Autowired
     private GameLogicService gameLogic;
-  //  @Autowired
- //   private CubeStatusController cubeStatusController;
     @CDIAutowired
     private WebSocketManager websocketManager;
     @Autowired
     private ConfiguredFacetsEventListener configuredfacetsEventListener;
     @Autowired
     private ChannelPresenceEventListener channelPresenceEventListener;
-    @Autowired
-    private MessageBean messageBean;
+
 
     // cannot implement two different Consumers!
     private Consumer<ConfiguredFacetsEvent> consumerConfiguredFacetsEvent =
@@ -324,21 +320,19 @@ public class GameManagerController {
 		return this.listOfGames.get(cube);
 	}
 	
-	private String message;
-	
-	public void healthNotification(String message, Cube cube) {
-		messageBean.alertInformation("Health Message", message);
-		this.message = message;
-		System.out.println(message);
+	/**
+	 * called by {@link CubeStatusController} if there is a health status to report i.e. low battery, no connection
+	 * puts current game on halted if cube is OFFLINE
+	 * 
+	 * @param cube to to report to the current game
+	 */
+	public void healthNotification(Cube cube) {
+
 		Game game = getCurrentGameForCube(cube);
-		System.out.println(game);
 		List<Long> usersToNotify = getAllUserIdsOfGameTeams(game.getTeams());
-		System.out.println(usersToNotify);
 		
 		websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
 	}
 	
-	public void displayMessage() {
-		messageBean.alertInformation("Health Message", message);
-	}
+
 }

@@ -2,6 +2,7 @@ package at.timeguess.backend.ui.controllers;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 import at.timeguess.backend.services.CubeService;
-
+import at.timeguess.backend.ui.beans.MessageBean;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
@@ -56,9 +58,12 @@ public class CubeStatusController {
     private WebSocketManager websocketManager;
     @Autowired
     private GameManagerController gameManagerController;
+    @Autowired
+    private MessageBean messageBean;
 
 	private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
 	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
+	private List<String> healthMessage = new ArrayList<>();
     
     /**
      * creates a status for each Cube in the database
@@ -315,33 +320,55 @@ public class CubeStatusController {
 			Cube cube = cubeService.getByMacAddress(m.getKey());
 			
 			if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
-				LOGGER.info("[{}] cube with mac {} lost connection", LocalDateTime.now().format(myFormat), m.getKey());
+				
+				/*
+				 * sets status offline 
+				 * TODO -> there should be a trigger which puts game to HALTED
+				 */
 				setOffline(m.getKey());
-				LOGGER.info("[{}] cube with mac {} changed to status OFFLINE", LocalDateTime.now().format(myFormat), m.getKey());
 				
+				// message for current game that cube is offline
 				StringBuilder message = new StringBuilder();
-				message.append("Cube with mac ").append(m.getKey()).append("lost connection and is OFFLINE!");		
-				gameManagerController.healthNotification(message.toString(), cube);
-				
+				message.append("Cube with mac ")
+					.append(m.getKey())
+					.append(" lost connection and is OFFLINE!");	
+				addHealthMessage(message.toString());				
+				gameManagerController.healthNotification(cube);	
 			}              
 			else {                 
 				if(m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {
-					LOGGER.info("[{}] cube with mac {} has low battery (level at {})", LocalDateTime.now().format(myFormat), m.getKey(), m.getValue().getBatteryLevel());  
 					
+					// message for current game that cube is has low battery
 					StringBuilder message = new StringBuilder();
-					message.append("Cube with mac ").append(m.getKey()).append("has low battery! Level at ").append(m.getValue().getBatteryLevel());			
-					gameManagerController.healthNotification(message.toString(), cube);
-				}
-				if(m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {
-					LOGGER.info("[{}] cube with mac {} reported rssi level at {}", LocalDateTime.now().format(myFormat),  m.getKey(), m.getValue().getRssi());   
+					message.append("Cube with mac ")
+						.append(m.getKey())
+						.append(" has low battery! Level at ")
+						.append(m.getValue().getBatteryLevel());	
 					
+					addHealthMessage(message.toString());
+				}
+				if(m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {   
+					
+					// message for current game that rssi of cube is below threshold
 					StringBuilder message = new StringBuilder();
-					message.append("Cube with mac ").append(m.getKey()).append("reported rssi level at ").append(m.getValue().getRssi());			
-					gameManagerController.healthNotification(message.toString(), cube);
+					message.append("Cube with mac ")
+						.append(m.getKey())
+						.append(" reported rssi level at ")
+						.append(m.getValue().getRssi());
 					
+					addHealthMessage(message.toString());
 				}
+				gameManagerController.healthNotification(cube);
 			}
 		}
+	}
+	
+	/**
+	 * displays health message(s) in current game
+	 */
+	public void displayHealthMessage() {
+		messageBean.alertError("Health Message", healthMessage);
+		this.healthMessage.clear();
 	}
 
 	/**
@@ -375,5 +402,15 @@ public class CubeStatusController {
                 return null;
             }
 	}
+
+	public List<String> getHealthMessage() {
+		return healthMessage;
+	}
+
+	public void addHealthMessage(String healthMessage) {
+		this.healthMessage.add(healthMessage);
+	}
+	
+	
 
 }

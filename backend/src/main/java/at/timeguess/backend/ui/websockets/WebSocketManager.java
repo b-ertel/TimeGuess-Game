@@ -3,7 +3,6 @@ package at.timeguess.backend.ui.websockets;
 import java.io.Serializable;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -41,7 +40,9 @@ import org.omnifaces.cdi.PushContext;
 @ApplicationScoped
 public class WebSocketManager implements Serializable {
 
-    // add other channels here + getter for them
+	private static final long serialVersionUID = 1L;
+	
+	// add other channels here + getter for them
     @Inject
     @Push(channel = "userRegistrationChannel")
     private PushContext userRegistrationChannel;

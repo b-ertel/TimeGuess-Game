@@ -14,7 +14,7 @@
             pfContext=PF
         </h:outputScript>
         
-		<p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
+		<p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true" sticky="true" value="Multiple"/>
 		
 		<h:form>
 			<p:panel style="font-size:24px !important; width:180px; text-align:center;">
@@ -126,30 +126,13 @@
                 </h:panelGrid>
         	</p:dialog>
       </h:form> 
-      
-      <h:form id="healthStatusForm">
-      		<p:dialog id="healthStatusDialog" header="Cube Health Status"
-        			  widgetVar="healthStatusDialog" dynamic="true" modal="true"
-					  resizable="false" closeOnEscape="true" showEffect="fade"
-					  hideEffect="fade" responsive="true" closeable="false">
-        		<p:outputLabel value="Cube is offline!!" 
-							   style="font-weight:bold"/>			   
-				<h:panelGrid columns="1">
-                     <p:commandButton value="Ok" action="#{gameManagerController.displayMessage()}" update=":gameRoundForm :gameTableForm :msg" >
-         <!--           <f:actionListener binding="#{gameManagerController.displayMessage()}" />  -->  
-                     </p:commandButton>
-                </h:panelGrid>
-        	</p:dialog>
-      </h:form>         
                  
-            
             <o:socket channel="countDownChannel" scope="session"
          	    user="#{sessionInfoBean.currentUser.id}"
                 onmessage="function(m){console.log(m);}">
                 <p:ajax event="countDownUpdate"
                     update=":gameRoundForm:roundInfo"/>
             </o:socket> 
-
 
 			<o:socket channel="newRoundChannel" scope="session"   
                 		onmessage="function(m){console.log(m);}"
@@ -181,11 +164,9 @@
                         oncomplete="PF('termOverDialog').show()" 
                         />  
                 <p:ajax event="healthMessage"
-                        onevent="#{gameManagerController.displayMessage()}"
-                        render="msg"
-                        update="msg"
-                        oncomplete="PF('healthStatusDialog').show()" 
-                        />          
+                		listener="#{cubeStatusController.displayHealthMessage()}"  
+                		update="msg"
+                        />       
             </o:socket>
         
  
