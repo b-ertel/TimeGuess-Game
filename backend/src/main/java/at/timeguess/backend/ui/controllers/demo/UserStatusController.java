@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import at.timeguess.backend.model.User;
-import at.timeguess.backend.model.demo.LogEntry;
-import at.timeguess.backend.model.demo.LogEntryType;
-import at.timeguess.backend.model.demo.UserStatus;
-import at.timeguess.backend.model.demo.UserStatusInfo;
+import at.timeguess.backend.model.LogEntry;
+import at.timeguess.backend.model.LogEntryType;
+import at.timeguess.backend.model.UserStatus;
+import at.timeguess.backend.model.UserStatusInfo;
 import at.timeguess.backend.repositories.UserRepository;
 import at.timeguess.backend.spring.UserStatusInitializationHandler;
 import at.timeguess.backend.ui.websockets.WebSocketManager;

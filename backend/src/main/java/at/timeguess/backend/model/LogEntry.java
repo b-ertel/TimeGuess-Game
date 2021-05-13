@@ -1,8 +1,6 @@
-package at.timeguess.backend.model.demo;
+package at.timeguess.backend.model;
 
 import java.util.Date;
-
-import at.timeguess.backend.model.User;
 
 /**
  * A class which represents a logEntry.
