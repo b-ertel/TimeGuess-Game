@@ -3,7 +3,7 @@ University. The goal is to implement a prototype of a game called **TimeGuess.**
 
 In this repository:
 
-- `diagrams` gives an overview of our project with a class diagramm, a component diagramm and a use case diagramm.
+- `documents` contains various documents (e.g., software concept, testing playbook, time records ...)
 
 - `backend` contains the implementation of the server-side backend
 
