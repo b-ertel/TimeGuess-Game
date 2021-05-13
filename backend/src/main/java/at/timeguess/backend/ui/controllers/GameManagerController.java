@@ -67,7 +67,7 @@ public class GameManagerController {
     private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
     private Map<Game, Boolean> midValidation = new ConcurrentHashMap<>();
     private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>(); // indicated if there is played a round currently in the game
-    private Map<Cube, Game> listOfGames = new HashMap<>();
+    private Map<Cube, Game> listOfGames = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void setup() {
@@ -88,17 +88,20 @@ public class GameManagerController {
     public synchronized void onConfiguredFacetsEvent(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
             Game game = listOfGames.get(configuredFacetsEvent.getCube());
-            if(!midValidation.get(game)) {
-            	if (!activeRound.get(game)) {
-                    activeRound.put(game, true);
-                    startRoundByCube(game, currentRound.get(game), configuredFacetsEvent.getCubeFace());
-                }
-                else {
-                    activeRound.put(game, false);
-                    midValidation.put(game, true);
-                    this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
-                }
-            }    
+
+            if(game.getStatus().equals(GameState.PLAYED)) {   // checks if game is in state PLAYED otherwise there should not be started a new round
+            	if(!midValidation.get(game)) {
+            		if (!activeRound.get(game)) {
+            			activeRound.put(game, true);
+            			startRoundByCube(game, currentRound.get(game), configuredFacetsEvent.getCubeFace());
+            		}
+            		else {
+                    	activeRound.put(game, false);
+                    	midValidation.put(game, true);
+                    	this.websocketManager.getNewRoundChannel().send("endRoundViaFlip", getAllUserIdsOfGameTeams(game.getTeams()));
+                	}
+            	}    
+            }
         }
     }
 
