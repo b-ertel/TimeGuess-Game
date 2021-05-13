@@ -5,6 +5,8 @@ import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -29,10 +31,23 @@ public class GameRoundController {
     
     private Round currentRound;
     
+    private Round nextRound;
+    
     private boolean inRound = false;
     
     private boolean inGuessingTeam = false;
+    
+    
+    @PostConstruct
+    public void setup() {
+    	this.nextRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
+    	this.inGuessingTeam = nextRound.getGuessingTeam().getTeamMembers().contains(sessionInfoBean.getCurrentUser());
+    }
 
+    public void getNextRoundInfos() {
+    	this.nextRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
+    	this.inGuessingTeam = nextRound.getGuessingTeam().getTeamMembers().contains(sessionInfoBean.getCurrentUser());
+    }
     
     public void startRound() {
     	this.inRound = true;
@@ -53,6 +68,10 @@ public class GameRoundController {
     
     public Round getCurrentRound() {
     	return this.currentRound;
+    }
+    
+    public Round getNextRound() {
+    	return this.nextRound;
     }
     
     public void setInRound(boolean inRound) {

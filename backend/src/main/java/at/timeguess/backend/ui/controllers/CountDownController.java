@@ -94,6 +94,7 @@ public class CountDownController {
 			 // put the round inactive to enable starting a new round via flip
 			Game currentGame = gameManagerController.getCurrentGameForUser(sessionBean.getCurrentUser());
 			gameManagerController.setActiveRoundFalse(currentGame);
+			gameManagerController.setMidValidationTrue(currentGame);
 		}
 		webSocketManager.getCountDownChannel().send("countDownUpdate", user.getId());  
 	}

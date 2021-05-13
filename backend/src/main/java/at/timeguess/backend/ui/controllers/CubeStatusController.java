@@ -49,7 +49,7 @@ public class CubeStatusController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CubeStatusController.class);
     private final DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
-	
+
     @Autowired
     private CubeService cubeService;
     @CDIAutowired
@@ -123,8 +123,9 @@ public class CubeStatusController {
 		}
 		else {
 			LOGGER.info("cube is not known...new cube is created");
-			updatedCube = cubeService.createCube(message);									// Cube is new and has to be created
-
+			updatedCube.setMacAddress(message.getIdentifier());
+			updatedCube = cubeService.saveCube(updatedCube);
+			LOGGER.info("new Cube createt with mac {}", updatedCube.getMacAddress());
 			this.cubeStatus.put(updatedCube.getMacAddress(), new CubeStatusInfo(updatedCube));
 			statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);
 		}
@@ -322,6 +323,38 @@ public class CubeStatusController {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get the latest reported value of the battery level characteristic for a given cube.
+	 * 
+	 * @param cube the cube
+	 * @return the battery level
+	 */
+	public Integer getBatteryLevel(Cube cube) {
+	    HealthStatus hs = healthStatus.get(cube.getMacAddress());
+	    if (hs != null) {
+	        return hs.getBatteryLevel();
+	    }
+	    else {
+	        return null;
+	    }
+	}
+
+	/**
+	 * Get the latest reported value of the RSSI for a given cube.
+	 * 
+	 * @param cube the cube
+	 * @return the RSSI
+	 */
+	public Integer getRssi(Cube cube) {
+	    HealthStatus hs = healthStatus.get(cube.getMacAddress());
+            if (hs != null) {
+                return hs.getRssi();
+            }
+            else {
+                return null;
+            }
 	}
 
     /**

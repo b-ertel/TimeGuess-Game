@@ -83,6 +83,13 @@
                         <p:inputText id="name" value="#{curr.name}"/>
                     </h:panelGrid>
                     <p:separator />
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="batteryLevel" value="Latest reported Battery Level: " />
+                        <p:inputText id="batteryLevel" value="#{cubeStatusController.getBatteryLevel(curr)}" disabled="true"/>
+                        <p:outputLabel for="rssi" value="Latest reported RSSI: "/>
+                        <p:inputText id="rssi" value="#{cubeStatusController.getRssi(curr)}" disabled="true"/>
+                    </h:panelGrid>
+                    <p:separator />
                       <h:panelGrid columns="6">
                         <p:commandButton value="Save" action="#{cubeController.saveCube()}" oncomplete="{PF('cubeUseDialog').hide()}" 
                         					update=":cubeDetailForm:cubeUseDialog :msg" />
@@ -136,13 +143,6 @@
 				hideEffect="fade" responsive="true" closable="false">
 
 				<p:outputPanel id="cubeConfigurationOutputPanel">
-					<p:panel header="MAC address of cube">
-						<h:outputText
-							value="#{cubeConfigurationController.cube.macAddress}" />
-					</p:panel>
-
-					<p:spacer height="5" />
-
 					<p:panel header="Instructions">
 						<h:outputText value="#{cubeConfigurationController.instruction}" />
 					</p:panel>
@@ -207,12 +207,6 @@
 				hideEffect="fade" responsive="true">
 
 				<p:outputPanel id="cubeTestOutputPanel">
-					<p:panel header="MAC address of cube">
-						<h:outputText value="#{cubeTestController.cube.macAddress}" />
-					</p:panel>
-
-					<p:spacer height="5" />
-
 					<p:panel header="Instructions">
 						<h:outputText
 							value="Turn the cube and check if the cube faces displayed below are correct!" />

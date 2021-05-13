@@ -142,8 +142,13 @@ public class CubeConfigurationController implements Consumer<UnconfiguredFacetsE
 
     public void submit() {
         if (isConfigured()) {
-            cubeService.saveMappingForCube(cube, mapping);
-            messageBean.alertInformation("CubeConfiguration", "Configuration successfully saved!");
+            try {
+                cubeService.saveMappingForCube(cube, mapping);
+                messageBean.alertInformation("CubeConfiguration", "Configuration successfully saved!");
+            }
+            catch (IllegalArgumentException e) {
+                messageBean.alertErrorFailValidation("Cube Configuration", e.getMessage());
+            }
         }
     }
 
