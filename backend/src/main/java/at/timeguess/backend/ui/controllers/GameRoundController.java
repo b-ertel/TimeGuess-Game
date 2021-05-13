@@ -10,8 +10,6 @@ import at.timeguess.backend.ui.beans.SessionInfoBean;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -42,17 +40,22 @@ public class GameRoundController {
     
     private Round nextRound;
     
-    private Game currentGame;
+    private Game currentGame = null;
     
     private boolean inRound = false;
     
     private boolean inGuessingTeam = false;
     
-
     public void setup() {
     	this.nextRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     	this.inGuessingTeam = nextRound.getGuessingTeam().getTeamMembers().contains(sessionInfoBean.getCurrentUser());
     	this.currentGame = this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
+    }
+    
+    public void destroy() {
+    	this.currentGame = null;
+    	this.currentRound = null;
+    	this.nextRound = null;
     }
 
     public void getNextRoundInfos() {
@@ -130,7 +133,12 @@ public class GameRoundController {
     }
     
     public Team computeWinningTeam() {
-    	return gameLogic.getTeamWithMostPoints(currentGame);
+    	Team winningTeam = gameLogic.getTeamWithMostPoints(currentGame);
+    	this.currentGame = null;
+    	this.currentRound = null;
+    	this.nextRound = null;
+        return winningTeam;
+    	
     }
  
 

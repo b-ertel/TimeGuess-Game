@@ -29,7 +29,6 @@ import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.Validation;
-import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.RoundService;
@@ -50,8 +49,6 @@ public class GameManagerController {
     private GameService gameService;
     @Autowired
     private RoundService roundService;
-    @Autowired
-    private CubeService cubeService;
     @Autowired
     private GameLogicService gameLogic;
     @CDIAutowired
@@ -276,34 +273,4 @@ public class GameManagerController {
         this.activeRound.remove(game);
     }
 
-    private void start2TestGames() {
-        Game testgame1 = gameService.loadGame(8L);
-        Cube cube = cubeService.getByMacAddress("56:23:89:34:56");
-
-        System.out.println("players for testgame 1:");
-        for (Team t : testgame1.getTeams()) {
-            for (User u : t.getTeamMembers()) {
-                System.out.println(u.getUsername());
-            }
-        }
-
-        Game testgame2 = gameService.loadGame(9L);
-        Cube cube2 = cubeService.getByMacAddress("22:23:89:90:56");
-
-        System.out.println("players for testgame 2:");
-        for (Team t : testgame2.getTeams()) {
-            for (User u : t.getTeamMembers()) {
-                System.out.println(u.getUsername());
-            }
-        }
-        System.out.println(testgame1.getMaxPoints());
-        listOfGames.put(cube, testgame1);
-        listOfGames.put(cube2, testgame2);
-        activeRound.put(testgame1, false);
-        activeRound.put(testgame2, false);
-        midValidation.put(testgame1, false);
-        midValidation.put(testgame2, false);
-        getNextRoundInfo(testgame1);
-        getNextRoundInfo(testgame2);
-    }
 }

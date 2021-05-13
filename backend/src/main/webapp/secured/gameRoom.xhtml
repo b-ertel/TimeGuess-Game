@@ -112,10 +112,10 @@
         			  widgetVar="gameOverDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="false" showEffect="fade"
 					  hideEffect="fade" responsive="true" closeable="false">
-        		<p:outputLabel value="Congratulations to #{gameRoundController.currentRound.guessingTeam.name} on winning the game" 
+        		<p:outputLabel value="Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game" 
 							   style="font-weight:bold"/>			   
 				<h:panelGrid columns="1">
-                     <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true"/>
+                     <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all"></p:commandButton>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>     
@@ -128,7 +128,7 @@
         		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!" 
 							   style="font-weight:bold"/>			   
 				<h:panelGrid columns="1">
-                     <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true"/>
+                     <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all"/>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>     
