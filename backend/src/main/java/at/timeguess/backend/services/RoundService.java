@@ -40,6 +40,11 @@ public class RoundService {
         return ret;
     }
     
+    /**
+     * method to estimate last round of a game
+     * @param game
+     * @return last round of game
+     */
     public Round getLastRound(Game game) {
     	if(roundRepository.getRoundOfGame(game).isEmpty()) {
     		return null;
@@ -47,10 +52,21 @@ public class RoundService {
     	return roundRepository.getRoundOfGame(game).get(roundRepository.getRoundOfGame(game).size()-1);
     }
     
+    /**
+     * method to check whether rounds where played in game or not
+     * @param game
+     * @return boolean
+     */
     public boolean roundsPlayedInGame(Game game) {
     	return (roundRepository.getRoundOfGame(game).size()!=0);
     }
     
+    /**
+     * Method to estimate which round was the last round, a certain team has played in a game
+     * @param game that team played
+     * @param team of which last round should be evaluated
+     * @return last round of the team in the game
+     */
     public Round getLastRoundOfTeam(Game game, Team team) {
     	if(roundRepository.getRoundOfGameWithTeam(game, team).isEmpty()) {
     		return null;
@@ -58,10 +74,22 @@ public class RoundService {
     	return roundRepository.getRoundOfGameWithTeam(game, team).get(roundRepository.getRoundOfGameWithTeam(game, team).size()-1);
     }
     
+    /**
+     * check whether team played rounds in game
+     * @param game
+     * @param team
+     * @return boolean
+     */
     public boolean teamPlayedRoundsInGame(Game game, Team team) {
     	return (roundRepository.getRoundOfGameWithTeam(game, team).size()!=0);
     }
     
+    /**
+     * Method to estimate how many points a team has reached in a certain game
+     * @param game
+     * @param team
+     * @return points of team in game
+     */
     public Integer getPointsOfTeamInGame(Game game, Team team) {
     	if(roundRepository.getPointsOfTeamInGame(game, team)==null)
     		return 0;

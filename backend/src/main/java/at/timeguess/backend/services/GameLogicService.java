@@ -45,6 +45,12 @@ public class GameLogicService {
         return !(availableTerms.size() == usedTerms.size());
     }
     
+    /**
+     * method to check wheter a team have reached the max points of a game
+     * @param game with a maximum of points
+     * @param team to check
+     * @return boolean
+     */
     public boolean teamReachedMaxPoints(Game game, Team team) {
     	if(game.getMaxPoints()<=roundService.getPointsOfTeamInGame(game, team)) {
     		return true;
@@ -52,6 +58,11 @@ public class GameLogicService {
     	return false;
     }
     
+    /**
+     * method to evaluate the team with the most points in a game
+     * @param game to evaluate
+     * @return team with the most points
+     */
     public Team getTeamWithMostPoints(Game game) {
     	Integer points = 0;
     	Team team = null;
@@ -94,6 +105,12 @@ public class GameLogicService {
         return next;
     }
 
+    /**
+     * Method to estimate which team comes next. If no rounds played in game, a  random team
+     * is chosen. If a round is played, the next team in the list is returned
+     * @param game to evaluate next team
+     * @return team that plays next
+     */
     public Team getNextTeam(Game game) {
         List<Team> teams = new ArrayList<>(game.getTeams());
         if (roundService.roundsPlayedInGame(game)) {
@@ -117,6 +134,13 @@ public class GameLogicService {
         }
     }
 
+    /**
+     * Method to estimate which user comes next. If team of user has not played any rounds in game, a random user
+     * is chosen. If a round is played by the team , the next user in the list is returned
+     * @param game to evaluate next team
+     * @param team of users
+     * @return user that plays next
+     */
     public User nextUser(Game game, Team team) {
         List<User> users = new ArrayList<>();
         Iterator<User> ite = team.getTeamMembers().iterator();
@@ -144,6 +168,12 @@ public class GameLogicService {
         }
     }
 
+    
+    /**
+     * Method to create next round of a game. Sets all values of {@link Round} except for points, time and activity
+     * @param game to evaluate
+     * @return next round
+     */
     public Round getNextRound(Game game) {
 		Round nextRound = new Round();
 		nextRound.setNr(game.getRounds().size()+1);
@@ -161,6 +191,12 @@ public class GameLogicService {
 		return nextRound;
 	}
     
+    /**
+     * Method that sets informations of cube-face into round
+     * @param round that gets informations
+     * @param cubeFace that delivers informations
+     * @return updated round
+     */
     public Round getCubeInfosIntoRound(Round round, CubeFace cubeFace) {
     	round.setActivity(cubeFace.getActivity());
     	round.setPoints(cubeFace.getPoints());
@@ -168,6 +204,11 @@ public class GameLogicService {
     	return round;
     }
     
+    /**
+     * Saves last round of game with corresponding validation
+     * @param game of which last round should be saved
+     * @param v validation of last round
+     */
     public void saveLastRound(Game game, Validation v) {
         Set<Round> rounds = game.getRounds();
         Round lastRound = null;

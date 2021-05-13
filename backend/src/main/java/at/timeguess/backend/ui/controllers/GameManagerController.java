@@ -135,7 +135,7 @@ public class GameManagerController {
     }
 
     /**
-     * Method that starts a new Round for a game. It initializes a new round and also calls a method to start the
+     * Method that starts a new Round by the cube for a game. It initializes a new round and also calls a method to start the
      * countdown.
      * @param currentGame, game for which round should be started
      * @param cubeFace,    face that sets round parameter
@@ -145,6 +145,10 @@ public class GameManagerController {
         this.websocketManager.getNewRoundChannel().send("startRound", getAllUserIdsOfGameTeams(game.getTeams()));
     }
     
+    /**
+     * Method to get Informations of next round, before cube starts the round
+     * @param game, game for which informations of next round should be estimated
+     */
     public void getNextRoundInfo(Game game) {
     	this.currentRound.put(game, gameLogic.getNextRound(game));
     }
@@ -227,6 +231,12 @@ public class GameManagerController {
         }
     }
 
+    /**
+     * Method to validate and save a round of a game. Checks if a team reached the maximum of points or if all enabled terms
+     * of topic have been used. Send corresponding message to all users in the game
+     * @param game
+     * @param v, validation of round
+     */
     public void validateRoundOfGame(Game game, Validation v) {
         gameLogic.saveLastRound(game, v);
         this.listOfGames.put(getCubeByGame(game), game);
@@ -248,6 +258,11 @@ public class GameManagerController {
         }
     }
 
+    /**
+     * Method to get the cube that corresponds to a game
+     * @param game, game to find cube of
+     * @return cube of the game
+     */
     private Cube getCubeByGame(Game game) {
         for (Entry<Cube, Game> e : this.listOfGames.entrySet()) {
             if (e.getValue().equals(game)) {
@@ -265,6 +280,11 @@ public class GameManagerController {
     	this.midValidation.put(game, true);
     }
 
+    /**
+     * Method to end the game. Sets status to finished, saves it in the database and removes it from all
+     * maps in controller
+     * @param game, game that finishes
+     */
     public void endGame(Game game) {
         game.setStatus(GameState.FINISHED);
         gameService.saveGame(game);
