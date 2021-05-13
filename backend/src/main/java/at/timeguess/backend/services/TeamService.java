@@ -1,6 +1,7 @@
 package at.timeguess.backend.services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -14,10 +15,18 @@ import org.springframework.web.context.WebApplicationContext;
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.repositories.TeamRepository;
+import at.timeguess.backend.spring.CDIAwareBeanPostProcessor;
 import at.timeguess.backend.ui.beans.MessageBean;
+import at.timeguess.backend.ui.websockets.WebSocketManager;
+import at.timeguess.backend.utils.CDIAutowired;
+import at.timeguess.backend.utils.CDIContextRelated;
 
+/**
+ * Service for accessing and manipulating team data.
+ */
 @Component
 @Scope(WebApplicationContext.SCOPE_APPLICATION)
+@CDIContextRelated
 public class TeamService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamService.class);
@@ -27,6 +36,19 @@ public class TeamService {
 
     @Autowired
     private MessageBean messageBean;
+
+    @CDIAutowired
+    private WebSocketManager websocketManager;
+
+    /**
+     * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
+     * and {@link PostConstruct} is not invoked, so autowiring is done manually
+     */
+    public TeamService() {
+        if (websocketManager == null) {
+            new CDIAwareBeanPostProcessor().postProcessAfterInitialization(this, "websocketManager");
+        }
+    }
 
     /**
      * Returns a list of all teams.
@@ -84,8 +106,10 @@ public class TeamService {
 
     /**
      * Saves the given team.
+     * Additionally fills gui message with success or failure info and triggers a push update.
      * @param team the team to save
      * @return the saved team
+     * @apiNote Message handling ist done here, because this is the central place for saving terms.
      */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('ADMIN')")
     public Team saveTeam(Team team) {
@@ -97,6 +121,10 @@ public class TeamService {
 
             // show ui message and log
             messageBean.alertInformation(ret.getName(), isNew ? "New team created" : "Team updated");
+
+            if (websocketManager != null)
+                websocketManager.getUserRegistrationChannel().send(
+                        Map.of("type", "teamUpdate", "name", team.getName(), "id", team.getId()));
 
             LOGGER.info("Team '{}' (id={}) was {}", ret.getName(), ret.getId(), isNew ? "created" : "updated");
         }
