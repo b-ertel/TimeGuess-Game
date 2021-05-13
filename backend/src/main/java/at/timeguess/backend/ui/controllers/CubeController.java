@@ -21,7 +21,7 @@ public class CubeController {
     @Autowired
     private CubeService cubeService;
     @Autowired
-    private CubeStatusController statusController;
+    private CubeStatusController cubeStatusController;
     @Autowired
     private MessageBean message;
 
@@ -35,8 +35,8 @@ public class CubeController {
     public void saveCube() {
         try {
             this.cube=cubeService.saveCube(this.cube);
-            statusController.updateCubeInStatus(this.cube);
-            statusController.updateSockets();
+            cubeStatusController.updateCubeInStatus(this.cube);
+            cubeStatusController.updateSockets();
             message.alertInformation("CubeManagment", "Cube saved");
         }
         catch (IllegalArgumentException e) {
@@ -67,8 +67,8 @@ public class CubeController {
     public void deleteCube() {
         try {
             cubeService.deleteCube(this.cube);
-            statusController.updateSockets();
-            statusController.deleteStatus(this.cube.getMacAddress());
+            cubeStatusController.updateSockets();
+            cubeStatusController.deleteStatus(this.cube.getMacAddress());
             message.alertInformation("CubeManagment", "Cube " + this.cube.getId() + " deleted");
         }
         catch (IllegalArgumentException e) {
@@ -91,6 +91,7 @@ public class CubeController {
     public void setCube(Cube cube) {
         this.cube = cube;
     }
+
 }
 
 
