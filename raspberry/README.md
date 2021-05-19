@@ -76,6 +76,8 @@ Before you can do anything else, you have to install some dependencies.
 In order to do this, just run the script `install-dependencies.sh` in the `raspberry`
 subfolder of the project. Note that this script has to be run as root.
 
+After the script has completed, reboot your system.
+
 # Build
 
 Next run the script `build.sh` in the `raspberry` subfolder of the project
