@@ -77,7 +77,7 @@
       		<p:dialog id="roundValidationDialog" header="Round Validation"
         			  widgetVar="roundValidationDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="false" showEffect="fade"
-					  hideEffect="fade" responsive="true">
+					  hideEffect="fade" responsive="true" closable="false">
         		<p:outputLabel value="Did #{gameRoundController.currentRound.guessingTeam.name} guess #{gameRoundController.currentRound.termToGuess.name} correct? (First click comes first)" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>
 				<p:outputLabel value="You gave your best shot, your fate is now in the hands of your rivals. Please wait until they have valuated your round..." 
@@ -94,7 +94,7 @@
       		<p:dialog id="roundTimesUpDialog" header="Time is up"
         			  widgetVar="roundTimesUpDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="false" showEffect="fade"
-					  hideEffect="fade" responsive="true" closeable="false">
+					  hideEffect="fade" responsive="true" closable="false">
         		<p:outputLabel value="Seems like #{gameRoundController.currentRound.guessingUser.username} did not guess #{gameRoundController.currentRound.termToGuess.name} within the time?" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>	
 				<p:outputLabel value="That took a bit long. Your rivals will decide whether you were quick enough...." 
@@ -109,7 +109,7 @@
       		<p:dialog id="gameOverDialog" header="Game Over"
         			  widgetVar="gameOverDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="false" showEffect="fade"
-					  hideEffect="fade" responsive="true" closeable="false">
+					  hideEffect="fade" responsive="true" closable="false">
         		<p:outputLabel value="Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game" 
 							   style="font-weight:bold"/>			   
 				<h:panelGrid columns="1">
@@ -122,7 +122,7 @@
       		<p:dialog id="termOverDialog" header="Terms Over"
         			  widgetVar="termOverDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="false" showEffect="fade"
-					  hideEffect="fade" responsive="true" closeable="false">
+					  hideEffect="fade" responsive="true" closable="false">
         		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!" 
 							   style="font-weight:bold"/>			   
 				<h:panelGrid columns="1">
