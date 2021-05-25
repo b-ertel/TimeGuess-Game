@@ -25,7 +25,8 @@ cd /tmp
 wget http://www.kernel.org/pub/linux/bluetooth/bluez-5.47.tar.xz
 tar -xf bluez-5.47.tar.xz
 cd bluez-5.47
-cp $WORKDIR/deployment/rctest.c $WORKDIR/deployment/l2test.c tools
+sed -i '43 a #include <linux/sockios.h>' tools/l2test.c
+sed -i '40 a #include <linux/sockios.h>' tools/rctest.c
 ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var
 make
 make install
