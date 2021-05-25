@@ -4,7 +4,9 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Validation;
+import at.timeguess.backend.model.utils.TeamScore;
 import at.timeguess.backend.services.GameLogicService;
+import at.timeguess.backend.services.HighscoreService;
 import at.timeguess.backend.services.RoundService;
 import at.timeguess.backend.ui.beans.SessionInfoBean;
 
@@ -35,6 +37,8 @@ public class GameRoundController {
     private RoundService roundService;
     @Autowired
     private GameLogicService gameLogic;
+    @Autowired
+    private HighscoreService highscoreService;
     
     private Round currentRound;
     
@@ -173,11 +177,12 @@ public class GameRoundController {
      */
     public Team computeWinningTeam() {
     	Team winningTeam = gameLogic.getTeamWithMostPoints(currentGame);
-    	this.currentGame = null;
-    	this.currentRound = null;
-    	this.nextRound = null;
         return winningTeam;
-    	
+    }
+    
+    public List<TeamScore> computeFinalRanking() {
+    	List<TeamScore> ls = highscoreService.getTeamRanking(currentGame);
+    	return ls;
     }
  
 
