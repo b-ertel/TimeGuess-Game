@@ -49,8 +49,7 @@
                         <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
                     </p:commandButton>
                     <p:commandButton title="Delete" icon="fa fa-trash"
-                        action="#{termDetailController.doDeleteTerm}" onsuccess="PF('termTable').filter()"
-                        update=":msg">
+                        action="#{termDetailController.doDeleteTerm}" update=":msg">
                         <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
                         <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this term? This cannot be undone." />
                     </p:commandButton>
