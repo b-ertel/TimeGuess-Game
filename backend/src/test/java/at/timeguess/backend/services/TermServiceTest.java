@@ -121,9 +121,9 @@ public class TermServiceTest {
 
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = { "1|AFRICA", "2|MOUNTAIN", "3|LAKE", "4|RIVER", "5|MEXICO",
-            "6|THE LORD OF THE RINGS", "7|MATRIX", "8|TITANIC", "9|INCEPTION", "10|FIGHT CLUB", "11|C3PO",
-            "12|CHEWBACCA", "13|DEATHSTAR", "14|DARTH VADER", "15|R2D2", "16|HAMBURGER", "17|HOT DOG", "18|TIRAMISU",
-            "19|LASAGNE", "20|PIZZA QUATTRO FORMAGGI" })
+        "6|THE LORD OF THE RINGS", "7|MATRIX", "8|TITANIC", "9|INCEPTION", "10|FIGHT CLUB", "11|C3PO",
+        "12|CHEWBACCA", "13|DEATHSTAR", "14|DARTH VADER", "15|R2D2", "16|HAMBURGER", "17|HOT DOG", "18|TIRAMISU",
+        "19|LASAGNE", "20|PIZZA QUATTRO FORMAGGI" })
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     public void testLoadTerm(long termId, String termNameExpected) {
         Term result = assertLoadTerm(termId, true, "Term '%s' could not be loaded from test data source");
@@ -135,6 +135,16 @@ public class TermServiceTest {
     public void testGetAllTerms() {
         List<Term> expected = createEntities(TestSetup::createTerm, LongStream.rangeClosed(1, 20).boxed());
         List<Term> result = termService.getAllTerms();
+
+        assertLists(expected, result);
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = { "1|1;2;3;4", "2|6;7;8;9;10", "3|11;12;13;14;15", "4|16;18;19;20" })
+    @WithMockUser(username = "admin", authorities = { "MANAGER" })
+    public void testGetAllEnabledTermsOfTopic(long topicId, final String termIdsExpected) {
+        List<Term> expected = createEntities(TestSetup::createTerm, termIdsExpected);
+        List<Term> result = termService.getAllEnabledTermsOfTopic(createTopic(topicId));
 
         assertLists(expected, result);
     }
