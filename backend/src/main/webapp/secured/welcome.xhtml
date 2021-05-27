@@ -42,6 +42,8 @@
                 <p:ajax event="close" update="userData" process="@parent" resetValues="true" />
 
                 <c:set var="curr" value="#{userDetailController.user}" scope="request" />
+                <p:tooltip for="password" value="once encrypted a password is undecryptable"
+                    rendered="#{userDetailController.hasEncryptedPassword()}" position="top" />
                 <p:outputPanel id="userData" rendered="#{not empty curr}">
                     <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
                         columnClasses="p-col-5, p-col-7" contentStyleClass="ui-fluid">
