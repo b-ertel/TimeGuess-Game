@@ -152,6 +152,10 @@ table {
     z-index: 100;
 }
 
+.ui-menu-list {
+    width: 95%;
+}
+
 .ui-datepicker-calendar .ui-state-default {
     color: #195478 !important;
 }
