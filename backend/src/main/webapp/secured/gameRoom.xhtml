@@ -95,7 +95,7 @@
         			  widgetVar="roundTimesUpDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="false" showEffect="fade"
 					  hideEffect="fade" responsive="true" closable="false">
-        		<p:outputLabel value="Seems like #{gameRoundController.currentRound.guessingUser.username} did not guess #{gameRoundController.currentRound.termToGuess.name} within the time?" 
+        		<p:outputLabel value="Seems like #{gameRoundController.currentRound.guessingTeam.name} did not guess #{gameRoundController.currentRound.termToGuess.name} within the time?" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>	
 				<p:outputLabel value="That took a bit long. Your rivals will decide whether you were quick enough...." 
 							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>		   

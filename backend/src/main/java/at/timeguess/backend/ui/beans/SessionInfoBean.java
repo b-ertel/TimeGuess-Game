@@ -1,6 +1,7 @@
 package at.timeguess.backend.ui.beans;
 
 import java.io.Serializable;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
@@ -45,8 +46,8 @@ public class SessionInfoBean implements Serializable {
     }
 
     /**
-     * Returns the username of the user for this session, empty string if no user has been authenticated for this
-     * session.
+     * Returns the username of the user for this session,
+     * empty string if no user has been authenticated for this session.
      * @return
      */
     public String getCurrentUserName() {
@@ -59,8 +60,8 @@ public class SessionInfoBean implements Serializable {
     }
 
     /**
-     * Returns the roles of the user for this session as space-separated list, empty string if no user has been
-     * authenticated for this session-
+     * Returns the roles of the user for this session as space-separated list,
+     * empty string if no user has been authenticated for this session-
      * @return
      */
     public String getCurrentUserRoles() {
@@ -78,12 +79,12 @@ public class SessionInfoBean implements Serializable {
 
     /**
      * Checks if a user is authenticated for this session.
-     * @return true if a non-anonymous user has been authenticated, false otherwise
+     * @return true if a non-anonymous user has been authenticated, false otherwise.
      */
     public boolean isLoggedIn() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
-            return auth.isAuthenticated() && !auth.getName().equals("anonymous");
+            return auth.isAuthenticated() && !auth.getName().startsWith("anonymous");
         }
         else {
             return false;
@@ -92,7 +93,7 @@ public class SessionInfoBean implements Serializable {
 
     /**
      * Checks if the user for this session has the given role (c.f. {@link UserRole}).
-     * @param role the role to check for as string
+     * @param  role the role to check for as string
      * @return true if a user is authenticated and the current user has the given role, false otherwise
      */
     public boolean hasRole(String role) {

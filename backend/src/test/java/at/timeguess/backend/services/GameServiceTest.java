@@ -301,7 +301,7 @@ public class GameServiceTest {
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAllCurrent() {
-        List<Game> expected = createEntities(TestSetup::createGame, Arrays.asList(6L, 7L));
+        List<Game> expected = createEntities(TestSetup::createGame, Arrays.asList(5L, 8L, 9L));
         List<Game> result = gameService.getAllCurrent();
 
         assertLists(expected, result);
