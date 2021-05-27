@@ -215,8 +215,7 @@ table {
     border: 0 none;
 }
 
-.ui-panelgrid.ui-noborder .ui-widget-content, .ui-panelgrid.ui-noborder .ui-widget-header
-    {
+.ui-panelgrid.ui-noborder .ui-widget-content, .ui-panelgrid.ui-noborder .ui-widget-header {
     border: 0 none;
 }
 
@@ -226,8 +225,7 @@ table {
     .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-header>tr.ui-widget-header,
     .ui-panelgrid.ui-panelgrid-blank tbody>tr.ui-widget-content,
     .ui-panelgrid.ui-panelgrid-blank tbody>tr.ui-widget-content>td.ui-panelgrid-cell,
-    .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-footer>tr.ui-widget-footer
-    {
+    .ui-panelgrid.ui-panelgrid-blank .ui-panelgrid-footer>tr.ui-widget-footer {
     background: 0;
     border: 0 none;
 }
@@ -236,8 +234,7 @@ table {
     padding: 0;
 }
 
-.ui-panelgrid .p-grid .ui-panelgrid-cell, .ui-panelgrid .ui-grid-responsive .ui-panelgrid-cell
-    {
+.ui-panelgrid .p-grid .ui-panelgrid-cell, .ui-panelgrid .ui-grid-responsive .ui-panelgrid-cell {
     border: 0 none;
 }
 
@@ -339,6 +336,40 @@ td.ui-panelgrid-cell {
 
 .ui-button-text {
     color: #4f4f4f;
+}
+
+/* all divs descendants of element with class ... */
+.ui-fileupload-row div {
+    padding: 4px 4px !important;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 1px;
+}
+
+/* all divs with class ... */
+div.ui-fileupload-files {
+    width: 100%;
+    margin: 2px 0px;
+}
+
+div.ui-fileupload-preview {
+    display: none !important;
+}
+
+div.ui-fileupload-filename {
+    display: table-cell !important;
+    text-overflow: ellipsis;
+}
+
+div.ui-fileupload-progress {
+    white-space: initial;
+    width: initial;
+}
+
+/* all elements with 2nd class descendants of divs with 1st class */
+div.ui-fileupload-content .ui-progressbar {
+    width: 94%;
+    top: 0px;
 }
 
 #gameCreateData .ui-menu .ui-menuitem {
