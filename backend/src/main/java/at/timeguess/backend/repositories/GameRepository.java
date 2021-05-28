@@ -31,7 +31,7 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     List<Object[]> getTopicAndOccurency();
 
     /**
-     * Returns a list of all games currently in setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
+     * Returns a list of all games currently in state ({@link GameState#VALID_SETUP} or {@link GameState#PLAYED}.
      * @return
      */
     @Query("SELECT g FROM Game g WHERE g.status IN (2, 3)")
