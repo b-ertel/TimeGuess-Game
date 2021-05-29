@@ -314,7 +314,8 @@ public class CubeStatusController {
 	 */
 	@Scheduled(fixedRate = 5000) 		// 5000 means every 5 seconds
     public void updateHealthStatus() {
-                           		
+		this.healthMessage.clear();
+		
 		for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) { 
 			
 			Cube cube = cubeService.getByMacAddress(m.getKey());
@@ -365,7 +366,6 @@ public class CubeStatusController {
 	 */
 	public void displayHealthMessage() {
 		messageBean.alertError("Health Message", healthMessage);
-		this.healthMessage.clear();
 	}
 
 	/**
