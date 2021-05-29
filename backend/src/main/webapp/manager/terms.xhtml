@@ -28,7 +28,7 @@
                         <p:column headerText="Term" sortBy="#{term.name}" filterBy="#{term.name}" filterMatchMode="contains" />
                         <p:column headerText="Topic" sortBy="#{term.topic}" filterBy="#{term.topic.name}" filterMatchMode="contains" />
                         <p:column headerText="Enable Term" sortBy="#{term.enabled}" style="width:10%"/>
-                        <p:column headerText="Edit Term" style="width:10%"/>
+                        <p:column headerText="Manage Term" style="width:10%"/>
                     </p:row>
                 </p:columnGroup>
 
@@ -47,6 +47,11 @@
                     <p:commandButton title="Edit" icon="fa fa-edit"
                         oncomplete="PF('termEditDialog').show()" update=":termDetailForm :msg">
                         <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
+                    </p:commandButton>
+                    <p:commandButton title="Delete" icon="fa fa-trash"
+                        action="#{termDetailController.doDeleteTerm}" update=":msg">
+                        <f:setPropertyActionListener value="#{term}" target="#{termDetailController.term}" />
+                        <p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this term? This cannot be undone." />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
@@ -122,11 +127,12 @@
                         <div>You can upload multiple files at once, each containing terms for one or multiple topics - but all in one is faster.</div>
                     </p:panel>
 
-                    <p:fileUpload id="termUpload" chooseIcon="fa fa-file-text-o" uploadIcon="fa fa-upload" cancelIcon="fa fa-window-close-o"
-                        listener="#{topicListController.doUploadTerms}" update=":msg"
+                    <p:fileUpload id="termUpload" chooseIcon="fa fa-file-text-o" uploadIcon="fa fa-upload"
+                        cancelIcon="fa fa-window-close-o" previewWidth="0" mode="advanced"
+                        listener="#{topicListController.doUploadTerms}" sequential="true" update=":msg"
                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('newTermsDialog').hide(); }"
-                        mode="advanced" multiple="true" dragDropSupport="true" sizeLimit="1000000"
-                        allowTypes="/(\.|\/)(json)$/i" style="margin:8px 0px 8px" />
+                        multiple="true" dragDropSupport="true" sizeLimit="1000000"
+                        accept=".json" allowTypes="/(\.|\/)(json)$/i" skinSimple="true" style="margin:8px 0px 8px" />
                 </p:outputPanel>
                 <p:separator style="margin:11px 0px 12px" />
 
