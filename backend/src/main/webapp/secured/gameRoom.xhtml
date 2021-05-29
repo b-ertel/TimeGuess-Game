@@ -25,8 +25,9 @@
 		</h:form>
 	
 	<h:form id="noGameForm" rendered="#{empty gameRoundController.currentGame}">
-		<p:outputLabel value="Game cant be played right now." 
-							   style="font-weight:bold"/>
+		<p:outputLabel style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" value="Your game has been successfully created. Please wait until there are enough players/rivals in the GameRoom (min. one player per team)." rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='VALID_SETUP'}"/>
+		<p:progressBar id="progressBarIndeterminate" style="height:6px" mode="indeterminate" rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='VALID_SETUP'}"/>
+		<p:outputLabel style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" value="Game is paused. Possible reasons: not enough players in GameRoom, no Connection to Cube." rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='HALTED'}"/>
 	</h:form>	
 		
 	<h:form id="gameTableForm" rendered="#{not empty gameRoundController.currentGame}">
