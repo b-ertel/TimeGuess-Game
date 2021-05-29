@@ -1,7 +1,6 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -297,6 +296,7 @@ public class GameManagerController {
     public void endGame(Game game) {
         game.setStatus(GameState.FINISHED);
         gameService.saveGame(game);
+                
         this.listOfGames.remove(getCubeByGame(game));
         this.currentRound.remove(game);
         this.activeRound.remove(game);
@@ -329,6 +329,26 @@ public class GameManagerController {
 		if(websocketManager != null) {
 			websocketManager.getNewRoundChannel().send("healthMessage", usersToNotify);
 			}
+		}
+	}
+	
+	/**
+	 * called by {@link CubeStatusController} if Cube is offline -> GameStatus should be put to HALTED
+	 * 
+	 * @param cube which is offline
+	 */
+	public void cubeOffline(Cube cube) {
+		listOfGames.get(cube).setStatus(GameState.HALTED);
+	}
+	
+	/**
+	 * called by {@link CubeStatusController} if Cube is online -> GameStatus should be put to PLAYED
+	 * 
+	 * @param cube which is online
+	 */
+	public void cubeOnline(Cube cube) {
+		if(listOfGames.containsKey(cube)) {
+			listOfGames.get(cube).setStatus(GameState.PLAYED);
 		}
 	}
 	
