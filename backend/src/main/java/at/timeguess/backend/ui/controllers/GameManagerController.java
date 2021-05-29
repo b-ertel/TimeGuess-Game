@@ -338,7 +338,9 @@ public class GameManagerController {
 	 * @param cube which is offline
 	 */
 	public void cubeOffline(Cube cube) {
-		listOfGames.get(cube).setStatus(GameState.HALTED);
+		if(listOfGames.containsKey(cube)) {
+			listOfGames.get(cube).setStatus(GameState.HALTED);
+		}
 	}
 	
 	/**
