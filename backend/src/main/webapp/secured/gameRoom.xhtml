@@ -19,6 +19,8 @@
 		<h:form>
 			<p:panel style="font-size:40px !important; background:#195478; border-radius:10px; position:top">
 			<h1 style="text-align:center; vertical-align:text-top; color:white; font-size:40px">Gameroom</h1>
+			<h:outputText style="text-align:center; display: block; width:100%; font-size:15px!important; color:white" rendered="#{not empty gameRoundController.currentGame}" value="---- ---- ---- ---- ---- ---- ----"/>
+			<h:outputText style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" rendered="#{not empty gameRoundController.currentGame}" value="#{gameRoundController.currentGame.name}   -   #{gameRoundController.currentGame.topic.name}   -   Max. points: #{gameRoundController.currentGame.maxPoints}"/>
 			</p:panel>
 		</h:form>
 	
@@ -28,7 +30,6 @@
 	</h:form>	
 		
 	<h:form id="gameTableForm" rendered="#{not empty gameRoundController.currentGame}">
-		<h:outputText style="text-align:center; display: block; width:100%; font-size:30px!important; color:white" value="Game: #{gameRoundController.currentGame.name}"/>
 		<p:dataTable id="leaderbord" var="team" value="#{gameRoundController.teamsInGame}">
 				            <p:column headerText="Name">
 				                <h:outputText value="#{team.name}" />
