@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -57,6 +58,11 @@ public class UserDetailControllerTest {
         User user = assertMockUser(10L, false);
         user.setPassword(password);
         assertEquals(expected, userDetailController.hasEncryptedPassword());
+    }
+
+    @Test
+    public void testHasEncryptedPasswordNoUser() {
+        assertEquals(false, userDetailController.hasEncryptedPassword());
     }
 
     @ParameterizedTest

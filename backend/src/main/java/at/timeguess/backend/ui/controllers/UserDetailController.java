@@ -64,7 +64,7 @@ public class UserDetailController implements Serializable {
      * @return
      */
     public boolean hasEncryptedPassword() {
-        return user.getPassword().matches("\\{.+\\}.+");
+        return user != null && user.getPassword().matches("\\{.+\\}.+");
     }
 
     /**
