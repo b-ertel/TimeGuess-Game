@@ -54,7 +54,7 @@
 	     			<h:panelGrid columns="2">    
            				<h:outputLabel for="cubeselect" value="Cube: "/> 
                			<p:selectOneMenu id="cubeselect" value="#{cubeController.cube}" converter="omnifaces.SelectItemsConverter"> 
-               				<f:selectItem itemLabel="Select" itemValue="" noSelectionOption="true"/>
+               		  		<f:selectItem itemLabel="Select" itemValue="#{null}" noSelectionOption="true"/> 	
                				<f:selectItems value="#{cubeController.allCubes}" var="cube" itemLabel="#{cube.id}"/>
                			</p:selectOneMenu>
                         <p:commandButton value="OK" oncomplete="PF('cubeUseDialog').show()" update=":cubeDetailForm:cubeUseDialog :msg" /> 
@@ -72,6 +72,12 @@
                 <p:ajax event="close" update="cubeData" process="@parent" resetValues="true" />
                 
                 <c:set var="curr" value="#{cubeController.cube}" scope="request" />
+
+                <p:outputLabel value="Please choose a cube!" rendered="#{empty curr}"/>
+                <h:panelGrid columns="2">   
+                	<p:commandButton value="OK" oncomplete="PF('cubeUseDialog').hide()" rendered="#{empty curr}"/>
+				</h:panelGrid>
+				
                 <p:outputPanel id="cubeData" rendered="#{not empty curr}">
                     <h:panelGrid columns="2">
                         <p:outputLabel for="id" value="Id: " />
@@ -95,7 +101,7 @@
 						<p:commandButton value="Configure"
 							oncomplete="PF('cubeConfigurationDialog').show()"
 							update="cubeConfigurationForm:cubeConfigurationDialog :msg"
-							rendered="#{cubeStatusController.checkConfiguration(curr.macAddress) and !cubeStatusController.isConfigured(curr)}" >
+							rendered="#{cubeStatusController.checkConfiguration(curr.macAddress)}" >
 							<f:actionListener binding="#{cubeStatusController.setInConfig(curr.macAddress)}" />
 							<f:actionListener binding="#{cubeConfigurationController.prepareForNewConfiguration(curr)}" />
 						</p:commandButton>
@@ -187,7 +193,13 @@
 							update=":cubeDetailForm:cubeUseDialog :msg">
 							<f:actionListener binding="#{cubeStatusController.setReady(curr.macAddress)}" />
 						</p:commandButton>
-						<p:commandButton value="Abort" action="#{cubeStatusController.setLive(curr.macAddress)}" onclick="PF('cubeConfigurationDialog').hide()" />
+						<p:commandButton value="Abort"
+							action="#{cubeStatusController.checkAbort(curr.macAddress)}"
+							onclick="PF('cubeConfigurationDialog').hide()"
+							oncomplete="PF('cubeUseDialog').show()"
+							update=":cubeDetailForm:cubeUseDialog :msg" >
+							<f:actionListener binding="#{cubeConfigurationController.abort()}" />
+						</p:commandButton>
 					</p:panel>
 				</p:outputPanel>
 

@@ -1,8 +1,6 @@
 package at.timeguess.backend.ui.controllers;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +49,6 @@ public class CubeStatusController {
     private static final int CALIBRATION_VERSION_AFTER_CONNECTION = 1;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CubeStatusController.class);
-    private final DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Autowired
     private CubeService cubeService;
@@ -111,22 +108,26 @@ public class CubeStatusController {
     public Cube updateCube(StatusMessage message) {
     	
 		Cube updatedCube = new Cube(); 
-		
-		if(cubeService.isMacAddressKnown(message.getIdentifier())) {						// Cube is already in database
+																						 
+		if(cubeService.isMacAddressKnown(message.getIdentifier())) {							// Cube is already in database
 			updatedCube = cubeService.getByMacAddress(message.getIdentifier());
 			LOGGER.info("cube is known..."); 
-
-			// delete any existing configurations if a reset of the TimeFlip device is detected
-			if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {
-			    LOGGER.info("calibration version is 0 --> cube lost configuration");
-				cubeService.deleteConfigurations(updatedCube);
-			}
 			
-			if(cubeService.isConfigured(updatedCube)){										// Cube is configured and ready
-				statusChange(updatedCube.getMacAddress(), CubeStatus.READY);
-			}
+			if(gameManagerController.getCurrentGameForCube(updatedCube) != null) {				// check if there exits a halted game with the cube just got online,
+				gameManagerController.cubeOnline(updatedCube);										// if so start game again and set CubeStatus to IN_GAME
+				setInGame(updatedCube.getMacAddress());
+			}																		
 			else { 
-				statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);					// Cube lost his configuration or has not been configured yet
+				if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {		// delete any existing configurations if a reset of the TimeFlip device is detected
+			    	LOGGER.info("calibration version is 0 --> cube lost configuration");
+					cubeService.deleteConfigurations(updatedCube);
+				}
+				if(cubeService.isConfigured(updatedCube)){										// Cube is configured and ready
+					statusChange(updatedCube.getMacAddress(), CubeStatus.READY);
+				}
+				else { 
+					statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);					// Cube lost his configuration or has not been configured yet
+				}
 			}
 		}
 		else {
@@ -204,7 +205,8 @@ public class CubeStatusController {
 	 * @param macAddress of the cubes which should be set to {@link CubeStatus.LIVE}
 	 */
 	public void setLive(String macAddress) {
-		statusChange(macAddress, CubeStatus.LIVE);
+	    statusChange(macAddress, CubeStatus.LIVE);
+
 	}
 	
 	/**
@@ -293,6 +295,21 @@ public class CubeStatusController {
 	}
 	
 	/**
+	 * checks if a configuration is aborted if there exists a configuration and
+	 * sets status of cube either to LIVE or to READY
+	 * 
+	 * @param macAddress to check
+	 */
+	public void checkAbort(String macAddress) {
+	    if (!isConfigured(cubeService.getByMacAddress(macAddress))) {
+	        setLive(macAddress);
+	    }
+	    else {
+	        setReady(macAddress);
+	    }
+	}
+	
+	/**
 	 * sends a "connectionCubeUpdate" to all socket listener
 	 */
 	public void updateSockets() {
@@ -315,11 +332,16 @@ public class CubeStatusController {
 	 */
 	@Scheduled(fixedRate = 5000) 		// 5000 means every 5 seconds
     public void updateHealthStatus() {
-                           		
+		this.healthMessage.clear();
+		
 		for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) { 
 			
 			Cube cube = cubeService.getByMacAddress(m.getKey());
 			
+			if(getStatus(cube.getMacAddress()).equals(CubeStatus.IN_GAME) && gameManagerController.getCurrentGameForCube(cube) == null) {
+				setReady(cube.getMacAddress());
+			}
+
 			if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
 				
 				// sets status offline
@@ -332,6 +354,12 @@ public class CubeStatusController {
 					.append(" lost connection and is OFFLINE!");	
 				addHealthMessage(message.toString());				
 				gameManagerController.healthNotification(cube);	
+				
+				// game cannot be continued
+				if(gameManagerController.getCurrentGameForCube(cube) != null) {
+					gameManagerController.cubeOffline(cube);
+				}
+				
 			}              
 			else {                 
 				if(m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {
@@ -366,7 +394,6 @@ public class CubeStatusController {
 	 */
 	public void displayHealthMessage() {
 		messageBean.alertError("Health Message", healthMessage);
-		this.healthMessage.clear();
 	}
 
 	/**

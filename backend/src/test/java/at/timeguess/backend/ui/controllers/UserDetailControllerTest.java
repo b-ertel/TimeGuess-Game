@@ -16,7 +16,9 @@ import static org.mockito.Mockito.when;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -48,6 +50,20 @@ public class UserDetailControllerTest {
     private MessageBean messageBean;
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = {
+        "{xx}oo|true", "{xx}{oo}|true", "{xx}|false", "{xx|false", "xxoo}|false", "xx}{oo}|false", "xx{oo}|false", "xx}oo}|false" })
+    public void testHasEncryptedPassword(String password, boolean expected) {
+        User user = assertMockUser(10L, false);
+        user.setPassword(password);
+        assertEquals(expected, userDetailController.hasEncryptedPassword());
+    }
+
+    @Test
+    public void testHasEncryptedPasswordNoUser() {
+        assertEquals(false, userDetailController.hasEncryptedPassword());
+    }
 
     @ParameterizedTest
     @ValueSource(longs = { 1, 40, 444 })
@@ -95,7 +111,7 @@ public class UserDetailControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(longs = { 1,  40, 444 })
+    @ValueSource(longs = { 1, 40, 444 })
     public void testDoSaveUserChangedPassword(Long userId) {
         String changed = "changed", encoded = "encoded";
         User user = assertMockUser(userId, true);

@@ -50,7 +50,7 @@ public class MessageBean implements Serializable {
      * @param messages   messages to be displayed
      */
     public void alertError(String header, List<String> messages) {
-        alertError(header, messages, false);
+        alertError(header, messages, true);
     }
 
     /**

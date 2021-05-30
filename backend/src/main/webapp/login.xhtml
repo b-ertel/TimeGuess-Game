@@ -92,7 +92,9 @@
                         <p:outputLabel for="lastNameCreate" value="Last Name: " />
                         <p:inputText id="lastNameCreate" value="#{newUserBean.lastName}" />
                         <p:outputLabel for="emailCreate" value="E-Mail: " />
-                        <p:inputText id="emailCreate" value="#{newUserBean.email}" />
+                        <p:inputText id="emailCreate" value="#{newUserBean.email}" validatorMessage="E-Mail: value is not an email address">
+                            <f:validateRegex pattern="^[\w\.!#\$%&amp;'*+\-/=?\^_`{|}~]+@[\w\-]+(\.[a-z0-9\-]+)+$"/>
+                        </p:inputText>
                     </p:panelGrid>
                 </p:outputPanel>
                 <p:separator style="margin:9px 0px 15px" />

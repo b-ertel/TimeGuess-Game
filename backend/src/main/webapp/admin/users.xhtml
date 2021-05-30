@@ -10,6 +10,8 @@
                 template="/WEB-INF/templates/main.xhtml">
 
     <ui:define name ="content">
+        <c:set var="emailMsg" value="E-Mail: value is not an email address" scope="application" />
+
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
 
         <h:form id="userListForm">
@@ -33,7 +35,7 @@
                 <p:column headerText="Roles">
                     <h:outputText value="#{user.roles}" />
                 </p:column>
-                <p:column headerText="Enabled">
+                <p:column headerText="Enabled" style="text-align:center">
                     <p:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
@@ -57,6 +59,8 @@
 
             <h:form id="userDetailForm" styleClass="findial" prependId="false">
                 <c:set var="curr" value="#{userDetailController.user}" scope="request" />
+                <p:tooltip for="password" value="once encrypted a password is undecryptable"
+                    rendered="#{userDetailController.hasEncryptedPassword()}" position="top" />
                 <p:outputPanel id="userData" rendered="#{not empty curr}">
                     <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
                         columnClasses="p-col-5, p-col-7" contentStyleClass="ui-fluid">
@@ -83,7 +87,9 @@
                         <p:outputLabel for="lastName" value="Last Name: " />
                         <p:inputText id="lastName" value="#{curr.lastName}"/>
                         <p:outputLabel for="email" value="E-Mail: " />
-                        <p:inputText id="email" value="#{curr.email}"/>
+                        <p:inputText id="email" value="#{curr.email}" validatorMessage="#{emailMsg}">
+                            <f:validateRegex pattern="^[\w\.!#\$%&amp;'*+\-/=?\^_`{|}~]+@[\w\-]+(\.[a-z0-9\-]+)+$"/>
+                        </p:inputText>
                     </p:panelGrid>
                     <p:separator style="margin:8px 0px 20px" />
 
@@ -147,7 +153,9 @@
                         <p:outputLabel for="lastNameCreate" value="Last Name: " />
                         <p:inputText id="lastNameCreate" value="#{newUserBean.lastName}" required="true" />
                         <p:outputLabel for="emailCreate" value="E-Mail: " />
-                        <p:inputText id="emailCreate" value="#{newUserBean.email}" required="true" />
+                        <p:inputText id="emailCreate" value="#{newUserBean.email}" required="true" validatorMessage="#{emailMsg}">
+                            <f:validateRegex pattern="^[\w\.!#\$%&amp;'*+\-/=?\^_`{|}~]+@[\w\-]+(\.[a-z0-9\-]+)+$"/>
+                        </p:inputText>
                     </p:panelGrid>
                     <p:separator style="margin:8px 0px 20px" />
 

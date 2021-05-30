@@ -60,6 +60,14 @@ public class UserDetailController implements Serializable {
     }
 
     /**
+     * Returns true if the currently displayed users password is encrypted, false otherwise.
+     * @return
+     */
+    public boolean hasEncryptedPassword() {
+        return user != null && user.getPassword().matches("\\{.+\\}.+");
+    }
+
+    /**
      * Returns the roles of the currently displayed user as a list (because Primefaces needs that).
      * @return
      */

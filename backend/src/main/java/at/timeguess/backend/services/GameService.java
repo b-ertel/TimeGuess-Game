@@ -63,7 +63,7 @@ public class GameService {
     }
 
     /**
-     * Returns a list of all games currently in setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
+     * Returns a list of all games currently in state ({@link GameState#VALID_SETUP} or {@link GameState#PLAYED}.
      * @return
      */
     public List<Game> getAllCurrent() {
@@ -81,7 +81,7 @@ public class GameService {
 
     /**
      * Returns a list of all games the given user is associated to, optionally restricted to games
-     * currently in setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
+     * currently in state ({@link GameState#VALID_SETUP} or {@link GameState#PLAYED}.
      * @param user
      * @param current
      * @return
