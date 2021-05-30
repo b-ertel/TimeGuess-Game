@@ -117,15 +117,17 @@ public class CubeStatusController {
 				gameManagerController.cubeOnline(updatedCube);										// if so start game again and set CubeStatus to IN_GAME
 				setInGame(updatedCube.getMacAddress());
 			}																		
-			else if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {		// delete any existing configurations if a reset of the TimeFlip device is detected
-			    LOGGER.info("calibration version is 0 --> cube lost configuration");
-				cubeService.deleteConfigurations(updatedCube);
-			}
-			else if(cubeService.isConfigured(updatedCube)){										// Cube is configured and ready
-				statusChange(updatedCube.getMacAddress(), CubeStatus.READY);
-			}
 			else { 
-				statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);						// Cube lost his configuration or has not been configured yet
+				if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {		// delete any existing configurations if a reset of the TimeFlip device is detected
+			    	LOGGER.info("calibration version is 0 --> cube lost configuration");
+					cubeService.deleteConfigurations(updatedCube);
+				}
+				if(cubeService.isConfigured(updatedCube)){										// Cube is configured and ready
+					statusChange(updatedCube.getMacAddress(), CubeStatus.READY);
+				}
+				else { 
+					statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);					// Cube lost his configuration or has not been configured yet
+				}
 			}
 		}
 		else {
