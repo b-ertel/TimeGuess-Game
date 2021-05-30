@@ -205,7 +205,8 @@ public class CubeStatusController {
 	 * @param macAddress of the cubes which should be set to {@link CubeStatus.LIVE}
 	 */
 	public void setLive(String macAddress) {
-		statusChange(macAddress, CubeStatus.LIVE);
+	    statusChange(macAddress, CubeStatus.LIVE);
+
 	}
 	
 	/**
@@ -291,6 +292,21 @@ public class CubeStatusController {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * checks if a configuration is aborted if there exists a configuration and
+	 * sets status of cube either to LIVE or to READY
+	 * 
+	 * @param macAddress to check
+	 */
+	public void checkAbort(String macAddress) {
+	    if (!isConfigured(cubeService.getByMacAddress(macAddress))) {
+	        setLive(macAddress);
+	    }
+	    else {
+	        setReady(macAddress);
+	    }
 	}
 	
 	/**
