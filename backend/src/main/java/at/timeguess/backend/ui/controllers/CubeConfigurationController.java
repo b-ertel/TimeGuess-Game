@@ -49,6 +49,7 @@ public class CubeConfigurationController implements Consumer<UnconfiguredFacetsE
     private String instruction;
     private List<CubeFace> cubeFaces; 
     private Map<CubeFace, Integer> mapping;
+    private Map<CubeFace, Integer> previousMapping;
 
     @PostConstruct
     public void init() {
@@ -71,6 +72,15 @@ public class CubeConfigurationController implements Consumer<UnconfiguredFacetsE
         instruction = MOVE_INSTRUCTION;
         cubeFaces = cubeService.allCubeFaces();
         mapping = new ConcurrentHashMap<>();
+        previousMapping = new ConcurrentHashMap<>();
+        for (CubeFace cubeFace : cubeFaces) {
+            Integer mappedFacet = cubeService.getMappedFacet(cube, cubeFace);
+            if (mappedFacet != null) {
+                mapping.put(cubeFace, mappedFacet);
+                previousMapping.put(cubeFace, mappedFacet);
+            }
+        }
+        cubeService.deleteConfigurations(cube);
     }
 
     @Override
@@ -149,6 +159,15 @@ public class CubeConfigurationController implements Consumer<UnconfiguredFacetsE
             catch (IllegalArgumentException e) {
                 messageBean.alertErrorFailValidation("Cube Configuration", e.getMessage());
             }
+        }
+    }
+
+    public void abort() {
+        try {
+            cubeService.saveMappingForCube(cube, previousMapping);
+        }
+        catch (IllegalArgumentException e) {
+            messageBean.alertErrorFailValidation("Cube Configuration", e.getMessage());
         }
     }
 

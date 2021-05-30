@@ -193,6 +193,21 @@ public class CubeService {
     }
 
     /**
+     * Find the mapped facet number for a given cube and cube face. 
+     * 
+     * @param cube the cube
+     * @param cubeFace the cube face
+     * @return the mapped facet number if this uniquely (!) exists or null otherwise
+     */
+    public Integer getMappedFacet(Cube cube, CubeFace cubeFace) {
+        List<Configuration> matchingConfigurations = configurationRepository.findByCube(cube).stream().filter(c -> c.getCubeface() == cubeFace).collect(Collectors.toList());
+        if (matchingConfigurations.size() == 1) {
+            return matchingConfigurations.get(0).getFacet();
+        }
+        return null;
+    }
+
+    /**
      * Process a {@link FacetsMessage}.
      *  
      * @param message the message
