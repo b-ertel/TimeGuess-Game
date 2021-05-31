@@ -58,14 +58,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/manager/**").hasAnyAuthority("MANAGER")
                 // Permit access only for some roles
                 .antMatchers("/secured/**").hasAnyAuthority("ADMIN", "MANAGER", "PLAYER")
-                // REST API requires authority "CUBE"
-                .antMatchers("/api/**").hasAnyAuthority("CUBE")
                 // Allow only certain roles to use websockets (only logged in users)
                 .antMatchers("/omnifaces.push/**").hasAnyAuthority("ADMIN", "MANAGER", "PLAYER").and().formLogin()
                 .loginPage("/login.xhtml").loginProcessingUrl("/login").defaultSuccessUrl("/secured/welcome.xhtml")
                 .failureHandler(authenticationFailureHandler());
         http.exceptionHandling().accessDeniedHandler(accessDeniedHandler());
         http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
+
+        // REST API requires authority "CUBE"
+        http.authorizeRequests().antMatchers("/api/**").hasAnyAuthority("CUBE").and().httpBasic();
 
     }
 
