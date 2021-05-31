@@ -58,6 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/manager/**").hasAnyAuthority("MANAGER")
                 // Permit access only for some roles
                 .antMatchers("/secured/**").hasAnyAuthority("ADMIN", "MANAGER", "PLAYER")
+                // REST API requires authority "CUBE"
+                .antMatchers("/api/**").hasAnyAuthority("CUBE")
                 // Allow only certain roles to use websockets (only logged in users)
                 .antMatchers("/omnifaces.push/**").hasAnyAuthority("ADMIN", "MANAGER", "PLAYER").and().formLogin()
                 .loginPage("/login.xhtml").loginProcessingUrl("/login").defaultSuccessUrl("/secured/welcome.xhtml")
@@ -72,7 +74,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // Configure roles and passwords via datasource
         auth.jdbcAuthentication().dataSource(dataSource)
                 .usersByUsernameQuery("SELECT username, password, enabled FROM user WHERE username=?")
-                .authoritiesByUsernameQuery("SELECT username, roles FROM user_role r JOIN user u ON r.user_id=u.id WHERE u.username=?");
+                .authoritiesByUsernameQuery("SELECT username, roles FROM user_role r JOIN user u ON r.user_id=u.id WHERE u.username=?")
+                .and()
+                .inMemoryAuthentication()
+                .withUser("cube")
+                .password(passwordEncoder().encode("passwd"))
+                .authorities("CUBE");
     }
     
     @Bean

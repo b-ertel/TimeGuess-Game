@@ -58,6 +58,7 @@ public class StatusMessageSender extends Thread {
                 Unirest.post(backendUrl + API_PATH)
                         .header("Content-Type", "application/json")
                         .body(body)
+                        .basicAuth("cube", "passwd")
                         .asJson()
                         .ifSuccess(response -> {
                             logger.info("Status message successfully processed by backend.");

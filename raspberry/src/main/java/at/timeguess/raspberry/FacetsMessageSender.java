@@ -35,6 +35,7 @@ public class FacetsMessageSender implements BluetoothNotification<byte[]> {
             Unirest.post(backendUrl + API_PATH)
                     .header("Content-Type", "application/json")
                     .body(body)
+                    .basicAuth("cube", "passwd")
                     .asEmpty()
                     .ifSuccess(response -> {
                         logger.info("Facets message successfully processed by backend.");
