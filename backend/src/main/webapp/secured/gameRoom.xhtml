@@ -103,7 +103,7 @@
 				<p:outputLabel value="That took a bit long. Please wait until your rivals confirm this round..." 
 							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>		   
 				<h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
-                     <p:commandButton value="Confirm" action="#{gameRoundController.endRoundThroughCountDown()}" update=":gameRoundForm :gameTableForm" oncomplete="PF('roundTimesUpDialog').hide()"/>
+                     <p:commandButton value="Confirm" action="#{gameRoundController.endRoundViaCountDown()}" update=":gameRoundForm :gameTableForm" oncomplete="PF('roundTimesUpDialog').hide()"/>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>
@@ -175,15 +175,18 @@
                       user="#{sessionInfoBean.currentUser.id}">
                 <p:ajax event="startRound"
                         update=":gameRoundForm:roundInfo" 
-                        listener="#{gameRoundController.startRound()}"/> 
+                        listener="#{gameRoundController.startRound()}"
+                        /> 
                 <p:ajax event="endRoundViaFlip"
                         update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" 
                         listener="#{gameRoundController.endRound()}"
-                        oncomplete="PF('roundValidationDialog').show()"/>
+                        oncomplete="PF('roundValidationDialog').show()"
+                        />
                 <p:ajax event="validatedRound"
                         onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "
                         listener="#{gameRoundController.getNextRoundInfos()}"
-                        update="@all"/>                 
+                        update="@all"
+                        />                 
                 <p:ajax event="endRoundViaCountDown"
                         update=":roundTimesUpForm:roundTimesUpDialog"
                         listener="#{gameRoundController.setInRound(false)}"
