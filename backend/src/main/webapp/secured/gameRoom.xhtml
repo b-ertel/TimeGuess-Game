@@ -103,12 +103,12 @@
 				<p:outputLabel value="That took a bit long. Please wait until your rivals confirm this round..." 
 							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>		   
 				<h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
-                     <p:commandButton value="Confirm" action="#{gameRoundController.endRoundThroughCountDown()}" update=":gameRoundForm :gameTableForm"/>
+                     <p:commandButton value="Confirm" action="#{gameRoundController.endRoundThroughCountDown()}" update=":gameRoundForm :gameTableForm" oncomplete="PF('roundTimesUpDialog').hide()"/>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>
             
-        <h:form id="gameOverform">
+        <h:form id="gameOverForm">
       		<p:dialog id="gameOverDialog" header="Game Over"
         			  widgetVar="gameOverDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="false" showEffect="fade"
@@ -183,14 +183,14 @@
                 <p:ajax event="validatedRound"
                         onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "
                         listener="#{gameRoundController.getNextRoundInfos()}"
-                        update=":gameTableForm :gameRoundForm"/>                 
+                        update="@all"/>                 
                 <p:ajax event="endRoundViaCountDown"
-                        render=":gameRoundForm:roundInfo :roundTimesUpForm:roundTimesUpDialog"
+                        update=":roundTimesUpForm:roundTimesUpDialog"
                         listener="#{gameRoundController.setInRound(false)}"
                         oncomplete="PF('roundTimesUpDialog').show()" 
                         />   
                 <p:ajax event="gameOver"
-                        render=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog"
+                        update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog"
                         onevent="PF('roundValidationDialog').hide())"
                         oncomplete="PF('gameOverDialog').show()" 
                         />  
