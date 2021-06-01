@@ -114,7 +114,7 @@
 						<p:commandButton value="Delete configuration"
 							action="#{cubeController.deleteConfigurations()}"
 							update=":cubeDetailForm:cubeUseDialog :msg"
-							rendered="#{cubeStatusController.isConfigured(curr)}">
+							rendered="#{cubeStatusController.isConfigured(curr) and !(cubeStatusController.getStatus(curr.macAddress) eq 'IN_GAME')}">
 							<p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this configuration? This cannot be undone." />
 							<f:actionListener binding="#{cubeStatusController.changeStatus(curr.macAddress)}" />
 						</p:commandButton>
