@@ -6,19 +6,25 @@ import static at.timeguess.backend.utils.TestSetup.createUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
+import at.timeguess.backend.services.TeamService;
 
 /**
  * Tests for {@link TeamMemberBean}.
@@ -30,6 +36,9 @@ public class TeamMemberBeanTest {
 
     @InjectMocks
     private TeamMemberBean teamMemberBean;
+
+    @Mock
+    private TeamService teamService;
 
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
@@ -46,17 +55,21 @@ public class TeamMemberBeanTest {
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
     public void testSetGame(Long gameId) {
+        when(teamService.getAllTeams()).thenReturn(List.of(createTeam(1L), createTeam(2L)));
+
         Game game = null;
         teamMemberBean.setGame(game);
-        assertNull(teamMemberBean.getTeams());
+        assertEquals(2, teamMemberBean.getTeams().size());
+        verify(teamService).getAllTeams();
 
         game = createGame(gameId);
-        teamMemberBean.setGame(game);
-        assertEquals(0, teamMemberBean.getTeams().size());
-
         game.setTeams(null);
         teamMemberBean.setGame(game);
-        assertNull(teamMemberBean.getTeams());
+        assertEquals(2, teamMemberBean.getTeams().size());
+        verify(teamService, times(2)).getAllTeams();
+
+        teamMemberBean.setGame(game);
+        assertEquals(2, teamMemberBean.getTeams().size());
 
         game.setTeams(Set.of(createTeam(1L), createTeam(2L)));
         teamMemberBean.setGame(game);

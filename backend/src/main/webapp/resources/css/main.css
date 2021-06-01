@@ -316,9 +316,18 @@ table {
     list-style: none;
 }
 
-div.ui-multiselectlistbox-listcontainer {
+#gameInfoForm div.ui-multiselectlistbox-listcontainer {
     float: none !important;
     width: auto;
+}
+ 
+#teamListForm .ui-multiselectlistbox-listcontainer {
+    width: 48%;
+    margin: 5px;
+}
+
+#teamListForm .ui-multiselectlistbox-item {
+    margin: 5px;
 }
 
 tr.ui-widget-content {
