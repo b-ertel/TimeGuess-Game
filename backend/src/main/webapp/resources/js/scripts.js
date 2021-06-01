@@ -31,6 +31,7 @@ function gameUpdate(name, id) {
 function teamUpdate(name, id) {
     clickIfExists("lobbyUpdate");
     clickIfExists("profileUpdate");
+    clickIfExists("teamsUpdate");
 }
 
 function termUpdate(name, id) {
