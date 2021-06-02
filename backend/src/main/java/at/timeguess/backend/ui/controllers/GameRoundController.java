@@ -54,6 +54,7 @@ public class GameRoundController {
      * Method that sets the attributes of class depending on which user is logged in
      */
     public void setup() {
+    	System.out.println("Setup "+sessionInfoBean.getCurrentUserName());
     	this.nextRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     	this.inGuessingTeam = nextRound.getGuessingTeam().getTeamMembers().contains(sessionInfoBean.getCurrentUser());
     	this.currentGame = this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());

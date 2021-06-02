@@ -121,16 +121,23 @@ public class GameManagerController {
             for (Team team : teams) {
                 if (team.getTeamMembers().stream().anyMatch(u -> userIds.contains(u.getId()))) counter++;
             }
-
+            GameState preStatus = game.getStatus();
             game.setStatus(counter < countTeams
                     ? game.getStatus() == GameState.PLAYED ? GameState.HALTED : GameState.VALID_SETUP
                     : GameState.PLAYED);
-            if((game.getStatus() == GameState.PLAYED) && !currentRound.containsKey(game)) {
+            if((preStatus==GameState.VALID_SETUP) && (game.getStatus() == GameState.PLAYED) && !currentRound.containsKey(game)) {
             	getNextRoundInfo(game);
             	this.websocketManager.getNewRoundChannel().send("startGame", getAllUserIdsOfGameTeams(game.getTeams()));
             }
-            if(game.getStatus() == GameState.PLAYED) {
+            if((game.getStatus() == GameState.PLAYED) && (preStatus == GameState.HALTED)) {
             	this.websocketManager.getNewRoundChannel().send("restartGame", getAllUserIdsOfGameTeams(game.getTeams()));
+            }
+            if((game.getStatus() == GameState.PLAYED) && (preStatus == GameState.PLAYED)) {
+            	if(isGameMidRound(game)) {
+            		this.websocketManager.getNewRoundChannel().send("setup", getAllUserIdsOfGameTeams(game.getTeams()));
+            	} else {
+            		this.websocketManager.getNewRoundChannel().send("setupandupdate", getAllUserIdsOfGameTeams(game.getTeams()));
+            	}	
             }
             if(game.getStatus() == GameState.HALTED) {
             	this.websocketManager.getNewRoundChannel().send("pauseGame", getAllUserIdsOfGameTeams(game.getTeams()));
@@ -355,4 +362,13 @@ public class GameManagerController {
 	}
 	
 
+	private boolean isGameMidRound(Game game) {
+		if(this.activeRound.get(game)) {
+			return true;
+		}
+		if(this.midValidation.get(game)) {
+			return true;
+		}
+		return false;
+	}
 }

@@ -13,7 +13,7 @@
         <h:outputScript>			
             pfContext=PF
         </h:outputScript>
-        
+               
 		<p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true" sticky="true" value="Multiple"/>
 		
 		<h:form>
@@ -45,13 +45,17 @@
             <div class="gameRoomContent">      
                 <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
 				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name}. " 
-							   rendered="#{empty gameRoundController.currentRound and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
+							   rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
 				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to describe first. " 
-							   rendered="#{empty gameRoundController.currentRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name} during next round. Flip the cube and try your best!" 
+							   rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
+				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name} during next round" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
 				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe during next round. Flip the cube and try your best!" 
-							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>			  
+							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
+				<p:outputLabel value="You have entered the GameRoom a little bit late, but no worries! #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name}. " 
+							   rendered="#{empty gameRoundController.currentRound and gameRoundController.nextRound.nr!=1 and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
+				<p:outputLabel value="You have entered the GameRoom a little bit late, but no worries! #{gameRoundController.nextRound.guessingUser.username} has to describe next. " 
+							   rendered="#{empty gameRoundController.currentRound and gameRoundController.nextRound.nr!=1 and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>			  
 				<p:outputPanel header="RoundInfo" rendered="#{gameRoundController.inRound}">
 						<h3>Time to Guess</h3>
 		            	<h1 class="p-text-center" style="border-bottom: double">
@@ -210,14 +214,18 @@
                 <p:ajax event="pauseGame"
                         update="@all"
                         listener="#{gameRoundController.destroy()}"
-                        />   
+                        /> 
+                <p:ajax event="setup"
+                		listener="#{gameRoundController.setup()}"
+                		/>  
+                <p:ajax event="setupandupdate"
+                		listener="#{gameRoundController.setup()}"
+                		update="@all"
+                		/> 
                 <p:ajax event="healthMessage"
                 		listener="#{cubeStatusController.displayHealthMessage()}"  
                 		update="msg"
                         />   
-            </o:socket>
-        
- 
-        
+            </o:socket>      
     </ui:define>
 </ui:composition>
