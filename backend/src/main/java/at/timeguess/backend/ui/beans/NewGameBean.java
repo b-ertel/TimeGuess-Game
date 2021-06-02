@@ -153,10 +153,10 @@ public class NewGameBean implements Serializable {
      */
     public void clearFields() {
         this.setGameName(null);
-        this.setMaxPoints(0);
+        this.setMaxPoints(10);
         this.setTopic(null);
         this.setCube(null);
-        this.setTeams(null);
+        this.setTeams(new HashSet<>());
     }
 
     /**
@@ -177,12 +177,14 @@ public class NewGameBean implements Serializable {
             cubeStatusController.switchCube(null, cube);
             game = gameService.saveGame(game);
 
-            if (game == null)
+            if (game == null) {
                 cubeStatusController.switchCube(cube, null);
-            else
+            }
+            else {
                 gameManagerController.addGame(game);
+                this.clearFields();
+            }
 
-            this.clearFields();
             return game;
         }
         else {

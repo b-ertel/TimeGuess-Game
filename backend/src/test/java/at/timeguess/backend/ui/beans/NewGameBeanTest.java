@@ -124,10 +124,10 @@ public class NewGameBeanTest {
         newGameBean.clearFields();
 
         assertNull(newGameBean.getGameName());
-        assertEquals(0, newGameBean.getMaxPoints());
+        assertEquals(10, newGameBean.getMaxPoints());
         assertNull(newGameBean.getTopic());
         assertNull(newGameBean.getCube());
-        assertNull(newGameBean.getTeams());
+        assertEquals(0, newGameBean.getTeams().size());
     }
 
     @Test

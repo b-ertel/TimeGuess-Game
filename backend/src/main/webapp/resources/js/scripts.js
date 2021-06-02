@@ -17,7 +17,12 @@ function showPassword(button, id = '') {
 function socketListener(message, channel, event) {
     console.log(message);
     try {
-        window[message.type](message.name, message.id);
+        if (window[message.type]) {
+            window[message.type](message.name, message.id);
+        }
+        else if (window[message]) {
+            window[message]();
+        }
     }
     catch(e) {
         console.log(e);
@@ -64,7 +69,7 @@ function userUpdate(name, id) {
     clickIfExists("usersUpdate");
 }
 
-function connectionCubeUpdate(name, id) {
+function connectionCubeUpdate() {
     clickIfExists("lobbyUpdate");
 }
 

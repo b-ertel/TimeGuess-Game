@@ -86,7 +86,7 @@ public class NewTeamBeanTest {
         newTeamBean.clearFields();
 
         assertNull(newTeamBean.getTeamName());
-        assertNull(newTeamBean.getPlayers());
+        assertEquals(0, newTeamBean.getPlayers().size());
     }
 
     @Test
