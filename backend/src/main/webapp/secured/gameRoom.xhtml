@@ -48,7 +48,7 @@
 							   rendered="#{empty gameRoundController.currentRound and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
 				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to describe first. " 
 							   rendered="#{empty gameRoundController.currentRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name} during next round. Flip the cube and try your best!" 
+				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name} during next round. " 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
 				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe during next round. Flip the cube and try your best!" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>			  
@@ -103,12 +103,12 @@
 				<p:outputLabel value="That took a bit long. Please wait until your rivals confirm this round..." 
 							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>		   
 				<h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
-                     <p:commandButton value="Confirm" action="#{gameRoundController.endRoundThroughCountDown()}" update=":gameRoundForm :gameTableForm"/>
+                     <p:commandButton value="Confirm" action="#{gameRoundController.endRoundViaCountDown()}" update=":gameRoundForm :gameTableForm" oncomplete="PF('roundTimesUpDialog').hide()"/>
                 </h:panelGrid>
         	</p:dialog>
       </h:form>
             
-        <h:form id="gameOverform">
+        <h:form id="gameOverForm">
       		<p:dialog id="gameOverDialog" header="Game Over"
         			  widgetVar="gameOverDialog" dynamic="true" modal="true"
 					  resizable="false" closeOnEscape="false" showEffect="fade"
@@ -175,22 +175,25 @@
                       user="#{sessionInfoBean.currentUser.id}">
                 <p:ajax event="startRound"
                         update=":gameRoundForm:roundInfo" 
-                        listener="#{gameRoundController.startRound()}"/> 
+                        listener="#{gameRoundController.startRound()}"
+                        /> 
                 <p:ajax event="endRoundViaFlip"
                         update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" 
                         listener="#{gameRoundController.endRound()}"
-                        oncomplete="PF('roundValidationDialog').show()"/>
+                        oncomplete="PF('roundValidationDialog').show()"
+                        />
                 <p:ajax event="validatedRound"
                         onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "
                         listener="#{gameRoundController.getNextRoundInfos()}"
-                        update=":gameTableForm :gameRoundForm"/>                 
+                        update="@all"
+                        />                 
                 <p:ajax event="endRoundViaCountDown"
-                        render=":gameRoundForm:roundInfo :roundTimesUpForm:roundTimesUpDialog"
+                        update=":roundTimesUpForm:roundTimesUpDialog"
                         listener="#{gameRoundController.setInRound(false)}"
                         oncomplete="PF('roundTimesUpDialog').show()" 
                         />   
                 <p:ajax event="gameOver"
-                        render=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog"
+                        update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog"
                         onevent="PF('roundValidationDialog').hide())"
                         oncomplete="PF('gameOverDialog').show()" 
                         />  
