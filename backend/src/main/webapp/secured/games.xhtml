@@ -109,7 +109,10 @@
         </h:form>
 
         <p:commandButton id="lobbyUpdate" styleClass="hidden" process="@all"
-            update=":gameListForm:gameCurrent :statForm :topicStatForm :scoreForm :gameCreateForm:cubeTeamSelection :gameCreateForm:playerSelection" />
+            update=":gameListForm:gameCurrent :statForm :topicStatForm :scoreForm :gameCreateForm:cubeTeamSelection :gameCreateForm:playerSelection :gameInfoData :teamTable">
+            <f:actionListener binding="#{gameDetailController.doReloadGame()}" />
+            <f:actionListener binding="#{teamMemberBean.doReloadGame()}" />
+        </p:commandButton>
         <o:socket channel="cubeChannel" scope="application" onmessage="socketListener" />
 
     </ui:define>

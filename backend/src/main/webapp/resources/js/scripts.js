@@ -15,8 +15,13 @@ function showPassword(button, id = '') {
 }
 
 function socketListener(message, channel, event) {
-    window[message.type](message.name, message.id);
     console.log(message);
+    try {
+        window[message.type](message.name, message.id);
+    }
+    catch(e) {
+        console.log(e);
+    }
 }
 
 function gameInvitation(name, id) {
@@ -24,6 +29,11 @@ function gameInvitation(name, id) {
 }
 
 function gameUpdate(name, id) {
+    clickIfExists("lobbyUpdate");
+    clickIfExists("profileUpdate");
+}
+
+function roundUpdate(name, id) {
     clickIfExists("lobbyUpdate");
     clickIfExists("profileUpdate");
 }

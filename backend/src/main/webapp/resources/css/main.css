@@ -347,6 +347,16 @@ td.ui-panelgrid-cell {
     color: #4f4f4f;
 }
 
+.ui-treetable .ui-treetable-data > tr > td {
+    padding: 0.3rem 0.3rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-width: 0 0 1px 0;
+}
+
+.ui-treetable .ui-treetable-data > tr > td .ui-treetable-toggler {
+    margin-right: 0.3rem;
+}
+
 /* all divs descendants of element with class ... */
 .ui-fileupload-row div {
     padding: 4px 4px !important;
@@ -389,12 +399,34 @@ div.ui-fileupload-content .ui-progressbar {
     height: 40px;
 }
 
+#gameInfoForm span.ui-column-title {
+    font-size: small !important;
+}
+
+#gameInfoForm .ui-datatable thead th {
+    background: #c4c4c4 -webkit-gradient(linear,left top,left bottom,from(rgba(255,255,255,0.8)),to(rgba(255,255,255,0))) !important;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255, 255, 255, 0.8)), to(rgba(255, 255, 255, 0))) !important;
+    background-position-x: initial !important;
+    background-position-y: initial !important;
+    background-size: initial !important;
+    background-attachment: initial !important;
+    background-origin: initial !important;
+    background-clip: initial !important;
+    background-color: rgb(196, 196, 196) !important;
+}
+
+#gameInfoForm .ui-datatable tbody td {
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-width: 0 0 1px 0 !important;
+}
+
 #hall .ui-panelgrid-cell.p-col-7 {
     height: 100%;
 }
 
 /* custom class to postfix too long lines with '...' */
 .truncate {
+    text-align: start !important;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

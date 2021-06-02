@@ -1,10 +1,17 @@
 package at.timeguess.backend.services;
 
-import org.junit.jupiter.api.Assertions;
+import static at.timeguess.backend.utils.TestSetup.createGame;
+import static at.timeguess.backend.utils.TestSetup.createTeam;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -29,54 +36,59 @@ public class RoundServiceTest {
 
     @Test
     public void getAllRounds() {
-        Assertions.assertEquals(19, roundService.getAllRounds().size());
+        assertEquals(19, roundService.getAllRounds().size());
     }
 
-    @DirtiesContext
     @Test
     public void testRoundsPlayedinGame() {
         Game gameWithRounds = gameRepo.findById((long) 1).get();
-        Assertions.assertTrue(roundService.roundsPlayedInGame(gameWithRounds));
+        assertTrue(roundService.roundsPlayedInGame(gameWithRounds));
 
         Game gameWithoutRounds = gameRepo.findById((long) 6).get();
-        Assertions.assertFalse(roundService.roundsPlayedInGame(gameWithoutRounds));
+        assertFalse(roundService.roundsPlayedInGame(gameWithoutRounds));
     }
 
-    @DirtiesContext
     @Test
     public void testRoundsPlayedinGameWithTeam() {
         Game gameWithRounds = gameRepo.findById((long) 1).get();
         Team teamWithRounds = gameWithRounds.getTeams().iterator().next();
-        Assertions.assertTrue(roundService.teamPlayedRoundsInGame(gameWithRounds, teamWithRounds));
+        assertTrue(roundService.teamPlayedRoundsInGame(gameWithRounds, teamWithRounds));
 
         Game gameWithoutRounds = gameRepo.findById((long) 6).get();
-        Assertions.assertFalse(roundService.teamPlayedRoundsInGame(gameWithoutRounds, teamWithRounds));
+        assertFalse(roundService.teamPlayedRoundsInGame(gameWithoutRounds, teamWithRounds));
 
         Team teamWithNoRoundsInGame = gameRepo.findById((long) 2).get().getTeams().iterator().next();
-        Assertions.assertFalse(roundService.teamPlayedRoundsInGame(gameWithoutRounds, teamWithNoRoundsInGame));
+        assertFalse(roundService.teamPlayedRoundsInGame(gameWithoutRounds, teamWithNoRoundsInGame));
     }
 
-    @DirtiesContext
     @Test
     public void testGetLastRound() {
         for (int i = 1; i < 5; i++) {
             Game game = gameRepo.findById((long) i).get();
             Round lastRound = roundService.getLastRound(game);
-            Assertions.assertEquals(lastRound.getId(), (long) 4 * i);
+            assertEquals(lastRound.getId(), (long) 4 * i);
         }
         Game gameWithNoRound = gameRepo.findById((long) 6).get();
-        Assertions.assertNull(roundService.getLastRound(gameWithNoRound));
+        assertNull(roundService.getLastRound(gameWithNoRound));
     }
 
-    @DirtiesContext
     @Test
     public void testGetLastRoundOfTeam() {
         Game gameWithRounds = gameRepo.findById((long) 1).get();
         Team teamWithRounds = gameWithRounds.getTeams().iterator().next();
-        Assertions.assertEquals(teamWithRounds.getId(),
-            roundService.getLastRoundOfTeam(gameWithRounds, teamWithRounds).getGuessingTeam().getId());
+        assertEquals(teamWithRounds.getId(), roundService.getLastRoundOfTeam(gameWithRounds, teamWithRounds).getGuessingTeam().getId());
 
         Game gameWithoutRounds = gameRepo.findById((long) 6).get();
-        Assertions.assertNull(roundService.getLastRoundOfTeam(gameWithoutRounds, teamWithRounds));
+        assertNull(roundService.getLastRoundOfTeam(gameWithoutRounds, teamWithRounds));
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', value = { "1|1|30", "1|2|40", "2|3|25", "2|4|50", "3|5|30", "3|6|50", "4|7|30", "4|8|35", "5|5|20", "5|7|20" })
+    public void testGetPointsOfTeamInGame(final Long gameId, final Long teamId, final Integer expected) {
+        Game game = createGame(gameId);
+        Team team = createTeam(teamId);
+        Integer result = roundService.getPointsOfTeamInGame(game, team);
+
+        assertEquals(expected, result);
     }
 }

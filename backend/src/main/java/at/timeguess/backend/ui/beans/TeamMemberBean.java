@@ -16,10 +16,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.Team;
+import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
 
 /**
  * Bean for JSF specific team member view.
+ * Loads information for teams in a given game or all teams.
  */
 @Component
 @Scope(WebApplicationContext.SCOPE_SESSION)
@@ -28,20 +30,22 @@ public class TeamMemberBean implements Serializable {
     private static final long serialVersionUID = -3429788166387415247L;
 
     @Autowired
+    private GameService gameService;
+    @Autowired
     private TeamService teamService;
 
     /**
      * Attributes to cache the currently displayed items
      */
+    private Game game;
     private Team team;
-    private List<SelectItem> teams;
 
     /**
      * Sets the currently displayed game.
      * @param game
      */
     public void setGame(Game game) {
-        teams = init(game);
+        this.game = game;
     }
 
     /**
@@ -66,20 +70,25 @@ public class TeamMemberBean implements Serializable {
      * @param game
      */
     public List<SelectItem> getTeams() {
-        if (teams == null) teams = initAll();
-        return teams;
+        return game == null ? createAll() : create(game);
     }
 
-    private List<SelectItem> init(Game game) {
-        Set<Team> teams = game == null ? null : game.getTeams();
-        return teams == null ? null : createTeams(teams);
+    public void doReloadGame() {
+        if (game != null) {
+            game = gameService.loadGame(game.getId());
+        }
     }
 
-    private List<SelectItem> initAll() {
-        return createTeams(teamService.getAllTeams());
+    private List<SelectItem> create(Game game) {
+        Set<Team> teams = game.getTeams();
+        return teams == null ? null : createTeamMembers(teams);
     }
 
-    private static List<SelectItem> createTeams(Collection<Team> teams) {
+    private List<SelectItem> createAll() {
+        return createTeamMembers(teamService.getAllTeams());
+    }
+
+    private static List<SelectItem> createTeamMembers(Collection<Team> teams) {
         List<SelectItem> uiteams = teams.stream().map(t -> {
             SelectItemGroup ret = new SelectItemGroup(t.getName());
             ret.setValue(t);

@@ -63,7 +63,7 @@ public class GameService {
     }
 
     /**
-     * Returns a list of all games currently in state ({@link GameState#VALID_SETUP} or {@link GameState#PLAYED}.
+     * Returns a list of all games currently not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP}, {@link GameState#PLAYED}, {@link GameState#HALTED}).
      * @return
      */
     public List<Game> getAllCurrent() {
