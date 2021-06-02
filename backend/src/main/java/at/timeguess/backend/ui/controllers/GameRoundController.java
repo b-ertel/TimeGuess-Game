@@ -64,6 +64,7 @@ public class GameRoundController {
      * Method that sets all important attributes to null
      */
     public void destroy() {
+    	System.out.println("Destroy " + sessionInfoBean.getCurrentUserName());
     	this.currentGame = null;
     	this.currentRound = null;
     	this.nextRound = null;

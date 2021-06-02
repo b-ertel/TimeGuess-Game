@@ -148,7 +148,7 @@ public class GameManagerController {
             // gameService.saveGame(game);
         }
     }
-
+    
     /**
      * Method that starts a new Round by the cube for a game. It initializes a new round and also calls a method to start the
      * countdown.

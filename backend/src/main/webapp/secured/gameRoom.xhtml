@@ -28,6 +28,7 @@
 		<p:outputLabel style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" value="Your game has been successfully created. Please wait until there are enough players/rivals in the GameRoom (min. one player per team)." rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='VALID_SETUP'}"/>
 		<p:progressBar id="progressBarIndeterminate" style="height:6px" mode="indeterminate" rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='VALID_SETUP'}"/>
 		<p:outputLabel style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" value="Game is paused. Possible reasons: not enough players in GameRoom, no Connection to Cube." rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='HALTED'}"/>
+		<p:outputLabel style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" value="The other players are playing a round. Please wait until round ended" rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='PLAYED'}"/>
 	</h:form>	
 		
 	<h:form id="gameTableForm" rendered="#{not empty gameRoundController.currentGame}">
@@ -88,7 +89,9 @@
         		<p:outputLabel value="Did #{gameRoundController.currentRound.guessingTeam.name} guess #{gameRoundController.currentRound.termToGuess.name} correct? (First click comes first)" 
 							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>
 				<p:outputLabel value="You gave your best shot, your fate is now in the hands of your rivals. Please wait until they have valuated your round..." 
-							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>			   
+							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>	
+				<p:outputLabel value="You have the chance to validate last round if you want to" 
+							   rendered="#{empty gameRoundController.currentRound}" style="font-weight:bold"/>		   
 				<h:panelGrid columns="3" rendered="#{!gameRoundController.inGuessingTeam}">
                      <p:commandButton value="Correct" action="#{gameRoundController.correctRound()}" update=":gameRoundForm :gameTableForm"/>
                      <p:commandButton value="Incorrect" action="#{gameRoundController.incorrectRound()}" update=":gameRoundForm :gameTableForm"/>
@@ -175,7 +178,7 @@
             </o:socket> 
 
 			<o:socket channel="newRoundChannel" scope="session"   
-                		onmessage="function(m){console.log(m);}"
+                	  onmessage="function(m){console.log(m);}"
                       user="#{sessionInfoBean.currentUser.id}">
                 <p:ajax event="startRound"
                         update=":gameRoundForm:roundInfo" 
