@@ -30,7 +30,7 @@ public class GameRoundController {
     @Autowired
     private SessionInfoBean sessionInfoBean;
     @Autowired
-    private GameManagerController webSocketGameController;
+    private GameManagerController gameManagerController;
     @Autowired
     private CountDownController countDownController;
     @Autowired
@@ -54,9 +54,9 @@ public class GameRoundController {
      * Method that sets the attributes of class depending on which user is logged in
      */
     public void setup() {
-    	this.nextRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
+    	this.nextRound = gameManagerController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     	this.inGuessingTeam = nextRound.getGuessingTeam().getTeamMembers().contains(sessionInfoBean.getCurrentUser());
-    	this.currentGame = this.webSocketGameController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
+    	this.currentGame = this.gameManagerController.getCurrentGameForUser(this.sessionInfoBean.getCurrentUser());
     }
     
     /**
@@ -72,7 +72,7 @@ public class GameRoundController {
      * Method to get round that is to be played
      */
     public void getNextRoundInfos() {
-    	this.nextRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
+    	this.nextRound = gameManagerController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     	this.inGuessingTeam = nextRound.getGuessingTeam().getTeamMembers().contains(sessionInfoBean.getCurrentUser());
     }
     
@@ -81,7 +81,7 @@ public class GameRoundController {
      */
     public void startRound() {
     	this.inRound = true;
-    	this.currentRound = webSocketGameController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
+    	this.currentRound = gameManagerController.getCurrentRoundForUser(sessionInfoBean.getCurrentUser());
     	this.countDownController.startCountDown(currentRound.getTime(), sessionInfoBean.getCurrentUser());
     	this.inGuessingTeam = currentRound.getGuessingTeam().getTeamMembers().contains(sessionInfoBean.getCurrentUser());
     }
@@ -97,9 +97,10 @@ public class GameRoundController {
     /**
      * Method to end a round through count-down
      */
-    public void endRoundThroughCountDown() {
+    public void endRoundViaCountDown() {
+		Game currentGame = gameManagerController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
+		gameManagerController.setActiveRoundFalse(currentGame);
     	incorrectRound();
-    	setInRound(false);
     }
     
     public Round getCurrentRound() {
@@ -130,24 +131,24 @@ public class GameRoundController {
 	 * Method to validate a round as correct. Gamemanagercontroller saves round correct.
 	 */
     public void correctRound() {
-    	Game game = webSocketGameController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
-    	webSocketGameController.validateRoundOfGame(game, Validation.CORRECT);
+    	Game game = gameManagerController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
+    	gameManagerController.validateRoundOfGame(game, Validation.CORRECT);
     }
     
     /**
      * Method to validate a round as incorrect. Gamemanagercontroller saves round incorrect.
      */
     public void incorrectRound() {
-    	Game game = webSocketGameController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
-    	webSocketGameController.validateRoundOfGame(game, Validation.INCORRECT);
+    	Game game = gameManagerController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
+    	gameManagerController.validateRoundOfGame(game, Validation.INCORRECT);
     }
     
     /**
      * Method to validate a round as cheated. Gamemanagercontroller saves round cheated.
      */
     public void cheatedRound() {
-    	Game game = webSocketGameController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
-    	webSocketGameController.validateRoundOfGame(game, Validation.CHEATED);    
+    	Game game = gameManagerController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
+    	gameManagerController.validateRoundOfGame(game, Validation.CHEATED);    
     }
       
     public Game getCurrentGame() {
