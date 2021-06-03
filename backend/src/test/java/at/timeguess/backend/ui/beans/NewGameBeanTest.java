@@ -108,26 +108,21 @@ public class NewGameBeanTest {
         assertTrue(newGameBean.getTeams().contains(team6));
         assertEquals(2, newGameBean.getTeams().size());
 
+        newGameBean.setTeams(null);
+        newGameBean.addNewTeam(team6);
+        assertTrue(newGameBean.getTeams().contains(team6));
+
         verifyNoInteractions(teamService);
     }
 
     @Test
     public void testClearFields() {
-        String name = fillBean();
-
-        assertEquals(name, newGameBean.getGameName());
-        assertTrue(newGameBean.getMaxPoints() > 0);
-        assertNotNull(newGameBean.getTopic());
-        assertNotNull(newGameBean.getCube());
-        assertTrue(newGameBean.getTeams().size() > 0);
+        String expected = fillBean();
+        assertFields(expected);
 
         newGameBean.clearFields();
 
-        assertNull(newGameBean.getGameName());
-        assertEquals(10, newGameBean.getMaxPoints());
-        assertNull(newGameBean.getTopic());
-        assertNull(newGameBean.getCube());
-        assertEquals(0, newGameBean.getTeams().size());
+        assertFieldsClear();
     }
 
     @Test
@@ -145,19 +140,7 @@ public class NewGameBeanTest {
         verify(gameManagerController).addGame(any(Game.class));
         verifyNoInteractions(messageBean);
         assertEquals(expected, result);
-    }
-
-    @Test
-    public void testCreateGameFailureSave() {
-        fillBean();
-        when(gameService.saveGame(any(Game.class))).thenReturn(null);
-
-        Game result = newGameBean.createGame();
-
-        verify(gameService).saveGame(any(Game.class));
-        verifyNoInteractions(gameManagerController);
-        verifyNoInteractions(messageBean);
-        assertNull(result);
+        assertFieldsClear();
     }
 
     @Test
@@ -169,6 +152,20 @@ public class NewGameBeanTest {
     }
 
     @Test
+    public void testCreateGameFailureSave() {
+        String expected = fillBean();
+        when(gameService.saveGame(any(Game.class))).thenReturn(null);
+
+        Game result = newGameBean.createGame();
+
+        verify(gameService).saveGame(any(Game.class));
+        verifyNoInteractions(gameManagerController);
+        verifyNoInteractions(messageBean);
+        assertNull(result);
+        assertFields(expected);
+    }
+
+    @Test
     public void testValidateInput() {
         newGameBean.setGameName(null);
         assertFalse(newGameBean.validateInput());
@@ -177,6 +174,8 @@ public class NewGameBeanTest {
         newGameBean.setGameName("agame");
         assertFalse(newGameBean.validateInput());
 
+        newGameBean.setMaxPoints(-5);
+        assertFalse(newGameBean.validateInput());
         newGameBean.setMaxPoints(20);
         assertFalse(newGameBean.validateInput());
 
@@ -241,5 +240,21 @@ public class NewGameBeanTest {
         newGameBean.setTopic(createTopic(12L));
         newGameBean.setTeams(Set.of(createTeam(2L), createTeam(15L)));
         return foo;
+    }
+
+    private void assertFields(String expected) {
+        assertEquals(expected, newGameBean.getGameName());
+        assertTrue(newGameBean.getMaxPoints() > 0);
+        assertNotNull(newGameBean.getTopic());
+        assertNotNull(newGameBean.getCube());
+        assertTrue(newGameBean.getTeams().size() > 0);
+    }
+
+    private void assertFieldsClear() {
+        assertNull(newGameBean.getGameName());
+        assertEquals(10, newGameBean.getMaxPoints());
+        assertNull(newGameBean.getTopic());
+        assertNull(newGameBean.getCube());
+        assertEquals(0, newGameBean.getTeams().size());
     }
 }
