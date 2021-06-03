@@ -194,3 +194,91 @@
         margin-top: .5rem;
     }
 }
+
+.gameroomHeader {
+    position:top;
+    border-radius: 10px;
+    background: #195478;
+    font-size:40px !important;
+}
+
+.gameroomHeader h1 {
+    text-align: center;
+    vertical-align: text-top;
+    color: white;
+    font-size: 40px;
+}
+
+.gameroomHeader span {
+    text-align: center;
+    display: block;
+    width: 100%;
+    color: white;
+}
+
+.gameroomNogame label {
+    text-align: center;
+    display: block;
+    width: 100%;
+    color:white;
+    font-size: 20px !important;
+}
+
+.gameroomNogame .ui-progressbar {
+    margin-top: 20px;
+    height: 6px;
+}
+
+#gameRoundForm {
+    width: 700px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+#gameRoundForm label {
+    font-weight: bold;
+}
+
+#gameRoundForm h3 {
+    margin: 20px 0 0;
+}
+
+#gameRoundForm h1 {
+    margin-top: 5px;
+    border-bottom: double;
+    font-weight:bold;
+    font-size:40px !important;
+}
+
+#gameRoundForm div.ui-panelgrid-cell {
+    padding: 10px 0px 8px;
+    text-align: center;
+}
+
+#gameRoundForm .ui-panel-titlebar {
+    margin-bottom: 12px;
+}
+
+#roundValidationForm label {
+    font-weight: bold;
+}
+
+#roundTimesUpForm label {
+    font-weight: bold;
+}
+
+.rankingHeader {
+    margin: auto;
+    background: #195478;
+    border-radius: 10px;
+}
+
+.rankingHeader h1 {
+    text-align: center;
+    color: white;
+}
+
+#rankingLabel {
+    font-weight: bold;
+    text-align: center;
+}

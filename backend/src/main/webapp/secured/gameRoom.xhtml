@@ -1,234 +1,301 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
-	xmlns:demo="http://java.sun.com/jsf/composite/demo"
-	template="/WEB-INF/templates/main.xhtml">
-    <ui:define name="content">
-        <!-- see chat.js -->
-        <h:outputScript>			
-            pfContext=PF
-        </h:outputScript>
-               
-		<p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true" sticky="true" value="Multiple"/>
-		
-		<h:form>
-			<p:panel style="font-size:40px !important; background:#195478; border-radius:10px; position:top">
-			<h1 style="text-align:center; vertical-align:text-top; color:white; font-size:40px">Gameroom</h1>
-			<h:outputText style="text-align:center; display: block; width:100%; font-size:15px!important; color:white" rendered="#{not empty gameRoundController.currentGame}" value="---- ---- ---- ---- ---- ---- ----"/>
-			<h:outputText style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" rendered="#{not empty gameRoundController.currentGame}" value="#{gameRoundController.currentGame.name}   -   #{gameRoundController.currentGame.topic.name}   -   Max. points: #{gameRoundController.currentGame.maxPoints}"/>
-			</p:panel>
-		</h:form>
-	
-	<h:form id="noGameForm" rendered="#{empty gameRoundController.currentGame}">
-		<p:outputLabel style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" value="Your game has been successfully created. Please wait until there are enough players/rivals in the GameRoom (min. one player per team)." rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='VALID_SETUP'}"/>
-		<p:progressBar id="progressBarIndeterminate" style="height:6px" mode="indeterminate" rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='VALID_SETUP'}"/>
-		<p:outputLabel style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" value="Game is paused. Possible reasons: not enough players in GameRoom, no Connection to Cube." rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='HALTED'}"/>
-		<p:outputLabel style="text-align:center; display: block; width:100%; font-size:20px!important; color:white" value="The other players are playing a round. Please wait until round ended" rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status=='PLAYED'}"/>
-	</h:form>	
-		
-	<h:form id="gameTableForm" rendered="#{not empty gameRoundController.currentGame}">
-		<p:dataTable id="leaderbord" var="team" value="#{gameRoundController.teamsInGame}">
-				            <p:column headerText="Name">
-				                <h:outputText value="#{team.name}" />
-				            </p:column>
-				            <p:column headerText="Points">
-				                <h:outputText value="#{gameRoundController.calculatePointsOfTeam(team)}" />
-				            </p:column>
-				        </p:dataTable> 
-	</h:form>
-		
-   <h:form id="gameRoundForm" style="width:700px; text-align:center; align:right; margin: 0 auto;" rendered="#{not empty gameRoundController.currentGame}">
-            <div class="gameRoomContent">      
-                <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
-				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name}. " 
-							   rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to describe first. " 
-							   rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name} during next round" 
-							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe during next round. Flip the cube and try your best!" 
-							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="You have entered the GameRoom a little bit late, but no worries! #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name}. " 
-							   rendered="#{empty gameRoundController.currentRound and gameRoundController.nextRound.nr!=1 and !gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>
-				<p:outputLabel value="You have entered the GameRoom a little bit late, but no worries! #{gameRoundController.nextRound.guessingUser.username} has to describe next. " 
-							   rendered="#{empty gameRoundController.currentRound and gameRoundController.nextRound.nr!=1 and gameRoundController.isInGuessingTeam()}" style="font-weight:bold"/>			  
-				<p:outputPanel header="RoundInfo" rendered="#{gameRoundController.inRound}">
-						<h3>Time to Guess</h3>
-		            	<h1 class="p-text-center" style="border-bottom: double">
-		             		<h:outputText value="#{countDownController.getCountDown()}" style="font-weight:bold; font-size:40px !important"/> 
-		             	</h1>
-						<div class="p-grid">
-		                        <div class="p-col-5"><p:outputLabel value="User: " /></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username}" style="font-weight:bold;"/></div>
-		                        <div class="p-col-5"><p:outputLabel value="Team: " /></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name}" style="font-weight:bold;"/></div>
-		                        <ui:fragment rendered="#{!gameRoundController.inGuessingTeam}">
-		                        <div class="p-col-5" ><p:outputLabel value="Term: "/></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.termToGuess.name}" style="font-weight:bold;"/></div>				                
-		                        </ui:fragment>
-		                        <div class="p-col-5"><p:outputLabel value="Points: " /></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.points}" style="font-weight:bold;"/></div>
-		                        <div class="p-col-5"><p:outputLabel value="Activity: " /></div>
-		                        <div class="p-col-7"><p:outputLabel value="#{gameRoundController.currentRound.activity}" style="font-weight:bold;"/></div>
-		                </div>
-				</p:outputPanel> 
-				</p:panel>
-            </div>
-      </h:form>
-       
-      <h:form id="roundValidationForm">
-      		<p:dialog id="roundValidationDialog" header="Round Validation"
-        			  widgetVar="roundValidationDialog" dynamic="true" modal="true"
-					  resizable="false" closeOnEscape="false" showEffect="fade"
-					  hideEffect="fade" responsive="true" closable="false">
-        		<p:outputLabel value="Did #{gameRoundController.currentRound.guessingTeam.name} guess #{gameRoundController.currentRound.termToGuess.name} correct? (First click comes first)" 
-							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>
-				<p:outputLabel value="You gave your best shot, your fate is now in the hands of your rivals. Please wait until they have valuated your round..." 
-							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>	
-				<p:outputLabel value="You have the chance to validate last round if you want to" 
-							   rendered="#{empty gameRoundController.currentRound}" style="font-weight:bold"/>		   
-				<h:panelGrid columns="3" rendered="#{!gameRoundController.inGuessingTeam}">
-                     <p:commandButton value="Correct" action="#{gameRoundController.correctRound()}" update=":gameRoundForm :gameTableForm"/>
-                     <p:commandButton value="Incorrect" action="#{gameRoundController.incorrectRound()}" update=":gameRoundForm :gameTableForm"/>
-                     <p:commandButton value="Cheated" action="#{gameRoundController.cheatedRound()}" update=":gameRoundForm :gameTableForm"/>
-                </h:panelGrid>
-        	</p:dialog>
-      </h:form>
-      
-      <h:form id="roundTimesUpForm">
-      		<p:dialog id="roundTimesUpDialog" header="Time is up"
-        			  widgetVar="roundTimesUpDialog" dynamic="true" modal="true"
-					  resizable="false" closeOnEscape="false" showEffect="fade"
-					  hideEffect="fade" responsive="true" closable="false">
-        		<p:outputLabel value="Seems like #{gameRoundController.currentRound.guessingUser.username} did not guess #{gameRoundController.currentRound.termToGuess.name} within the time. Please confirm this round to go on!" 
-							   rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" style="font-weight:bold"/>	
-				<p:outputLabel value="That took a bit long. Please wait until your rivals confirm this round..." 
-							   rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" style="font-weight:bold"/>		   
-				<h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
-                     <p:commandButton value="Confirm" action="#{gameRoundController.endRoundThroughCountDown()}" update=":gameRoundForm :gameTableForm" oncomplete="PF('roundTimesUpDialog').hide()"/>
-                </h:panelGrid>
-        	</p:dialog>
-      </h:form>
-            
-        <h:form id="gameOverForm">
-      		<p:dialog id="gameOverDialog" header="Game Over"
-        			  widgetVar="gameOverDialog" dynamic="true" modal="true"
-					  resizable="false" closeOnEscape="false" showEffect="fade"
-					  hideEffect="fade" responsive="true" closable="false">
-				<p:panel style="margin: auto; background:#195478; border-radius:10px">
-					<h1 style="text-align: center; color:white">Ranking</h1>
-				</p:panel>
-				<p:outputLabel value="Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game" 
-							   style="font-weight:bold; text-align:center"/>
-				<p:dataTable id="leaderbord" var="teamscore" value="#{gameRoundController.computeFinalRanking()}" rowIndexVar="index">
-	                        <p:column headerText="Rank" style="text-align:center">
-	                            <h:outputText value="#{index + 1}" />
-	                        </p:column>
-				            <p:column headerText="Name">
-				                <h:outputText value="#{teamscore.team.name}" />
-				            </p:column>
-				            <p:column headerText="Points">
-				                <h:outputText value="#{teamscore.score}" />
-				            </p:column>
-				</p:dataTable>			   
-				<h:panelGrid columns="1">
-                     <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all">
-                     	<f:actionListener binding="#{gameRoundController.destroy()}" />
-                     </p:commandButton>
-                </h:panelGrid>
-        	</p:dialog>
-      </h:form>     
-            
-       <h:form id="termOverform">
-      		<p:dialog id="termOverDialog" header="Terms Over"
-        			  widgetVar="termOverDialog" dynamic="true" modal="true"
-					  resizable="false" closeOnEscape="false" showEffect="fade"
-					  hideEffect="fade" responsive="true" closable="false">
-        		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!" 
-							   style="font-weight:bold"/>	
-				<p:dataTable id="leaderbord" var="teamscore" value="#{gameRoundController.computeFinalRanking()}" rowIndexVar="index">
-	                        <p:column headerText="Rank" style="text-align:center">
-	                            <h:outputText value="#{index + 1}" />
-	                        </p:column>
-				            <p:column headerText="Name">
-				                <h:outputText value="#{teamscore.team.name}" />
-				            </p:column>
-				            <p:column headerText="Points">
-				                <h:outputText value="#{teamscore.score}" />
-				            </p:column>
-				</p:dataTable>	   	   
-				<h:panelGrid columns="1">
-                     <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all">
-                     	<f:actionListener binding="#{gameRoundController.destroy()}" />
-                     </p:commandButton>
-                </h:panelGrid>
-        	</p:dialog>
-      </h:form> 
-                 
-            <o:socket channel="countDownChannel" scope="session"
-         	    user="#{sessionInfoBean.currentUser.id}"
-                onmessage="function(m){console.log(m);}">
-                <p:ajax event="countDownUpdate"
-                    update=":gameRoundForm:roundInfo"/>
-            </o:socket> 
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    template="/WEB-INF/templates/main.xhtml">
 
-			<o:socket channel="newRoundChannel" scope="session"   
-                	  onmessage="function(m){console.log(m);}"
-                      user="#{sessionInfoBean.currentUser.id}">
-                <p:ajax event="startRound"
-                        update=":gameRoundForm:roundInfo" 
-                        listener="#{gameRoundController.startRound()}"/> 
-                <p:ajax event="endRoundViaFlip"
-                        update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" 
-                        listener="#{gameRoundController.endRound()}"
-                        oncomplete="PF('roundValidationDialog').show()"/>
-                <p:ajax event="validatedRound"
-                        onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "
-                        listener="#{gameRoundController.getNextRoundInfos()}"
-                        update="@all"/>                 
-                <p:ajax event="endRoundViaCountDown"
-                        update=":roundTimesUpForm:roundTimesUpDialog"
-                        listener="#{gameRoundController.setInRound(false)}"
-                        oncomplete="PF('roundTimesUpDialog').show()" 
-                        />   
-                <p:ajax event="gameOver"
-                        update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog"
-                        onevent="PF('roundValidationDialog').hide())"
-                        oncomplete="PF('gameOverDialog').show()" 
-                        />  
-               	<p:ajax event="termsOver"
-                        render=":gameRoundForm:roundInfo :termOverForm:termOverDialog"
-                        onevent="PF('roundValidationDialog').hide()) PF('roundTimesUpDialog').hide()"
-                        oncomplete="PF('termOverDialog').show()" 
-                        /> 
-                <p:ajax event="startGame"
-                        update="@all"
-                        listener="#{gameRoundController.setup()}"
-                        />   
-                <p:ajax event="restartGame"
-                        update="@all"
-                        listener="#{gameRoundController.setup()}"
-                        /> 
-                <p:ajax event="pauseGame"
-                        update="@all"
-                        listener="#{gameRoundController.destroy()}"
-                        /> 
-                <p:ajax event="setup"
-                		listener="#{gameRoundController.setup()}"
-                		/>  
-                <p:ajax event="setupandupdate"
-                		listener="#{gameRoundController.setup()}"
-                		update="@all"
-                		/> 
-                <p:ajax event="healthMessage"
-                		listener="#{cubeStatusController.displayHealthMessage()}"  
-                		update="msg"
-                        />   
-            </o:socket>      
+    <ui:define name="content">
+        <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true" sticky="true" value="Multiple"/>
+
+        <h:form>
+            <p:panel styleClass="gameroomHeader">
+                <h1>Gameroom</h1>
+                <h:outputText style="font-size:15px!important"
+                    value="---- ---- ---- ---- ---- ---- ----"
+                    rendered="#{not empty gameRoundController.currentGame}" />
+                <h:outputText style="font-size:20px!important"
+                    value="#{gameRoundController.currentGame.name}   -   #{gameRoundController.currentGame.topic.name}   -   Max. points: #{gameRoundController.currentGame.maxPoints}"
+                    rendered="#{not empty gameRoundController.currentGame}" />
+            </p:panel>
+        </h:form>
+
+        <h:form id="noGameForm" styleClass="gameroomNogame" rendered="#{empty gameRoundController.currentGame}">
+            <p:outputLabel
+                value="Your game is up and running, but paused for some reason. Possibly because there are not enough players in the gameroom (minimum one player per team) or a lost connection to the cube. Please wait..."
+                rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status == 'VALID_SETUP'}" />
+            <p:outputLabel
+                value="Your game was paused from outside. Please find somebody to restart it..."
+                rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status == 'HALTED'}" />
+            <p:outputLabel
+                value="The other players are in the middle of a round. Please wait until it ends..."
+                rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status == 'PLAYED'}" />
+            <p:progressBar id="progressBarIndeterminate" mode="indeterminate"
+                rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status != 'PLAYED'}" />
+        </h:form>
+
+        <h:form id="gameTableForm" rendered="#{not empty gameRoundController.currentGame}">
+            <p:dataTable id="leaderbord" var="team" value="#{gameRoundController.teamsInGame}">
+                <p:column headerText="Name">
+                    <h:outputText value="#{team.name}" />
+                </p:column>
+                <p:column headerText="Points">
+                    <h:outputText value="#{gameRoundController.calculatePointsOfTeam(team)}" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="gameRoundForm" rendered="#{not empty gameRoundController.currentGame}">
+            <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
+                <p:outputLabel
+                    value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name}. " 
+                    rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and !gameRoundController.isInGuessingTeam()}" />
+                <p:outputLabel
+                    value="Flip your cube to start the first round! May the best team win! #{gameRoundController.nextRound.guessingUser.username} has to describe first. "
+                    rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and gameRoundController.isInGuessingTeam()}" />
+                <p:outputLabel
+                    value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name} during next round" 
+                    rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and !gameRoundController.isInGuessingTeam()}" />
+                <p:outputLabel
+                    value="#{gameRoundController.currentRound.guessingTeam.name} tried to guess #{gameRoundController.currentRound.termToGuess.name} during last round. #{gameRoundController.nextRound.guessingUser.username} has to describe during next round. Flip the cube and try your best!" 
+                    rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and gameRoundController.isInGuessingTeam()}" />
+                <p:outputLabel
+                    value="You have entered the GameRoom a little bit late, but no worries! #{gameRoundController.nextRound.guessingUser.username} has to describe #{gameRoundController.nextRound.termToGuess.name}. " 
+                    rendered="#{empty gameRoundController.currentRound and gameRoundController.nextRound.nr!=1 and !gameRoundController.isInGuessingTeam()}" />
+                <p:outputLabel
+                    value="You have entered the GameRoom a little bit late, but no worries! #{gameRoundController.nextRound.guessingUser.username} has to describe next. "
+                    rendered="#{empty gameRoundController.currentRound and gameRoundController.nextRound.nr!=1 and gameRoundController.isInGuessingTeam()}" />
+
+                <p:outputPanel header="RoundInfo" rendered="#{gameRoundController.inRound}">
+                    <h3>Time left to guess</h3>
+                    <h1 class="p-text-center">
+                         <h:outputText value="#{countDownController.getCountDown()}" />
+                    </h1>
+                    <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
+                        columnClasses="p-col-5, p-col-7" contentStyleClass="ui-fluid">
+                        <p:outputLabel value="User: " />
+                        <p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username}" />
+
+                        <p:outputLabel value="Team: " />
+                        <p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name}" />
+
+                        <c:if test="${!gameRoundController.inGuessingTeam}">
+                            <p:outputLabel value="Term: "/>
+                            <p:outputLabel value="#{gameRoundController.currentRound.termToGuess.name}" />
+                        </c:if>
+
+                        <p:outputLabel value="Points: " />
+                        <p:outputLabel value="#{gameRoundController.currentRound.points}" />
+
+                        <p:outputLabel value="Activity: " />
+                        <p:outputLabel value="#{gameRoundController.currentRound.activity}" />
+                    </p:panelGrid> 
+                </p:outputPanel>
+            </p:panel>
+        </h:form>
+
+        <h:form id="roundValidationForm">
+            <p:dialog id="roundValidationDialog" header="Round Validation"
+                widgetVar="roundValidationDialog" dynamic="true" modal="true"
+                resizable="false" closeOnEscape="false" showEffect="fade"
+                hideEffect="fade" responsive="true" closable="false">
+
+                <p:outputLabel
+                    value="Did #{gameRoundController.currentRound.guessingTeam.name} guess #{gameRoundController.currentRound.termToGuess.name} correct? (First click comes first)"
+                    rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" />
+                <p:outputLabel
+                    value="You gave your best shot, your fate is now in the hands of your rivals. Please wait until they have valuated your round..."
+                    rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" />
+                <p:outputLabel
+                    value="You have the chance to validate last round if you want to"
+                    rendered="#{empty gameRoundController.currentRound}" />
+
+                <h:panelGrid columns="3" rendered="#{!gameRoundController.inGuessingTeam}">
+                    <p:commandButton value="Correct"
+                        action="#{gameRoundController.correctRound()}" update=":gameRoundForm :gameTableForm"/>
+                    <p:commandButton value="Incorrect"
+                        action="#{gameRoundController.incorrectRound()}" update=":gameRoundForm :gameTableForm"/>
+                    <p:commandButton value="Cheated"
+                        action="#{gameRoundController.cheatedRound()}" update=":gameRoundForm :gameTableForm"/>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="roundTimesUpForm">
+              <p:dialog id="roundTimesUpDialog" header="Time is up"
+                widgetVar="roundTimesUpDialog" dynamic="true" modal="true"
+                resizable="false" closeOnEscape="false" showEffect="fade"
+                hideEffect="fade" responsive="true" closable="false">
+                
+                <p:outputLabel
+                    value="Seems like #{gameRoundController.currentRound.guessingTeam.name} did not guess #{gameRoundController.currentRound.termToGuess.name} within the time. Please confirm this round to continue!"
+                    rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" />
+                <p:outputLabel
+                    value="That took a bit long. Please wait until your rivals confirm this round..."
+                    rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" />
+                
+                <h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
+                    <p:commandButton value="Confirm"
+                        action="#{gameRoundController.endRoundThroughCountDown()}" update=":gameRoundForm :gameTableForm"
+                        oncomplete="PF('roundTimesUpDialog').hide()"/>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="gameOverForm">
+            <p:dialog id="gameOverDialog" header="Game Over"
+                widgetVar="gameOverDialog" dynamic="true" modal="true"
+                resizable="false" closeOnEscape="false" showEffect="fade"
+                hideEffect="fade" responsive="true" closable="false">
+                
+                <p:panel styleClass="rankingHeader"><h1>Ranking</h1></p:panel>
+                
+                <p:outputLabel value="Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!"
+                    styleClass="rankingLabel" />
+                <p:dataTable id="leaderbord" var="teamscore" value="#{gameRoundController.computeFinalRanking()}" rowIndexVar="index">
+                    <p:column headerText="Rank" style="text-align:center">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Name">
+                        <h:outputText value="#{teamscore.team.name}" />
+                    </p:column>
+                    <p:column headerText="Points">
+                        <h:outputText value="#{teamscore.score}" />
+                    </p:column>
+                </p:dataTable>
+                
+                <h:panelGrid columns="1">
+                    <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all">
+                         <f:actionListener binding="#{gameRoundController.destroy()}" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="termOverform">
+            <p:dialog id="termOverDialog" header="Terms Over"
+                widgetVar="termOverDialog" dynamic="true" modal="true"
+                resizable="false" closeOnEscape="false" showEffect="fade"
+                hideEffect="fade" responsive="true" closable="false">
+                
+                <p:outputLabel value="You played quite some rounds. Unfortunatly all terms within this topic have been used. Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!" 
+                    styleClass="rankingLabel" />
+                <p:dataTable id="leaderbord" var="teamscore" value="#{gameRoundController.computeFinalRanking()}" rowIndexVar="index">
+                    <p:column headerText="Rank" style="text-align:center">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Name">
+                        <h:outputText value="#{teamscore.team.name}" />
+                    </p:column>
+                    <p:column headerText="Points">
+                        <h:outputText value="#{teamscore.score}" />
+                    </p:column>
+                </p:dataTable>
+                <h:panelGrid columns="1">
+                    <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all">
+                         <f:actionListener binding="#{gameRoundController.destroy()}" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="gameCanceledForm">
+            <p:dialog id="gameCanceledDialog" header="Game Canceled"
+                widgetVar="gameCanceledDialog" dynamic="true" modal="true"
+                resizable="false" closeOnEscape="false" showEffect="fade"
+                hideEffect="fade" responsive="true" closable="false">
+                
+                <p:outputLabel value="Your game was canceled from outside, team #{gameRoundController.computeWinningTeam().name} was in the lead!" 
+                    styleClass="rankingLabel" />
+                <p:dataTable id="leaderbord" var="teamscore" value="#{gameRoundController.computeFinalRanking()}" rowIndexVar="index">
+                    <p:column headerText="Rank" style="text-align:center">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Name">
+                        <h:outputText value="#{teamscore.team.name}" />
+                    </p:column>
+                    <p:column headerText="Points">
+                        <h:outputText value="#{teamscore.score}" />
+                    </p:column>
+                </p:dataTable>
+                <h:panelGrid columns="1">
+                    <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all">
+                         <f:actionListener binding="#{gameRoundController.destroy()}" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+
+        <o:socket channel="countDownChannel" scope="session"
+            user="#{sessionInfoBean.currentUser.id}"
+            onmessage="function(m){console.log(m);}">
+            <p:ajax event="countDownUpdate" update=":gameRoundForm:roundInfo"/>
+        </o:socket>
+
+        <o:socket channel="newRoundChannel" scope="session"
+            onmessage="function(m){console.log(m);}"
+            user="#{sessionInfoBean.currentUser.id}">
+
+            <p:ajax event="startRound"
+                update=":gameRoundForm:roundInfo"
+                listener="#{gameRoundController.startRound()}"/>
+
+            <p:ajax event="endRoundViaFlip"
+                update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog"
+                listener="#{gameRoundController.endRound()}"
+                oncomplete="PF('roundValidationDialog').show()"/>
+
+            <p:ajax event="validatedRound"
+                onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "
+                listener="#{gameRoundController.getNextRoundInfos()}"
+                update="@all" />
+
+            <p:ajax event="endRoundViaCountDown"
+                update=":roundTimesUpForm:roundTimesUpDialog"
+                listener="#{gameRoundController.setInRound(false)}"
+                oncomplete="PF('roundTimesUpDialog').show()" />
+
+            <p:ajax event="gameOver"
+                update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog"
+                onevent="PF('roundValidationDialog').hide())"
+                oncomplete="PF('gameOverDialog').show()" />
+
+            <p:ajax event="termsOver"
+                render=":gameRoundForm:roundInfo :termOverForm:termOverDialog"
+                onevent="PF('roundValidationDialog').hide()) PF('roundTimesUpDialog').hide()"
+                oncomplete="PF('termOverDialog').show()" />
+
+            <p:ajax event="gameCanceled"
+                update=":gameRoundForm:roundInfo :gameCanceledForm:gameCanceledDialog"
+                onevent="PF('roundValidationDialog').hide())"
+                oncomplete="PF('gameCanceledDialog').show()" />
+
+            <p:ajax event="startGame"
+                update="@all"
+                listener="#{gameRoundController.setup()}" />
+
+            <p:ajax event="restartGame"
+                update="@all"
+                listener="#{gameRoundController.setup()}" />
+
+            <p:ajax event="pauseGame"
+                update="@all"
+                listener="#{gameRoundController.destroy()}" />
+
+            <p:ajax event="setup"
+                listener="#{gameRoundController.setup()}" />
+
+            <p:ajax event="setupandupdate"
+                listener="#{gameRoundController.setup()}"
+                update="@all" />
+
+            <p:ajax event="healthMessage"
+                listener="#{cubeStatusController.displayHealthMessage()}"
+                update="msg" />
+        </o:socket>
     </ui:define>
 </ui:composition>
