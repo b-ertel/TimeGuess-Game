@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+<body>
+    <ui:composition>
+        <h:form id="#{dialogName}Form">
+            <p:dialog id="#{dialogName}Dialog" header="#{dialogHeader}"
+                widgetVar="#{dialogName}Dialog" dynamic="true" modal="true"
+                resizable="false" closeOnEscape="false" showEffect="fade"
+                hideEffect="fade" responsive="true" closable="false">
+
+                <p:panel styleClass="rankingLabel" rendered="#{gameOver}">Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!</p:panel>
+                <p:panel styleClass="rankingLabel" rendered="#{termOver}">
+                    <p:outputPanel>You played quite some rounds... unfortunatly all terms within this topic have been used.</p:outputPanel>
+                    <p:outputPanel style="margin-top:10px">Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!</p:outputPanel>
+                </p:panel>
+                <p:panel styleClass="rankingLabel" rendered="#{gameCanceled}">
+                    <p:outputPanel>Your game was canceled from outside!</p:outputPanel>
+                    <p:outputPanel style="margin-top:10px">#{gameRoundController.computeWinningTeam().name} was in the lead...</p:outputPanel>
+                </p:panel>
+
+                <p:panel styleClass="rankingHeader">
+                    <h1>Ranking</h1>
+                </p:panel>
+
+                <p:dataTable id="leaderbord" value="#{gameRoundController.computeFinalRanking()}"
+                    var="teamscore" rowIndexVar="index" style="margin-bottom:12px">
+                    <p:column headerText="Rank" style="text-align:center">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Name">
+                        <h:outputText value="#{teamscore.team.name}" />
+                    </p:column>
+                    <p:column headerText="Points">
+                        <h:outputText value="#{teamscore.score}" />
+                    </p:column>
+                </p:dataTable>
+                <h:panelGrid columns="1">
+                    <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all">
+                        <f:actionListener binding="#{gameRoundController.destroy()}" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+    </ui:composition>
+</body>
+</html>

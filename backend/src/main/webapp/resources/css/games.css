@@ -203,6 +203,7 @@
 }
 
 .gameroomHeader h1 {
+    margin: auto;
     text-align: center;
     vertical-align: text-top;
     color: white;
@@ -216,7 +217,7 @@
     color: white;
 }
 
-.gameroomNogame label {
+.gameroomNogame div {
     text-align: center;
     display: block;
     width: 100%;
@@ -235,7 +236,7 @@
     margin: 0 auto;
 }
 
-#gameRoundForm label {
+#gameRoundForm div {
     font-weight: bold;
 }
 
@@ -250,21 +251,37 @@
     font-size:40px !important;
 }
 
+#gameRoundForm div.ui-panel-content {
+    margin-bottom: 5px;
+}
+
 #gameRoundForm div.ui-panelgrid-cell {
-    padding: 10px 0px 8px;
     text-align: center;
+}
+
+#gameRoundForm div.ui-outputpanel {
+    margin: 10px 5px 10px;
 }
 
 #gameRoundForm .ui-panel-titlebar {
     margin-bottom: 12px;
 }
 
-#roundValidationForm label {
+#roundValidationForm div {
     font-weight: bold;
 }
 
-#roundTimesUpForm label {
+#roundValidationForm table, #roundTimesUpForm table {
+    margin-top: 12px;
+}
+
+#roundTimesUpForm div {
     font-weight: bold;
+}
+
+.dlgContent div {
+    margin: 10px 5px 10px;
+    text-align: center;
 }
 
 .rankingHeader {
@@ -274,11 +291,14 @@
 }
 
 .rankingHeader h1 {
+    margin: 2px;
     text-align: center;
     color: white;
+    font-size: larger !important;
 }
 
-#rankingLabel {
+.rankingLabel {
+    margin: 8px 0 10px;
     font-weight: bold;
     text-align: center;
 }
