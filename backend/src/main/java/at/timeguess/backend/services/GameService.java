@@ -63,7 +63,8 @@ public class GameService {
     }
 
     /**
-     * Returns a list of all games currently in state ({@link GameState#VALID_SETUP} or {@link GameState#PLAYED}.
+     * Returns a list of all games currently not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP},
+     * {@link GameState#PLAYED}, {@link GameState#HALTED}).
      * @return
      */
     public List<Game> getAllCurrent() {
@@ -72,18 +73,18 @@ public class GameService {
 
     /**
      * Returns a list of all games with the given status.
-     * @param gs
+     * @param  gameState
      * @return
      */
-    public List<Game> getByStatus(GameState gs) {
-        return gameRepo.findByStatus(gs);
+    public List<Game> getByStatus(GameState gameState) {
+        return gameRepo.findByStatus(gameState);
     }
 
     /**
-     * Returns a list of all games the given user is associated to, optionally restricted to games
-     * currently in state ({@link GameState#VALID_SETUP} or {@link GameState#PLAYED}.
-     * @param user
-     * @param current
+     * Returns a list of all games the given user is associated to, optionally restricted to games currently
+     * not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP}, {@link GameState#PLAYED}, {@link GameState#HALTED}).
+     * @param  user
+     * @param  current
      * @return
      */
     public List<Game> getByUser(User user, boolean current) {
@@ -92,7 +93,7 @@ public class GameService {
 
     /**
      * Loads a single game identified by its id.
-     * @param gameId
+     * @param  gameId
      * @return
      */
     public Game loadGame(Long gameId) {
@@ -102,7 +103,7 @@ public class GameService {
     /**
      * Saves the game. If the game is new the user requesting this operation will be stored as {@link Game#creator}.
      * Additionally fills gui message with success or failure info and triggers a push update.
-     * @param game the game to save
+     * @param  game the game to save
      * @return the saved game
      * @apiNote Message handling ist done here, because this is the central place for saving games.
      */
@@ -111,9 +112,7 @@ public class GameService {
         Game ret = null;
         try {
             boolean isNew = game.isNew();
-            if (isNew) {
-                game.setCreator(userService.getAuthenticatedUser());
-            }
+            if (isNew) { game.setCreator(userService.getAuthenticatedUser()); }
             ret = gameRepo.save(game);
 
             // fill ui message, send update and log
@@ -121,11 +120,11 @@ public class GameService {
 
             if (websocketManager != null)
                 websocketManager.getUserRegistrationChannel().send(
-                        Map.of("type", "gameUpdate", "name", game.getName(), "id", game.getId()));
+                    Map.of("type", "gameUpdate", "name", game.getName(), "id", game.getId()));
 
             User auth = userService.getAuthenticatedUser();
             LOGGER.info("Game '{}' (id={}) was {} by User '{}' (id={})", ret.getName(), ret.getId(),
-                    isNew ? "created" : "updated", auth.getUsername(), auth.getId());
+                isNew ? "created" : "updated", auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
             String msg = "Saving game failed";
@@ -158,7 +157,7 @@ public class GameService {
 
             User auth = userService.getAuthenticatedUser();
             LOGGER.info("Game '{}' (id={}) was deleted by User '{}' (id={})", game.getName(), game.getId(),
-                    auth.getUsername(), auth.getId());
+                auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
             String name = game == null ? "Unknown" : game.getName();
@@ -182,14 +181,14 @@ public class GameService {
             messageBean.alertInformation(game.getName(), "Your participation was successfully confirmed");
 
             LOGGER.info("User '{}' (id={}) confirmed participation in game '{}' (id={})", user.getUsername(),
-                    user.getId(), game.getName(), game.getId());
+                user.getId(), game.getName(), game.getId());
         }
     }
 
     /**
      * Returns whether participation confirmation is possible for the given user and game.
-     * @param user the user whose participation confirmation is checked for the given game.
-     * @param game the game whose participation confirmation is checked for the given user.
+     * @param  user the user whose participation confirmation is checked for the given game.
+     * @param  game the game whose participation confirmation is checked for the given user.
      * @return true if participation confirmation is disabled, false otherwise.
      */
     public boolean disabledConfirmation(User user, Game game) {
@@ -199,8 +198,8 @@ public class GameService {
 
     /**
      * Returns whether participation confirmation is possible for the given game.
-     * @param game the game whose participation confirmation is checked.
-     * @return true if participation confirmation is disabled, false otherwise.
+     * @param  game the game whose participation confirmation is checked.
+     * @return      true if participation confirmation is disabled, false otherwise.
      */
     public boolean disabledConfirmation(Game game) {
         switch (game.getStatus()) {

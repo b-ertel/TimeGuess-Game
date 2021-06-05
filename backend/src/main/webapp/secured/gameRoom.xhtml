@@ -189,50 +189,50 @@
             user="#{sessionInfoBean.currentUser.id}">
 
             <p:ajax event="startRound"
-                update=":gameRoundForm:roundInfo"
-                listener="#{gameRoundController.startRound()}"/>
+                listener="#{gameRoundController.startRound()}"
+                update=":gameRoundForm:roundInfo" />
 
             <p:ajax event="endRoundViaFlip"
-                update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog"
                 listener="#{gameRoundController.endRound()}"
-                oncomplete="PF('roundValidationDialog').show()"/>
+                oncomplete="PF('roundValidationDialog').show()"
+                update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" />
 
             <p:ajax event="validatedRound"
-                onstart="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide() "
                 listener="#{gameRoundController.getNextRoundInfos()}"
+                oncomplete="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide()"
                 update="@all" />
 
             <p:ajax event="endRoundViaCountDown"
-                update=":roundTimesUpForm:roundTimesUpDialog"
                 listener="#{gameRoundController.setInRound(false)}"
-                oncomplete="PF('roundTimesUpDialog').show()" />
+                oncomplete="PF('roundTimesUpDialog').show()"
+                update=":roundTimesUpForm:roundTimesUpDialog" />
 
             <p:ajax event="gameOver"
-                update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog"
                 onevent="PF('roundValidationDialog').hide())"
-                oncomplete="PF('gameOverDialog').show()" />
+                oncomplete="PF('gameOverDialog').show()"
+                update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog" />
 
             <p:ajax event="termsOver"
-                render=":gameRoundForm:roundInfo :termOverForm:termOverDialog"
                 onevent="PF('roundValidationDialog').hide()) PF('roundTimesUpDialog').hide()"
-                oncomplete="PF('termOverDialog').show()" />
+                oncomplete="PF('termOverDialog').show()"
+                update=":gameRoundForm:roundInfo :termOverForm:termOverDialog" />
 
             <p:ajax event="gameCanceled"
-                update=":gameRoundForm:roundInfo :gameCanceledForm:gameCanceledDialog"
                 onevent="PF('roundValidationDialog').hide())"
-                oncomplete="PF('gameCanceledDialog').show()" />
+                oncomplete="PF('gameCanceledDialog').show()"
+                update=":gameRoundForm:roundInfo :gameCanceledForm:gameCanceledDialog" />
 
             <p:ajax event="startGame"
-                update="@all"
-                listener="#{gameRoundController.setup()}" />
+                listener="#{gameRoundController.setup()}"
+                update="@all" />
 
             <p:ajax event="restartGame"
-                update="@all"
-                listener="#{gameRoundController.setup()}" />
+                listener="#{gameRoundController.setup()}"
+                update="@all" />
 
             <p:ajax event="pauseGame"
-                update="@all"
-                listener="#{gameRoundController.destroy()}" />
+                listener="#{gameRoundController.destroy()}"
+                update="@all" />
 
             <p:ajax event="setup"
                 listener="#{gameRoundController.setup()}" />

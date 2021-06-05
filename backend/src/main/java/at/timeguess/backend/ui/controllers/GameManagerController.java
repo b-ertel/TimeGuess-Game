@@ -1,19 +1,25 @@
 package at.timeguess.backend.ui.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import at.timeguess.backend.events.ChannelPresenceEvent;
@@ -53,6 +59,8 @@ public class GameManagerController {
     @CDIAutowired
     private WebSocketManager websocketManager;
     @Autowired
+    private AuthenticationManager authManager;
+    @Autowired
     private ConfiguredFacetsEventListener configuredfacetsEventListener;
     @Autowired
     private ChannelPresenceEventListener channelPresenceEventListener;
@@ -63,11 +71,8 @@ public class GameManagerController {
     private Consumer<ChannelPresenceEvent> consumerChannelPresenceEvent =
         (cpEvent) -> GameManagerController.this.onChannelPresenceEvent(cpEvent);
 
-    private Map<Game, Round> currentRound = new ConcurrentHashMap<>();
-    private Map<Game, Boolean> midValidation = new ConcurrentHashMap<>();
-    private Map<Game, Boolean> activeRound = new ConcurrentHashMap<>(); // indicates if a round is currently played in a certain game
-    private Map<Game, Integer> presentTeams = new ConcurrentHashMap<>();
-    private Map<Cube, Game> listOfGames = new ConcurrentHashMap<>();
+    // contains all current games with states
+    private Status status = new Status();
 
     @PostConstruct
     public void setup() {
@@ -86,20 +91,19 @@ public class GameManagerController {
      * Method is called on facet-event, checks to which game the event belongs and estimates whether a round should start or end.
      */
     public synchronized void onConfiguredFacetsEvent(ConfiguredFacetsEvent configuredFacetsEvent) {
-        if (listOfGames.keySet().contains(configuredFacetsEvent.getCube())) {
-            Game game = listOfGames.get(configuredFacetsEvent.getCube());
+        if (status.containsCube(configuredFacetsEvent.getCube())) {
+            GameData data = status.getGameDataReloaded(configuredFacetsEvent.getCube());
 
-            if (game.getStatus().equals(GameState.PLAYED)) {   // checks if game is in state PLAYED otherwise there should not be started a new round
-                if (!midValidation.get(game)) {
-                    if (!activeRound.get(game)) {
-                        activeRound.put(game, true);
-                        startRoundByCube(game, currentRound.get(game), configuredFacetsEvent.getCubeFace());
-                    }
-                    else {
-                        activeRound.put(game, false);
-                        midValidation.put(game, true);
-                        sendGameMessage(game, "endRoundViaFlip");
-                    }
+            // only act if game is currently played
+            if (data != null && data.game.getStatus() == GameState.PLAYED && !data.isValidating) {
+                data.isRoundActive = !data.isRoundActive;
+
+                if (data.isRoundActive) {
+                    startRoundByCube(data, configuredFacetsEvent.getCubeFace());
+                }
+                else {
+                    data.isValidating = true;
+                    endRoundByCube(data, configuredFacetsEvent.getCubeFace());
                 }
             }
         }
@@ -109,159 +113,72 @@ public class GameManagerController {
      * A method for processing a {@link ChannelPresenceEvent}.
      * Checks for each game currently to be played whether enough players are present and sets the games state accordingly.
      * Is called by a channel supervisor when players enter or leave the game room.
-     * @apiNote Game should be saved here, but cannot for missing authentication context.
      */
     public synchronized void onChannelPresenceEvent(ChannelPresenceEvent channelPresenceEvent) {
         if (!channelPresenceEvent.getChannel().equals("newRoundChannel")) return;
 
         final Set<Long> userIds = channelPresenceEvent.getUserIds();
-        for (Game game : this.listOfGames.values()) {
+        status.reloaded().forEach(data -> {
             // count present teams
-            Set<Team> teams = game.getTeams();
-            int countTeams = teams.size();
-            int counter = 0;
-            for (Team team : teams) {
-                if (team.getTeamMembers().stream().anyMatch(u -> userIds.contains(u.getId()))) counter++;
-            }
-            presentTeams.put(game, counter);
+            data.updateTeamPresence(userIds);
 
-            // switch state if appropriate
-            GameState preStatus = game.getStatus();
-            if (preStatus == GameState.VALID_SETUP || preStatus == GameState.PLAYED) {
-                game.setStatus(counter < countTeams ? GameState.VALID_SETUP : GameState.PLAYED);
-            }
-            
-            // TODO: save game to keep db up-to-date
-            // game = saveGame(game);
-
-            // act according to current state
-            switch (game.getStatus()) {
-                case PLAYED:
-                    switch (preStatus) {
-                        case PLAYED:
-                            sendGameMessage(game, isGameMidRound(game) ? "setup" : "setupandupdate");
-                            break;
-
-                        default:
-                            if (currentRound.containsKey(game)) {
-                                sendGameMessage(game, "restartGame");
-                            }
-                            else {
-                                getNextRoundInfo(game);
-                                sendGameMessage(game, "startGame");
-                            }
-                            break;
-                    }
-                    break;
-
-                case CANCELED:
-                    endGame(game, false);
-                    sendGameMessage(game, "gameCanceled");
-                    break;
-                    
-                default:
-                    sendGameMessage(game, "pauseGame");
-                    break;
-            }
-        }
+            // switch state if appropriate and act according to change
+            switchGameState(data);
+        });
     }
 
     /**
-     * Method that starts a new Round by the cube for a game.
-     * It initializes a new round and also calls a method to start the countdown.
-     * @param currentGame, game for which round should be started
-     * @param cubeFace face that sets round parameter
-     */
-    public void startRoundByCube(Game game, Round round, CubeFace cubeFace) {
-        this.currentRound.put(game, gameLogic.getCubeInfosIntoRound(round, cubeFace));
-        sendGameMessage(game, "startRound");
-    }
-
-    /**
-     * Method to get Informations of next round, before cube starts the round
-     * @param game game for which informations of next round should be estimated
-     */
-    public void getNextRoundInfo(Game game) {
-        this.currentRound.put(game, gameLogic.getNextRound(game));
-    }
-
-    public Round getCurrentRoundOfGame(Game game) {
-        return this.currentRound.get(game);
-    }
-
-    /**
-     * method to get the current round for a given user, called by {@link UserGameController}
-     * @param  user to find current round
-     * @return current round
-     */
-    public Round getCurrentRoundForUser(User user) {
-        Round round = new Round();
-        for (Map.Entry<Game, Round> e : currentRound.entrySet()) {
-            for (Team t : e.getKey().getTeams()) {
-                if (t.getTeamMembers().contains(user)) {
-                    round = e.getValue();
-                    break;
-                }
-            }
-        }
-        return round;
-    }
-
-    /**
-     * A method to put all usernames of players, that are online, into a list
-     * @param  listOfTeams
-     * @return list of usernames
-     */
-    private List<Long> getAllUserIdsOfGameTeams(Set<Team> listOfTeams) {
-        List<Long> userIds = new ArrayList<>();
-        List<User> users = new ArrayList<>();
-        for (Team team : listOfTeams) {
-            users.addAll(team.getTeamMembers());
-        }
-        users.stream().forEach(user -> userIds.add(user.getId()));
-        return userIds;
-    }
-
-    /**
-     * find the game in which a given user is currently playing, called by{@link CouuntDownController}
+     * Method to find the game in which a given user is currently playing, called by{@link CountDownController}
      * @param  user to find current game
      * @return current game
      */
     public Game getCurrentGameForUser(User user) {
-        for (Game g : this.listOfGames.values()) {
-            for (Team t : g.getTeams()) {
-                if (t.getTeamMembers().contains(user)) {
-                    return g;
-                }
-            }
-        }
-        return null;
+        Optional<GameData> data = status.getGameDataForUser(user);
+        return data.isPresent() ? data.get().game : null;
+    }
+
+    /**
+     * Method to get the current round for a given user, called by {@link GameRoundController}
+     * @param  user to find current round
+     * @return current round
+     */
+    public Round getCurrentRoundForUser(User user) {
+        Optional<GameData> data = status.getGameDataForUser(user);
+        return data.isPresent() ? data.get().currentRound : new Round();
+    }
+
+    /**
+     * Checks if the given cube is currently in use.
+     * @param  cube to find game for
+     * @return
+     */
+    public boolean hasCurrentGameForCube(Cube cube) {
+        return status.containsCube(cube);
     }
 
     /**
      * Method to add a newly created game to the saved list of currently available games
-     * and send notifications to all participating team members, except the game creator.
+     * and send notifications to all participating team members.
      * @param game
      */
     public void addGame(Game game) {
-        if (game == null) throw new NullPointerException("startGame was called with null game");
-
-        // change game status
-        game.setStatus(GameState.VALID_SETUP);
-        game = gameService.saveGame(game);
-
-        if (game != null) {
-            // add game to map
-            listOfGames.put(game.getCube(), game);
-            activeRound.put(game, false);
-            midValidation.put(game, false);
+        // add game to internal list and change game status
+        if (status.addGame(game)) {
 
             // send invitation to all contained team members
-            Set<Long> invited = game.getTeams().stream().flatMap(t -> t.getTeamMembers().stream().map(User::getId))
-                .collect(Collectors.toSet());
-            websocketManager.getMessageChannel()
-                .send(Map.of("type", "gameInvitation", "name", game.getName(), "id", game.getId()), invited);
+            websocketManager.getMessageChannel().send(
+                Map.of("type", "gameInvitation", "name", game.getName(), "id", game.getId()),
+                getAllUserIdsOfGameTeams(game));
         }
+    }
+
+    /**
+     * Method to switch from active to validating round, called by {@link CountDownController}
+     * @param user user to find current round for
+     */
+    public void endRoundByCountDown(User user) {
+        // put the round inactive to enable starting a new round via flip
+        endRoundByCountDown(status.getGameDataForUser(user).orElse(null));
     }
 
     /**
@@ -272,72 +189,39 @@ public class GameManagerController {
      * @param v validation of round
      */
     public void validateRoundOfGame(Game game, Validation v) {
-        gameLogic.saveLastRound(game, v);
-        this.listOfGames.put(getCubeByGame(game), game);
-        midValidation.put(game, false);
-        if (gameLogic.teamReachedMaxPoints(game, this.currentRound.get(game).getGuessingTeam())) {
-            endGame(game, true);
-            sendGameMessage(game, "gameOver");
-        }
-        else {
-            if (!gameLogic.stillTermsAvailable(game)) {
-                Team winningTeam = gameLogic.getTeamWithMostPoints(game);
-                game.setMaxPoints(roundService.getPointsOfTeamInGame(game, winningTeam));
-                endGame(game, true);
-                sendGameMessage(game, "termsOver");
+        GameData data = status.getGameDataReloaded(game);
+
+        // only act if game is currently played
+        if (data != null && data.game.getStatus() == GameState.PLAYED && data.isValidating) {
+            gameLogic.saveLastRound(data.game, v);
+            data.isValidating = false;
+
+            if (gameLogic.teamReachedMaxPoints(data.game, data.currentRound.getGuessingTeam())) {
+                endGameFinished(data);
+            }
+            else if (gameLogic.stillTermsAvailable(data.game)) {
+                endRoundValidated(data);
             }
             else {
-                getNextRoundInfo(this.listOfGames.get(getCubeByGame(game)));
-                sendGameMessage(game, "validatedRound");
+                endGameTermsOver(data);
             }
         }
     }
 
     /**
-     * Method to get the cube that corresponds to a game
-     * @param  game game to find cube of
-     * @return cube of the game
+     * called by {@link CubeStatusController} if Cube is offline -> GameStatus should be put to {@link GameState#VALID_SETUP}
+     * @param cube which is offline
      */
-    private Cube getCubeByGame(Game game) {
-        for (Entry<Cube, Game> e : this.listOfGames.entrySet()) {
-            if (e.getValue().equals(game)) {
-                return e.getKey();
-            }
-        }
-        return null;
-    }
-
-    public void setActiveRoundFalse(Game game) {
-        this.activeRound.put(game, false);
-    }
-
-    public void setMidValidationTrue(Game game) {
-        this.midValidation.put(game, true);
+    public void cubeOffline(Cube cube) {
+        switchGameState(status.setCubeState(cube, false));
     }
 
     /**
-     * Method to end the game. Sets status to finished, saves it in the database
-     * and removes it from all maps in controller
-     * @param game game that finishes
+     * called by {@link CubeStatusController} if Cube is online -> GameStatus should be put to PLAYED if otherwise appropriate
+     * @param cube which is online
      */
-    public void endGame(Game game, boolean finished) {
-        game.setStatus(finished ? GameState.FINISHED : GameState.CANCELED);
-        if (finished) gameService.saveGame(game);
-
-        this.listOfGames.remove(getCubeByGame(game));
-        this.currentRound.remove(game);
-        this.activeRound.remove(game);
-        this.midValidation.remove(game);
-        this.presentTeams.remove(game);
-    }
-
-    /**
-     * finds a game with a given cube
-     * @param  cube to find the game
-     * @return the game
-     */
-    public Game getCurrentGameForCube(Cube cube) {
-        return this.listOfGames.get(cube);
+    public void cubeOnline(Cube cube) {
+        switchGameState(status.setCubeState(cube, true));
     }
 
     /**
@@ -346,47 +230,378 @@ public class GameManagerController {
      * @param cube to report to the current game
      */
     public void healthNotification(Cube cube) {
-        Game game = getCurrentGameForCube(cube);
-        sendGameMessage(game, "healthMessage");
+        sendHealthNotification(status.getGameData(cube));
     }
 
     /**
-     * called by {@link CubeStatusController} if Cube is offline -> GameStatus should be put to {@link GameState#VALID_SETUP}
-     * @param cube which is offline
+     * Method to put all usernames of players, that are online, into a list
+     * @param  listOfTeams
+     * @return list of user ids
      */
-    public void cubeOffline(Cube cube) {
-        if (listOfGames.containsKey(cube)) {
-            Game game = listOfGames.get(cube);
-            if (game.getStatus() == GameState.PLAYED) game.setStatus(GameState.VALID_SETUP);
+    private Set<Long> getAllUserIdsOfGameTeams(Game game) {
+        return game.getTeams().stream()
+            .flatMap(t -> t.getTeamMembers().stream().map(User::getId))
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * Switches the state of the given game and acts according to a change if necessary.
+     * @param data
+     */
+    private void switchGameState(GameData data) {
+        if (data == null) return;
+
+        GameState oldState = data.game.getStatus();
+
+        switch (status.switchGameState(data)) {
+            case PLAYED:
+                switch (oldState) {
+                    case PLAYED:
+                        setupGame(data);
+                        break;
+
+                    default:
+                        if (data.currentRound == null) {
+                            startGame(data);
+                        }
+                        else {
+                            restartGame(data);
+                        }
+                        break;
+                }
+                break;
+
+            case CANCELED:
+                endGameCanceled(data);
+                break;
+
+            default:
+                pauseGame(data);
+                break;
+        }
+    }
+
+    /* --- start - push message sending functions --- */
+    private void setupGame(GameData data) {
+        sendGameMessage(data.game, data.isRoundActive || data.isValidating ? "setup" : "setupandupdate");
+    }
+
+    /**
+     * Method to get informations of next round, before cube starts the round
+     * @param data data of game for which informations of next round should be estimated
+     */
+    private void startGame(GameData data) {
+        data.currentRound = gameLogic.getNextRound(data.game);
+        sendGameMessage(data.game, "startGame");
+    }
+
+    private void restartGame(GameData data) {
+        sendGameMessage(data.game, "restartGame");
+    }
+
+    private void pauseGame(GameData data) {
+        sendGameMessage(data.game, "pauseGame");
+    }
+
+    private void endGameCanceled(GameData data) {
+        status.endGame(data, false);
+        sendGameMessage(data.game, "gameCanceled");
+    }
+
+    private void endGameFinished(GameData data) {
+        status.endGame(data, true);
+        sendGameMessage(data.game, "gameOver");
+    }
+
+    private void endGameTermsOver(GameData data) {
+        Team winningTeam = gameLogic.getTeamWithMostPoints(data.game);
+        data.game.setMaxPoints(roundService.getPointsOfTeamInGame(data.game, winningTeam));
+
+        status.endGame(data, true);
+        sendGameMessage(data.game, "termsOver");
+    }
+
+    /**
+     * Method that starts a new Round by the cube for a game.
+     * It initializes a new round and also calls a method to start the countdown.
+     * @param data     data of game for which round should be started
+     * @param cubeFace face that sets round parameters
+     */
+    private void startRoundByCube(GameData data, CubeFace cubeFace) {
+        data.currentRound = gameLogic.getCubeInfosIntoRound(data.currentRound, cubeFace);
+        sendGameMessage(data.game, "startRound");
+    }
+
+    private void endRoundByCube(GameData data, CubeFace cubeFace) {
+        sendGameMessage(data.game, "endRoundViaFlip");
+    }
+
+    private void endRoundByCountDown(GameData data) {
+        // send countdown ended only on first call, but avoid inconsistency in properties
+        if (data != null && (!data.isValidating || data.isRoundActive)) {
+            data.isValidating = true;
+            data.isRoundActive = false;
+            sendGameMessage(data.game, "endRoundViaCountDown");
         }
     }
 
     /**
-     * called by {@link CubeStatusController} if Cube is online -> GameStatus should be put to PLAYED if otherwise appropriate
-     * @param cube which is online
+     * Method to get informations of next round, before cube starts the round
+     * @param data data of game for which informations of next round should be estimated
      */
-    public void cubeOnline(Cube cube) {
-        if (listOfGames.containsKey(cube)) {
-            Game game = listOfGames.get(cube);
-            if (game.getStatus() == GameState.VALID_SETUP && presentTeams.get(game) >= game.getTeamCount()) {
-                game.setStatus(GameState.PLAYED);
+    private void endRoundValidated(GameData data) {
+        data.currentRound = gameLogic.getNextRound(data.game);
+        sendGameMessage(data.game, "validatedRound");
+    }
+
+    public void sendHealthNotification(GameData data) {
+        if (data != null) sendGameMessage(data.game, "healthMessage");
+    }
+
+    private void sendGameMessage(Game game, String message) {
+        if (game != null) { this.websocketManager.getNewRoundChannel().send(message, getAllUserIdsOfGameTeams(game)); }
+    }
+    /* --- end - push message sending functions --- */
+
+    private class Status implements Iterable<GameData> {
+
+        private Map<Cube, GameData> cube2Game = new ConcurrentHashMap<>();
+
+        private static final String DEFAULT_USER = "system";
+        private static final String DEFAULT_PASSWORD = "passwd";
+
+        public boolean containsCube(Cube cube) {
+            return cube2Game.containsKey(cube);
+        }
+
+        public GameData getGameData(Cube cube) {
+            return getGameData(cube, false);
+        }
+
+        @SuppressWarnings("unused")
+        public GameData getGameData(Game game) {
+            return getGameData(game, false);
+        }
+
+        public GameData getGameDataReloaded(Cube cube) {
+            return getGameData(cube, true);
+        }
+
+        public GameData getGameDataReloaded(Game game) {
+            return getGameData(game, true);
+        }
+
+        public Optional<GameData> getGameDataForUser(User user) {
+            return cube2Game.values().stream()
+                .filter(gd -> gd.game.getTeams().stream().anyMatch(t -> t.getTeamMembers().contains(user)))
+                .findFirst();
+        }
+
+        public GameData setCubeState(Cube cube, boolean isOnline) {
+            GameData data = getGameData(cube);
+            if (data != null) data.isCubeOnline = isOnline;
+            return data;
+        }
+
+        /**
+         * Switches the given games state if appropriate and saves the game.
+         * @return game status after possibly changing it and saving the game
+         */
+        public GameState switchGameState(GameData data) {
+            GameState ret = data.game.getStatus();
+            switch (ret) {
+                case VALID_SETUP:
+                case PLAYED:
+                    //GameState newState = data.isTeamsPresent && data.isCubeOnline ?
+                    GameState newState = data.isTeamsPresent ? GameState.PLAYED : GameState.VALID_SETUP;
+                    Game game = setGameState(data.game, newState);
+                    //problematic: if (game != null) data.game = game;
+                    assert newState == game.getStatus();
+                    return newState;
+
+                default:
+                    return ret;
+            }
+        }
+
+        /**
+         * Adds the given game to the inner list, sets its state to {@link GameState#VALID_SETUP} and saves it.
+         * @param  game
+         * @throws IllegalArgumentException if game is null
+         * @throws IllegalArgumentException if game is not in state {@link GameState#SETUP}
+         * @throws IllegalArgumentException if set cube is already associated with another contained game
+         */
+        @SuppressWarnings("unlikely-arg-type")
+        public boolean addGame(Game game) {
+            if (game == null)
+                throw new IllegalArgumentException("Game must not be null");
+
+            // check correct initial state
+            if (game.getStatus() != GameState.SETUP)
+                throw new IllegalArgumentException(String.format(
+                    "Game %s is in state %s, must be in %s state for adding", game, game.getStatus(), GameState.SETUP));
+
+            // check cube already in use
+            Cube cube = game.getCube();
+            if (cube2Game.containsKey(cube) && !cube2Game.equals(game))
+                throw new IllegalArgumentException(
+                    String.format("Cube %s is already in use for game %s", cube, cube2Game.get(cube)));
+
+            // save new gamestate, on error revert state
+            Game ret = setGameState(game, GameState.VALID_SETUP);
+            if (ret == null) return false;
+
+            // put into internal list tied to cube
+            cube2Game.put(cube, new GameData(game));
+            return true;
+        }
+
+        /**
+         * Ends the game. Sets its status to finished, saves it in the database
+         * and removes it from the inner list.
+         * @param game game that finishes
+         */
+        public void endGame(GameData data, boolean finished) {
+            setGameState(data.game, finished ? GameState.FINISHED : GameState.CANCELED);
+            cube2Game.remove(data.game.getCube());
+        }
+
+        @Override
+        public Iterator<GameData> iterator() {
+            return cube2Game.values().iterator();
+        }
+
+        public Stream<GameData> reloaded() {
+            return cube2Game.values().stream().map(gd -> reload(gd));
+        }
+
+        private GameData getGameData(Cube cube, boolean reload) {
+            GameData data = cube2Game.get(cube);
+            if (reload) data = reload(data);
+            return data;
+        }
+
+        private GameData getGameData(Game game, boolean reload) {
+            return game == null ? null : getGameData(game.getCube(), reload);
+        }
+
+        /**
+         * Reloads the given instances game from db and return the input value for convenience.
+         * @param  data instance to reload
+         * @return given instance reloaded
+         */
+        private GameData reload(GameData data) {
+            if (data == null) return null;
+
+            // ensure authenticated (is not the case when called from presence event)
+            setAuthenticatedUserDefault();
+
+            // transfer relevant (possibly changed outside) values from fresh instance
+            // to saved one, the other way around rounds cannot be saved
+            // => hibernate exception 'detached entity passed to persist'
+            Game game = gameService.loadGame(data.game.getId());
+            if (game != null) {
+                data.game.setName(game.getName());
+                data.game.setMaxPoints(game.getMaxPoints());
+                data.game.setTopic(game.getTopic());
+                data.game.setStatus(game.getStatus());
+            }
+            return data;
+        }
+
+        /**
+         * Tries to save given game with given state, on error resets old state in instance.
+         * @param  game  game to save with given state
+         * @param  state state to save in given game
+         * @return       saved game or null if given game could not be saved,
+         *               given game if state is already set
+         */
+        private Game setGameState(Game game, GameState newState) {
+            GameState oldState = game.getStatus();
+            if (oldState != newState) {
+                setAuthenticatedUserDefault();
+                game.setStatus(newState);
+                Game ret = gameService.saveGame(game);
+                if (ret == null) game.setStatus(oldState);
+                return ret;
+            }
+            return game;
+        }
+
+        private void setAuthenticatedUserDefault() {
+            SecurityContext context = SecurityContextHolder.getContext();
+            Authentication auth = context.getAuthentication();
+            if (auth == null) {
+                auth = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(DEFAULT_USER, DEFAULT_PASSWORD));
+                context.setAuthentication(auth);
             }
         }
     }
 
-    private boolean isGameMidRound(Game game) {
-        if (this.activeRound.get(game)) {
-            return true;
-        }
-        if (this.midValidation.get(game)) {
-            return true;
-        }
-        return false;
-    }
+    public static class GameData {
 
-    private void sendGameMessage(Game game, String message) {
-        if (game != null) {
-            this.websocketManager.getNewRoundChannel().send(message, getAllUserIdsOfGameTeams(game.getTeams()));
+        final Game game;
+        Round currentRound = null;
+        boolean isRoundActive = false;
+        boolean isValidating = false;
+        boolean isTeamsPresent = false;
+        // must assume that cube is online in the first place
+        // because online-message is not sent often enough to start with false (game would have to wait for it...)
+        boolean isCubeOnline = true;
+
+        public GameData(Game game) {
+            if (game == null) throw new IllegalArgumentException("Cannot hold null game");
+            this.game = game;
+        }
+
+        /**
+         * Calculates the number of present teams from the given list of user ids
+         * and sets its internal field accordingly.
+         * @param userIds
+         */
+        public void updateTeamPresence(Set<Long> userIds) {
+            // count present teams (one player per team must be present)
+            Set<Team> teams = game.getTeams();
+            long count = teams.stream().filter(t -> t.getTeamMembers().stream()
+                .anyMatch(u -> userIds.contains(u.getId()))).count();
+
+            isTeamsPresent = count >= game.getTeamCount();
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 11;
+            int result = 57;
+            result = prime * result + (game == null ? 0 : game.hashCode());
+            return result;
+        }
+
+        /**
+         * Checks for equality with itself or the held game.
+         * @return true if obj is or holds the same game, false otherwise.
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+
+            if (obj == null)
+                return false;
+
+            if (obj.getClass() == Game.class) { final Game other = (Game) obj; return Objects.equals(game, other); }
+
+            if (obj.getClass() == GameData.class) {
+                final GameData other = (GameData) obj;
+                return Objects.equals(game, other.game);
+            }
+
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("GameData<%s>", game);
         }
     }
 }

@@ -209,11 +209,11 @@ public class UserService {
 
             if (websocketManager != null)
                 websocketManager.getUserRegistrationChannel().send(
-                        Map.of("type", "userUpdate", "name", user.getUsername(), "id", user.getId()));
+                    Map.of("type", "userUpdate", "name", user.getUsername(), "id", user.getId()));
 
             if (auth == null) auth = ret;
             LOGGER.info("User '{}' (id={}) was {} by User '{}' (id={})", ret.getUsername(), ret.getId(),
-                    isNew ? "created" : "updated", auth.getUsername(), auth.getId());
+                isNew ? "created" : "updated", auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
             String msg = "Saving user failed";
@@ -236,22 +236,22 @@ public class UserService {
     public void deleteUser(User user) {
         try {
             userRepository.delete(user);
-            
+
             // very weird behaviour: the following kind of exception should be thrown
             // but instead just nothing happens... so do-it-yourself
             if (this.hasUser(user.getUsername()))
-                    throw new DataIntegrityViolationException("Delete failed without throwing an exception");
+                throw new DataIntegrityViolationException("Delete failed without throwing an exception");
 
             // fill ui message, send update and log
             messageBean.alertInformation(user.getUsername(), "User was deleted");
 
             if (websocketManager != null)
-                websocketManager.getUserRegistrationChannel()
-                    .send(Map.of("type", "userUpdate", "name", user.getUsername(), "id", user.getId()));
+                websocketManager.getUserRegistrationChannel().send(
+                    Map.of("type", "userUpdate", "name", user.getUsername(), "id", user.getId()));
 
             User auth = getAuthenticatedUser();
             LOGGER.info("User '{}' (id={}) was deleted by User '{}' (id={})", user.getUsername(), user.getId(),
-                    auth.getUsername(), auth.getId());
+                auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
             messageBean.alertErrorFailValidation(user.getUsername(), "Deleting user failed");
@@ -266,7 +266,12 @@ public class UserService {
      */
     User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return userRepository.findFirstByUsername(auth.getName());
+        User user = userRepository.findFirstByUsername(auth.getName());
+        if (user == null && !auth.getName().startsWith("anonymous")) {
+            user = new User();
+            user.setUsername(auth.getName());
+        }
+        return user;
     }
 
     private User getAdminUser() {

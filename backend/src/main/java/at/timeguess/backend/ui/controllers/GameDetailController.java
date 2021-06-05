@@ -90,29 +90,25 @@ public class GameDetailController implements Serializable {
     }
 
     /**
-     * Return the
+     * Return the possible state transitions from the current one.
      * @return
      */
     public Set<GameState> getPossNextStates() {
         EnumSet<GameState> poss = EnumSet.noneOf(GameState.class);
         // always include current state in list of options
-        // always allow cancellation
         poss.add(game.getStatus());
-        poss.add(GameState.CANCELED);
         switch (game.getStatus()) {
             case SETUP:
-                poss.add(GameState.VALID_SETUP);
+                poss.add(GameState.CANCELED);
                 break;
             case VALID_SETUP:
-                poss.add(GameState.PLAYED);
-                poss.add(GameState.HALTED);
-                break;
             case PLAYED:
                 poss.add(GameState.HALTED);
-                poss.add(GameState.FINISHED);
+                poss.add(GameState.CANCELED);
                 break;
             case HALTED:
-                poss.add(GameState.PLAYED);
+                poss.add(GameState.VALID_SETUP);
+                poss.add(GameState.CANCELED);
                 break;
             default:
                 break;
@@ -122,7 +118,7 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if state can change from the saved to the given.
-     * @param next
+     * @param  next
      * @return
      */
     public boolean canTraverse(GameState next) {
@@ -131,7 +127,7 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if the given team is currently playing in any other than the saved game or not.
-     * @param team
+     * @param  team
      * @return
      */
     public boolean isAvailableTeam(Team team) {
@@ -144,6 +140,7 @@ public class GameDetailController implements Serializable {
      */
     public boolean isLockedMaxPoints() {
         switch (game.getStatus()) {
+            case VALID_SETUP:
             case PLAYED:
             case FINISHED:
             case CANCELED:
@@ -159,8 +156,8 @@ public class GameDetailController implements Serializable {
      */
     public boolean isLockedTopic() {
         switch (game.getStatus()) {
+            case VALID_SETUP:
             case PLAYED:
-            case HALTED:
             case FINISHED:
             case CANCELED:
                 return true;
@@ -175,6 +172,7 @@ public class GameDetailController implements Serializable {
      */
     public boolean isLockedTeam() {
         switch (game.getStatus()) {
+            case VALID_SETUP:
             case PLAYED:
             case HALTED:
             case FINISHED:
@@ -191,7 +189,9 @@ public class GameDetailController implements Serializable {
      */
     public boolean isLockedCube() {
         switch (game.getStatus()) {
+            case VALID_SETUP:
             case PLAYED:
+            case HALTED:
             case FINISHED:
             case CANCELED:
                 return true;
@@ -212,8 +212,10 @@ public class GameDetailController implements Serializable {
      * Action to force a reload of the currently displayed game.
      */
     public void doReloadGame() {
-        game = gameService.loadGame(game.getId());
-        orgCube = game.getCube();
+        if (game != null) {
+            game = gameService.loadGame(game.getId());
+            orgCube = game.getCube();
+        }
     }
 
     /**

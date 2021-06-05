@@ -14,7 +14,7 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
 
     /**
      * to find open games (GameState.VALID_SETUP), active (GameState.PLAYED), finished (GameState.FINISHED)
-     * @param status
+     * @param  status
      * @return
      */
     @Query("SELECT g FROM Game g WHERE :status =  g.status")
@@ -22,7 +22,7 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
 
     /**
      * Returns the count of games for the given topic id.
-     * @param topicid
+     * @param  topicid
      * @return
      */
     int countByTopicId(long topicid);
@@ -31,10 +31,11 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     List<Object[]> getTopicAndOccurency();
 
     /**
-     * Returns a list of all games currently in state ({@link GameState#VALID_SETUP} or {@link GameState#PLAYED}.
+     * Returns a list of all games currently not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP},
+     * {@link GameState#PLAYED}, {@link GameState#HALTED}).
      * @return
      */
-    @Query("SELECT g FROM Game g WHERE g.status IN (2, 3)")
+    @Query("SELECT g FROM Game g WHERE g.status IN (0, 1, 2, 3)")
     List<Game> findAllCurrent();
 
     /**
@@ -45,17 +46,17 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     List<Game> findByUserAll(User user);
 
     /**
-     * Returns a list of all games the given user is associated to, which are currently in
-     * setup state ({@link GameState#SETUP} or {@link GameState#VALID_SETUP}.
+     * Returns a list of all games the given user is associated to, which are currently not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP},
+     * {@link GameState#PLAYED}, {@link GameState#HALTED}).
      * @return
      */
-    @Query("SELECT g FROM Game g JOIN g.teams t JOIN t.team.teamMembers u WHERE u = ?1 AND g.status IN (0, 1)")
+    @Query("SELECT g FROM Game g JOIN g.teams t JOIN t.team.teamMembers u WHERE u = ?1 AND g.status IN (0, 1, 2, 3)")
     List<Game> findByUserCurrent(User user);
 
     /**
      * Checks if given user is participating in given game.
-     * @param user
-     * @param game
+     * @param  user
+     * @param  game
      * @return
      */
     @Query("SELECT CASE WHEN COUNT(g) > 0 THEN true ELSE false END FROM Game g JOIN g.teams t JOIN t.team.teamMembers u WHERE u = ?1 AND g = ?2")

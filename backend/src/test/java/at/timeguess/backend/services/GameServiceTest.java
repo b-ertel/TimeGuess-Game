@@ -301,7 +301,7 @@ public class GameServiceTest {
     @Test
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetAllCurrent() {
-        List<Game> expected = createEntities(TestSetup::createGame, Arrays.asList(5L, 8L, 9L));
+        List<Game> expected = createEntities(TestSetup::createGame, Arrays.asList(5L, 6L, 7L, 8L, 9L));
         List<Game> result = gameService.getAllCurrent();
 
         assertLists(expected, result);
@@ -328,7 +328,7 @@ public class GameServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "1|", "2|", "3|6", "4|", "5|", "6|6", "7|", "8|", "9|6", "10|6" })
+    @CsvSource(delimiter = '|', value = { "1|", "2|5;9", "3|6;9", "4|", "5|8", "6|6;8", "7|5;8", "8|5;8", "9|6;9", "10|5;6;9" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetByUserCurrent(long userId, String gamesIdsExpected) {
         List<Game> expected = createEntities(TestSetup::createGame, gamesIdsExpected);
