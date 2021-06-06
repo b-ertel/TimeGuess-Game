@@ -14,6 +14,9 @@ public class MessageSender {
     private static final String FACETS_API_PATH = "/api/facets";
     private static final String STATUS_API_PATH = "/api/status";
 
+    private static final String USERNAME = "cube";
+    private static final String PASSWORD = "passwd";
+
     private static final Logger LOGGER = Logger.getLogger("at.timeguess.raspberry");
 
     private String backendUrl;
@@ -45,6 +48,7 @@ public class MessageSender {
             Unirest.post(backendUrl + FACETS_API_PATH)
                     .header("Content-Type", "application/json")
                     .body(body)
+                    .basicAuth(USERNAME, PASSWORD)
                     .asEmpty()
                     .ifSuccess(response -> {
                         LOGGER.info("Facets message successfully processed by backend.");
@@ -76,6 +80,7 @@ public class MessageSender {
             Unirest.post(backendUrl + STATUS_API_PATH)
                     .header("Content-Type", "application/json")
                     .body(body)
+                    .basicAuth(USERNAME, PASSWORD)
                     .asJson()
                     .ifSuccess(response -> {
                         LOGGER.info("Status message successfully processed by backend.");
