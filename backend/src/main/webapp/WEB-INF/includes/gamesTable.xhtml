@@ -45,6 +45,7 @@
                                 <p:commandLink title="Info" oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog :msg">
                                     <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                                     <f:setPropertyActionListener value="#{game}" target="#{teamMemberBean.game}" />
+                                    <f:setPropertyActionListener value="#{game}" target="#{gameInfoBean.game}" />
                                     <p:graphicImage name="images/game.jpg" />
                                 </p:commandLink>
                                 <div class="game-name">#{game.name}</div>
@@ -67,6 +68,7 @@
                             <p:commandLink title="Info" oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog">
                                 <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                                 <f:setPropertyActionListener value="#{game}" target="#{teamMemberBean.game}" />
+                                <f:setPropertyActionListener value="#{game}" target="#{gameInfoBean.game}" />
                                 <p:graphicImage name="images/game.jpg" />
                             </p:commandLink>
                             <div class="game-list-detail">
@@ -142,6 +144,7 @@
                             oncomplete="PF('gameInfoDialog').show()" update=":gameInfoForm:gameInfoDialog :msg">
                             <f:setPropertyActionListener value="#{game}" target="#{gameDetailController.game}" />
                             <f:setPropertyActionListener value="#{game}" target="#{teamMemberBean.game}" />
+                            <f:setPropertyActionListener value="#{game}" target="#{gameInfoBean.game}" />
                         </p:commandButton>
                     </p:column>
                 </p:dataTable>
@@ -159,14 +162,14 @@
                 <o:socket channel="messageChannel" scope="session" user="#{sessionInfoBean.currentUser.id}" onmessage="socketListener" />
             </h:form>
 
-            <h:form id="gameInfoForm">
+            <h:form id="gameInfoForm" prependId="false">
                 <ui:remove>show game info</ui:remove>
                 <p:dialog header="Game Info" id="gameInfoDialog" widgetVar="gameInfoDialog" dynamic="true"
-                    modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade" width="380">
+                    modal="true" resizable="true" closeOnEscape="true" showEffect="fade" hideEffect="fade">
 
-                    <p:outputPanel id="gameInfoData" rendered="#{not empty curr}">
+                    <p:outputPanel id="gameInfoData" widgetVar="gameInfoData" rendered="#{not empty curr}">
                         <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
-                                columnClasses="p-col-6, p-col-6" contentStyleClass="ui-fluid">
+                            columnClasses="p-col-6, p-col-6" contentStyleClass="ui-fluid">
                             <p:outputLabel for="nameInfo" value="Name: "/>
                             <h:outputLabel id="nameInfo" value="#{curr.name}" styleClass="rightm10"/>
 
@@ -179,7 +182,7 @@
                         <p:separator style="margin:8px 0px 14px" />
 
                         <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
-                                columnClasses="p-col-8, p-col-4" contentStyleClass="ui-fluid">
+                            columnClasses="p-col-8, p-col-4" contentStyleClass="ui-fluid">
                             <p:outputLabel for="statusInfo" value="Status: "/>
                             <h:outputText id="statusInfo" value="#{curr.status}" styleClass="rightm10"/>
 
@@ -189,22 +192,61 @@
                         <p:separator style="margin:8px 0px 14px" />
 
                         <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
-                                columnClasses="p-col-6, p-col-6" contentStyleClass="ui-fluid">
+                            columnClasses="p-col-6, p-col-6" contentStyleClass="ui-fluid">
                             <p:outputLabel for="createUserInfo" value="Game creator: "/>
-                            <h:outputText id="createUserInfo" value="#{curr.creator.username}" styleClass="rightm10"/>                        
+                            <h:outputText id="createUserInfo" value="#{curr.creator.username}" styleClass="rightm10"/>
                         </p:panelGrid>
-
-                        <h:panelGrid columns="1" style="margin-top:3px">
-                            <p:multiSelectListbox value="#{teamMemberBean.team}" header="Teams and Players">
-                                <f:selectItems value="#{teamMemberBean.teams}" />
-                            </p:multiSelectListbox>
-                        </h:panelGrid>
-                        <p:separator style="margin:11px 0px 12px" />
-
-                        <h:panelGrid columns="1">
-                            <p:commandButton value="Abort" onclick="PF('gameInfoDialog').hide()" />
-                        </h:panelGrid>
                     </p:outputPanel>
+
+                    <h:panelGrid columns="1" style="margin-top:3px"
+                        rendered="#{isPlayer and !(isAdmin or isManager)}">
+                        <p:multiSelectListbox id="teamTable" value="#{teamMemberBean.team}" header="Teams and Players">
+                            <f:selectItems value="#{teamMemberBean.teams}" />
+                        </p:multiSelectListbox>
+                    </h:panelGrid>
+
+                    <p:treeTable id="gameInfoTable" value="#{gameInfoBean.teams}" var="team"
+                        rendered="#{isAdmin or isManager}" style="margin-top:7px">
+                        <f:facet name="header">Teams and Players</f:facet>
+                        <p:column headerText="Name" styleClass="truncate">
+                            <h:outputText value="#{team.name}" />
+                        </p:column>
+                        <p:column headerText="Rounds" style="width:12%">
+                            <h:outputText value="#{team.rounds}" />
+                        </p:column>
+                        <p:column headerText="Points" style="width:10%">
+                            <h:outputText value="#{team.points}" />
+                        </p:column>
+                    </p:treeTable>
+
+                    <p:dataTable id="roundTable" value="#{gameInfoBean.rounds}" var="round"
+                        scrollable="true" scrollHeight="100"
+                        rendered="#{isAdmin or isManager}" style="margin-top:15px">
+                        <f:facet name="header">Rounds played</f:facet>
+                        <!-- <p:column headerText="No." style="width:10%">
+                            <h:outputText value="#{round.nr}"/>
+                        </p:column> -->
+                        <p:column headerText="Term" styleClass="truncate" style="width:38%">
+                            <h:outputText value="#{round.termToGuess.name}"/>
+                        </p:column>
+                        <p:column headerText="Team" styleClass="truncate" style="width:20%">
+                            <h:outputText value="#{round.guessingTeam.name}"/>
+                        </p:column>
+                        <p:column headerText="Player" styleClass="truncate" style="width:20%">
+                            <h:outputText value="#{round.guessingUser.username}"/>
+                        </p:column>
+                        <p:column headerText="Success" style="width:12%">
+                            <p:selectBooleanCheckbox value="#{round.correctAnswer}" disabled="true" />
+                        </p:column>
+                        <p:column headerText="Points" style="width:10%">
+                            <h:outputText value="#{round.points}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <p:separator style="margin:11px 0px 12px" />
+
+                    <h:panelGrid columns="1">
+                        <p:commandButton value="Abort" onclick="PF('gameInfoDialog').hide()" />
+                    </h:panelGrid>
                 </p:dialog>
             </h:form>
 

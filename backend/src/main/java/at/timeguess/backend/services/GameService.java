@@ -103,8 +103,8 @@ public class GameService {
     /**
      * Saves the game. If the game is new the user requesting this operation will be stored as {@link Game#creator}.
      * Additionally fills gui message with success or failure info and triggers a push update.
-     * @param  game the game to save
-     * @return the saved game
+     * @param   game the game to save
+     * @return  the saved game
      * @apiNote Message handling ist done here, because this is the central place for saving games.
      */
     @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('ADMIN')")
@@ -152,8 +152,8 @@ public class GameService {
             messageBean.alertInformation(game.getName(), "Game was deleted");
 
             if (websocketManager != null)
-                websocketManager.getUserRegistrationChannel()
-                    .send(Map.of("type", "gameUpdate", "name", game.getName(), "id", game.getId()));
+                websocketManager.getUserRegistrationChannel().send(
+                    Map.of("type", "gameUpdate", "name", game.getName(), "id", game.getId()));
 
             User auth = userService.getAuthenticatedUser();
             LOGGER.info("Game '{}' (id={}) was deleted by User '{}' (id={})", game.getName(), game.getId(),
@@ -189,7 +189,7 @@ public class GameService {
      * Returns whether participation confirmation is possible for the given user and game.
      * @param  user the user whose participation confirmation is checked for the given game.
      * @param  game the game whose participation confirmation is checked for the given user.
-     * @return true if participation confirmation is disabled, false otherwise.
+     * @return      true if participation confirmation is disabled, false otherwise.
      */
     public boolean disabledConfirmation(User user, Game game) {
         // game confirmation generally disabled or user not invited?

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	template="/WEB-INF/templates/main.xhtml">
+
+	<ui:define name="content">
+		<c:set value="#{null}" target="#{teamMemberBean}" property="game" />
+
+		<h:form id="teamListForm">
+			<ui:remove>show all teams</ui:remove>
+			<p:panelGrid columns="1" style="width:100%">
+				<p:multiSelectListbox value="#{teamMemberBean.team}" header="Teams and Players">
+					<f:selectItems value="#{teamMemberBean.teams}" />
+				</p:multiSelectListbox>
+			</p:panelGrid>
+		</h:form>
+
+		<p:commandButton id="teamsUpdate" styleClass="hidden" process="@all" update=":teamListForm" />
+		<o:socket channel="userRegistrationChannel" scope="application" onmessage="socketListener" />
+
+	</ui:define>
+</ui:composition>

@@ -78,15 +78,12 @@ public class NewTeamBeanTest {
 
     @Test
     public void testClearFields() {
-        String name = fillBean();
-
-        assertEquals(name, newTeamBean.getTeamName());
-        assertTrue(newTeamBean.getPlayers().size() > 0);
+        String expected = fillBean();
+        assertFields(expected);
 
         newTeamBean.clearFields();
 
-        assertNull(newTeamBean.getTeamName());
-        assertNull(newTeamBean.getPlayers());
+        assertFieldsClear();
     }
 
     @Test
@@ -101,6 +98,7 @@ public class NewTeamBeanTest {
         verify(teamService).saveTeam(any(Team.class));
         verifyNoInteractions(messageBean);
         assertEquals(expected, result);
+        assertFieldsClear();
 
         assertTrue(expected.compareTo(result) == 0);
         assertNull(result.getGames());
@@ -122,6 +120,19 @@ public class NewTeamBeanTest {
 
         verifyNoInteractions(teamService);
         verify(messageBean).alertErrorFailValidation(anyString(), anyString());
+    }
+
+    @Test
+    public void testCreateTeamFailureSave() {
+        String expected = fillBean();
+        when(teamService.saveTeam(any(Team.class))).thenReturn(null);
+
+        Team result = newTeamBean.createTeam();
+
+        verify(teamService).saveTeam(any(Team.class));
+        verifyNoInteractions(messageBean);
+        assertNull(result);
+        assertFields(expected);
     }
 
     @Test
@@ -155,5 +166,15 @@ public class NewTeamBeanTest {
         newTeamBean.setTeamName(foo);
         newTeamBean.setPlayers(Set.of(createUser(2L), createUser(15L)));
         return foo;
+    }
+
+    private void assertFields(String expected) {
+        assertEquals(expected, newTeamBean.getTeamName());
+        assertTrue(newTeamBean.getPlayers().size() > 0);
+    }
+
+    private void assertFieldsClear() {
+        assertNull(newTeamBean.getTeamName());
+        assertEquals(0, newTeamBean.getPlayers().size());
     }
 }

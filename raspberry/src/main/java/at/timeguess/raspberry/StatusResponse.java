@@ -1,10 +1,10 @@
-package at.timeguess.backend.model.api;
+package at.timeguess.raspberry;
 
 /**
- * A class for facets responses.
+ * A class for status responses.
  */
 public class StatusResponse {
-    
+
     private int reportingInterval; // interval for sending status messages
     private int calibrationVersion; // new value to write to the Calibration version characteristic
 

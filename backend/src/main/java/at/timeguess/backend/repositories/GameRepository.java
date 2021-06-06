@@ -46,8 +46,8 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     List<Game> findByUserAll(User user);
 
     /**
-     * Returns a list of all games the given user is associated to, which are currently not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP},
-     * {@link GameState#PLAYED}, {@link GameState#HALTED}).
+     * Returns a list of all games the given user is associated to, which are currently not finished (states {@link GameState#SETUP},
+     * {@link GameState#VALID_SETUP}, {@link GameState#PLAYED}, {@link GameState#HALTED}).
      * @return
      */
     @Query("SELECT g FROM Game g JOIN g.teams t JOIN t.team.teamMembers u WHERE u = ?1 AND g.status IN (0, 1, 2, 3)")

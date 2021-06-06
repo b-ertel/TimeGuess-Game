@@ -62,7 +62,7 @@
             </p:dataTable>
         </h:form>
 
-        <h:form id="gameRoundForm" rendered="#{not empty gameRoundController.currentGame and not empty gameRoundController.currentRound}">
+        <h:form id="gameRoundForm" rendered="#{not empty gameRoundController.currentGame}">
             <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
                 <h:panelGroup rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and !gameRoundController.isInGuessingTeam()}">
                     <p:outputPanel>#{gameRoundController.nextRound.guessingUser.username} from #{gameRoundController.nextRound.guessingTeam.name} has to describe the term #{gameRoundController.nextRound.termToGuess.name}.</p:outputPanel>
@@ -163,7 +163,7 @@
                 
                 <h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
                     <p:commandButton value="Confirm"
-                        action="#{gameRoundController.endRoundThroughCountDown}" update=":gameRoundForm :gameTableForm"
+                        action="#{gameRoundController.endRoundViaCountDown}" update=":gameRoundForm :gameTableForm"
                         oncomplete="PF('roundTimesUpDialog').hide()"/>
                 </h:panelGrid>
             </p:dialog>

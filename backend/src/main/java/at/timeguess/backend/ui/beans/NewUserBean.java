@@ -184,7 +184,9 @@ public class NewUserBean implements Serializable {
             consumer.accept(user);
 
             user = this.userService.saveUser(user);
-            this.clearFields();
+            if (user != null) {
+                this.clearFields();
+            }
 
             return user;
         }

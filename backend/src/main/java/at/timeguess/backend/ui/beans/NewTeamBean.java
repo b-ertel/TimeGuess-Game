@@ -1,6 +1,7 @@
 package at.timeguess.backend.ui.beans;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class NewTeamBean implements Serializable {
     private MessageBean messageBean;
 
     private String teamname;
-    private Set<User> players;
+    private Set<User> players = new HashSet<>();
 
     public String getTeamName() {
         return teamname;
@@ -73,7 +74,7 @@ public class NewTeamBean implements Serializable {
      */
     public void clearFields() {
         this.setTeamName(null);
-        this.setPlayers(null);
+        this.setPlayers(new HashSet<>());
     }
 
     /**
@@ -88,7 +89,9 @@ public class NewTeamBean implements Serializable {
             team.setTeamMembers(players);
 
             team = teamService.saveTeam(team);
-            this.clearFields();
+            if (team != null) {
+                this.clearFields();
+            }
 
             return team;
         }

@@ -68,6 +68,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling().accessDeniedHandler(accessDeniedHandler());
         http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
 
+        // REST API requires authority "CUBE"
+        http.authorizeRequests().antMatchers("/api/**").hasAnyAuthority("CUBE").and().httpBasic();
+
     }
 
     @Autowired

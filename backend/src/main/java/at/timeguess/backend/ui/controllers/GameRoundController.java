@@ -113,9 +113,9 @@ public class GameRoundController {
     /**
      * Method to end a round through count-down
      */
-    public void endRoundThroughCountDown() {
+    public void endRoundViaCountDown() {
+        gameManagerController.endRoundByCountDown(sessionInfoBean.getCurrentUser());
         incorrectRound();
-        setInRound(false);
     }
 
     public Round getCurrentRound() {
@@ -167,9 +167,6 @@ public class GameRoundController {
     }
 
     public Game getCurrentGame() {
-        if (currentGame == null) {
-            currentGame = gameManagerController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
-        }
         return currentGame;
     }
 
@@ -186,9 +183,9 @@ public class GameRoundController {
      * @return
      */
     public RunState getCurrentRunState() {
-        if (getCurrentGame() == null) return RunState.NONE;
+        if (getCurrGame() == null) return RunState.NONE;
 
-        switch (currentGame.getStatus()) {
+        switch (currGame.getStatus()) {
             case FINISHED:
             case CANCELED:
             case SETUP:
@@ -209,17 +206,24 @@ public class GameRoundController {
      */
     public RoundState getCurrentRoundState() {
         return getCurrentRunState() == RunState.RUNNING ?
-            gameManagerController.getRoundStateForGame(currentGame) : RoundState.NONE;
+            gameManagerController.getRoundStateForGame(currGame) : RoundState.NONE;
     }
 
     public WaitReason getCurrentWaitReason() {
         return getCurrentRunState() == RunState.WAITING ?
-            gameManagerController.getWaitReasonForGame(currentGame) : WaitReason.NONE;
+            gameManagerController.getWaitReasonForGame(currGame) : WaitReason.NONE;
     }
 
     public NoGameReason getCurrentNoGameReason() {
         return getCurrentRunState() == RunState.NONE ?
-            gameManagerController.getNoGameReasonForGame(currentGame) : NoGameReason.NONE;
+            gameManagerController.getNoGameReasonForGame(currGame) : NoGameReason.NONE;
+    }
+    private Game currGame;
+    private Game getCurrGame() {
+        if (currGame == null) {
+            currGame = gameManagerController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
+        }
+        return currGame;
     }
 
     /**

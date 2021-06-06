@@ -1,4 +1,4 @@
-package at.timeguess.backend.model.api;
+package at.timeguess.raspberry;
 
 /**
  * A class for facets messages.
@@ -23,5 +23,5 @@ public class FacetsMessage {
     public void setFacet(int facet) {
         this.facet = facet;
     }
-    
+
 }
