@@ -1,5 +1,7 @@
 package at.timeguess.backend.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
@@ -13,8 +15,12 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
+import at.timeguess.backend.model.Round;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
+import at.timeguess.backend.model.Validation;
+import at.timeguess.backend.repositories.RoundRepository;
+import at.timeguess.backend.repositories.TeamRepository;
 import at.timeguess.backend.repositories.TermRepository;
 import at.timeguess.backend.repositories.TopicRepository;
 
@@ -37,6 +43,12 @@ public class GameLogicServiceTest {
 
     @Autowired
     TermRepository termRepo;
+    
+    @Autowired
+    TeamRepository teamRepo;
+    
+    @Autowired
+    RoundRepository roundRepo;
 
     @DirtiesContext
     @Test
@@ -81,4 +93,74 @@ public class GameLogicServiceTest {
             Assertions.assertTrue(gameLogicService.usedTerms(game).contains(termUsed));
         }
     }
+    
+    @DirtiesContext
+    @Test
+    public void teststillTermsAvailable() {
+    	Game game = gameService.loadGame((long) 1);
+    	Assertions.assertTrue(!gameLogicService.stillTermsAvailable(game));
+    	Game game2 = gameService.loadGame((long) 2);
+    	Assertions.assertTrue(gameLogicService.stillTermsAvailable(game2));
+    }
+    
+    @DirtiesContext
+    @Test
+    public void testGetTeamWithMostPoints() {
+    	Game game = gameService.loadGame((long) 1);
+    	Team teamWithMostPoints = teamRepo.findById((long) 2).get();
+    	Assertions.assertEquals(teamWithMostPoints, gameLogicService.getTeamWithMostPoints(game));  	
+    }
+    
+    @DirtiesContext
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
+    @Test
+    public void testSaveGame() {
+    	Game game = new Game();
+    	game.setName("TestGame");
+        game.setMaxPoints(10);
+        game.setTopic(topicRepo.findById((long) 1).get());
+        game.setStatus(GameState.PLAYED);
+        gameService.saveGame(game);
+        game.setTeams(gameService.loadGame((long) 1).getTeams());
+        gameLogicService.getNextRound(game);
+        gameLogicService.saveLastRound(game, Validation.CHEATED);
+        Assertions.assertEquals(20, roundRepo.findAll().size());
+    }
+    
+    @DirtiesContext
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
+    @Test
+    public void testPlayRound() {
+    	Game game = new Game();
+        game.setName("TestGame");
+        game.setMaxPoints(10);
+        game.setTopic(topicRepo.findById((long) 1).get());
+        game.setStatus(GameState.PLAYED);
+        gameService.saveGame(game);
+        game.setTeams(gameService.loadGame((long) 1).getTeams());
+        
+        Round lastRound = null;
+        List<Term> usedTerms = new ArrayList<>();
+        int i = 1;
+        while (true) {
+        	Round newRound = gameLogicService.getNextRound(game);
+        	if(i!=1) {
+	        	Assertions.assertNotEquals(newRound.getGuessingTeam(), lastRound.getGuessingTeam());
+	        	Assertions.assertNotEquals(newRound.getGuessingUser(), lastRound.getGuessingUser());
+	        	Assertions.assertNotEquals(newRound.getTermToGuess(), lastRound.getTermToGuess());
+        	}
+        	gameLogicService.saveLastRound(game, Validation.CORRECT);
+        	Assertions.assertEquals(i, newRound.getNr());
+        	usedTerms.add(newRound.getTermToGuess());
+        	Assertions.assertFalse(usedTerms.contains(gameLogicService.nextTerm(game)));
+        	lastRound = newRound;
+        	i++;
+        	if(i==3) {
+        		break;
+        	}
+        }
+    }
+    
 }
+
+
