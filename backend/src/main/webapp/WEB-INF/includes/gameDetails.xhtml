@@ -52,7 +52,7 @@
                             <p:selectOneMenu id="cube" value="#{curr.cube}" converter="omnifaces.SelectItemsConverter"
                                required="true" requiredMessage="#{cubeMsg}" disabled="#{gameDetailController.lockedCube}">
                                <f:selectItem itemLabel="Select" />
-                               <f:selectItems value="#{cubeController.allCubes}" var="cu" itemDisabled="#{not cubeStatusController.isReady(cu)}" />
+                               <f:selectItems value="#{cubeController.allCubes}" var="cu" itemDisabled="#{!cubeStatusController.isReady(cu) and !(cu eq curr.cube)}" />
                             </p:selectOneMenu>
                         </p:panelGrid>
                         <p:separator style="margin:12px 0px 20px" />

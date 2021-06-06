@@ -15,8 +15,18 @@ function showPassword(button, id = '') {
 }
 
 function socketListener(message, channel, event) {
-    window[message.type](message.name, message.id);
     console.log(message);
+    try {
+        if (window[message.type]) {
+            window[message.type](message.name, message.id);
+        }
+        else if (window[message]) {
+            window[message]();
+        }
+    }
+    catch(e) {
+        console.log(e);
+    }
 }
 
 function gameInvitation(name, id) {
@@ -24,6 +34,11 @@ function gameInvitation(name, id) {
 }
 
 function gameUpdate(name, id) {
+    clickIfExists("lobbyUpdate");
+    clickIfExists("profileUpdate");
+}
+
+function roundUpdate(name, id) {
     clickIfExists("lobbyUpdate");
     clickIfExists("profileUpdate");
 }
@@ -54,7 +69,7 @@ function userUpdate(name, id) {
     clickIfExists("usersUpdate");
 }
 
-function connectionCubeUpdate(name, id) {
+function connectionCubeUpdate() {
     clickIfExists("lobbyUpdate");
 }
 

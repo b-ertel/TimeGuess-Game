@@ -122,7 +122,7 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if state can change from the saved to the given.
-     * @param next
+     * @param  next
      * @return
      */
     public boolean canTraverse(GameState next) {
@@ -131,7 +131,7 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if the given team is currently playing in any other than the saved game or not.
-     * @param team
+     * @param  team
      * @return
      */
     public boolean isAvailableTeam(Team team) {
@@ -212,8 +212,10 @@ public class GameDetailController implements Serializable {
      * Action to force a reload of the currently displayed game.
      */
     public void doReloadGame() {
-        game = gameService.loadGame(game.getId());
-        orgCube = game.getCube();
+        if (game != null) {
+            game = gameService.loadGame(game.getId());
+            orgCube = game.getCube();
+        }
     }
 
     /**

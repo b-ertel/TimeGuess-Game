@@ -50,13 +50,13 @@
                         <p:selectOneMenu id="cubeCreate" value="#{newGameBean.cube}" converter="omnifaces.SelectItemsConverter"
                            required="true" requiredMessage="#{cubeMsg}">
                            <f:selectItem itemLabel="Select" />
-                           <f:selectItems value="#{cubeController.allCubes}" var="cu" itemDisabled="#{not cubeStatusController.isReady(cu)}" />
+                           <f:selectItems id="cubeCreateAll" value="#{cubeController.allCubes}" var="cu" itemDisabled="#{not cubeStatusController.isReady(cu)}" />
                         </p:selectOneMenu>
 
                         <h:outputLabel for="teamsCreate" value="Teams: " />
                         <p:selectCheckboxMenu id="teamsCreate" value="#{newGameBean.teams}" label="#{sel2Label}"
-                            required="true" requiredMessage="#{teamsMsg}" dynamic="true"
-                            multiple="true" filter="true" filterMatchMode="contains">
+                            required="true" requiredMessage="#{teamsMsg}" converter="omnifaces.SelectItemsConverter"
+                            multiple="true" filter="true" filterMatchMode="contains" dynamic="true">
                             <!-- have to use all teams, otherwise list doesn't work -->
                             <f:selectItems id="teamsCreateAll" value="#{newGameBean.allTeams}" var="t" itemLabel="#{t.name}"
                                 itemDisabled="#{not newGameBean.isAvailableTeam(t)}" />
@@ -79,15 +79,14 @@
 
                             <p:outputLabel for="teamnameCreate" value="Name: "/>
                             <p:inputText id="teamnameCreate" value="#{newTeamBean.teamName}" required="true" maxlength="100" />
-                            <p:separator style="margin:6px 0px 16px" />
                         </p:panelGrid>
 
                         <p:panelGrid id="playerSelection" columns="2" layout="flex" styleClass="ui-panelgrid-blank"
-                            columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid">
+                            columnClasses="p-col-2, p-col-10" contentStyleClass="ui-fluid" style="margin-top:10px">
                             <h:outputLabel for="playersCreate" value="Players: " />
                             <p:selectCheckboxMenu id="playersCreate" value="#{newTeamBean.players}" label="#{sel2Label}"
                                 required="true" requiredMessage="Players: Select at least 2 players" converter="omnifaces.SelectItemsConverter"
-                                multiple="true" filter="true" filterMatchMode="contains">
+                                multiple="true" filter="true" filterMatchMode="contains" dynamic="true">
                                 <f:selectItems value="#{newTeamBean.allPlayers}" var="p" itemLabel="#{p.username}"
                                     itemDisabled="#{not newTeamBean.isAvailablePlayer(p)}" />
                             </p:selectCheckboxMenu>
@@ -101,7 +100,7 @@
                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('gameCreateDialog').hide(); }"
                         process="nameCreate maxPointsCreate cubeCreate topicCreate teamsCreate @this"
                         update="gameCreateData :gameListForm :gameInfoForm:gameInfoData :msg" validateClient="true" />
-                    <p:commandButton value="Reload" action="#{newGameBean.clearFields}"
+                    <p:commandButton value="Reset" action="#{newGameBean.clearFields}"
                         process="@parent" update="gameCreateData :msg" resetValues="true"/>
                     <p:commandButton value="Abort" onsuccess="PF('gameCreateDialog').hide()"/>
                 </h:panelGrid>
@@ -109,7 +108,10 @@
         </h:form>
 
         <p:commandButton id="lobbyUpdate" styleClass="hidden" process="@all"
-            update=":gameListForm:gameCurrent :statForm :topicStatForm :scoreForm :gameCreateForm:cubeTeamSelection :gameCreateForm:playerSelection" />
+            update=":gameListForm:gameCurrent :statForm :topicStatForm :scoreForm :cubeTeamSelection :playerSelection :gameInfoData :teamTable">
+            <f:actionListener binding="#{gameDetailController.doReloadGame()}" />
+            <f:actionListener binding="#{teamMemberBean.doReloadGame()}" />
+        </p:commandButton>
         <o:socket channel="cubeChannel" scope="application" onmessage="socketListener" />
 
     </ui:define>

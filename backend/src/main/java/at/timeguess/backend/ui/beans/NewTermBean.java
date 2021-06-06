@@ -68,7 +68,9 @@ public class NewTermBean implements Serializable {
             term.setEnabled(true);
 
             term = termService.saveTerm(term);
-            this.clearFields();
+            if (term != null) {
+                this.clearFields();
+            }
 
             return term;
         }

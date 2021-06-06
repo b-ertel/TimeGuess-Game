@@ -178,7 +178,7 @@
                 <h:panelGrid columns="3">
                     <p:commandButton value="Save" action="#{newUserBean.createUserAdmin}"
                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('userCreateDialog').hide(); }" update="userCreateData :msg" />
-                    <p:commandButton value="Reload" action="#{newUserBean.clearFields}"
+                    <p:commandButton value="Reset" action="#{newUserBean.clearFields}"
                         process="@parent" update=":userCreateForm:userCreateData :msg" resetValues="true" />
                     <p:commandButton value="Abort" onclick="PF('userCreateDialog').hide()" />
                 </h:panelGrid>
