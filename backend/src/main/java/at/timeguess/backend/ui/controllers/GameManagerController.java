@@ -50,6 +50,80 @@ import at.timeguess.backend.utils.CDIContextRelated;
 @CDIContextRelated
 public class GameManagerController {
 
+    /**
+     * Possible states for a current round in any running game.
+     */
+    public enum RoundState {
+        /**
+         * No round is active.
+         */
+        NONE,
+        /**
+         * Round is set up and waiting for cube infos.
+         */
+        STARTING,
+        /**
+         * Countdown is running.
+         */
+        RUNNING,
+        /**
+         * Round ended by cube or countdown and waiting for validation.
+         */
+        VALIDATING,
+        /**
+         * Round state is inconsistent and must be reset.
+         */
+        ERROR
+    }
+
+    /**
+     * Possible reasons for a current game to wait for some state change.
+     */
+    public enum WaitReason {
+        /**
+         * There is no reason to wait.
+         */
+        NONE,
+        /**
+         * Not all set teams are present, per team at least one player must be in the gameroom.
+         */
+        TEAMS_ABSENT,
+        /**
+         * The cube state is reported to be offline by {@link CubeStatusController}.
+         */
+        CUBE_OFFLINE,
+        /**
+         * The game was halted from outside (by some user with privileges to do so).
+         */
+        GAME_HALTED
+    }
+
+    /**
+     * Possible reasons for no current game available.
+     */
+    public enum NoGameReason {
+        /**
+         * There is a game currently available.
+         */
+        NONE,
+        /**
+         * The game has finished by reaching the set maximum points or by running out of terms.
+         */
+        GAME_FINISHED,
+        /**
+         * The game was canceled from outside (by some user with privileges to do so).
+         */
+        GAME_CANCELED,
+        /**
+         * The game is in some other state not ready to be played.
+         */
+        GAME_WRONGSTATE,
+        /**
+         * The game is unknown.
+         */
+        GAME_UNKNOWN
+    }
+
     @Autowired
     private GameService gameService;
     @Autowired
@@ -154,6 +228,67 @@ public class GameManagerController {
      */
     public boolean hasCurrentGameForCube(Cube cube) {
         return status.containsCube(cube);
+    }
+
+    /**
+     * Returns the current round state for the given game.
+     * @param  game
+     * @return
+     */
+    public RoundState getRoundStateForGame(Game game) {
+        GameData data = status.getGameData(game);
+
+        if (data == null || data.currentRound == null) return RoundState.NONE;
+        if (!data.isRoundActive && !data.isValidating) return RoundState.STARTING;
+        if (data.isRoundActive && !data.isValidating) return RoundState.RUNNING;
+        if (!data.isRoundActive && data.isValidating) return RoundState.VALIDATING;
+
+        return RoundState.ERROR;
+    }
+
+    /**
+     * Returns the current reason to wait for the given game to continue.
+     * @param  game
+     * @return
+     */
+    public WaitReason getWaitReasonForGame(Game game) {
+        GameData data = status.getGameData(game);
+
+        if (data != null && data.game != null) {
+            switch (data.game.getStatus()) {
+                case HALTED:
+                    return WaitReason.GAME_HALTED;
+
+                case VALID_SETUP:
+                    if (!data.isCubeOnline) return WaitReason.CUBE_OFFLINE;
+                    if (!data.isTeamsPresent) return WaitReason.TEAMS_ABSENT;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        return WaitReason.NONE;
+    }
+
+    /**
+     * Returns the current reason to wait for the given game to continue.
+     * @param  game
+     * @return
+     */
+    public NoGameReason getNoGameReasonForGame(Game game) {
+        GameData data = status.getGameData(game);
+
+        if (data == null || data.game == null) return NoGameReason.GAME_UNKNOWN;
+
+        switch (data.game.getStatus()) {
+            case FINISHED:
+                return NoGameReason.GAME_FINISHED;
+            case CANCELED:
+                return NoGameReason.GAME_CANCELED;
+            default:
+                return NoGameReason.GAME_WRONGSTATE;
+        }
     }
 
     /**
@@ -378,7 +513,6 @@ public class GameManagerController {
             return getGameData(cube, false);
         }
 
-        @SuppressWarnings("unused")
         public GameData getGameData(Game game) {
             return getGameData(game, false);
         }
@@ -412,10 +546,10 @@ public class GameManagerController {
             switch (ret) {
                 case VALID_SETUP:
                 case PLAYED:
-                    //GameState newState = data.isTeamsPresent && data.isCubeOnline ?
+                    // GameState newState = data.isTeamsPresent && data.isCubeOnline ?
                     GameState newState = data.isTeamsPresent ? GameState.PLAYED : GameState.VALID_SETUP;
                     Game game = setGameState(data.game, newState);
-                    //problematic: if (game != null) data.game = game;
+                    // problematic: if (game != null) data.game = game;
                     assert newState == game.getStatus();
                     return newState;
 

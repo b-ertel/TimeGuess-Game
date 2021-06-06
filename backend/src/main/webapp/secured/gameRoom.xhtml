@@ -24,6 +24,15 @@
             </p:panel>
         </h:form>
 
+        <h:form id="stateInfo" prependId="false">
+            <p:panel>
+                <p:outputPanel>Game is in state: #{gameRoundController.currentRunState}</p:outputPanel>
+                <p:outputPanel>Round is in state: #{gameRoundController.currentRoundState}</p:outputPanel>
+                <p:outputPanel>Reason to wait is: #{gameRoundController.currentWaitReason}</p:outputPanel>
+                <p:outputPanel>Reason for no game is: #{gameRoundController.currentNoGameReason}</p:outputPanel>
+            </p:panel>
+        </h:form>
+
         <h:form id="noGameForm" styleClass="gameroomNogame" rendered="#{empty gameRoundController.currentGame}">
             <h:panelGroup rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status == 'VALID_SETUP'}">
                 <p:outputPanel>Your game is up and running, but paused for some reason.</p:outputPanel>
@@ -53,7 +62,7 @@
             </p:dataTable>
         </h:form>
 
-        <h:form id="gameRoundForm" rendered="#{not empty gameRoundController.currentGame}">
+        <h:form id="gameRoundForm" rendered="#{not empty gameRoundController.currentGame and not empty gameRoundController.currentRound}">
             <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
                 <h:panelGroup rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and !gameRoundController.isInGuessingTeam()}">
                     <p:outputPanel>#{gameRoundController.nextRound.guessingUser.username} from #{gameRoundController.nextRound.guessingTeam.name} has to describe the term #{gameRoundController.nextRound.termToGuess.name}.</p:outputPanel>
@@ -128,11 +137,11 @@
 
                 <h:panelGrid columns="3" rendered="#{!gameRoundController.inGuessingTeam}">
                     <p:commandButton value="Correct"
-                        action="#{gameRoundController.correctRound()}" update=":gameRoundForm :gameTableForm"/>
+                        action="#{gameRoundController.correctRound}" update=":gameRoundForm :gameTableForm"/>
                     <p:commandButton value="Incorrect"
-                        action="#{gameRoundController.incorrectRound()}" update=":gameRoundForm :gameTableForm"/>
+                        action="#{gameRoundController.incorrectRound}" update=":gameRoundForm :gameTableForm"/>
                     <p:commandButton value="Cheated"
-                        action="#{gameRoundController.cheatedRound()}" update=":gameRoundForm :gameTableForm"/>
+                        action="#{gameRoundController.cheatedRound}" update=":gameRoundForm :gameTableForm"/>
                 </h:panelGrid>
             </p:dialog>
         </h:form>
@@ -154,7 +163,7 @@
                 
                 <h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
                     <p:commandButton value="Confirm"
-                        action="#{gameRoundController.endRoundThroughCountDown()}" update=":gameRoundForm :gameTableForm"
+                        action="#{gameRoundController.endRoundThroughCountDown}" update=":gameRoundForm :gameTableForm"
                         oncomplete="PF('roundTimesUpDialog').hide()"/>
                 </h:panelGrid>
             </p:dialog>
@@ -189,61 +198,61 @@
             user="#{sessionInfoBean.currentUser.id}">
 
             <p:ajax event="startRound"
-                listener="#{gameRoundController.startRound()}"
-                update=":gameRoundForm:roundInfo" />
+                listener="#{gameRoundController.startRound}"
+                update=":gameRoundForm:roundInfo stateInfo" />
 
             <p:ajax event="endRoundViaFlip"
-                listener="#{gameRoundController.endRound()}"
+                listener="#{gameRoundController.endRound}"
                 oncomplete="PF('roundValidationDialog').show()"
-                update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" />
+                update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog stateInfo" />
 
             <p:ajax event="validatedRound"
-                listener="#{gameRoundController.getNextRoundInfos()}"
+                listener="#{gameRoundController.getNextRoundInfos}"
                 oncomplete="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide()"
                 update="@all" />
 
             <p:ajax event="endRoundViaCountDown"
                 listener="#{gameRoundController.setInRound(false)}"
                 oncomplete="PF('roundTimesUpDialog').show()"
-                update=":roundTimesUpForm:roundTimesUpDialog" />
+                update=":roundTimesUpForm:roundTimesUpDialog stateInfo" />
 
             <p:ajax event="gameOver"
                 onevent="PF('roundValidationDialog').hide())"
                 oncomplete="PF('gameOverDialog').show()"
-                update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog" />
+                update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog stateInfo" />
 
             <p:ajax event="termsOver"
                 onevent="PF('roundValidationDialog').hide()) PF('roundTimesUpDialog').hide()"
                 oncomplete="PF('termOverDialog').show()"
-                update=":gameRoundForm:roundInfo :termOverForm:termOverDialog" />
+                update=":gameRoundForm:roundInfo :termOverForm:termOverDialog stateInfo" />
 
             <p:ajax event="gameCanceled"
                 onevent="PF('roundValidationDialog').hide())"
                 oncomplete="PF('gameCanceledDialog').show()"
-                update=":gameRoundForm:roundInfo :gameCanceledForm:gameCanceledDialog" />
+                update=":gameRoundForm:roundInfo :gameCanceledForm:gameCanceledDialog stateInfo" />
 
             <p:ajax event="startGame"
-                listener="#{gameRoundController.setup()}"
+                listener="#{gameRoundController.setup}"
                 update="@all" />
 
             <p:ajax event="restartGame"
-                listener="#{gameRoundController.setup()}"
+                listener="#{gameRoundController.setup}"
                 update="@all" />
 
             <p:ajax event="pauseGame"
-                listener="#{gameRoundController.destroy()}"
+                listener="#{gameRoundController.destroy}"
                 update="@all" />
 
             <p:ajax event="setup"
-                listener="#{gameRoundController.setup()}" />
+                listener="#{gameRoundController.setup}" />
 
             <p:ajax event="setupandupdate"
-                listener="#{gameRoundController.setup()}"
+                listener="#{gameRoundController.setup}"
                 update="@all" />
 
             <p:ajax event="healthMessage"
-                listener="#{cubeStatusController.displayHealthMessage()}"
-                update="msg" />
+                listener="#{cubeStatusController.displayHealthMessage}"
+                update="msg stateInfo" />
         </o:socket>
     </ui:define>
 </ui:composition>
