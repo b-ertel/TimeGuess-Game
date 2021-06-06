@@ -54,12 +54,6 @@ avoid this when simulating you have two possibilities:
 - set a higher value for the "Expiration Interval"
   in the admin web interface
 
-Note that you need "Basic Authentication" with the following
-credentials to send status messages:
-
-Username: cube
-Password: passwd
-
 ------------------
 2. Facets Messages
 ------------------
@@ -78,8 +72,9 @@ and "facet" is the facet number.
 
 No response will be sent to such requests.
 
+
 Note that you need "Basic Authentication" with the following
-credentials to send status messages:
+credentials to send messages:
 
 Username: cube
 Password: passwd
