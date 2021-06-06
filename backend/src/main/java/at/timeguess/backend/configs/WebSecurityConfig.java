@@ -65,6 +65,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling().accessDeniedHandler(accessDeniedHandler());
         http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
 
+        // REST API requires authority "CUBE"
+        http.authorizeRequests().antMatchers("/api/**").hasAnyAuthority("CUBE").and().httpBasic();
+
     }
 
     @Autowired
@@ -72,7 +75,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // Configure roles and passwords via datasource
         auth.jdbcAuthentication().dataSource(dataSource)
                 .usersByUsernameQuery("SELECT username, password, enabled FROM user WHERE username=?")
-                .authoritiesByUsernameQuery("SELECT username, roles FROM user_role r JOIN user u ON r.user_id=u.id WHERE u.username=?");
+                .authoritiesByUsernameQuery("SELECT username, roles FROM user_role r JOIN user u ON r.user_id=u.id WHERE u.username=?")
+                .and()
+                .inMemoryAuthentication()
+                .withUser("cube")
+                .password(passwordEncoder().encode("passwd"))
+                .authorities("CUBE");
     }
     
     @Bean

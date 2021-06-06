@@ -1,7 +1,7 @@
 package at.timeguess.backend.model.api;
 
 /**
- * A class that represents the response to a {@link StatusMessage}.
+ * A class for facets responses.
  */
 public class StatusResponse {
     
