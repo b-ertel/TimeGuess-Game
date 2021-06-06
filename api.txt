@@ -1,0 +1,86 @@
+***************************
+Notes on using the REST API
+***************************
+
+The following information might be useful if you don't have
+a TimeFlip device or Raspberry Pi and want to use the REST API
+directly (e.g., with Insomnia or any other tool).
+
+------------------
+1. Status Messages
+------------------
+
+The backend expects regular POST requests of the following
+JSON format at the URL "/api/status":
+
+{
+    "identifier": "56:23:89:34:56",
+    "calibrationVersion": 1,
+    "batteryLevel": 90,
+    "rssi": -50
+}
+
+Here "identifier" is the MAC address of the TimeFlip device,
+"calibrationVersion" is the the current value of the calibration
+version characteristic, "batteryLevel" is the current value
+of the battery level characteristic and "rssi" is the current
+value of the RSSI property.
+
+It then sends back an answer in the following JSON format:
+
+{
+    "reportingInterval": 10,
+    "calibrationVersion": 1
+}
+
+Here "reportingInterval" is the interval until the next status
+messages shall be sent and "calibrationVersion" is the new
+value for the calibration version characteristic.
+
+The calibration version is zero after a "hard reset" of
+the TimeFlip device (i.e., after the battery has been
+taken out) and is sent to the backend in order to be able
+to detect such an event and delete all saved configurations
+for the TimeFlip device since after a "hard reset" the
+facet numbers might have changed. When simulating just
+send an arbitrary nonzero value for the calibration version
+characteristic.
+
+The backend considers a cube "offline" if no status
+message has been received for a certain time. In order to
+avoid this when simulating you have two possibilities:
+
+- frequently send status messages :)
+- set a higher value for the "Expiration Interval"
+  in the admin web interface
+
+Note that you need "Basic Authentication" with the following
+credentials to send status messages:
+
+Username: cube
+Password: passwd
+
+------------------
+2. Facets Messages
+------------------
+
+The backend accepts POST requests of the following JSON format
+indicating a change of the facets characteristic at the URL
+"/api/facets":
+
+{
+    "identifier": "56:23:89:34:56",
+    "facet": 1
+}
+
+Here "identifier" is the MAC address of the TimeFlip device
+and "facet" is the facet number.
+
+No response will be sent to such requests.
+
+Note that you need "Basic Authentication" with the following
+credentials to send status messages:
+
+Username: cube
+Password: passwd
+

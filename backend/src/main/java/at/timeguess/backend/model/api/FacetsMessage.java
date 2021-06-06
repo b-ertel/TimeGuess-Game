@@ -1,17 +1,7 @@
 package at.timeguess.backend.model.api;
 
 /**
- * A class that represents the messages from a Raspberry Pi
- * that has established a connection with a TimeFlip device
- * signaling a change of the facets characteristic.
- * <p>
- * Example:
- * <pre>
- * {
- *   "identifier": "56:23:89:34:56",
- *   "facet": 1
- * }
- * </pre>
+ * A class for facets messages.
  */
 public class FacetsMessage {
 
