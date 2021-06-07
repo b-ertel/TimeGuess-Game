@@ -143,7 +143,9 @@
 					  resizable="false" closeOnEscape="false" showEffect="fade"
 					  hideEffect="fade" responsive="true" closable="false">
         		<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!" 
-							   style="font-weight:bold"/>	
+							   style="font-weight:bold" rendered="#{not empty gameRoundController.computeWinningTeam()}"/>	
+				<p:outputLabel value="You played quite some rounds. Unfortunatly all terms of this topic have been used. The current game results in a draw!" 
+							   style="font-weight:bold" rendered="#{empty gameRoundController.computeWinningTeam()}"/>
 				<p:dataTable id="leaderbord" var="teamscore" value="#{gameRoundController.computeFinalRanking()}" rowIndexVar="index">
 	                        <p:column headerText="Rank" style="text-align:center">
 	                            <h:outputText value="#{index + 1}" />
