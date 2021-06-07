@@ -30,6 +30,7 @@ import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.services.GameLogicService;
 import at.timeguess.backend.services.GameService;
+import at.timeguess.backend.services.GameTeamService;
 import at.timeguess.backend.services.RoundService;
 import at.timeguess.backend.ui.websockets.WebSocketManager;
 import at.timeguess.backend.utils.CDIAutowired;
@@ -46,6 +47,8 @@ public class GameManagerController {
 
     @Autowired
     private GameService gameService;
+    @Autowired
+    private GameTeamService gameTeamService;
     @Autowired
     private RoundService roundService;
     @Autowired
@@ -296,6 +299,7 @@ public class GameManagerController {
     public void endGame(Game game) {
         game.setStatus(GameState.FINISHED);
         gameService.saveGame(game);
+        gameTeamService.updatePoints(game);
                 
         this.listOfGames.remove(getCubeByGame(game));
         this.currentRound.remove(game);
