@@ -2,6 +2,7 @@ package at.timeguess.backend.events;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import at.timeguess.backend.model.Cube;
@@ -22,6 +23,7 @@ public class UnconfiguredFacetsEventPublisher {
      * @param cube the cube
      * @param facet the facet number
      */
+    @PreAuthorize("hasAuthority('CUBE')")
     public void publishUnconfiguredFacetsEvent(Cube cube, Integer facet) {
         UnconfiguredFacetsEvent unconfiguredFacetsEvent = new UnconfiguredFacetsEvent(this, cube, facet);
         applicationEventPublisher.publishEvent(unconfiguredFacetsEvent);

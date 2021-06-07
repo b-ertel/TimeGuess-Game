@@ -59,8 +59,7 @@ public class CubeService {
      * @param cube the cube to save
      * @throws IllegalArgumentException
      */
-    // TODO: access control
-    // @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('CUBE')")
     public Cube saveCube(Cube cube) throws IllegalArgumentException {
         try {
             return cubeRepo.save(cube);
@@ -130,8 +129,6 @@ public class CubeService {
      * @param cube the cube
      * @return a boolean indicating if the cube is configured
      */
-    // TODO: access control
-    // @PreAuthorize("hasAuthority('ADMIN')")
     public boolean isConfigured(Cube cube){
         return !configurationRepository.findByCube(cube).isEmpty();
     }
@@ -141,8 +138,7 @@ public class CubeService {
      *  
      * @param cube the cube
      */
-    // TODO: access control
-    // @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('CUBE')")
     public void deleteConfigurations(Cube cube) {
         for (Configuration configuration : configurationRepository.findByCube(cube)) {
             configurationRepository.delete(configuration);
@@ -212,6 +208,7 @@ public class CubeService {
      *  
      * @param message the message
      */
+    @PreAuthorize("hasAuthority('CUBE')")
     public void processFacetsMessage(FacetsMessage message) {
         String identifier = message.getIdentifier();
         int facet = message.getFacet();
