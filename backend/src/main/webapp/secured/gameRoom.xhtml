@@ -208,12 +208,12 @@
                 <h:panelGroup styleClass="dlgContent">
                     <c:choose>
                         <c:when test="#{grc.inGuessingTeam}">
-                            <p:outputPanel>That took a bit long!</p:outputPanel>
+                            <p:outputPanel>That took too long and is rated with 0 points!</p:outputPanel>
                             <p:outputPanel>Please wait until your rivals have confirmed this round...</p:outputPanel>
                         </c:when>
                         <c:otherwise>
-                            <p:outputPanel>Seems like #{grc.currentRound.guessingTeam.name} did not guess #{grc.currentRound.termToGuess.name} in time.</p:outputPanel>
-                            <p:outputPanel>Please confirm this round to continue!</p:outputPanel>
+                            <p:outputPanel>Seems like #{grc.currentRound.guessingTeam.name} did not guess #{grc.currentRound.termToGuess.name} in time...</p:outputPanel>
+                            <p:outputPanel>Please confirm to end this round.</p:outputPanel>
                         </c:otherwise>
                     </c:choose>
                 </h:panelGroup>
