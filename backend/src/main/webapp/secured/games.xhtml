@@ -50,7 +50,7 @@
                         <p:selectOneMenu id="cubeCreate" value="#{newGameBean.cube}" converter="omnifaces.SelectItemsConverter"
                            required="true" requiredMessage="#{cubeMsg}">
                            <f:selectItem itemLabel="Select" />
-                           <f:selectItems id="cubeCreateAll" value="#{cubeController.allCubes}" var="cu" itemDisabled="#{not cubeStatusController.isReady(cu)}" />
+                           <f:selectItems value="#{cubeController.allCubes}" var="cu" itemDisabled="#{not cubeStatusController.isReady(cu)}" />
                         </p:selectOneMenu>
 
                         <h:outputLabel for="teamsCreate" value="Teams: " />
@@ -58,7 +58,7 @@
                             required="true" requiredMessage="#{teamsMsg}" converter="omnifaces.SelectItemsConverter"
                             multiple="true" filter="true" filterMatchMode="contains" dynamic="true">
                             <!-- have to use all teams, otherwise list doesn't work -->
-                            <f:selectItems id="teamsCreateAll" value="#{newGameBean.allTeams}" var="t" itemLabel="#{t.name}"
+                            <f:selectItems value="#{newGameBean.allTeams}" var="t" itemLabel="#{t.name}"
                                 itemDisabled="#{not newGameBean.isAvailableTeam(t)}" />
                         </p:selectCheckboxMenu>
                     </p:panelGrid>
@@ -108,10 +108,12 @@
         </h:form>
 
         <p:commandButton id="lobbyUpdate" styleClass="hidden" process="@all"
-            update=":gameListForm:gameCurrent :statForm :topicStatForm :scoreForm :cubeTeamSelection :playerSelection :gameInfoData :teamTable">
+            update=":gameListForm:gameCurrent :statForm :topicStatForm :scoreForm :topicCreate :teamsCreate :playerSelection :gameInfoData :teamTable">
             <f:actionListener binding="#{gameDetailController.doReloadGame()}" />
             <f:actionListener binding="#{teamMemberBean.doReloadGame()}" />
         </p:commandButton>
+        <p:commandButton id="cubeUpdate" styleClass="hidden" process="@all" update=":cubeCreate" />
+
         <o:socket channel="cubeChannel" scope="application" onmessage="socketListener" />
 
     </ui:define>

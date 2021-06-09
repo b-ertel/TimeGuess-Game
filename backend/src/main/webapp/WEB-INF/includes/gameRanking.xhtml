@@ -42,7 +42,7 @@
                 </p:dataTable>
                 <h:panelGrid columns="1">
                     <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all">
-                        <f:actionListener binding="#{gameRoundController.destroy()}" />
+                        <f:actionListener binding="#{gameRoundController.gameOver()}" />
                     </p:commandButton>
                 </h:panelGrid>
             </p:dialog>

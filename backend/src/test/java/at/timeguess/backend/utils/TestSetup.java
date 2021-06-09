@@ -109,12 +109,22 @@ public class TestSetup {
     }
 
     /**
-     * Creates a simple round with the given id only.
-     * @param roundId
+     * Creates a simple round with the given nr only.
+     * @param nr
      * @return
      */
-    public static Round createRound(Long roundId) {
-        return createEntity(Round::new, e -> e.setId(roundId));
+    public static Round createRound(int nr) {
+        return createEntity(Round::new, e -> e.setNr(nr));
+    }
+
+    /**
+     * Creates a simple round with the given nr and game only.
+     * @param nr
+     * @param game
+     * @return
+     */
+    public static Round createRound(int nr, Game game) {
+        return createEntity(() -> new Round(game, nr), e -> {});
     }
 
     /**

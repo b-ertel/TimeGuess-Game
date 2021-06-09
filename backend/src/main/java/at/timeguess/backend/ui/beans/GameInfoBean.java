@@ -1,11 +1,14 @@
 package at.timeguess.backend.ui.beans;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -48,8 +51,9 @@ public class GameInfoBean implements Serializable {
      * Returns the rounds of the set game.
      * @param game
      */
-    public Set<Round> getRounds() {
-        return game == null ? null : game.getRounds();
+    public List<Round> getRounds() {
+        return game == null ? null :game.getRounds().stream()
+            .sorted(Comparator.comparing(Round::getNr)).collect(Collectors.toList());
     }
 
     /**

@@ -165,7 +165,7 @@
             <h:form id="gameInfoForm" prependId="false">
                 <ui:remove>show game info</ui:remove>
                 <p:dialog header="Game Info" id="gameInfoDialog" widgetVar="gameInfoDialog" dynamic="true"
-                    modal="true" resizable="true" closeOnEscape="true" showEffect="fade" hideEffect="fade">
+                    modal="true" resizable="false" closeOnEscape="true" showEffect="fade" hideEffect="fade">
 
                     <p:outputPanel id="gameInfoData" widgetVar="gameInfoData" rendered="#{not empty curr}">
                         <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
@@ -223,10 +223,10 @@
                         scrollable="true" scrollHeight="100"
                         rendered="#{isAdmin or isManager}" style="margin-top:15px">
                         <f:facet name="header">Rounds played</f:facet>
-                        <!-- <p:column headerText="No." style="width:10%">
+                        <p:column headerText="No." style="width:7%">
                             <h:outputText value="#{round.nr}"/>
-                        </p:column> -->
-                        <p:column headerText="Term" styleClass="truncate" style="width:38%">
+                        </p:column>
+                        <p:column headerText="Term" styleClass="truncate" style="width:33%">
                             <h:outputText value="#{round.termToGuess.name}"/>
                         </p:column>
                         <p:column headerText="Team" styleClass="truncate" style="width:20%">
@@ -258,7 +258,7 @@
                 </p:confirmDialog>
                 <p:draggable for="deleteGameConfirm"/>
             </h:form>
-            
+
             <o:socket channel="userRegistrationChannel" scope="application" onmessage="socketListener" />
         </ui:composition>
     </body>

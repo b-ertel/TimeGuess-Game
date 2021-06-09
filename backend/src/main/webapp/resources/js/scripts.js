@@ -70,7 +70,7 @@ function userUpdate(name, id) {
 }
 
 function connectionCubeUpdate() {
-    clickIfExists("lobbyUpdate");
+    clickIfExists("cubeUpdate");
 }
 
 function clickIfExists(id) {

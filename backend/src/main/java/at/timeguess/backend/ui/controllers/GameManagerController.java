@@ -1,5 +1,7 @@
 package at.timeguess.backend.ui.controllers;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +14,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.swing.Timer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -163,22 +166,37 @@ public class GameManagerController {
     /**
      * A method for processing a {@link ConfiguredFacetsEvent}.
      * Method is called on facet-event, checks to which game the event belongs and estimates whether a round should start or end.
+     * When the countdown is running and the gamestate changes to paused, the current round can be invalidated by throwing the cube.
+     * That way the same guessing team gets a new term when the game restarts.
      */
     public synchronized void onConfiguredFacetsEvent(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (status.containsCube(configuredFacetsEvent.getCube())) {
             GameData data = status.getGameDataReloaded(configuredFacetsEvent.getCube());
 
-            // only act if game is currently played
-            if (data != null && data.game.getStatus() == GameState.PLAYED && !data.isValidating) {
-                data.isRoundActive = !data.isRoundActive;
+            switch (data.game.getStatus()) {
+                case PLAYED:
+                    // start countdown and validation only when game is currently running
+                    switch (getRoundState(data)) {
+                        case STARTING:
+                            startRoundByCube(data, configuredFacetsEvent.getCubeFace());
+                            break;
 
-                if (data.isRoundActive) {
-                    startRoundByCube(data, configuredFacetsEvent.getCubeFace());
-                }
-                else {
-                    data.isValidating = true;
-                    endRoundByCube(data, configuredFacetsEvent.getCubeFace());
-                }
+                        case RUNNING:
+                            endRoundByCube(data, configuredFacetsEvent.getCubeFace());
+                            break;
+
+                        default:
+                            break;
+                    }
+                    break;
+
+                case VALID_SETUP:
+                    // set round to invalid to repeat it with different term
+                    switchRoundState(data, RoundState.ERROR);
+                    break;
+
+                default:
+                    break;
             }
         }
     }
@@ -212,13 +230,13 @@ public class GameManagerController {
     }
 
     /**
-     * Method to get the current round for a given user, called by {@link GameRoundController}
-     * @param  user to find current round
+     * Method to get the current round for a given game, called by {@link GameRoundController}
+     * @param  game to find current round
      * @return current round
      */
-    public Round getCurrentRoundForUser(User user) {
-        Optional<GameData> data = status.getGameDataForUser(user);
-        return data.isPresent() ? data.get().currentRound : new Round();
+    public Round getCurrentRoundForGame(Game game) {
+        GameData data = status.getGameData(game);
+        return data == null ? new Round() : data.currentRound;
     }
 
     /**
@@ -236,14 +254,7 @@ public class GameManagerController {
      * @return
      */
     public RoundState getRoundStateForGame(Game game) {
-        GameData data = status.getGameData(game);
-
-        if (data == null || data.currentRound == null) return RoundState.NONE;
-        if (!data.isRoundActive && !data.isValidating) return RoundState.STARTING;
-        if (data.isRoundActive && !data.isValidating) return RoundState.RUNNING;
-        if (!data.isRoundActive && data.isValidating) return RoundState.VALIDATING;
-
-        return RoundState.ERROR;
+        return getRoundState(status.getGameData(game));
     }
 
     /**
@@ -252,23 +263,7 @@ public class GameManagerController {
      * @return
      */
     public WaitReason getWaitReasonForGame(Game game) {
-        GameData data = status.getGameData(game);
-
-        if (data != null && data.game != null) {
-            switch (data.game.getStatus()) {
-                case HALTED:
-                    return WaitReason.GAME_HALTED;
-
-                case VALID_SETUP:
-                    if (!data.isCubeOnline) return WaitReason.CUBE_OFFLINE;
-                    if (!data.isTeamsPresent) return WaitReason.TEAMS_ABSENT;
-                    break;
-
-                default:
-                    break;
-            }
-        }
-        return WaitReason.NONE;
+        return getWaitReason(status.getGameData(game));
     }
 
     /**
@@ -277,18 +272,46 @@ public class GameManagerController {
      * @return
      */
     public NoGameReason getNoGameReasonForGame(Game game) {
+        return getNoGameReason(status.getGameData(game));
+    }
+
+    /**
+     * Returns the formatted current countdown value for the given game.
+     * @param  game
+     * @return
+     */
+    public String getCountDownForGame(Game game) {
         GameData data = status.getGameData(game);
+        return data == null ? "--:--" : data.countDown.getCountDown();
+    }
 
-        if (data == null || data.game == null) return NoGameReason.GAME_UNKNOWN;
+    /**
+     * Returns the numeric current countdown value for the given game.
+     * @param  game
+     * @return
+     */
+    public int getTimerForGame(Game game) {
+        GameData data = status.getGameData(game);
+        return data == null ? 0 : data.countDown.getTimer();
+    }
 
-        switch (data.game.getStatus()) {
-            case FINISHED:
-                return NoGameReason.GAME_FINISHED;
-            case CANCELED:
-                return NoGameReason.GAME_CANCELED;
-            default:
-                return NoGameReason.GAME_WRONGSTATE;
-        }
+    /**
+     * Method to calculate the points the given team has reached in the given game.
+     * @param  game
+     * @param  team of which points are to be estimated
+     * @return points
+     */
+    public Integer getPointsOfTeamForGame(Game game, Team team) {
+        return roundService.getPointsOfTeamInGame(game, team);
+    }
+
+    /**
+     * Method to check which team has won the current game.
+     * @param  game
+     * @return winning team
+     */
+    public Team getTeamWithMostPointsForGame(Game game) {
+        return gameLogic.getTeamWithMostPoints(game);
     }
 
     /**
@@ -302,18 +325,8 @@ public class GameManagerController {
 
             // send invitation to all contained team members
             websocketManager.getMessageChannel().send(
-                Map.of("type", "gameInvitation", "name", game.getName(), "id", game.getId()),
-                getAllUserIdsOfGameTeams(game));
+                Map.of("type", "gameInvitation", "name", game.getName(), "id", game.getId()), getAllUserIdsOfGameTeams(game));
         }
-    }
-
-    /**
-     * Method to switch from active to validating round, called by {@link CountDownController}
-     * @param user user to find current round for
-     */
-    public void endRoundByCountDown(User user) {
-        // put the round inactive to enable starting a new round via flip
-        endRoundByCountDown(status.getGameDataForUser(user).orElse(null));
     }
 
     /**
@@ -324,14 +337,19 @@ public class GameManagerController {
      * @param v validation of round
      */
     public void validateRoundOfGame(Game game, Validation v) {
-        GameData data = status.getGameDataReloaded(game);
+        // end validation phase without checking the game status, as this leads to less problems
+        // - players can evaluate the round as incorrect themselves
+        // - by throwing the cube while the game is paused a running round can be invalidated
+        GameData data = status.getGameData(game);
 
-        // only act if game is currently played
-        if (data != null && data.game.getStatus() == GameState.PLAYED && data.isValidating) {
-            gameLogic.saveLastRound(data.game, v);
-            data.isValidating = false;
+        if (getRoundState(data) == RoundState.VALIDATING) {
+            gameLogic.validateRound(data.game, data.currentRound, v);
+            status.saveGame(data.game);
 
-            if (gameLogic.teamReachedMaxPoints(data.game, data.currentRound.getGuessingTeam())) {
+            Round lastRound = data.currentRound;
+            switchRoundState(data, RoundState.NONE);
+
+            if (gameLogic.teamReachedMaxPoints(data.game, lastRound.getGuessingTeam())) {
                 endGameFinished(data);
             }
             else if (gameLogic.stillTermsAvailable(data.game)) {
@@ -379,6 +397,44 @@ public class GameManagerController {
             .collect(Collectors.toSet());
     }
 
+    private RoundState getRoundState(GameData data) {
+        if (data == null || data.currentRound == null) return RoundState.NONE;
+        if (!data.isRoundActive && !data.isValidating) return RoundState.STARTING;
+        if (data.isRoundActive && !data.isValidating) return RoundState.RUNNING;
+        if (!data.isRoundActive && data.isValidating) return RoundState.VALIDATING;
+
+        return RoundState.ERROR;
+    }
+
+    private WaitReason getWaitReason(GameData data) {
+        if (data != null && data.game != null) {
+            switch (data.game.getStatus()) {
+                case HALTED:
+                    return WaitReason.GAME_HALTED;
+
+                case VALID_SETUP:
+                    if (!data.isCubeOnline) return WaitReason.CUBE_OFFLINE;
+                    if (!data.isTeamsPresent) return WaitReason.TEAMS_ABSENT;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        return WaitReason.NONE;
+    }
+
+    private NoGameReason getNoGameReason(GameData data) {
+        if (data == null || data.game == null) return NoGameReason.GAME_UNKNOWN;
+
+        switch (data.game.getStatus()) {
+            case FINISHED: return NoGameReason.GAME_FINISHED;
+            case CANCELED: return NoGameReason.GAME_CANCELED;
+            case SETUP: return NoGameReason.GAME_WRONGSTATE;
+            default: return NoGameReason.NONE;
+        }
+    }
+
     /**
      * Switches the state of the given game and acts according to a change if necessary.
      * @param data
@@ -387,22 +443,21 @@ public class GameManagerController {
         if (data == null) return;
 
         GameState oldState = data.game.getStatus();
+        GameState newState = status.switchGameState(data);
 
-        switch (status.switchGameState(data)) {
+        switch (newState) {
             case PLAYED:
-                switch (oldState) {
-                    case PLAYED:
-                        setupGame(data);
-                        break;
-
-                    default:
-                        if (data.currentRound == null) {
+                if (oldState != GameState.PLAYED) {
+                    switch (getRoundState(data)) {
+                        case NONE:
+                        case ERROR:
                             startGame(data);
-                        }
-                        else {
+                            break;
+
+                        default:
                             restartGame(data);
-                        }
-                        break;
+                            break;
+                    }
                 }
                 break;
 
@@ -416,17 +471,56 @@ public class GameManagerController {
         }
     }
 
-    /* --- start - push message sending functions --- */
-    private void setupGame(GameData data) {
-        sendGameMessage(data.game, data.isRoundActive || data.isValidating ? "setup" : "setupandupdate");
+    /**
+     * Sets the appropriate state attributes for the given state to the given data.
+     * @param data
+     * @param newState
+     */
+    private void switchRoundState(GameData data, RoundState newState) {
+        if (data == null) return;
+
+        switch (newState) {
+            case STARTING:
+                data.countDown.reset();
+                data.currentRound = getRoundState(data) == RoundState.ERROR
+                    ? gameLogic.repeatRound(data.game, data.currentRound)
+                    : gameLogic.getNextRound(data.game);
+                data.isRoundActive = false;
+                data.isValidating = false;
+                break;
+
+            case RUNNING:
+                data.startCountDown();
+                data.isRoundActive = true;
+                data.isValidating = false;
+                break;
+
+            case VALIDATING:
+                data.countDown.endCountDown();
+                data.isRoundActive = false;
+                data.isValidating = true;
+                break;
+
+            case NONE:
+                data.currentRound = null;
+                data.isRoundActive = false;
+                data.isValidating = false;
+                break;
+
+            case ERROR:
+                data.isRoundActive = true;
+                data.isValidating = true;
+                break;
+        }
     }
 
+    /* --- START - push message sending functions --- */
     /**
      * Method to get informations of next round, before cube starts the round
      * @param data data of game for which informations of next round should be estimated
      */
     private void startGame(GameData data) {
-        data.currentRound = gameLogic.getNextRound(data.game);
+        switchRoundState(data, RoundState.STARTING);
         sendGameMessage(data.game, "startGame");
     }
 
@@ -459,23 +553,25 @@ public class GameManagerController {
     /**
      * Method that starts a new Round by the cube for a game.
      * It initializes a new round and also calls a method to start the countdown.
-     * @param data     data of game for which round should be started
+     * @param data data of game for which round should be started
      * @param cubeFace face that sets round parameters
      */
     private void startRoundByCube(GameData data, CubeFace cubeFace) {
-        data.currentRound = gameLogic.getCubeInfosIntoRound(data.currentRound, cubeFace);
+        gameLogic.getCubeInfosIntoRound(data.currentRound, cubeFace);
+        switchRoundState(data, RoundState.RUNNING);
+
         sendGameMessage(data.game, "startRound");
     }
 
     private void endRoundByCube(GameData data, CubeFace cubeFace) {
+        switchRoundState(data, RoundState.VALIDATING);
         sendGameMessage(data.game, "endRoundViaFlip");
     }
 
     private void endRoundByCountDown(GameData data) {
-        // send countdown ended only on first call, but avoid inconsistency in properties
-        if (data != null && (!data.isValidating || data.isRoundActive)) {
-            data.isValidating = true;
-            data.isRoundActive = false;
+        // send countdown ended only on first call
+        if (getRoundState(data) == RoundState.RUNNING) {
+            switchRoundState(data, RoundState.VALIDATING);
             sendGameMessage(data.game, "endRoundViaCountDown");
         }
     }
@@ -485,7 +581,7 @@ public class GameManagerController {
      * @param data data of game for which informations of next round should be estimated
      */
     private void endRoundValidated(GameData data) {
-        data.currentRound = gameLogic.getNextRound(data.game);
+        switchRoundState(data, RoundState.STARTING);
         sendGameMessage(data.game, "validatedRound");
     }
 
@@ -494,9 +590,17 @@ public class GameManagerController {
     }
 
     private void sendGameMessage(Game game, String message) {
-        if (game != null) { this.websocketManager.getNewRoundChannel().send(message, getAllUserIdsOfGameTeams(game)); }
+        if (game != null) {
+            this.websocketManager.getNewRoundChannel().send(message, getAllUserIdsOfGameTeams(game));
+        }
     }
-    /* --- end - push message sending functions --- */
+
+    private void sendCountDownUpdate(Game game) {
+        if (game != null) {
+            this.websocketManager.getCountDownChannel().send("countDownUpdate", getAllUserIdsOfGameTeams(game));
+        }
+    }
+    /* --- END - push message sending functions --- */
 
     private class Status implements Iterable<GameData> {
 
@@ -521,10 +625,6 @@ public class GameManagerController {
             return getGameData(cube, true);
         }
 
-        public GameData getGameDataReloaded(Game game) {
-            return getGameData(game, true);
-        }
-
         public Optional<GameData> getGameDataForUser(User user) {
             return cube2Game.values().stream()
                 .filter(gd -> gd.game.getTeams().stream().anyMatch(t -> t.getTeamMembers().contains(user)))
@@ -542,19 +642,20 @@ public class GameManagerController {
          * @return game status after possibly changing it and saving the game
          */
         public GameState switchGameState(GameData data) {
-            GameState ret = data.game.getStatus();
-            switch (ret) {
+            GameState oldState = data.game.getStatus();
+            switch (oldState) {
                 case VALID_SETUP:
                 case PLAYED:
                     // GameState newState = data.isTeamsPresent && data.isCubeOnline ?
-                    GameState newState = data.isTeamsPresent ? GameState.PLAYED : GameState.VALID_SETUP;
+                    GameState newState = data.isTeamsPresent && data.isCubeOnline ? GameState.PLAYED
+                        : GameState.VALID_SETUP;
                     Game game = setGameState(data.game, newState);
                     // problematic: if (game != null) data.game = game;
-                    assert newState == game.getStatus();
+                    assert game == null && data.game.getStatus() == oldState || data.game.getStatus() == newState;
                     return newState;
 
                 default:
-                    return ret;
+                    return oldState;
             }
         }
 
@@ -586,7 +687,7 @@ public class GameManagerController {
             if (ret == null) return false;
 
             // put into internal list tied to cube
-            cube2Game.put(cube, new GameData(game));
+            cube2Game.put(cube, new GameData(game, GameManagerController.this.new CountDown()));
             return true;
         }
 
@@ -630,9 +731,8 @@ public class GameManagerController {
             // ensure authenticated (is not the case when called from presence event)
             setAuthenticatedUserDefault();
 
-            // transfer relevant (possibly changed outside) values from fresh instance
-            // to saved one, the other way around rounds cannot be saved
-            // => hibernate exception 'detached entity passed to persist'
+            // transfer relevant (possibly changed outside) values from fresh instance to saved one,
+            // the other way around (i.e. replacing current instance) leads to different kinds of problems
             Game game = gameService.loadGame(data.game.getId());
             if (game != null) {
                 data.game.setName(game.getName());
@@ -644,18 +744,26 @@ public class GameManagerController {
         }
 
         /**
+         * Tries to save the given game after making sure authentication is set.
+         * @param  game
+         * @return saved game
+         */
+        private Game saveGame(Game game) {
+            setAuthenticatedUserDefault();
+            return gameService.saveGame(game);
+        }
+
+        /**
          * Tries to save given game with given state, on error resets old state in instance.
          * @param  game  game to save with given state
          * @param  state state to save in given game
-         * @return       saved game or null if given game could not be saved,
-         *               given game if state is already set
+         * @return saved game or null if given game could not be saved, given game if state is already set
          */
         private Game setGameState(Game game, GameState newState) {
             GameState oldState = game.getStatus();
             if (oldState != newState) {
-                setAuthenticatedUserDefault();
                 game.setStatus(newState);
-                Game ret = gameService.saveGame(game);
+                Game ret = saveGame(game);
                 if (ret == null) game.setStatus(oldState);
                 return ret;
             }
@@ -666,8 +774,7 @@ public class GameManagerController {
             SecurityContext context = SecurityContextHolder.getContext();
             Authentication auth = context.getAuthentication();
             if (auth == null) {
-                auth = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(DEFAULT_USER, DEFAULT_PASSWORD));
+                auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(DEFAULT_USER, DEFAULT_PASSWORD));
                 context.setAuthentication(auth);
             }
         }
@@ -675,18 +782,25 @@ public class GameManagerController {
 
     public static class GameData {
 
+        final CountDown countDown;
         final Game game;
         Round currentRound = null;
         boolean isRoundActive = false;
         boolean isValidating = false;
-        boolean isTeamsPresent = false;
-        // must assume that cube is online in the first place
-        // because online-message is not sent often enough to start with false (game would have to wait for it...)
+        boolean isTeamsPresent = false; // assume cube is online (otherwise would have to wait for online-message)
         boolean isCubeOnline = true;
 
-        public GameData(Game game) {
+        public GameData(Game game, CountDown countDown) {
             if (game == null) throw new IllegalArgumentException("Cannot hold null game");
             this.game = game;
+            this.countDown = countDown;
+        }
+
+        /**
+         * Starts a countdown for the held game with the time set in the current round.
+         */
+        public void startCountDown() {
+            countDown.startCountDown(currentRound.getTime(), this);
         }
 
         /**
@@ -696,8 +810,8 @@ public class GameManagerController {
          */
         public void updateTeamPresence(Set<Long> userIds) {
             // count present teams (one player per team must be present)
-            Set<Team> teams = game.getTeams();
-            long count = teams.stream().filter(t -> t.getTeamMembers().stream()
+            long count = game.getTeams().stream()
+                .filter(t -> t.getTeamMembers().stream()
                 .anyMatch(u -> userIds.contains(u.getId()))).count();
 
             isTeamsPresent = count >= game.getTeamCount();
@@ -723,7 +837,10 @@ public class GameManagerController {
             if (obj == null)
                 return false;
 
-            if (obj.getClass() == Game.class) { final Game other = (Game) obj; return Objects.equals(game, other); }
+            if (obj.getClass() == Game.class) {
+                final Game other = (Game) obj;
+                return Objects.equals(game, other);
+            }
 
             if (obj.getClass() == GameData.class) {
                 final GameData other = (GameData) obj;
@@ -732,10 +849,100 @@ public class GameManagerController {
 
             return false;
         }
+    }
 
-        @Override
-        public String toString() {
-            return String.format("GameData<%s>", game);
+    public class CountDown {
+
+        private int min = 0;
+        private int sec = 0;
+        private Timer timer;
+        private int delay = 1000; // milliseconds
+
+        /**
+         * @return countDown as string to display
+         */
+        public String getCountDown() {
+            return getMin() + " : " + getSec();
+        }
+
+        /**
+         * @return countDown as integer
+         */
+        public int getTimer() {
+            return getMin() * 60 + getSec();
+        }
+
+        public int getMin() {
+            return min;
+        }
+
+        public void setMin(int min) {
+            this.min = min;
+        }
+
+        public int getSec() {
+            return sec;
+        }
+
+        public void setSec(int sec) {
+            this.sec = sec;
+        }
+
+        /**
+         * starts countDown with given time and for given game
+         * @param time to guess
+         * @param game for which the countdown starts
+         */
+        public void startCountDown(int time, GameData gameData) {
+            setMin(time);
+            setSec(0);
+
+            ActionListener task = new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    count(gameData);
+                }
+            };
+            this.timer = new Timer(delay, task);
+            this.timer.start();
+        }
+
+        /**
+         * stops countDown
+         */
+        public void endCountDown() {
+            if (this.timer != null) { this.timer.stop(); }
+        }
+
+        public void reset() {
+            this.timer = null;
+            setMin(0);
+            setSec(0);
+        }
+
+        /**
+         * counting step - informs websocket listener after each update
+         */
+        public void count(GameData gameData) {
+            if (min > 0) {
+                if (sec > 0) {
+                    sec--;
+                }
+                else {
+                    min--;
+                    sec = 59;
+                }
+            }
+            else if (min == 0 && sec > 0) {
+                sec--;
+            }
+            else {
+                endCountDown();
+                // put the round inactive to enable starting a new round via flip
+                GameManagerController.this.endRoundByCountDown(gameData);
+            }
+            GameManagerController.this.sendCountDownUpdate(gameData.game);
         }
     }
 }

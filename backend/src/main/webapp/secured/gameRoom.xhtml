@@ -10,160 +10,217 @@
     template="/WEB-INF/templates/main.xhtml">
 
     <ui:define name="content">
+        <f:metadata>
+            <f:viewAction action="#{gameRoundController.setUser(sessionInfoBean.currentUser)}" />
+        </f:metadata>
+        <c:set var="grc" value="#{gameRoundController}" scope="session" />
+
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true" sticky="true" value="Multiple"/>
 
         <h:form>
             <p:panel styleClass="gameroomHeader">
                 <h1>Gameroom</h1>
-                <h:outputText style="font-size:15px!important"
-                    value="---- ---- ---- ---- ---- ---- ----"
-                    rendered="#{not empty gameRoundController.currentGame}" />
+                <h:outputText style="font-size:15px!important" value="---- ---- ---- ---- ---- ---- ----" />
                 <h:outputText style="font-size:20px!important"
-                    value="#{gameRoundController.currentGame.name}   -   #{gameRoundController.currentGame.topic.name}   -   Max. points: #{gameRoundController.currentGame.maxPoints}"
-                    rendered="#{not empty gameRoundController.currentGame}" />
+                    value="#{grc.currentGame.name}   -   #{grc.currentGame.topic.name}   -   Max. points: #{grc.currentGame.maxPoints}"
+                    rendered="#{not empty grc.currentGame}" />
+                <h:outputText style="font-size:20px!important"
+                    value="No game available"
+                    rendered="#{empty grc.currentGame}" />
             </p:panel>
         </h:form>
 
-        <h:form id="stateInfo" prependId="false">
-            <p:panel>
-                <p:outputPanel>Game is in state: #{gameRoundController.currentRunState}</p:outputPanel>
-                <p:outputPanel>Round is in state: #{gameRoundController.currentRoundState}</p:outputPanel>
-                <p:outputPanel>Reason to wait is: #{gameRoundController.currentWaitReason}</p:outputPanel>
-                <p:outputPanel>Reason for no game is: #{gameRoundController.currentNoGameReason}</p:outputPanel>
-            </p:panel>
-        </h:form>
-
-        <h:form id="noGameForm" styleClass="gameroomNogame" rendered="#{empty gameRoundController.currentGame}">
-            <h:panelGroup rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status == 'VALID_SETUP'}">
-                <p:outputPanel>Your game is up and running, but paused for some reason.</p:outputPanel>
-                <p:outputPanel>Possibly because there are not enough players in the gameroom (minimum one player per team) or a lost connection to the cube.</p:outputPanel>
-                <p:outputPanel>Please wait...</p:outputPanel>
+        <h:form id="noGameForm" styleClass="gameroomNogame" rendered="#{grc.currentRunState == 'NONE'}">
+            <h:panelGroup rendered="#{grc.currentNoGameReason == 'GAME_FINISHED'}">
+                <p:outputPanel>Your game finished by reaching the maximum points set or running out of terms.</p:outputPanel>
+                <p:outputPanel>Please leave the gameroom!</p:outputPanel>
             </h:panelGroup>
-            <h:panelGroup rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status == 'HALTED'}">
+            <h:panelGroup rendered="#{grc.currentNoGameReason == 'GAME_CANCELED'}">
+                <p:outputPanel>Your game was canceled from outside and cannot be restarted.</p:outputPanel>
+                <p:outputPanel>Please leave the gameroom!</p:outputPanel>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{grc.currentNoGameReason == 'GAME_WRONGSTATE'}">
+                <p:outputPanel>Your game is in some wrong state and cannot be started right now.</p:outputPanel>
+                <p:outputPanel>Please find some privileged user to fix that...</p:outputPanel>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{grc.currentNoGameReason == 'GAME_UNKNOWN'}">
+                <p:outputPanel>There is no game known for you to play right now.</p:outputPanel>
+                <p:outputPanel>Please leave the gameroom!</p:outputPanel>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{grc.currentNoGameReason == 'NONE'}">
+                <p:outputPanel>Your game has some incorrect state, but there is no obvious reason... please try to reload the page.</p:outputPanel>
+            </h:panelGroup>
+        </h:form>
+
+        <h:form id="waitGameForm" styleClass="gameroomNogame" rendered="#{grc.currentRunState == 'WAITING'}">
+            <h:panelGroup rendered="#{grc.currentWaitReason == 'TEAMS_ABSENT'}">
+                <p:outputPanel>Your game is up and running, but paused because there are not enough players in the gameroom (minimum is one player per team).</p:outputPanel>
+                <p:outputPanel>Please inform your friends and wait...</p:outputPanel>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{grc.currentWaitReason == 'CUBE_OFFLINE'}">
+                <p:outputPanel>Your game is up and running, but paused because the connection to the cube was lost.</p:outputPanel>
+                <p:outputPanel>Please try to reconnect it and wait...</p:outputPanel>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{grc.currentWaitReason == 'GAME_HALTED'}">
                 <p:outputPanel>Your game was paused from outside.</p:outputPanel>
                 <p:outputPanel>Please find somebody to restart it...</p:outputPanel>
             </h:panelGroup>
-            <h:panelGroup rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status == 'PLAYED'}">
-                <p:outputPanel>The other players are in the middle of a round.</p:outputPanel>
-                <p:outputPanel>Please wait until it ends...</p:outputPanel>
+            <h:panelGroup rendered="#{grc.currentWaitReason == 'NONE'}">
+                <p:outputPanel>There is no reason to wait... please try to reload the page.</p:outputPanel>
             </h:panelGroup>
-            <p:progressBar id="progressBarIndeterminate" mode="indeterminate"
-                rendered="#{gameManagerController.getCurrentGameForUser(sessionInfoBean.currentUser).status != 'PLAYED'}" />
+            <p:progressBar id="progressBarIndeterminate" mode="indeterminate" />
         </h:form>
 
-        <h:form id="gameTableForm" rendered="#{not empty gameRoundController.currentGame}">
-            <p:dataTable id="leaderbord" var="team" value="#{gameRoundController.teamsInGame}">
-                <p:column headerText="Name">
+        <h:form id="gameTableForm" rendered="#{not empty grc.currentGame}">
+            <p:dataTable id="leaderbord" var="team" value="#{grc.teamsInGame}"
+                rowStyleClass="#{grc.isGuessingTeam(team) ? grc.isUserTeam(team) ? 'USERTEAM GUESSTEAM' : 'GUESSTEAM' : grc.isUserTeam(team) ? 'USERTEAM' : null}">
+                <p:column headerText="Team">
                     <h:outputText value="#{team.name}" />
                 </p:column>
-                <p:column headerText="Points">
-                    <h:outputText value="#{gameRoundController.calculatePointsOfTeam(team)}" />
+                <p:column headerText="Current Points">
+                    <h:outputText value="#{grc.calculatePointsOfTeam(team)}" />
                 </p:column>
             </p:dataTable>
         </h:form>
 
-        <h:form id="gameRoundForm" rendered="#{not empty gameRoundController.currentGame}">
-            <p:panel id="roundInfo" header="Round #{gameRoundController.currentRound.nr}">
-                <h:panelGroup rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and !gameRoundController.isInGuessingTeam()}">
-                    <p:outputPanel>#{gameRoundController.nextRound.guessingUser.username} from #{gameRoundController.nextRound.guessingTeam.name} has to describe the term #{gameRoundController.nextRound.termToGuess.name}.</p:outputPanel>
-                </h:panelGroup>
-                <h:panelGroup rendered="#{empty gameRoundController.currentRound and (gameRoundController.nextRound.nr==1) and gameRoundController.isInGuessingTeam()}">
-                    <p:outputPanel>Flip your cube to start the first round... may the best team win!</p:outputPanel>
-                    <p:outputPanel>#{gameRoundController.nextRound.guessingUser.username} has to describe first.</p:outputPanel>
-                </h:panelGroup>
-                <h:panelGroup rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and !gameRoundController.isInGuessingTeam()}">
-                    <p:outputPanel>#{gameRoundController.currentRound.guessingTeam.name} tried to guess the term #{gameRoundController.currentRound.termToGuess.name} during the last round.</p:outputPanel>
-                    <p:outputPanel>Next #{gameRoundController.nextRound.guessingUser.username} from #{gameRoundController.nextRound.guessingTeam.name} has to describe the term #{gameRoundController.nextRound.termToGuess.name}</p:outputPanel>
-                </h:panelGroup>
-                <h:panelGroup rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inRound and gameRoundController.isInGuessingTeam()}">
-                    <p:outputPanel>#{gameRoundController.currentRound.guessingTeam.name} tried to guess the term #{gameRoundController.currentRound.termToGuess.name} during the last round.</p:outputPanel>
-                    <p:outputPanel>Next #{gameRoundController.nextRound.guessingUser.username} has to describe.</p:outputPanel>
-                    <p:outputPanel>Flip the cube and try your best!</p:outputPanel>
-                </h:panelGroup>
-                <h:panelGroup rendered="#{empty gameRoundController.currentRound and gameRoundController.nextRound.nr!=1 and !gameRoundController.isInGuessingTeam()}">
-                    <p:outputPanel>You have entered the GameRoom a little bit late, but no worries! The next round is starting...</p:outputPanel>
-                    <p:outputPanel>#{gameRoundController.nextRound.guessingUser.username} from #{gameRoundController.nextRound.guessingTeam.name} has to describe the term #{gameRoundController.nextRound.termToGuess.name}.</p:outputPanel>
-                </h:panelGroup>
-                <h:panelGroup rendered="#{empty gameRoundController.currentRound and gameRoundController.nextRound.nr!=1 and gameRoundController.isInGuessingTeam()}">
-                    <p:outputPanel>You have entered the GameRoom a little bit late, but no worries! The next round is starting...</p:outputPanel>
-                    <p:outputPanel>#{gameRoundController.nextRound.guessingUser.username} has to describe next.</p:outputPanel>
-                </h:panelGroup>
+        <h:form id="gameRoundForm" prependId="false" rendered="#{grc.currentRunState == 'RUNNING'}">
+            <c:set var="currRound" value="#{grc.currentRound}" scope="request" />
+            <p:panel id="roundInfo" header="Round #{grc.currentRound.nr}">
+                <p:outputPanel rendered="#{currRound.nr > 1}">
+                    <c:choose>
+                        <c:when test="#{empty grc.lastRound}">
+                            You entered the gameroom a little late, so there is no information about the last round available for you, but you can jump right in.
+                        </c:when>
+                        <c:otherwise>
+                            #{grc.inLastGuessingTeam ? 'You' : grc.lastRound.guessingTeam.name} #{grc.lastRound.correctAnswer ? 'correctly guessed' : 'tried to guess'} the term #{grc.lastRound.termToGuess.name} during the last round.
+                        </c:otherwise>
+                    </c:choose>
+                </p:outputPanel>
 
-                <p:outputPanel header="RoundInfo" rendered="#{gameRoundController.inRound}">
+                <c:choose>
+                    <c:when test="#{grc.inGuessingTeam}">
+                        <c:choose>
+                            <c:when test="#{grc.currentRoundState == 'STARTING'}">
+                                <c:choose>
+                                    <c:when test="#{currRound.nr == 1}">
+                                        <p:outputPanel>Flip your cube to start the first round... may the best team win!</p:outputPanel>
+                                        <p:outputPanel>#{currRound.guessingUser.username} has to describe first.</p:outputPanel>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <p:outputPanel>#{currRound.guessingUser.username} has to describe next... flip the cube and try your best!</p:outputPanel>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:when>
+                            <c:when test="#{grc.currentRoundState == 'RUNNING'}">
+                                <p:outputPanel>#{currRound.guessingUser.username} is describing at the moment.</p:outputPanel>
+                            </c:when>
+                            <c:when test="#{grc.currentRoundState == 'VALIDATING'}">
+                                <p:outputPanel>#{currRound.guessingUser.username} has just finished describing.</p:outputPanel>
+                                <p:outputLabel>Your teams effort is currently evaluated by the other teams.</p:outputLabel>
+                            </c:when>
+                        </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                        <c:choose>
+                            <c:when test="#{grc.currentRoundState == 'STARTING'}">
+                                <p:outputPanel>#{currRound.nr == 1 ? 'First' : 'Next'} #{currRound.guessingUser.username} from #{currRound.guessingTeam.name} has to describe the term #{currRound.termToGuess.name}.</p:outputPanel>
+                            </c:when>
+                            <c:when test="#{grc.currentRoundState == 'RUNNING'}">
+                                <p:outputPanel>Currently #{currRound.guessingUser.username} from #{currRound.guessingTeam.name} is describing the term #{currRound.termToGuess.name}.</p:outputPanel>
+                            </c:when>
+                            <c:when test="#{grc.currentRoundState == 'VALIDATING'}">
+                                <p:outputPanel>#{currRound.guessingUser.username} from #{currRound.guessingTeam.name} has just finished describing the term #{currRound.termToGuess.name}.</p:outputPanel>
+                                <p:outputPanel>If you don't see the round validation dialog, click the button in the top right corner.</p:outputPanel>
+                            </c:when>
+                        </c:choose>
+    
+                        <p:commandButton type="button" icon="fa fa-superpowers" styleClass="revalidate"
+                            onclick="PF('roundValidationDialog').show()"
+                            update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" />
+                    </c:otherwise>
+                </c:choose>
+
+                <p:outputPanel header="RoundInfo">
                     <h3>Time left to guess</h3>
                     <h1 class="p-text-center">
-                         <h:outputText value="#{countDownController.getCountDown()}" />
+                        <h:outputText id="countDown" value="#{grc.countDown}" />
                     </h1>
                     <p:panelGrid columns="2" layout="flex" styleClass="ui-panelgrid-blank" style="margin-top:15px"
                         columnClasses="p-col-5, p-col-7" contentStyleClass="ui-fluid">
                         <p:outputLabel value="User: " />
-                        <p:outputLabel value="#{gameRoundController.currentRound.guessingUser.username}" />
+                        <p:outputLabel value="#{currRound.guessingUser.username}" />
 
                         <p:outputLabel value="Team: " />
-                        <p:outputLabel value="#{gameRoundController.currentRound.guessingTeam.name}" />
+                        <p:outputLabel value="#{currRound.guessingTeam.name}" />
 
-                        <c:if test="${!gameRoundController.inGuessingTeam}">
-                            <p:outputLabel value="Term: "/>
-                            <p:outputLabel value="#{gameRoundController.currentRound.termToGuess.name}" />
-                        </c:if>
+                        <p:outputLabel value="Term: "/>
+                        <p:outputLabel value="#{grc.inGuessingTeam ? '?' : currRound.termToGuess.name}" />
 
                         <p:outputLabel value="Points: " />
-                        <p:outputLabel value="#{gameRoundController.currentRound.points}" />
+                        <p:outputLabel value="#{currRound.points}" />
 
                         <p:outputLabel value="Activity: " />
-                        <p:outputLabel value="#{gameRoundController.currentRound.activity}" />
-                    </p:panelGrid> 
+                        <p:outputLabel value="#{currRound.activity}" />
+                    </p:panelGrid>
                 </p:outputPanel>
             </p:panel>
         </h:form>
 
         <h:form id="roundValidationForm">
-            <p:dialog id="roundValidationDialog" header="Round Validation"
-                widgetVar="roundValidationDialog" dynamic="true" modal="true"
-                resizable="false" closeOnEscape="false" showEffect="fade"
-                hideEffect="fade" responsive="true" closable="false">
+            <p:dialog id="roundValidationDialog" header="Round Validation" widgetVar="roundValidationDialog" modal="true" dynamic="true"
+                responsive="true" resizable="false" closable="false" closeOnEscape="false" showEffect="fade" hideEffect="fade">
 
-                <h:panelGroup rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" styleClass="dlgContent">
-                    <p:outputPanel>Did #{gameRoundController.currentRound.guessingTeam.name} guess #{gameRoundController.currentRound.termToGuess.name} correctly?</p:outputPanel>
-                    <p:outputPanel>First click comes first...</p:outputPanel>
-                </h:panelGroup>
-                <h:panelGroup rendered="#{gameRoundController.inGuessingTeam}" styleClass="dlgContent">
-                    <p:outputPanel>You gave your best shot, your fate is now in the hands of your rivals.</p:outputPanel>
-                    <p:outputPanel>Please wait until they have evaluated your effort...</p:outputPanel>
-                </h:panelGroup>
-                <h:panelGroup rendered="#{empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" styleClass="dlgContent">
-                    <p:outputPanel>You have the chance to validate the last round if you want to...</p:outputPanel>
-                </h:panelGroup>
-
-                <h:panelGrid columns="3" rendered="#{!gameRoundController.inGuessingTeam}">
-                    <p:commandButton value="Correct"
-                        action="#{gameRoundController.correctRound}" update=":gameRoundForm :gameTableForm"/>
-                    <p:commandButton value="Incorrect"
-                        action="#{gameRoundController.incorrectRound}" update=":gameRoundForm :gameTableForm"/>
-                    <p:commandButton value="Cheated"
-                        action="#{gameRoundController.cheatedRound}" update=":gameRoundForm :gameTableForm"/>
-                </h:panelGrid>
+                <c:choose>
+                    <c:when test="#{grc.currentRoundState == 'VALIDATING'}">
+                        <h:panelGroup styleClass="dlgContent">
+                            <c:choose>
+                                <c:when test="#{grc.inGuessingTeam}">
+                                    <p:outputPanel>You gave your best shot, your fate is now in the hands of your rivals.</p:outputPanel>
+                                    <p:outputPanel>Please wait until they have evaluated your effort...</p:outputPanel>
+                                </c:when>
+                                <c:otherwise>
+                                    <p:outputPanel>Did #{grc.currentRound.guessingTeam.name} guess #{grc.currentRound.termToGuess.name} correctly?</p:outputPanel>
+                                    <p:outputPanel>First click comes first...</p:outputPanel>
+                                </c:otherwise>
+                            </c:choose>
+                        </h:panelGroup>
+                        
+                        <h:panelGrid columns="3" rendered="#{!grc.inGuessingTeam}">
+                            <p:commandButton value="Correct" action="#{grc.correctRound}" update=":gameRoundForm :gameTableForm"/>
+                            <p:commandButton value="Incorrect" action="#{grc.incorrectRound}" update=":gameRoundForm :gameTableForm"/>
+                            <p:commandButton value="Cheated" action="#{grc.cheatedRound}" update=":gameRoundForm :gameTableForm"/>
+                        </h:panelGrid>
+                    </c:when>
+                    <c:otherwise>
+                        <p:outputPanel>Round cannot be validated right now!</p:outputPanel>
+                        <h:panelGrid columns="1">
+                            <p:commandButton value="OK" onclick="PF('roundValidationDialog').hide()" />
+                        </h:panelGrid>
+                    </c:otherwise>
+                </c:choose>
             </p:dialog>
         </h:form>
 
         <h:form id="roundTimesUpForm">
-              <p:dialog id="roundTimesUpDialog" header="Time is up"
-                widgetVar="roundTimesUpDialog" dynamic="true" modal="true"
-                resizable="false" closeOnEscape="false" showEffect="fade"
-                hideEffect="fade" responsive="true" closable="false">
-                
-                <h:panelGroup rendered="#{not empty gameRoundController.currentRound and !gameRoundController.inGuessingTeam}" styleClass="dlgContent">
-                    <p:outputPanel>Seems like #{gameRoundController.currentRound.guessingTeam.name} did not guess #{gameRoundController.currentRound.termToGuess.name} in time.</p:outputPanel>
-                    <p:outputPanel>Please confirm this round to continue!</p:outputPanel>
+            <p:dialog id="roundTimesUpDialog" header="Time is up" widgetVar="roundTimesUpDialog" modal="true" dynamic="true"
+                responsive="true" resizable="false" closable="false" closeOnEscape="false" showEffect="fade" hideEffect="fade">
+
+                <h:panelGroup styleClass="dlgContent">
+                    <c:choose>
+                        <c:when test="#{grc.inGuessingTeam}">
+                            <p:outputPanel>That took a bit long!</p:outputPanel>
+                            <p:outputPanel>Please wait until your rivals have confirmed this round...</p:outputPanel>
+                        </c:when>
+                        <c:otherwise>
+                            <p:outputPanel>Seems like #{grc.currentRound.guessingTeam.name} did not guess #{grc.currentRound.termToGuess.name} in time.</p:outputPanel>
+                            <p:outputPanel>Please confirm this round to continue!</p:outputPanel>
+                        </c:otherwise>
+                    </c:choose>
                 </h:panelGroup>
-                <h:panelGroup rendered="#{not empty gameRoundController.currentRound and gameRoundController.inGuessingTeam}" styleClass="dlgContent">
-                    <p:outputPanel>That took a bit long!</p:outputPanel>
-                    <p:outputPanel>Please wait until your rivals confirm this round...</p:outputPanel>
-                </h:panelGroup>
-                
-                <h:panelGrid columns="2" rendered="#{!gameRoundController.inGuessingTeam}">
+
+                <h:panelGrid columns="2" rendered="#{!grc.inGuessingTeam}">
                     <p:commandButton value="Confirm"
-                        action="#{gameRoundController.endRoundViaCountDown}" update=":gameRoundForm :gameTableForm"
+                        action="#{grc.endRoundViaCountDown}" update=":gameRoundForm :gameTableForm"
                         oncomplete="PF('roundTimesUpDialog').hide()"/>
                 </h:panelGrid>
             </p:dialog>
@@ -190,7 +247,7 @@
         <o:socket channel="countDownChannel" scope="session"
             user="#{sessionInfoBean.currentUser.id}"
             onmessage="function(m){console.log(m);}">
-            <p:ajax event="countDownUpdate" update=":gameRoundForm:roundInfo"/>
+            <p:ajax event="countDownUpdate" update="countDown" />
         </o:socket>
 
         <o:socket channel="newRoundChannel" scope="session"
@@ -198,61 +255,61 @@
             user="#{sessionInfoBean.currentUser.id}">
 
             <p:ajax event="startRound"
-                listener="#{gameRoundController.startRound}"
-                update=":gameRoundForm:roundInfo stateInfo" />
+                listener="#{grc.startRound}"
+                update=":gameRoundForm:roundInfo" />
 
             <p:ajax event="endRoundViaFlip"
-                listener="#{gameRoundController.endRound}"
+                listener="#{grc.endRound}"
                 oncomplete="PF('roundValidationDialog').show()"
-                update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog stateInfo" />
+                update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" />
+
+            <p:ajax event="endRoundViaCountDown"
+                oncomplete="PF('roundTimesUpDialog').show()"
+                update=":roundTimesUpForm:roundTimesUpDialog" />
 
             <p:ajax event="validatedRound"
-                listener="#{gameRoundController.getNextRoundInfos}"
+                listener="#{grc.validatedRound}"
                 oncomplete="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide()"
                 update="@all" />
 
-            <p:ajax event="endRoundViaCountDown"
-                listener="#{gameRoundController.setInRound(false)}"
-                oncomplete="PF('roundTimesUpDialog').show()"
-                update=":roundTimesUpForm:roundTimesUpDialog stateInfo" />
-
             <p:ajax event="gameOver"
-                onevent="PF('roundValidationDialog').hide())"
+                onevent="PF('roundValidationDialog').hide()"
                 oncomplete="PF('gameOverDialog').show()"
-                update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog stateInfo" />
+                update=":gameRoundForm:roundInfo :gameOverForm:gameOverDialog" />
 
             <p:ajax event="termsOver"
-                onevent="PF('roundValidationDialog').hide()) PF('roundTimesUpDialog').hide()"
+                onevent="PF('roundValidationDialog').hide(); PF('roundTimesUpDialog').hide()"
                 oncomplete="PF('termOverDialog').show()"
-                update=":gameRoundForm:roundInfo :termOverForm:termOverDialog stateInfo" />
+                update=":gameRoundForm:roundInfo :termOverForm:termOverDialog" />
 
             <p:ajax event="gameCanceled"
-                onevent="PF('roundValidationDialog').hide())"
+                onevent="PF('roundValidationDialog').hide()"
                 oncomplete="PF('gameCanceledDialog').show()"
-                update=":gameRoundForm:roundInfo :gameCanceledForm:gameCanceledDialog stateInfo" />
+                update=":gameRoundForm:roundInfo :gameCanceledForm:gameCanceledDialog" />
 
             <p:ajax event="startGame"
-                listener="#{gameRoundController.setup}"
+                listener="#{grc.setup}"
                 update="@all" />
 
             <p:ajax event="restartGame"
-                listener="#{gameRoundController.setup}"
+                listener="#{grc.setup}"
+                onevent="if (grc.getCurrentRoundState() == 'VALIDATING') { PF('roundValidationDialog').show(); }"
                 update="@all" />
 
             <p:ajax event="pauseGame"
-                listener="#{gameRoundController.destroy}"
+                listener="#{grc.pauseGame}"
                 update="@all" />
 
             <p:ajax event="setup"
-                listener="#{gameRoundController.setup}" />
+                listener="#{grc.setup}" />
 
             <p:ajax event="setupandupdate"
-                listener="#{gameRoundController.setup}"
+                listener="#{grc.setup}"
                 update="@all" />
 
             <p:ajax event="healthMessage"
                 listener="#{cubeStatusController.displayHealthMessage}"
-                update="msg stateInfo" />
+                update="msg" />
         </o:socket>
     </ui:define>
 </ui:composition>

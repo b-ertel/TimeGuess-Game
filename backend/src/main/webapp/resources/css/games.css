@@ -29,6 +29,17 @@
     color: #2E4053 !important;
 }
 
+.GUESSTEAM {
+    background-color: rgba(165, 208, 165, 0.7) !important;
+    background-image: none !important;
+    color: #2E4053 !important;
+}
+
+.USERTEAM {
+    font-style: italic;
+    font-weight: 600;
+}
+
 /* custom classes from primefaces show cases */
 .game-badge {
     border-radius: 2px;
@@ -301,4 +312,16 @@
     margin: 8px 0 10px;
     font-weight: bold;
     text-align: center;
+}
+
+#roundInfo {
+    position: relative;
+}
+
+#roundInfo button.revalidate {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    right: 4px;
+    top: 5px;
 }
