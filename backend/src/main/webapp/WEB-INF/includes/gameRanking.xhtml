@@ -4,7 +4,8 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:p="http://primefaces.org/ui">
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core">
 
 <body>
     <ui:composition>
@@ -14,14 +15,31 @@
                 resizable="false" closeOnEscape="false" showEffect="fade"
                 hideEffect="fade" responsive="true" closable="false">
 
-                <p:panel styleClass="rankingLabel" rendered="#{gameOver}">Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!</p:panel>
-                <p:panel styleClass="rankingLabel" rendered="#{termOver}">
-                    <p:outputPanel>You played quite some rounds... unfortunatly all terms within this topic have been used.</p:outputPanel>
-                    <p:outputPanel style="margin-top:10px">Congratulations to #{gameRoundController.computeWinningTeam().name} on winning the game!</p:outputPanel>
-                </p:panel>
-                <p:panel styleClass="rankingLabel" rendered="#{gameCanceled}">
-                    <p:outputPanel>Your game was canceled from outside!</p:outputPanel>
-                    <p:outputPanel style="margin-top:10px">#{gameRoundController.computeWinningTeam().name} was in the lead...</p:outputPanel>
+                <p:panel styleClass="rankingLabel">
+                    <c:set var="winner" value="#{gameRoundController.computeWinningTeam()}" scope="request" />
+                    <c:choose>
+                        <c:when test="#{gameOver}">
+                           <p:outputLabel>Congratulations to #{winner.name} on winning the game!</p:outputLabel>
+                        </c:when>
+                        <c:otherwise>
+                            <c:choose>
+                                <c:when test="#{gameCanceled}">
+                                    <p:outputPanel>Your game was canceled from outside!</p:outputPanel>
+                                    <p:outputPanel style="margin-top:10px">
+                                        <p:outputLabel rendered="#{not empty winner}">#{winner.name} was in the lead...</p:outputLabel>
+                                        <p:outputLabel rendered="#{empty winner}">So far the game resulted in a draw...</p:outputLabel>
+                                    </p:outputPanel>
+                                </c:when>
+                                <c:otherwise>
+                                    <p:outputPanel>You played quite some rounds... unfortunatly all terms within this topic have been used.</p:outputPanel>
+                                </c:otherwise>
+                                    <p:outputPanel style="margin-top:10px">
+                                        <p:outputLabel rendered="#{not empty winner}">Congratulations to #{winner.name} on winning the game!</p:outputLabel>
+                                        <p:outputLabel rendered="#{empty winner}">Looks like the game resulted in a draw!</p:outputLabel>
+                                    </p:outputPanel>
+                            </c:choose>
+                        </c:otherwise>
+                    </c:choose>
                 </p:panel>
 
                 <p:panel styleClass="rankingHeader">

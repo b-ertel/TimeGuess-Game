@@ -62,6 +62,7 @@ public class CubeServiceTest {
      */
     @Test
     @DirtiesContext
+    @WithMockUser(username = "cube", authorities = { "CUBE" })
     public void testSaveNewCube() {
         Cube cube = new Cube();
         cube.setMacAddress("123");
@@ -78,6 +79,7 @@ public class CubeServiceTest {
      */
     @Test
     @DirtiesContext
+    @WithMockUser(username = "cube", authorities = { "CUBE" })
     public void testSaveNewCubeDuplicateMacAddress() {
         Cube cube1 = new Cube();
         cube1.setMacAddress("123");

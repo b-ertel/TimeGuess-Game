@@ -61,15 +61,24 @@ public class GameLogicService {
      * @return team with the most points
      */
     public Team getTeamWithMostPoints(Game game) {
-        Integer points = 0;
-        Team team = null;
-        for (Team t : game.getTeams()) {
-            if (roundService.getPointsOfTeamInGame(game, t) > points) {
-                team = t;
-                points = roundService.getPointsOfTeamInGame(game, t);
-            }
-        }
-        return team;
+    	Integer points = 0;
+    	Team team = null;
+    	boolean draw = false;
+    	for(Team t : game.getTeams()) {
+    		if(roundService.getPointsOfTeamInGame(game, t)==points) {
+    			draw = true;
+    		}
+    		if(roundService.getPointsOfTeamInGame(game, t)>points) {
+    			team = t;
+    			points = roundService.getPointsOfTeamInGame(game, t);
+    			draw = false;
+    		}
+    	}
+    	if(draw) {
+    		return null;
+    	} else {
+    	return team;
+    	}
     }
 
     /**
