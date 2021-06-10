@@ -135,7 +135,7 @@ public class GameManagerController {
     @Autowired
     private RoundService roundService;
     @Autowired
-    private GameLogicService gameLogic;
+    private GameLogicService gameLogicService;
     @CDIAutowired
     private WebSocketManager websocketManager;
     @Autowired
@@ -314,7 +314,7 @@ public class GameManagerController {
      * @return winning team
      */
     public Team getTeamWithMostPointsForGame(Game game) {
-        return gameLogic.getTeamWithMostPoints(game);
+        return gameLogicService.getTeamWithMostPoints(game);
     }
 
     /**
@@ -346,16 +346,16 @@ public class GameManagerController {
         GameData data = status.getGameData(game);
 
         if (getRoundState(data) == RoundState.VALIDATING) {
-            gameLogic.validateRound(data.game, data.currentRound, v);
+            gameLogicService.validateRound(data.game, data.currentRound, v);
             status.saveGame(data.game);
 
             Round lastRound = data.currentRound;
             switchRoundState(data, RoundState.NONE);
 
-            if (gameLogic.teamReachedMaxPoints(data.game, lastRound.getGuessingTeam())) {
+            if (gameLogicService.teamReachedMaxPoints(data.game, lastRound.getGuessingTeam())) {
                 endGameFinished(data);
             }
-            else if (gameLogic.stillTermsAvailable(data.game)) {
+            else if (gameLogicService.stillTermsAvailable(data.game)) {
                 endRoundValidated(data);
             }
             else {
@@ -486,8 +486,8 @@ public class GameManagerController {
             case STARTING:
                 data.countDown.reset();
                 data.currentRound = getRoundState(data) == RoundState.ERROR
-                    ? gameLogic.repeatRound(data.game, data.currentRound)
-                    : gameLogic.getNextRound(data.game);
+                    ? gameLogicService.repeatRound(data.game, data.currentRound)
+                    : gameLogicService.getNextRound(data.game);
                 data.isRoundActive = false;
                 data.isValidating = false;
                 break;
@@ -546,7 +546,7 @@ public class GameManagerController {
     }
 
     private void endGameTermsOver(GameData data) {
-        Team winningTeam = gameLogic.getTeamWithMostPoints(data.game);
+        Team winningTeam = gameLogicService.getTeamWithMostPoints(data.game);
         data.game.setMaxPoints(roundService.getPointsOfTeamInGame(data.game, winningTeam));
 
         status.endGame(data, true);
@@ -560,7 +560,7 @@ public class GameManagerController {
      * @param cubeFace face that sets round parameters
      */
     private void startRoundByCube(GameData data, CubeFace cubeFace) {
-        gameLogic.getCubeInfosIntoRound(data.currentRound, cubeFace);
+        gameLogicService.getCubeInfosIntoRound(data.currentRound, cubeFace);
         switchRoundState(data, RoundState.RUNNING);
 
         sendGameMessage(data.game, "startRound");
@@ -898,31 +898,27 @@ public class GameManagerController {
          * @param game for which the countdown starts
          */
         public void startCountDown(int time, GameData gameData) {
-            setMin(time);
-            setSec(0);
+            reset(time);
 
-            ActionListener task = new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    count(gameData);
-                }
-            };
-            this.timer = new Timer(delay, task);
-            this.timer.start();
+            timer = new Timer(delay, e -> count(gameData));
+            timer.setInitialDelay(1200);
+            timer.start();
         }
 
         /**
          * stops countDown
          */
         public void endCountDown() {
-            if (this.timer != null) { this.timer.stop(); }
+            if (timer != null) {
+                timer.stop();
+            }
         }
 
+        /**
+         * resets countdown to 0
+         */
         public void reset() {
-            this.timer = null;
-            setMin(0);
-            setSec(0);
+            reset(0);
         }
 
         /**
@@ -947,6 +943,16 @@ public class GameManagerController {
                 GameManagerController.this.endRoundByCountDown(gameData);
             }
             GameManagerController.this.sendCountDownUpdate(gameData.game);
+        }
+
+        private void reset(int min) {
+            if (timer != null) {
+                if (timer.isRunning()) timer.stop();
+                timer.removeActionListener(timer.getActionListeners()[0]);
+                timer = null;                
+            }
+            setMin(min);
+            setSec(0);
         }
     }
 }
