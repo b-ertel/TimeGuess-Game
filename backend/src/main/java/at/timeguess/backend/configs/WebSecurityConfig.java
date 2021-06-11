@@ -84,7 +84,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .inMemoryAuthentication()
             .withUser("cube")
             .password(passwordEncoder().encode("passwd"))
-            .authorities("CUBE", "PLAYER")
+            .authorities("CUBE")
             .and()
             .withUser("system")
             .password(passwordEncoder().encode("passwd"))

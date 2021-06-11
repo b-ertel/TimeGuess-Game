@@ -116,7 +116,7 @@ public class GameService {
      * @return  the saved game
      * @apiNote Message handling ist done here, because this is the central place for saving games.
      */
-    @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('PLAYER') or hasAuthority('ADMIN') or hasAuthority('CUBE')")
     public Game saveGame(Game game) {
         Game ret = null;
         try {
