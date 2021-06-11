@@ -24,6 +24,8 @@
                 <p:menubar id="toolbar" rendered="#{not isAdminAccess}" styleClass="pagemenu">
                     <p:menuitem value="&#xA0;Create Game&#xA0;" icon="fa fa-plus"
                         oncomplete="PF('gameCreateDialog').show()" update=":gameCreateForm:gameCreateDialog" />
+                    <p:menuitem value="&#xA0;Create Team&#xA0;" icon="fa fa-plus"
+                        oncomplete="PF('teamCreateDialog').show()" update=":teamCreateForm:teamCreateDialog" />
                 </p:menubar>
 
                 <ui:remove>show current games for player only</ui:remove>
