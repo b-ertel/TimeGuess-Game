@@ -69,7 +69,7 @@ public class TopicService {
 
     @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
     public Topic loadTopicId(Long topicId) {
-        return topicRepository.findById(topicId).get();
+        return topicRepository.findById(topicId).orElse(null);
     }
 
     /**
@@ -93,7 +93,7 @@ public class TopicService {
 
             if (websocketManager != null)
                 websocketManager.getUserRegistrationChannel().send(
-                        Map.of("type", "topicUpdate", "name", topic.getName(), "id", topic.getId()));
+                    Map.of("type", "topicUpdate", "name", topic.getName(), "id", topic.getId()));
 
             LOGGER.info("Topic '{}' (id={}) was {}", ret.getName(), ret.getId(), isNew ? "created" : "updated");
         }

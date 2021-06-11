@@ -1,7 +1,5 @@
 package at.timeguess.backend.ui.controllers;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -17,7 +15,9 @@ import javax.annotation.PreDestroy;
 import javax.swing.Timer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -145,6 +145,9 @@ public class GameManagerController {
     @Autowired
     private ChannelPresenceEventListener channelPresenceEventListener;
 
+    @Value("${jobs.enabled:true}")
+    private boolean isJobEnabled;
+
     // cannot implement two different Consumers!
     private Consumer<ConfiguredFacetsEvent> consumerConfiguredFacetsEvent =
         (cfEvent) -> GameManagerController.this.onConfiguredFacetsEvent(cfEvent);
@@ -164,6 +167,36 @@ public class GameManagerController {
     public void destroy() {
         configuredfacetsEventListener.unsubscribe(consumerConfiguredFacetsEvent);
         channelPresenceEventListener.unsubscribe("newRoundChannel", consumerChannelPresenceEvent);
+    }
+
+    /**
+     * Scheduled task which checks in a fixed interval for game states changed from outside.
+     * Checked states are {@link GameState#SETUP}, {@link GameState#HALTED} and {@link GameState#CANCELED}.
+     */
+    @Scheduled(fixedDelayString = "${backend.game.check.delay.seconds:5}000")   // 5000 means every 5 seconds
+    public void updateGameStatus() {
+        if (isJobEnabled) {
+            for (Game game : gameService
+                .getByStatus(new GameState[] { GameState.SETUP, GameState.HALTED, GameState.CANCELED })) {
+                switch (game.getStatus()) {
+                    case SETUP:
+                        addGame(game);
+                        break;
+
+                    case CANCELED:
+                        removeGame(game);
+                        break;
+
+                    case HALTED:
+                        GameData data = status.getGameData(game);
+                        if (data != null) switchGameState(data);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     /**
@@ -330,6 +363,16 @@ public class GameManagerController {
             websocketManager.getMessageChannel().send(
                 Map.of("type", "gameInvitation", "name", game.getName(), "id", game.getId()), getAllUserIdsOfGameTeams(game));
         }
+    }
+
+    /**
+     * Method to remove a canceled from the saved list of currently available games
+     * and send notifications to all participating team members.
+     * @param game
+     */
+    public void removeGame(Game game) {
+        GameData data = status.getGameData(game);
+        if (data != null) switchGameState(data);
     }
 
     /**
@@ -605,7 +648,7 @@ public class GameManagerController {
     }
     /* --- END - push message sending functions --- */
 
-    private class Status implements Iterable<GameData> {
+    class Status implements Iterable<GameData> {
 
         private Map<Cube, GameData> cube2Game = new ConcurrentHashMap<>();
 
@@ -681,7 +724,7 @@ public class GameManagerController {
 
             // check cube already in use
             Cube cube = game.getCube();
-            if (cube2Game.containsKey(cube) && !cube2Game.equals(game))
+            if (cube2Game.containsKey(cube) && !cube2Game.get(cube).equals(game))
                 throw new IllegalArgumentException(
                     String.format("Cube %s is already in use for game %s", cube, cube2Game.get(cube)));
 
@@ -816,7 +859,8 @@ public class GameManagerController {
             // count present teams (one player per team must be present)
             long count = game.getTeams().stream()
                 .filter(t -> t.getTeamMembers().stream()
-                .anyMatch(u -> userIds.contains(u.getId()))).count();
+                .anyMatch(u -> userIds.contains(u.getId())))
+                .count();
 
             isTeamsPresent = count >= game.getTeamCount();
         }
@@ -949,7 +993,7 @@ public class GameManagerController {
             if (timer != null) {
                 if (timer.isRunning()) timer.stop();
                 timer.removeActionListener(timer.getActionListeners()[0]);
-                timer = null;                
+                timer = null;
             }
             setMin(min);
             setSec(0);

@@ -81,6 +81,15 @@ public class GameService {
     }
 
     /**
+     * Returns a list of all games with the given status.
+     * @param  gameState
+     * @return
+     */
+    public List<Game> getByStatus(GameState[] gameState) {
+        return gameRepo.findByStatus(gameState);
+    }
+
+    /**
      * Returns a list of all games the given user is associated to, optionally restricted to games currently
      * not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP}, {@link GameState#PLAYED}, {@link GameState#HALTED}).
      * @param  user
@@ -97,7 +106,7 @@ public class GameService {
      * @return
      */
     public Game loadGame(Long gameId) {
-        return gameRepo.findById(gameId).get();
+        return gameRepo.findById(gameId).orElse(null);
     }
 
     /**

@@ -181,7 +181,7 @@ public class NewGameBean implements Serializable {
                 cubeStatusController.switchCube(cube, null);
             }
             else {
-                gameManagerController.addGame(game);
+                gameManagerController.updateGameStatus();
                 this.clearFields();
             }
 

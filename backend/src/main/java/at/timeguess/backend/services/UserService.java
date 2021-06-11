@@ -160,7 +160,7 @@ public class UserService {
      */
     @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #user.username")
     public User loadUser(User user) {
-        return userRepository.findById(user.getId()).get();
+        return userRepository.findById(user.getId()).orElse(null);
     }
 
     /**

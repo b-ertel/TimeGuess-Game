@@ -88,7 +88,7 @@ public class TermService {
      */
     @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
     public Term loadTerm(Long id) {
-        return termRepository.findById(id).get();
+        return termRepository.findById(id).orElse(null);
     }
 
     /**
@@ -104,7 +104,7 @@ public class TermService {
 
                 if (websocketManager != null)
                     websocketManager.getUserRegistrationChannel().send(
-                            Map.of("type", "termUpdate", "name", "multiple", "id", 0L));
+                        Map.of("type", "termUpdate", "name", "multiple", "id", 0L));
             }
             infoOnSave = null;
         }
@@ -134,7 +134,7 @@ public class TermService {
 
                 if (websocketManager != null)
                     websocketManager.getUserRegistrationChannel().send(
-                            Map.of("type", "termUpdate", "name", term.getName(), "id", term.getId()));
+                        Map.of("type", "termUpdate", "name", term.getName(), "id", term.getId()));
             }
             else
                 infoOnSave = true;
@@ -168,11 +168,11 @@ public class TermService {
 
             if (websocketManager != null)
                 websocketManager.getUserRegistrationChannel().send(
-                        Map.of("type", "termUpdate", "name", term.getName(), "id", term.getId()));
+                    Map.of("type", "termUpdate", "name", term.getName(), "id", term.getId()));
 
             User auth = userService.getAuthenticatedUser();
             LOGGER.info("Term '{}' (id={}) was deleted by User '{}' (id={})", term.getName(), term.getId(),
-                    auth.getUsername(), auth.getId());
+                auth.getUsername(), auth.getId());
         }
         catch (Exception e) {
             String name = term == null ? "Unknown" : term.getName();

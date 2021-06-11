@@ -32,12 +32,12 @@
                                 </c:when>
                                 <c:otherwise>
                                     <p:outputPanel>You played quite some rounds... unfortunatly all terms within this topic have been used.</p:outputPanel>
+                                    <p:outputPanel style="margin-top:10px">
+                                        <p:outputLabel rendered="#{not empty winner}">Congratulations to #{winner.name} on winning the game!</p:outputLabel>
+                                        <p:outputLabel rendered="#{empty winner}">Looks like the game results in a draw!</p:outputLabel>
+                                    </p:outputPanel>
                                 </c:otherwise>
                             </c:choose>
-                            <p:outputPanel style="margin-top:10px">
-                                <p:outputLabel rendered="#{not empty winner}">Congratulations to #{winner.name} on winning the game!</p:outputLabel>
-                                <p:outputLabel rendered="#{empty winner}">Looks like the game results in a draw!</p:outputLabel>
-                            </p:outputPanel>
                         </c:otherwise>
                     </c:choose>
                 </p:panel>

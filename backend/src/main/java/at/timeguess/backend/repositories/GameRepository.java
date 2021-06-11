@@ -17,8 +17,16 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
      * @param  status
      * @return
      */
-    @Query("SELECT g FROM Game g WHERE :status =  g.status")
+    @Query("SELECT g FROM Game g WHERE :status = g.status")
     List<Game> findByStatus(@Param("status") GameState status);
+
+    /**
+     * to find games by status
+     * @param  status
+     * @return
+     */
+    @Query("SELECT g FROM Game g WHERE g.status IN (:status)")
+    List<Game> findByStatus(@Param("status") GameState[] status);
 
     /**
      * Returns the count of games for the given topic id.

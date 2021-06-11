@@ -137,7 +137,7 @@ public class NewGameBeanTest {
         verify(cubeStatusController).switchCube(nullable(Cube.class), any(Cube.class));
         verify(gameService).saveGame(any(Game.class));
         verifyNoMoreInteractions(cubeStatusController);
-        verify(gameManagerController).addGame(any(Game.class));
+        verify(gameManagerController).updateGameStatus();
         verifyNoInteractions(messageBean);
         assertEquals(expected, result);
         assertFieldsClear();

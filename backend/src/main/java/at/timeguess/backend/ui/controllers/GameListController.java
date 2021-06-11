@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
 import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.GameService;
 
@@ -94,14 +95,17 @@ public class GameListController implements Serializable {
     }
 
     /**
-     * Checks if the given game can be deleted currently (it cannot while played).
+     * Checks if the given game can be deleted currently (it cannot while in states
+     * {@link GameState#VALID_SETUP}, {@link GameState#PLAYED}, {@link GameState#HALTED}.
      * @return
      */
     public boolean isLockedDelete(Game game) {
         if (game == null) return true;
-        
+
         switch (game.getStatus()) {
+            case VALID_SETUP:
             case PLAYED:
+            case HALTED:
                 return true;
             default:
                 return false;
