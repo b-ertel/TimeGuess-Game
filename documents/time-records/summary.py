@@ -54,9 +54,6 @@ def read_files(files):
         # superscript "1"
         if key == "Bernhard":
             excel.at[21, "Dauer \n[hh:mm]"] = datetime.time(hour=1, minute=30)
-        # empty line
-        if key == "Verena":
-            excel.drop(29, inplace=True)
         df = pd.DataFrame({"name": key,
             "date": excel["Datum"],
             "duration": excel["Dauer \n[hh:mm]"].apply(time_to_duration),
