@@ -89,10 +89,10 @@
                 <p:outputPanel rendered="#{currRound.nr > 1}">
                     <c:choose>
                         <c:when test="#{empty grc.lastRound}">
-                            You entered the gameroom a little late, so there is no information about the last round available for you, but you can jump right in.
+                            You entered the gameroom a little late, so there is no information about the last round available, but you can jump right in.
                         </c:when>
                         <c:otherwise>
-                            #{grc.inLastGuessingTeam ? 'You' : grc.lastRound.guessingTeam.name} #{grc.lastRound.correctAnswer ? 'correctly guessed' : 'tried to guess'} the term #{grc.lastRound.termToGuess.name} during the last round.
+                            #{grc.inLastGuessingTeam ? 'You' : grc.lastRound.guessingTeam.name} #{grc.lastRound.correctAnswer ? 'correctly guessed' : 'tried to guess'} the term #{grc.lastRound.termToGuess.name} during the last round, resulting in #{grc.lastRound.points} point#{grc.lastRound.points == 1 ? '' : 's'}.
                         </c:otherwise>
                     </c:choose>
                 </p:outputPanel>
