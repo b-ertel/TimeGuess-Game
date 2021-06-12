@@ -46,7 +46,7 @@
                     <h1>Ranking</h1>
                 </p:panel>
 
-                <p:dataTable id="leaderbord" value="#{gameRoundController.computeFinalRanking()}"
+                <p:dataTable value="#{gameRoundController.computeFinalRanking()}"
                     var="teamscore" rowIndexVar="index" style="margin-bottom:12px">
                     <p:column headerText="Rank" style="text-align:center">
                         <h:outputText value="#{index + 1}" />

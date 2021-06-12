@@ -314,6 +314,15 @@
     text-align: center;
 }
 
+.teamTree {
+    margin-top: 7px;
+}
+
+.center20 {
+    width: 20%;
+    text-align: center;
+}
+
 #roundInfo {
     position: relative;
 }

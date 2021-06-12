@@ -88,6 +88,7 @@ public class GameInfoBeanTest {
 
         gameInfoBean.setGame(game);
         TreeNode result = gameInfoBean.getTeams();
+        assertEquals(game, ((GameInfo) result.getData()).getObject());
         assertEquals(2, result.getChildCount());
 
         var nodes = result.getChildren();

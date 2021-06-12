@@ -12,6 +12,7 @@
     <ui:define name="content">
         <f:metadata>
             <f:viewAction action="#{gameRoundController.setUser(sessionInfoBean.currentUser)}" />
+            <f:viewAction action="#{gameInfoBean.setGame(gameRoundController.currentGame)}" />
         </f:metadata>
         <c:set var="grc" value="#{gameRoundController}" scope="session" />
 
@@ -72,15 +73,20 @@
         </h:form>
 
         <h:form id="gameTableForm" rendered="#{not empty grc.currentGame}">
-            <p:dataTable id="leaderbord" var="team" value="#{grc.teamsInGame}"
-                rowStyleClass="#{grc.isGuessingTeam(team) ? grc.isUserTeam(team) ? 'USERTEAM GUESSTEAM' : 'GUESSTEAM' : grc.isUserTeam(team) ? 'USERTEAM' : null}">
-                <p:column headerText="Team">
-                    <h:outputText value="#{team.name}" />
+            <p:treeTable id="gameInfoTable" value="#{gameInfoBean.teams}" var="row" styleClass="teamTree"
+                rowStyleClass="#{grc.isGuessingTeam(row.object) ? grc.isUserTeam(row.object) ? 'USERTEAM GUESSTEAM' : 'GUESSTEAM' : grc.isUserTeam(row.object) ? 'USERTEAM' : null}">
+                
+                <f:facet name="header">Teams and Players</f:facet>
+                <p:column headerText="Name" styleClass="truncate">
+                    <h:outputText value="#{row.name}" />
                 </p:column>
-                <p:column headerText="Current Points">
-                    <h:outputText value="#{grc.calculatePointsOfTeam(team)}" />
+                <p:column headerText="Rounds" styleClass="center20">
+                    <h:outputText value="#{row.rounds}" />
                 </p:column>
-            </p:dataTable>
+                <p:column headerText="Points" styleClass="center20">
+                    <h:outputText value="#{row.points}" />
+                </p:column>
+            </p:treeTable>
         </h:form>
 
         <h:form id="gameRoundForm" prependId="false" rendered="#{grc.currentRunState == 'RUNNING'}">
@@ -133,7 +139,7 @@
                                 <p:outputPanel>If you don't see the round validation dialog, click the button in the top right corner.</p:outputPanel>
                             </c:when>
                         </c:choose>
-    
+
                         <p:commandButton type="button" icon="fa fa-superpowers" styleClass="revalidate"
                             onclick="PF('roundValidationDialog').show()"
                             update=":gameRoundForm:roundInfo :roundValidationForm:roundValidationDialog" />
@@ -186,9 +192,9 @@
                         </h:panelGroup>
                         
                         <h:panelGrid columns="3" rendered="#{!grc.inGuessingTeam}">
-                            <p:commandButton value="Correct" action="#{grc.correctRound}" update=":gameRoundForm :gameTableForm"/>
-                            <p:commandButton value="Incorrect" action="#{grc.incorrectRound}" update=":gameRoundForm :gameTableForm"/>
-                            <p:commandButton value="Cheated" action="#{grc.cheatedRound}" update=":gameRoundForm :gameTableForm"/>
+                            <p:commandButton value="Correct" action="#{grc.correctRound}" update=":gameRoundForm"/>
+                            <p:commandButton value="Incorrect" action="#{grc.incorrectRound}" update=":gameRoundForm"/>
+                            <p:commandButton value="Cheated" action="#{grc.cheatedRound}" update=":gameRoundForm"/>
                         </h:panelGrid>
                     </c:when>
                     <c:otherwise>
@@ -220,7 +226,7 @@
 
                 <h:panelGrid columns="2" rendered="#{!grc.inGuessingTeam}">
                     <p:commandButton value="Confirm"
-                        action="#{grc.endRoundViaCountDown}" update=":gameRoundForm :gameTableForm"
+                        action="#{grc.endRoundViaCountDown}" update=":gameRoundForm"
                         oncomplete="PF('roundTimesUpDialog').hide()"/>
                 </h:panelGrid>
             </p:dialog>
@@ -298,13 +304,6 @@
 
             <p:ajax event="pauseGame"
                 listener="#{grc.pauseGame}"
-                update="@all" />
-
-            <p:ajax event="setup"
-                listener="#{grc.setup}" />
-
-            <p:ajax event="setupandupdate"
-                listener="#{grc.setup}"
                 update="@all" />
 
             <p:ajax event="healthMessage"

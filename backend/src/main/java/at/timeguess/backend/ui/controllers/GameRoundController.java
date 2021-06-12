@@ -50,6 +50,7 @@ public class GameRoundController {
 
     private User user = null;
     private Game currentGame = null;
+    private Team currentTeam = null;
     private Round currentRound;
     private Round lastRound;
 
@@ -70,8 +71,18 @@ public class GameRoundController {
     }
 
     public Game getCurrentGame() {
-        if (currentGame == null) { currentGame = gameManagerController.getCurrentGameForUser(user); }
+        if (currentGame == null) {
+            currentGame = gameManagerController.getCurrentGameForUser(user);
+        }
         return currentGame;
+    }
+
+    public Team getCurrentTeam() {
+        if (currentTeam == null && getCurrentGame() != null) {
+            currentTeam = currentGame.getTeams().stream()
+                .filter(t -> t.getTeamMembers().contains(user)).findFirst().orElse(null);
+        }
+        return currentTeam;
     }
 
     public Round getCurrentRound() {
@@ -90,27 +101,73 @@ public class GameRoundController {
         return currentGame.getTeams();
     }
 
+    /**
+     * Method to check if given team is current round's guessing team.
+     * @param  team
+     * @return
+     */
     public boolean isGuessingTeam(Team team) {
         Team guessteam = currentRound == null ? null : currentRound.getGuessingTeam();
         return guessteam == null ? false : guessteam.equals(team);
     }
 
+    /**
+     * Method to check if given user is currently describing player.
+     * @param   user
+     * @return
+     * @apiNote      method name equals the one for teams to be called from ui with different types
+     */
+    public boolean isGuessingTeam(User user) {
+        return currentRound == null ? false : currentRound.getGuessingUser().equals(user);
+    }
+
+    /**
+     * Method to check if saved user is in current round's guessing team.
+     * @return
+     */
     public boolean isInGuessingTeam() {
-        return currentRound == null ? false : currentRound.getGuessingTeam().getTeamMembers().contains(user);
+        return currentRound == null ? false : isInTeam(currentRound.getGuessingTeam(), user);
     }
 
+    /**
+     * Method to check if saved user is in last round's guessing team.
+     * @return
+     */
     public boolean isInLastGuessingTeam() {
-        return lastRound == null ? false : lastRound.getGuessingTeam().getTeamMembers().contains(user);
+        return lastRound == null ? false : isInTeam(lastRound.getGuessingTeam(), user);
     }
 
+    /**
+     * Method to check if saved user is in given team.
+     * @param  team
+     * @return
+     */
     public boolean isUserTeam(Team team) {
-        return team == null ? false : team.getTeamMembers().contains(user);
+        return isInTeam(team, user);
     }
 
+    /**
+     * Method to check if saved user is in same team as given user.
+     * @param   team
+     * @return
+     * @apiNote      method name equals the one for teams to be called from ui with different types
+     */
+    public boolean isUserTeam(User user) {
+        return getCurrentTeam() == null ? false : currentTeam.getTeamMembers().contains(user);
+    }
+
+    /**
+     * Method to get the formatted current countdown value for the saved user's current game.
+     * @return
+     */
     public String getCountDown() {
         return gameManagerController.getCountDownForGame(currentGame);
     }
 
+    /**
+     * Method to get the numeric current countdown value for the saved user's current game.
+     * @return
+     */
     public int getTimer() {
         return gameManagerController.getTimerForGame(currentGame);
     }
@@ -246,6 +303,10 @@ public class GameRoundController {
         return highscoreService.getTeamRanking(currentGame);
     }
 
+    private boolean isInTeam(Team team, User user) {
+        return team == null ? false : team.getTeamMembers().contains(user);
+    }
+
     private void updateRound() {
         switch (getCurrentRoundState()) {
             case STARTING:
@@ -263,6 +324,7 @@ public class GameRoundController {
 
     private void destroy() {
         currentGame = null;
+        currentTeam = null;
         currentRound = null;
         lastRound = null;
     }
