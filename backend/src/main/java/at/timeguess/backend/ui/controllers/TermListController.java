@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,8 +16,6 @@ import at.timeguess.backend.services.TermService;
  * Controller for the term list view.
  */
 @Component
-@Named
-@RequestScoped
 @Scope(WebApplicationContext.SCOPE_SESSION)
 public class TermListController implements Serializable {
 
