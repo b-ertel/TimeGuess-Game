@@ -5,9 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -15,18 +12,18 @@ import org.springframework.stereotype.Service;
 import at.timeguess.backend.events.ConfiguredFacetsEventPublisher;
 import at.timeguess.backend.events.UnconfiguredFacetsEventPublisher;
 import at.timeguess.backend.model.Configuration;
-import at.timeguess.backend.model.Threshold;
-import at.timeguess.backend.model.ThresholdType;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Interval;
 import at.timeguess.backend.model.IntervalType;
+import at.timeguess.backend.model.Threshold;
+import at.timeguess.backend.model.ThresholdType;
 import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.repositories.ConfigurationRepository;
-import at.timeguess.backend.repositories.IntervalRepository;
-import at.timeguess.backend.repositories.ThresholdRepository;
 import at.timeguess.backend.repositories.CubeFaceRepository;
 import at.timeguess.backend.repositories.CubeRepository;
+import at.timeguess.backend.repositories.IntervalRepository;
+import at.timeguess.backend.repositories.ThresholdRepository;
 
 /**
  * A service for all kinds of stuff related to cubes, cube faces and configurations.
@@ -34,8 +31,6 @@ import at.timeguess.backend.repositories.CubeRepository;
  */
 @Service
 public class CubeService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CubeService.class);
 
     @Autowired
     private CubeRepository cubeRepo;

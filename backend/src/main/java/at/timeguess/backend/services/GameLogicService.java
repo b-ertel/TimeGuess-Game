@@ -20,7 +20,6 @@ import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.Validation;
-import at.timeguess.backend.model.exceptions.AllTermsUsedInGameException;
 
 @Component
 @Scope("application")
@@ -33,7 +32,7 @@ public class GameLogicService {
 
     @Autowired
     RoundService roundService;
-    
+
     /**
      * method to check whether all terms of a topic have been used or not
      * @param  game
@@ -61,24 +60,21 @@ public class GameLogicService {
      * @return team with the most points
      */
     public Team getTeamWithMostPoints(Game game) {
-    	Integer points = 0;
-    	Team team = null;
-    	boolean draw = false;
-    	for(Team t : game.getTeams()) {
-    		if(roundService.getPointsOfTeamInGame(game, t)==points) {
-    			draw = true;
-    		}
-    		if(roundService.getPointsOfTeamInGame(game, t)>points) {
-    			team = t;
-    			points = roundService.getPointsOfTeamInGame(game, t);
-    			draw = false;
-    		}
-    	}
-    	if(draw) {
-    		return null;
-    	} else {
-    	return team;
-    	}
+        Integer points = 0;
+        Team team = null;
+        boolean draw = false;
+        for (Team t : game.getTeams()) {
+            Integer pointsOfTeamInGame = roundService.getPointsOfTeamInGame(game, t);
+            if (pointsOfTeamInGame == points) {
+                draw = true;
+            }
+            else if (pointsOfTeamInGame > points) {
+                team = t;
+                points = pointsOfTeamInGame;
+                draw = false;
+            }
+        }
+        return draw ? null : team;
     }
 
     /**
@@ -96,7 +92,6 @@ public class GameLogicService {
      * method to choose randomly a term from the one, that where not already picked in previous rounds
      * @param  game
      * @return term to guess
-     * @throws AllTermsUsedInGameException, if every term has been played
      */
     public Term nextTerm(Game game) {
         List<Term> terms = termService.getAllTermsOfTopic(game.getTopic());
@@ -216,7 +211,7 @@ public class GameLogicService {
      */
     public Round repeatRound(Game game, Round round) {
         round.setTermToGuess(nextTerm(game));
-        
+
         LOGGER.info("Round nr '{}', with team '{}' and user '{}' will be repeated", round.getNr(),
             round.getGuessingTeam().getName(), round.getGuessingUser().getUsername());
         return round;
@@ -239,9 +234,9 @@ public class GameLogicService {
             round.setGame(game);
             game.getRounds().add(round);
             game.setRoundNr(game.getRoundNr() + 1);
-            
-            LOGGER.info("Round nr '{}', with team '{}' is ready to be saved, gamerounds '{}', points '{}'", round.getNr(),
-                round.getGuessingTeam().getName(), game.getRounds().size(), round.getPoints());
+
+            LOGGER.info("Round nr '{}', with team '{}' is ready to be saved, gamerounds '{}', points '{}'",
+                round.getNr(), round.getGuessingTeam().getName(), game.getRounds().size(), round.getPoints());
         }
     }
 }

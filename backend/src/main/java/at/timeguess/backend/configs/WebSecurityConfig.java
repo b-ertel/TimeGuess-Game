@@ -25,6 +25,7 @@ import at.timeguess.backend.spring.CustomizedLogoutSuccessHandler;
 /**
  * Spring configuration for web security.
  */
+@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity()
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {

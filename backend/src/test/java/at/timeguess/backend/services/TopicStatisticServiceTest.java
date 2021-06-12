@@ -1,9 +1,5 @@
 package at.timeguess.backend.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +9,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import at.timeguess.backend.model.Game;
-import at.timeguess.backend.model.GameState;
-import at.timeguess.backend.model.Round;
-import at.timeguess.backend.model.Team;
-import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
-import at.timeguess.backend.model.UserRole;
-import at.timeguess.backend.model.Validation;
 import at.timeguess.backend.repositories.RoundRepository;
 import at.timeguess.backend.repositories.TeamRepository;
 import at.timeguess.backend.repositories.TermRepository;
