@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -78,7 +77,7 @@ public class GameServiceTest {
         gameService.deleteGame(gameToDelete);
 
         assertEquals(ctBefore - 1, gameService.getAllGames().size(), "No game has been deleted after calling gameService.deleteGame");
-        assertThrows(NoSuchElementException.class, () -> gameService.loadGame(id_to_del));
+        assertNull(gameService.loadGame(id_to_del));
     }
 
     @Test
