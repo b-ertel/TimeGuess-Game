@@ -157,7 +157,7 @@ public class CubeService {
             throw new IllegalArgumentException("The given cube does not exist!");
         }
         if (isConfigured(cube)) {
-            throw new IllegalArgumentException("An existing configuration already exists for the given cube and has to be deleted first!");
+            throw new IllegalArgumentException("Configuration already exists for the given cube and has to be deleted first!");
         }
         for (Entry<CubeFace, Integer> entry : mapping.entrySet()) {
             Configuration configuration = new Configuration();

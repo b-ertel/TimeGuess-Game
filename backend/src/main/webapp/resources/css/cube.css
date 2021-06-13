@@ -1,0 +1,21 @@
+.cubeAdminContent .loggedIn {
+    color: green;
+    font-weight: bold;
+}
+
+.cubeAdminContent .loggedOut {
+    color: grey;
+}
+
+.cubeAdminContent .cubeAdminPanel {
+    vertical-align: top;
+    width: 450px;
+}
+
+.cubeAdminContent .cubeAdminPanelContent {
+    width: 410px;
+}
+
+.cubeAdminContent .onlineInfoBox {
+    height: 150px;
+}
