@@ -53,7 +53,7 @@ public class ChannelObserver implements Serializable {
     /**
      * Removes user leaving channel from stored list, if present. Also sends current userId list to registered
      * subscribers.
-     * @param event
+     * @param event event
      */
     public void onClose(@Observes @Closed SocketEvent event) {
         String channel = event.getChannel(); // returns <o:socket channel>
@@ -68,7 +68,7 @@ public class ChannelObserver implements Serializable {
 
     /**
      * Adds user entering channel to stored list, if present. Also sends current userId list to registered subscribers.
-     * @param event
+     * @param event event
      * @apiNote a single person can open multiple sockets on same channel/user
      */
     public void onOpen(@Observes @Opened SocketEvent event) {
@@ -83,7 +83,7 @@ public class ChannelObserver implements Serializable {
 
     /**
      * Changes switching users in stored list. Also sends current userId list to registered subscribers.
-     * @param event
+     * @param event event
      */
     public void onSwitch(@Observes @Switched SocketEvent event) {
         String channel = event.getChannel(); // returns <o:socket channel>

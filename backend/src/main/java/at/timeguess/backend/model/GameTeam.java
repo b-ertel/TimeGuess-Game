@@ -45,6 +45,10 @@ public class GameTeam implements Serializable, Persistable<GameTeamId>{
     public Game getGame() {
         return game;
     }
+    
+    public void setPoints(int points) {
+    	this.points = points;
+    }
 
     public int getPoints() {
         return points;

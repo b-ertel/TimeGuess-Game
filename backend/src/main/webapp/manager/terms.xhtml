@@ -12,14 +12,18 @@
     <ui:define name ="content">
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
 
-        <h:form id="termListForm">
+        <h:form>
             <ui:remove>create term command</ui:remove>
             <p:menubar id="toolbar" styleClass="pagemenu">
                 <p:menuitem value="&nbsp;Create Term&nbsp;" icon="fa fa-plus"
                     oncomplete="PF('termCreateDialog').show()" update=":termCreateForm:termCreateDialog"/>
                 <p:menuitem icon="fa fa-file-text-o" value="&nbsp;Load new Terms from file&nbsp;" oncomplete="PF('newTermsDialog').show()" />
             </p:menubar>
+        </h:form>
 
+        <ui:include src="/WEB-INF/includes/topics.xhtml" />
+
+        <h:form id="termListForm">
             <ui:remove>show all terms</ui:remove>
             <p:dataTable id="termTable" widgetVar="termTable" var="term" value="#{termListController.terms}" filteredValue="#{termListController.filterTerms}"
                 rowKey="#{term.id}" selection="#{termListController.selectedTerm}" selectionMode="single">
@@ -169,7 +173,7 @@
                 <h:panelGrid columns="3">
                     <p:commandButton value="Save" action="#{newTermBean.createTerm()}"
                         oncomplete="if (args &amp;&amp; !args.validationFailed) { PF('termCreateDialog').hide(); }" update="termCreateData :msg" />
-                    <p:commandButton value="Reload" action="#{newTermBean.clearFields}"
+                    <p:commandButton value="Reset" action="#{newTermBean.clearFields}"
                         process="@parent" update=":termCreateForm:termCreateData :msg" resetValues="true" />
                     <p:commandButton value="Abort" onclick="PF('termCreateDialog').hide()" />
                 </h:panelGrid>
@@ -177,7 +181,7 @@
         </h:form>
 
         <h:form>
-            <ui:remove>delete term confirmation</ui:remove>            
+            <ui:remove>delete term confirmation</ui:remove>
             <p:confirmDialog id="deleteTermConfirm" global="true" closeOnEscape="true" showEffect="fade" hideEffect="fade" width="40%">
                 <p:commandButton value="No" type="button" icon="fa fa-close" styleClass="ui-confirmdialog-no" />
                 <p:commandButton value="Yes" type="button" icon="fa fa-check" styleClass="ui-confirmdialog-yes" />

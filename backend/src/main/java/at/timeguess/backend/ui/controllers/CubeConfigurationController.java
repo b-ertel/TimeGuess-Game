@@ -64,7 +64,7 @@ public class CubeConfigurationController implements Consumer<UnconfiguredFacetsE
     /**
      * Prepare the controller for a fresh attempt to configure a cube.
      * 
-     * @param cube the cube to configure
+     * @param cubeToConfigure the cube to configure
      */
     public void prepareForNewConfiguration(Cube cubeToConfigure) {
         cube = cubeToConfigure;
@@ -139,7 +139,7 @@ public class CubeConfigurationController implements Consumer<UnconfiguredFacetsE
 
     /**
      * Remove the assigned facet from a given cube face. 
-     * @param cubeFace
+     * @param cubeFace cubeface
      */
     public void removeAssignedFacetNumber(CubeFace cubeFace) {
         mapping.remove(cubeFace);

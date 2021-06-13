@@ -47,26 +47,17 @@ public class UserServiceMockedTest {
 
     @Test
     public void testSaveUser() {
-        User user = createUser(5L);
-        String username = "aname";
-        user.setUsername(username);
+        assertSaveUser("aname", true);
+    }
 
-        SecurityContext contextSec = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(contextSec);
-        Authentication auth = mock(Authentication.class);
-        when(contextSec.getAuthentication()).thenReturn(auth);
-        when(auth.getName()).thenReturn(username);
-        when(userRepository.findFirstByUsername(username)).thenReturn(user);
+    @Test
+    public void testSaveUserAnonymous() {
+        assertSaveUser("anonymous", false);
+    }
 
-        PushContext contextPush = mock(PushContext.class);
-        when(userRepository.save(user)).thenReturn(user);
-        when(websocketManager.getUserRegistrationChannel()).thenReturn(contextPush);
-
-        assertDoesNotThrow(() -> userService.saveUser(user));
-
-        verify(userRepository).save(user);
-        verify(messageBean).alertInformation(nullable(String.class), anyString());
-        verify(contextPush).send(anyMap());
+    @Test
+    public void testSaveUserInternal() {
+        assertSaveUser("aname", false);
     }
 
     @Test
@@ -97,5 +88,30 @@ public class UserServiceMockedTest {
         verify(userRepository).getTotalByUsername(anyString());
         verify(messageBean).alertErrorFailValidation(nullable(String.class), anyString());
         verifyNoMoreInteractions(context);
+    }
+
+    private void assertSaveUser(String username, boolean known) {
+        User user = createUser(5L);
+        user.setUsername(username);
+
+        SecurityContext contextSec = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(contextSec);
+        Authentication auth = mock(Authentication.class);
+        when(contextSec.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(username);
+        if (known)
+            when(userRepository.findFirstByUsername(username)).thenReturn(user);
+        else
+            when(userRepository.findFirstByUsername(username)).thenReturn(null);
+
+        PushContext contextPush = mock(PushContext.class);
+        when(userRepository.save(user)).thenReturn(user);
+        when(websocketManager.getUserRegistrationChannel()).thenReturn(contextPush);
+
+        assertDoesNotThrow(() -> userService.saveUser(user));
+
+        verify(userRepository).save(user);
+        verify(messageBean).alertInformation(nullable(String.class), anyString());
+        verify(contextPush).send(anyMap());
     }
 }

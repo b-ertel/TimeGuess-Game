@@ -16,11 +16,12 @@ import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.CDIContextRelated;
 
 /**
- * This beanPostProcessor is used to manually "autowire" CDI-managed beans (see {@link WebSocketManager}) within the spring-context.
+ * This beanPostProcessor is used to manually "autowire" CDI-managed beans
+ * (see {@link WebSocketManager}) within the spring-context.
  * This happens after a beans' initialization is finished.
  * 
- * This class is part of the skeleton project provided for students of the courses "Software Architecture" and "Software Engineering"
- * offered by the University of Innsbruck.
+ * This class is part of the skeleton project provided for students of the courses
+ * "Software Architecture" and "Software Engineering" offered by the University of Innsbruck.
  */
 @Component
 /*
@@ -48,13 +49,20 @@ public class CDIAwareBeanPostProcessor implements BeanPostProcessor {
                     // when annotation is present, perform a manual "autowiring"
                     if (field.isAnnotationPresent(CDIAutowired.class)) {
                         Class<?> fieldType = field.getType();
-                        Object cdiManagedBean = CDI.current().select(fieldType).get();
-                        LOGGER.info("Field '{}' of '{}' successfully autowired", field.getName(), bean.getClass());
+                        CDI<Object> cdi = null;
                         try {
-                            field.set(bean, cdiManagedBean);
+                            cdi = CDI.current();
                         }
-                        catch (IllegalArgumentException | IllegalAccessException e) {
-                            LOGGER.error("Manual CDI-injection failed", e);
+                        catch (Exception e) {}
+                        if (cdi != null) {
+                            Object cdiManagedBean = CDI.current().select(fieldType).get();
+                            LOGGER.info("Field '{}' of '{}' successfully autowired", field.getName(), bean.getClass());
+                            try {
+                                field.set(bean, cdiManagedBean);
+                            }
+                            catch (IllegalArgumentException | IllegalAccessException e) {
+                                LOGGER.error("Manual CDI-injection failed", e);
+                            }
                         }
                     }
                 }

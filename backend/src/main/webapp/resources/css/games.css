@@ -29,6 +29,17 @@
     color: #2E4053 !important;
 }
 
+.GUESSTEAM {
+    background-color: rgba(165, 208, 165, 0.7) !important;
+    background-image: none !important;
+    color: #2E4053 !important;
+}
+
+.USERTEAM {
+    font-style: italic;
+    font-weight: 600;
+}
+
 /* custom classes from primefaces show cases */
 .game-badge {
     border-radius: 2px;
@@ -193,4 +204,133 @@
     .games-buttonbar>div:last-child {
         margin-top: .5rem;
     }
+}
+
+.gameroomHeader {
+    position:top;
+    border-radius: 10px;
+    background: #195478;
+    font-size:40px !important;
+}
+
+.gameroomHeader h1 {
+    margin: auto;
+    text-align: center;
+    vertical-align: text-top;
+    color: white;
+    font-size: 40px;
+}
+
+.gameroomHeader span {
+    text-align: center;
+    display: block;
+    width: 100%;
+    color: white;
+}
+
+.gameroomNogame div {
+    text-align: center;
+    display: block;
+    width: 100%;
+    color:white;
+    font-size: 20px !important;
+}
+
+.gameroomNogame .ui-progressbar {
+    margin-top: 20px;
+    height: 6px;
+}
+
+#gameRoundForm {
+    width: 700px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+#gameRoundForm div {
+    font-weight: bold;
+}
+
+#gameRoundForm h3 {
+    margin: 20px 0 0;
+}
+
+#gameRoundForm h1 {
+    margin-top: 5px;
+    border-bottom: double;
+    font-weight:bold;
+    font-size:40px !important;
+}
+
+#gameRoundForm div.ui-panel-content {
+    margin-bottom: 5px;
+}
+
+#gameRoundForm div.ui-panelgrid-cell {
+    text-align: center;
+}
+
+#gameRoundForm div.ui-outputpanel {
+    margin: 10px 5px 10px;
+}
+
+#gameRoundForm .ui-panel-titlebar {
+    margin-bottom: 12px;
+}
+
+#roundValidationForm div {
+    font-weight: bold;
+}
+
+#roundValidationForm table, #roundTimesUpForm table {
+    margin-top: 12px;
+}
+
+#roundTimesUpForm div {
+    font-weight: bold;
+}
+
+.dlgContent div {
+    margin: 10px 5px 10px;
+    text-align: center;
+}
+
+.rankingHeader {
+    margin: auto;
+    background: #195478;
+    border-radius: 10px;
+}
+
+.rankingHeader h1 {
+    margin: 2px;
+    text-align: center;
+    color: white;
+    font-size: larger !important;
+}
+
+.rankingLabel {
+    margin: 8px 0 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.teamTree {
+    margin-top: 7px;
+}
+
+.center20 {
+    width: 20%;
+    text-align: center;
+}
+
+#roundInfo {
+    position: relative;
+}
+
+#roundInfo button.revalidate {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    right: 4px;
+    top: 5px;
 }

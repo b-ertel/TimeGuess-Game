@@ -121,7 +121,7 @@ public class NewGameBean implements Serializable {
 
     /**
      * Returns a list of all teams.
-     * @return
+     * @return list of teams
      */
     public List<Team> getAllTeams() {
         return teamService.getAllTeams();
@@ -129,8 +129,8 @@ public class NewGameBean implements Serializable {
 
     /**
      * Checks if the given team is currently playing or not.
-     * @param team
-     * @return
+     * @param team team
+     * @return true if it is, false if not
      */
     public boolean isAvailableTeam(Team team) {
         return teamService.isAvailableTeam(team);
@@ -138,7 +138,7 @@ public class NewGameBean implements Serializable {
 
     /**
      * Adds the given team to the saved list.
-     * @param team
+     * @param team team
      */
     public void addNewTeam(Team team) {
         if (team != null) {
@@ -153,14 +153,15 @@ public class NewGameBean implements Serializable {
      */
     public void clearFields() {
         this.setGameName(null);
-        this.setMaxPoints(0);
+        this.setMaxPoints(10);
         this.setTopic(null);
         this.setCube(null);
-        this.setTeams(null);
+        this.setTeams(new HashSet<>());
     }
 
     /**
      * Creates a new game with the settings saved.
+     * @return saved game
      * @apiNote shows a ui message if input fields are invalid.
      */
     public Game createGame() {
@@ -177,12 +178,14 @@ public class NewGameBean implements Serializable {
             cubeStatusController.switchCube(null, cube);
             game = gameService.saveGame(game);
 
-            if (game == null)
+            if (game == null) {
                 cubeStatusController.switchCube(cube, null);
-            else
-                gameManagerController.addGame(game);
+            }
+            else {
+                gameManagerController.updateGameStatus();
+                this.clearFields();
+            }
 
-            this.clearFields();
             return game;
         }
         else {
@@ -193,7 +196,7 @@ public class NewGameBean implements Serializable {
 
     /**
      * Checks if all fields contain valid values.
-     * @return
+     * @return true if valid, false if not
      */
     public boolean validateInput() {
         if (Strings.isBlank(gameName)) return false;

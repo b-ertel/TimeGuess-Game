@@ -52,15 +52,12 @@ public class NewTermBeanTest {
 
     @Test
     public void testClearFields() {
-        String name = fillBean();
-
-        assertEquals(name, newTermBean.getTermName());
-        assertNotNull(newTermBean.getTopic());
+        String expected = fillBean();
+        assertFields(expected);
 
         newTermBean.clearFields();
 
-        assertNull(newTermBean.getTermName());
-        assertNull(newTermBean.getTopic());
+        assertFieldsClear();
     }
 
     @Test
@@ -75,6 +72,7 @@ public class NewTermBeanTest {
         verify(termService).saveTerm(any(Term.class));
         verifyNoInteractions(messageBean);
         assertEquals(expected, result);
+        assertFieldsClear();
     }
 
     @Test
@@ -83,6 +81,19 @@ public class NewTermBeanTest {
 
         verifyNoInteractions(termService);
         verify(messageBean).alertErrorFailValidation(anyString(), anyString());
+    }
+
+    @Test
+    public void testCreateTermFailureSave() {
+        String expected = fillBean();
+        when(termService.saveTerm(any(Term.class))).thenReturn(null);
+
+        Term result = newTermBean.createTerm();
+
+        verify(termService).saveTerm(any(Term.class));
+        verifyNoInteractions(messageBean);
+        assertNull(result);
+        assertFields(expected);
     }
 
     @Test
@@ -116,5 +127,15 @@ public class NewTermBeanTest {
         newTermBean.setTermName(foo);
         newTermBean.setTopic(createTopic(2L));
         return foo;
+    }
+
+    private void assertFields(String expected) {
+        assertEquals(expected, newTermBean.getTermName());
+        assertNotNull(newTermBean.getTopic());
+    }
+
+    private void assertFieldsClear() {
+        assertNull(newTermBean.getTermName());
+        assertNull(newTermBean.getTopic());
     }
 }

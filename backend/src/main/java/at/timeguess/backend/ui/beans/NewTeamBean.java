@@ -1,6 +1,7 @@
 package at.timeguess.backend.ui.beans;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class NewTeamBean implements Serializable {
     private MessageBean messageBean;
 
     private String teamname;
-    private Set<User> players;
+    private Set<User> players = new HashSet<>();
 
     public String getTeamName() {
         return teamname;
@@ -53,7 +54,7 @@ public class NewTeamBean implements Serializable {
 
     /**
      * Returns a list of all players.
-     * @return
+     * @return list of users
      */
     public List<User> getAllPlayers() {
         return userService.getAllPlayers();
@@ -61,8 +62,8 @@ public class NewTeamBean implements Serializable {
 
     /**
      * Checks if the given user is currently playing or not.
-     * @param user
-     * @return
+     * @param user user
+     * @return true if he is, false if not
      */
     public boolean isAvailablePlayer(User user) {
         return userService.isAvailablePlayer(user);
@@ -73,11 +74,12 @@ public class NewTeamBean implements Serializable {
      */
     public void clearFields() {
         this.setTeamName(null);
-        this.setPlayers(null);
+        this.setPlayers(new HashSet<>());
     }
 
     /**
      * Creates a new team with the settings saved.
+     * @return saved team
      * @apiNote shows a ui message if input fields are invalid.
      */
     public Team createTeam() {
@@ -88,7 +90,9 @@ public class NewTeamBean implements Serializable {
             team.setTeamMembers(players);
 
             team = teamService.saveTeam(team);
-            this.clearFields();
+            if (team != null) {
+                this.clearFields();
+            }
 
             return team;
         }
@@ -100,7 +104,7 @@ public class NewTeamBean implements Serializable {
 
     /**
      * Checks if all fields contain valid values.
-     * @return
+     * @return true if valid, false if not
      */
     public boolean validateInput() {
         if (Strings.isBlank(teamname)) return false;

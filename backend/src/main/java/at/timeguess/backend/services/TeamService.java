@@ -42,7 +42,7 @@ public class TeamService {
 
     /**
      * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
-     * and {@link PostConstruct} is not invoked, so autowiring is done manually
+     * and {@link javax.annotation.PostConstruct} is not invoked, so autowiring is done manually
      */
     public TeamService() {
         if (websocketManager == null) {
@@ -52,7 +52,7 @@ public class TeamService {
 
     /**
      * Returns a list of all teams.
-     * @return
+     * @return list of teams
      */
     public List<Team> getAllTeams() {
         return teamRepository.findAll();
@@ -60,8 +60,7 @@ public class TeamService {
 
     /**
      * Returns a list of teams currently not playing.
-     * @param team
-     * @return
+     * @return list of teams
      */
     public List<Team> getAvailableTeams() {
         return teamRepository.findAvailableTeams();
@@ -69,8 +68,8 @@ public class TeamService {
 
     /**
      * Returns the team for the given id.
-     * @param id
-     * @return
+     * @param id team id
+     * @return team
      */
     public Optional<Team> findById(Long id) {
         return teamRepository.findById(id);
@@ -78,8 +77,8 @@ public class TeamService {
 
     /**
      * Returns the team for the given name.
-     * @param name
-     * @return
+     * @param name of team
+     * @return team
      */
     public Team loadTeam(String name) {
         return teamRepository.findFirstByName(name);
@@ -87,8 +86,8 @@ public class TeamService {
 
     /**
      * Checks if the given team is currently playing or not.
-     * @param team
-     * @return
+     * @param team team
+     * @return true if it is, false if not
      */
     public boolean isAvailableTeam(Team team) {
         return teamRepository.getIsAvailableTeam(team);
@@ -96,9 +95,9 @@ public class TeamService {
 
     /**
      * Checks if the given team is currently playing in any other than the given game or not.
-     * @param team
-     * @param game
-     * @return
+     * @param team team
+     * @param game game
+     * @return true if it is, false if not
      */
     public boolean isAvailableTeamForGame(Team team, Game game) {
         return teamRepository.getIsAvailableTeamForGame(team, game);

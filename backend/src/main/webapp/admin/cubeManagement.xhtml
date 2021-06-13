@@ -10,10 +10,6 @@
     xmlns:timeguess="http://java.sun.com/jsf/composite/timeguess"
 	template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
-        <!-- see chat.js -->
-        <h:outputScript>			
-            pfContext=PF
-        </h:outputScript>
         <p:growl id="msg" showDetail="true" skipDetailIfEqualsSummary="true"/>
 
         <h:form id="toolbarForm">
@@ -28,7 +24,7 @@
         </h:form>
 
         <h:form id="CubeStatusForm">
-            <div class="chatRoomContent">
+            <div class="cubeAdminContent">
                 <h1>Cube Management</h1>
 
                 <p:panelGrid columns="1" style="width: 35%;"
@@ -39,7 +35,7 @@
 				  <!-- displays cube status -->
                   <h3>Cubes Status</h3>
                      <p:scrollPanel id="onlineCubeInfo"
-                                styleClass="chatRoomPanelContent onlineInfoBox"
+                                styleClass="cubeAdminPanelContent onlineInfoBox"
                                 widgetVar="onlineInfoWidget">
                          
                          <ui:repeat var="cubeStatusInfo"
@@ -114,7 +110,7 @@
 						<p:commandButton value="Delete configuration"
 							action="#{cubeController.deleteConfigurations()}"
 							update=":cubeDetailForm:cubeUseDialog :msg"
-							rendered="#{cubeStatusController.isConfigured(curr)}">
+							rendered="#{cubeStatusController.isConfigured(curr) and !(cubeStatusController.getStatus(curr.macAddress) eq 'IN_GAME')}">
 							<p:confirm header="Confirmation" icon="fa fa-exclamation-triangle" message="Are you sure about deleting this configuration? This cannot be undone." />
 							<f:actionListener binding="#{cubeStatusController.changeStatus(curr.macAddress)}" />
 						</p:commandButton>
@@ -160,7 +156,7 @@
 
 					<p:spacer height="5" />
 
-					<p:dataTable var="cubeFace"
+					<p:dataTable var="cubeFace" scrollable="true" scrollHeight="300"
 						value="#{cubeConfigurationController.cubeFaces}">
 						<p:column headerText="Cube Face Description">
 							<h:outputText

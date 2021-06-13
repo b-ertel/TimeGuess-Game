@@ -109,7 +109,7 @@ public class NewUserBean implements Serializable {
 
     /**
      * Returns a set containing all available user roles.
-     * @return
+     * @return all possible user roles
      */
     public EnumSet<UserRole> getAllUserRoles() {
         return UserRole.getUserRoles();
@@ -131,6 +131,7 @@ public class NewUserBean implements Serializable {
 
     /**
      * Creates a new user with the role of player.
+     * @return saved user
      * @apiNote shows a ui message if input fields are invalid.
      */
     public User createUser() {
@@ -139,6 +140,7 @@ public class NewUserBean implements Serializable {
 
     /**
      * Creates a new user with the set role.
+     * @return saved user
      * @apiNote shows a ui message if input fields are invalid.
      */
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -148,8 +150,8 @@ public class NewUserBean implements Serializable {
 
     /**
      * Checks if all fields contain valid values.
-     * @param isAdmin true when registering via administrative interface,
-     *        false when registering via user registration interface
+     * @param isAdminAccess true when registering via administrative interface,
+     * false when registering via user registration interface
      * @return true if all necessary fields contain valid values, false otherwise
      */
     public boolean validateInput(boolean isAdminAccess) {
@@ -184,7 +186,9 @@ public class NewUserBean implements Serializable {
             consumer.accept(user);
 
             user = this.userService.saveUser(user);
-            this.clearFields();
+            if (user != null) {
+                this.clearFields();
+            }
 
             return user;
         }

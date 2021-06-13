@@ -1,20 +1,25 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:p="http://primefaces.org/ui"
     template="/WEB-INF/templates/main.xhtml">
 
-    <ui:define name ="content">
+    <ui:define name="content">
 
         <ui:include src="/WEB-INF/includes/gamesTable.xhtml">
             <ui:param name="isAdminAccess" value="#{true}" />
         </ui:include>
-        
+
         <ui:include src="/WEB-INF/includes/gameDetails.xhtml" />
 
-        <p:commandButton id="lobbyUpdate" styleClass="hidden"
-            process="@all" onsuccess="PF('gameTable').filter()" update=":gameListForm:gameTable" />
+        <p:commandButton id="lobbyUpdate" styleClass="hidden" process="@all"
+            onsuccess="PF('gameTable').filter()"
+            update=":gameTable :gameInfoData :gameInfoTable :roundTable">
+            <f:actionListener binding="#{gameDetailController.doReloadGame()}" />
+            <f:actionListener binding="#{gameInfoBean.doReloadGame()}" />
+        </p:commandButton>
 
     </ui:define>
 </ui:composition>

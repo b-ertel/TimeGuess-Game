@@ -1,10 +1,16 @@
 package at.timeguess.backend.ui.beans;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static at.timeguess.backend.utils.TestSetup.USERROLES;
+import static at.timeguess.backend.utils.TestSetup.createUser;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-import static at.timeguess.backend.utils.TestSetup.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 
@@ -65,49 +71,45 @@ public class NewUserBeanTest {
         newUserBean.setUserRole(role);
         newUserBean.setEnabled(false);
 
-        assertEquals(foo, newUserBean.getUsername());
-        assertEquals(foo, newUserBean.getPassword());
-        assertEquals(foo, newUserBean.getRepeated());
-        assertEquals(foo, newUserBean.getFirstName());
-        assertEquals(foo, newUserBean.getLastName());
-        assertEquals(foo, newUserBean.getEmail());
+        assertFields(foo, true);
         assertEquals(role, newUserBean.getUserRole());
         assertFalse(newUserBean.isEnabled());
 
         newUserBean.clearFields();
 
-        assertNull(newUserBean.getUsername());
-        assertNull(newUserBean.getPassword());
-        assertNull(newUserBean.getRepeated());
-        assertNull(newUserBean.getFirstName());
-        assertNull(newUserBean.getLastName());
-        assertNull(newUserBean.getEmail());
-        assertNull(newUserBean.getUserRole());
-        assertTrue(newUserBean.isEnabled());
+        assertFieldsClear();
     }
 
     @Test
     public void testCreateUser() {
         String foo = fillBean(false);
+        User expected = createUser(6L);
+        when(userService.saveUser(any(User.class))).thenReturn(expected);
 
-        newUserBean.createUser();
+        User result = newUserBean.createUser();
 
         verify(userService).saveUser(any(User.class));
         verify(passwordEncoder).encode(foo);
         verifyNoInteractions(messageBean);
+        assertEquals(expected, result);
+        assertFieldsClear();
     }
 
     @ParameterizedTest
     @ValueSource(ints = { 1, 2, 3 })
     public void testCreateUserAdmin(Integer roleNr) {
         String foo = fillBean(true);
+        User expected = createUser(6L);
+        when(userService.saveUser(any(User.class))).thenReturn(expected);
         newUserBean.setUserRole(USERROLES.get(roleNr));
 
-        newUserBean.createUserAdmin();
+        User result = newUserBean.createUserAdmin();
 
         verify(userService).saveUser(any(User.class));
         verify(passwordEncoder).encode(foo);
         verifyNoInteractions(messageBean);
+        assertEquals(expected, result);
+        assertFieldsClear();
     }
 
     @Test
@@ -117,6 +119,19 @@ public class NewUserBeanTest {
         verifyNoInteractions(userService);
         verifyNoInteractions(passwordEncoder);
         verify(messageBean).alertErrorFailValidation(anyString(), anyString());
+    }
+
+    @Test
+    public void testCreateUserFailureSave() {
+        String foo = fillBean(false);
+        when(userService.saveUser(any(User.class))).thenReturn(null);
+
+        User result = newUserBean.createUser();
+
+        verify(userService).saveUser(any(User.class));
+        verifyNoInteractions(messageBean);
+        assertNull(result);
+        assertFields(foo, false);
     }
 
     @Test
@@ -173,5 +188,28 @@ public class NewUserBeanTest {
             newUserBean.setEnabled(false);
         }
         return foo;
+    }
+
+    private void assertFields(String expected, boolean isAdmin) {
+        assertEquals(expected, newUserBean.getUsername());
+        assertEquals(expected, newUserBean.getPassword());
+        assertEquals(expected, newUserBean.getRepeated());
+
+        if (isAdmin) {
+            assertEquals(expected, newUserBean.getFirstName());
+            assertEquals(expected, newUserBean.getLastName());
+            assertEquals(expected, newUserBean.getEmail());
+        }
+    }
+
+    private void assertFieldsClear() {
+        assertNull(newUserBean.getUsername());
+        assertNull(newUserBean.getPassword());
+        assertNull(newUserBean.getRepeated());
+        assertNull(newUserBean.getFirstName());
+        assertNull(newUserBean.getLastName());
+        assertNull(newUserBean.getEmail());
+        assertNull(newUserBean.getUserRole());
+        assertTrue(newUserBean.isEnabled());
     }
 }

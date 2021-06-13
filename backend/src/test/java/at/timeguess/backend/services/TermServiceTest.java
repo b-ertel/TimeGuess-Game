@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.Test;
@@ -214,7 +213,7 @@ public class TermServiceTest {
         termService.deleteTerm(term);
 
         assertEquals(ctBefore - 1, termService.getAllTerms().size(), "No term has been deleted after calling termService.deleteTerm");
-        assertThrows(NoSuchElementException.class, () -> termService.loadTerm(termId));
+        assertNull(termService.loadTerm(termId));
     }
 
     @Test

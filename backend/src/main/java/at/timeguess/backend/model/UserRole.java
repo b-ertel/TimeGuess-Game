@@ -17,7 +17,7 @@ public enum UserRole {
 
     /**
      * Returns a set containing all available user roles.
-     * @return
+     * @return set of all user roles
      */
     public static EnumSet<UserRole> getUserRoles() {
         return userRoles;
@@ -25,8 +25,8 @@ public enum UserRole {
 
     /**
      * Maps the given set of roles to a specific user role according to apps inheritance rules.
-     * @param roles
-     * @return
+     * @param roles roles
+     * @return resulting role
      */
     public static UserRole mapUserRole(Set<UserRole> roles) {
         if (roles != null) {
@@ -38,8 +38,8 @@ public enum UserRole {
 
     /**
      * Maps the given user role to a set of roles according to apps inheritance rules.
-     * @param role
-     * @return
+     * @param role role
+     * @return set of roles
      */
     public static Set<UserRole> mapUserRole(UserRole role) {
         Set<UserRole> roles = new HashSet<>();

@@ -7,9 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import at.timeguess.backend.model.Game;
+import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.UserRole;
 import at.timeguess.backend.model.utils.PlayerGamesComparator;
+import at.timeguess.backend.model.utils.TeamScore;
+import at.timeguess.backend.model.utils.TeamScoreComparator;
 import at.timeguess.backend.model.utils.UserScores;
 import at.timeguess.backend.repositories.RoundRepository;
 import at.timeguess.backend.repositories.UserRepository;
@@ -26,6 +30,9 @@ public class HighscoreService {
 	
 	@Autowired 
 	RoundRepository roundRepo;
+	
+	@Autowired
+	RoundService roundService;
 	
 	/**
 	 * Method, that puts informations about number of games won, correct/incorrect answers of a user into the UserScore-class and
@@ -48,6 +55,17 @@ public class HighscoreService {
 	public List<UserScores> getHighscoresByGamesWon() {
 		List<UserScores>  ls = getUserScores();
 		PlayerGamesComparator comp = new PlayerGamesComparator();
+		ls.sort(comp);
+		return ls;
+	}
+	
+	public List<TeamScore> getTeamRanking(Game game) {
+		List<TeamScore> ls = new ArrayList<>();
+		for(Team team : game.getTeams()) {
+			TeamScore score = new TeamScore(team, roundService.getPointsOfTeamInGame(game, team));
+			ls.add(score);
+		}
+		TeamScoreComparator comp = new TeamScoreComparator();
 		ls.sort(comp);
 		return ls;
 	}
