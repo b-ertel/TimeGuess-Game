@@ -1,16 +1,20 @@
 package at.timeguess.backend.ui.beans;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Persistable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -38,7 +42,7 @@ public class GameInfoBean implements Serializable {
 
     /**
      * Sets the currently displayed game.
-     * @param game
+     * @param game game
      */
     public void setGame(Game game) {
         this.game = game;
@@ -46,15 +50,17 @@ public class GameInfoBean implements Serializable {
 
     /**
      * Returns the rounds of the set game.
-     * @param game
+     * @return list of rounds
      */
-    public Set<Round> getRounds() {
-        return game == null ? null : game.getRounds();
+    public List<Round> getRounds() {
+        return game == null ? null :game.getRounds().stream()
+            .sorted(Comparator.comparing(Round::getNr))
+            .collect(Collectors.toList());
     }
 
     /**
      * Returns the team infos for the set game.
-     * @param game
+     * @return {@link TreeNode}
      */
     public TreeNode getTeams() {
         return game == null ? new DefaultTreeNode() : createGameInfos(game);
@@ -78,18 +84,18 @@ public class GameInfoBean implements Serializable {
         // fill helpers maps with base data
         teams.stream().forEach(t -> {
             // team
-            mteams.put(t.getId(), new GameInfo(t.getId(), t.getName(), 0, 0));
+            mteams.put(t.getId(), new GameInfo(t, t.getName(), 0, 0));
             // players
             Set<Long> playerIds = new HashSet<>();
             t.getTeamMembers().forEach(u -> {
                 playerIds.add(u.getId());
-                mplayers.put(u.getId(), new GameInfo(u.getId(), u.getUsername(), 0, 0));
+                mplayers.put(u.getId(), new GameInfo(u, u.getUsername(), 0, 0));
             });
             mplayerIds.put(t.getId(), playerIds);
         });
 
         // complete with round and point info
-        GameInfo gameinfo = new GameInfo(game.getId(), game.getName(), 0, 0);
+        GameInfo gameinfo = new GameInfo(game, game.getName(), 0, 0);
         rounds.stream().forEach(r -> {
             gameinfo.addRound();
             gameinfo.addPoints(r.getPoints());
@@ -103,7 +109,8 @@ public class GameInfoBean implements Serializable {
         var eplayers = mplayers.entrySet();
         mteams.values().forEach(teaminfo -> {
             TreeNode tn = new DefaultTreeNode(teaminfo, root);
-            eplayers.stream().filter(e -> mplayerIds.get(teaminfo.getId()).contains(e.getKey()))
+            eplayers.stream()
+                .filter(e -> mplayerIds.get(teaminfo.getId()).contains(e.getKey()))
                 .forEach(e -> new DefaultTreeNode(e.getValue(), tn));
         });
 
@@ -120,20 +127,24 @@ public class GameInfoBean implements Serializable {
 
     public static class GameInfo implements Comparable<GameInfo> {
 
-        private Long id;
+        private Persistable<Long> object;
         private String name;
         private Integer rounds;
         private Integer points;
 
-        public GameInfo(Long id, String name, int rounds, int points) {
-            this.id = id;
+        public GameInfo(Persistable<Long> object, String name, int rounds, int points) {
+            this.object = object;
             this.name = name;
             this.rounds = rounds;
             this.points = points;
         }
 
+        public Persistable<Long> getObject() {
+            return object;
+        }
+
         public Long getId() {
-            return id;
+            return object.getId();
         }
 
         public String getName() {

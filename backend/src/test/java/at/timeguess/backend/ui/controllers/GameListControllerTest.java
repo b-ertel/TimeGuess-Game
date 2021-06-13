@@ -154,19 +154,19 @@ public class GameListControllerTest {
 
         game.setStatus(GameState.SETUP);
         assertFalse(gameListController.isLockedDelete(game));
-        game.setStatus(GameState.VALID_SETUP);
-        assertFalse(gameListController.isLockedDelete(game));
-        game.setStatus(GameState.HALTED);
-        assertFalse(gameListController.isLockedDelete(game));
         game.setStatus(GameState.FINISHED);
         assertFalse(gameListController.isLockedDelete(game));
         game.setStatus(GameState.CANCELED);
         assertFalse(gameListController.isLockedDelete(game));
 
+        game.setStatus(GameState.VALID_SETUP);
+        assertTrue(gameListController.isLockedDelete(game));
         game.setStatus(GameState.PLAYED);
         assertTrue(gameListController.isLockedDelete(game));
+        game.setStatus(GameState.HALTED);
+        assertTrue(gameListController.isLockedDelete(game));
         game = null;
-        assertTrue(gameListController.isLockedDelete(game));        
+        assertTrue(gameListController.isLockedDelete(game));
 
         verifyNoInteractions(gameService);
     }

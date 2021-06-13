@@ -34,10 +34,9 @@ public class TopicDetailController implements Serializable {
 
     /**
      * Sets the currently displayed topic and reloads it form db. This term is
-     * targeted by any further calls of
-     * {@link #doReloadTopic()}, {@link #doSaveTopic()}.
+     * targeted by any further calls of {@link #doReloadTopic()}, {@link #doSaveTopic(Topic)}.
      *
-     * @param term
+     * @param topic topic
      */
     public void setTopic(Topic topic) {
         this.topic = topic;

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.ui.beans.MessageBean;
 import at.timeguess.backend.model.Cube;
+import at.timeguess.backend.model.CubeStatus;
 
 /**
  *  Controller for displaying {@link Cube} entities.

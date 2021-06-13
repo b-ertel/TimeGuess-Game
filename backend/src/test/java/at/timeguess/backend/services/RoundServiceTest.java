@@ -66,7 +66,7 @@ public class RoundServiceTest {
         for (int i = 1; i < 5; i++) {
             Game game = gameRepo.findById((long) i).get();
             Round lastRound = roundService.getLastRound(game);
-            assertEquals(lastRound.getId(), (long) 4 * i);
+            assertEquals(4, lastRound.getId().getNr());
         }
         Game gameWithNoRound = gameRepo.findById((long) 6).get();
         assertNull(roundService.getLastRound(gameWithNoRound));
