@@ -1,6 +1,7 @@
 package at.timeguess.backend.configs;
 
 import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,12 +16,10 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import at.timeguess.backend.configs.handler.CustomAccessDeniedHandler;
 import at.timeguess.backend.configs.handler.CustomAuthenticationFailureHandler;
-import at.timeguess.backend.spring.CustomizedLogoutSuccessHandler;
 
 /**
  * Spring configuration for web security.
@@ -33,11 +32,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     DataSource dataSource;
 
-    @Bean
-    protected LogoutSuccessHandler logoutSuccessHandler() {
-        return new CustomizedLogoutSuccessHandler();
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -46,8 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable(); // needed for H2 console
 
         http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).invalidateHttpSession(true)
-            .deleteCookies("JSESSIONID").logoutSuccessUrl("/login.xhtml")
-            .logoutSuccessHandler(this.logoutSuccessHandler());
+            .deleteCookies("JSESSIONID").logoutSuccessUrl("/login.xhtml");
 
         http.authorizeRequests()
             // Permit access to the H2 console
