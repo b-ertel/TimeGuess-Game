@@ -52,7 +52,8 @@ public class CubeService {
      * Save a new or existing cube to the database.
      * 
      * @param cube the cube to save
-     * @throws IllegalArgumentException
+     * @return cube
+     * @throws IllegalArgumentException if cube could not be saved
      */
     @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('CUBE')")
     public Cube saveCube(Cube cube) throws IllegalArgumentException {
@@ -74,7 +75,7 @@ public class CubeService {
     /**
      * Check if a cube with a given MAC address exists in the database.
      * 
-     * @param cube to find out if mac address is already known
+     * @param macAddress to find out if mac address is already known
      * @return true if mac address is known, false otherwise
      */
     public boolean isMacAddressKnown(String macAddress) {
@@ -95,7 +96,7 @@ public class CubeService {
      * Delete a given cube from the database.
      * 
      * @param cube the cube to delete
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException when cube could not be deleted
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteCube(Cube cube) throws IllegalArgumentException{
@@ -149,7 +150,7 @@ public class CubeService {
      * 
      * @param cube the cube
      * @param mapping a mapping of Cube faces to facet numbers
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if mac address is unknown or cube is already configured
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public void saveMappingForCube(Cube cube, Map<CubeFace, Integer> mapping) throws IllegalArgumentException {

@@ -42,7 +42,7 @@ public class GameInfoBean implements Serializable {
 
     /**
      * Sets the currently displayed game.
-     * @param game
+     * @param game game
      */
     public void setGame(Game game) {
         this.game = game;
@@ -50,7 +50,7 @@ public class GameInfoBean implements Serializable {
 
     /**
      * Returns the rounds of the set game.
-     * @param game
+     * @return list of rounds
      */
     public List<Round> getRounds() {
         return game == null ? null :game.getRounds().stream()
@@ -60,7 +60,7 @@ public class GameInfoBean implements Serializable {
 
     /**
      * Returns the team infos for the set game.
-     * @param game
+     * @return {@link TreeNode}
      */
     public TreeNode getTeams() {
         return game == null ? new DefaultTreeNode() : createGameInfos(game);

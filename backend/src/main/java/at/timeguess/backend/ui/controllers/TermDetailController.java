@@ -34,8 +34,9 @@ public class TermDetailController implements Serializable {
 
     /**
      * Sets the currently displayed term and reloads it form db.
-     * This term is targeted by any further calls of {@link #doReloadTerm()}, {@link #doSaveTerm()} and {@link #doDeleteTerm()}.
-     * @param term
+     * This term is targeted by any further calls of {@link #doReloadTerm()},
+     * {@link #doSaveTerm()} and {@link #doDeleteTerm()}.
+     * @param term term
      */
     public void setTerm(Term term) {
         this.term = term;

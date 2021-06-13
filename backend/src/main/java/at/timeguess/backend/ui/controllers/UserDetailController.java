@@ -44,7 +44,7 @@ public class UserDetailController implements Serializable {
     /**
      * Sets the currently displayed user and reloads it form db.
      * This user is targeted by any further calls of {@link #doReloadUser()}, {@link #doSaveUser()} and {@link #doDeleteUser()}.
-     * @param user
+     * @param user user
      */
     public void setUser(User user) {
         this.user = user;
@@ -53,7 +53,7 @@ public class UserDetailController implements Serializable {
 
     /**
      * Returns the currently displayed user.
-     * @return
+     * @return user
      */
     public User getUser() {
         return user;
@@ -61,7 +61,7 @@ public class UserDetailController implements Serializable {
 
     /**
      * Returns true if the currently displayed users password is encrypted, false otherwise.
-     * @return
+     * @return true if it is, false if not
      */
     public boolean hasEncryptedPassword() {
         return user != null && user.getPassword().matches("\\{.+\\}.+");
@@ -69,7 +69,7 @@ public class UserDetailController implements Serializable {
 
     /**
      * Returns the roles of the currently displayed user as a list (because Primefaces needs that).
-     * @return
+     * @return list of user roles
      */
     public List<UserRole> getUserRoles() {
         return user == null ? null : new ArrayList<>(user.getRoles());
@@ -78,7 +78,7 @@ public class UserDetailController implements Serializable {
     /**
      * Sets the roles of the currently displayed user to the given values (because Primefaces can only deal with a
      * list).
-     * @return
+     * @param userRoles list of user roles
      */
     public void setUserRoles(List<UserRole> userRoles) {
         if (user != null) user.setRoles(new HashSet<>(userRoles));
@@ -86,7 +86,7 @@ public class UserDetailController implements Serializable {
 
     /**
      * Returns a set containing all available user roles.
-     * @return
+     * @return ser of user roles
      */
     public Set<UserRole> getAllUserRoles() {
         return UserRole.getUserRoles();

@@ -12,7 +12,7 @@ import org.hibernate.annotations.Immutable;
 
 /**
  * Helper class used to combine JPA queries for final result retrieval.
- * @see {@link at.timeguess.backend.services.UserService.getTotalGamesWon} for usage example.
+ * See {@link at.timeguess.backend.services.UserService#getTotalGamesWon(at.timeguess.backend.model.User)} for usage example.
  */
 @Entity
 @Immutable

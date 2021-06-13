@@ -3,8 +3,6 @@ package at.timeguess.backend.services;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +44,7 @@ public class GameService {
 
     /**
      * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
-     * and {@link PostConstruct} is not invoked, so autowiring is done manually
+     * and {@link javax.annotation.PostConstruct} is not invoked, so autowiring is done manually
      */
     public GameService() {
         if (websocketManager == null) {
@@ -56,16 +54,16 @@ public class GameService {
 
     /**
      * Returns a list of all games.
-     * @return
+     * @return list of games
      */
     public List<Game> getAllGames() {
         return gameRepo.findAll();
     }
 
     /**
-     * Returns a list of all games currently not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP},
-     * {@link GameState#PLAYED}, {@link GameState#HALTED}).
-     * @return
+     * Returns a list of all games currently not finished (states {@link GameState#SETUP},
+     * {@link GameState#VALID_SETUP}, {@link GameState#PLAYED}, {@link GameState#HALTED}).
+     * @return list of games
      */
     public List<Game> getAllCurrent() {
         return gameRepo.findAllCurrent();
@@ -73,8 +71,8 @@ public class GameService {
 
     /**
      * Returns a list of all games with the given status.
-     * @param  gameState
-     * @return
+     * @param  gameState game state
+     * @return list of games
      */
     public List<Game> getByStatus(GameState gameState) {
         return gameRepo.findByStatus(gameState);
@@ -82,8 +80,8 @@ public class GameService {
 
     /**
      * Returns a list of all games with the given status.
-     * @param  gameState
-     * @return
+     * @param  gameState array of game states
+     * @return list of games
      */
     public List<Game> getByStatus(GameState[] gameState) {
         return gameRepo.findByStatus(gameState);
@@ -91,10 +89,11 @@ public class GameService {
 
     /**
      * Returns a list of all games the given user is associated to, optionally restricted to games currently
-     * not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP}, {@link GameState#PLAYED}, {@link GameState#HALTED}).
-     * @param  user
-     * @param  current
-     * @return
+     * not finished (states {@link GameState#SETUP}, {@link GameState#VALID_SETUP}, {@link GameState#PLAYED},
+     * {@link GameState#HALTED}).
+     * @param  user user
+     * @param  current true for current, false for all
+     * @return list of games
      */
     public List<Game> getByUser(User user, boolean current) {
         return current ? gameRepo.findByUserCurrent(user) : gameRepo.findByUserAll(user);
@@ -102,15 +101,15 @@ public class GameService {
 
     /**
      * Loads a single game identified by its id.
-     * @param  gameId
-     * @return
+     * @param  gameId game id
+     * @return game
      */
     public Game loadGame(Long gameId) {
         return gameRepo.findById(gameId).orElse(null);
     }
 
     /**
-     * Saves the game. If the game is new the user requesting this operation will be stored as {@link Game#creator}.
+     * Saves the game. If the game is new the user requesting this operation will be stored as {@link Game#setCreator(User)}.
      * Additionally fills gui message with success or failure info and triggers a push update.
      * @param   game the game to save
      * @return  the saved game
@@ -198,7 +197,7 @@ public class GameService {
      * Returns whether participation confirmation is possible for the given user and game.
      * @param  user the user whose participation confirmation is checked for the given game.
      * @param  game the game whose participation confirmation is checked for the given user.
-     * @return      true if participation confirmation is disabled, false otherwise.
+     * @return true if participation confirmation is disabled, false otherwise.
      */
     public boolean disabledConfirmation(User user, Game game) {
         // game confirmation generally disabled or user not invited?
@@ -208,7 +207,7 @@ public class GameService {
     /**
      * Returns whether participation confirmation is possible for the given game.
      * @param  game the game whose participation confirmation is checked.
-     * @return      true if participation confirmation is disabled, false otherwise.
+     * @return true if participation confirmation is disabled, false otherwise.
      */
     public boolean disabledConfirmation(Game game) {
         switch (game.getStatus()) {

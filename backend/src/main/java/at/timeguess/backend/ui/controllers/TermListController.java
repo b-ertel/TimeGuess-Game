@@ -32,14 +32,16 @@ public class TermListController implements Serializable {
 
     /**
      * Returns a list of all all terms.
+     * @return list of terms
      */
     public List<Term> getTerms() {
         return termService.getAllTerms();
     }
 
     /**
-     * Returns and sets a list of games, by default all returned by
-     * {@link getTerms()} (helper methods for primefaces datatable filter and sort).
+     * Returns and sets a list of games, by default all returned by {@link #getTerms()}
+     * (helper methods for primefaces datatable filter and sort).
+     * @return collection of terms
      */
     public Collection<Term> getFilterTerms() {
         if (filterTerms == null) filterTerms = getTerms();
@@ -52,6 +54,7 @@ public class TermListController implements Serializable {
 
     /**
      * Returns and sets the currently selected game (helper methods for primefaces datatable contextmenu).
+     * @return term
      */
     public Term getSelectedTerm() {
         return selectedTerm;

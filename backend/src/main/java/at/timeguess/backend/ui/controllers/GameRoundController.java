@@ -61,7 +61,7 @@ public class GameRoundController {
     /**
      * Sets the user for which a game is displayed.
      * Needs to be set on entering the game page to update values correctly.
-     * @param user
+     * @param user user
      */
     public void setUser(User user) {
         this.user = user;
@@ -103,8 +103,8 @@ public class GameRoundController {
 
     /**
      * Method to check if given team is current round's guessing team.
-     * @param  team
-     * @return
+     * @param  team team
+     * @return true if it is, false if not
      */
     public boolean isGuessingTeam(Team team) {
         Team guessteam = currentRound == null ? null : currentRound.getGuessingTeam();
@@ -113,9 +113,9 @@ public class GameRoundController {
 
     /**
      * Method to check if given user is currently describing player.
-     * @param   user
-     * @return
-     * @apiNote      method name equals the one for teams to be called from ui with different types
+     * @param   user user
+     * @return  true is he is, false if not
+     * @apiNote method name equals the one for teams to be called from ui with different types
      */
     public boolean isGuessingTeam(User user) {
         return currentRound == null ? false : currentRound.getGuessingUser().equals(user);
@@ -123,7 +123,7 @@ public class GameRoundController {
 
     /**
      * Method to check if saved user is in current round's guessing team.
-     * @return
+     * @return true if it is, false if not
      */
     public boolean isInGuessingTeam() {
         return currentRound == null ? false : isInTeam(currentRound.getGuessingTeam(), user);
@@ -131,7 +131,7 @@ public class GameRoundController {
 
     /**
      * Method to check if saved user is in last round's guessing team.
-     * @return
+     * @return true if saved user is, false if not
      */
     public boolean isInLastGuessingTeam() {
         return lastRound == null ? false : isInTeam(lastRound.getGuessingTeam(), user);
@@ -139,8 +139,8 @@ public class GameRoundController {
 
     /**
      * Method to check if saved user is in given team.
-     * @param  team
-     * @return
+     * @param  team team
+     * @return true if it is, false if not
      */
     public boolean isUserTeam(Team team) {
         return isInTeam(team, user);
@@ -148,9 +148,9 @@ public class GameRoundController {
 
     /**
      * Method to check if saved user is in same team as given user.
-     * @param   team
-     * @return
-     * @apiNote      method name equals the one for teams to be called from ui with different types
+     * @param   user user
+     * @return  true if it is, false if not
+     * @apiNote method name equals the one for teams to be called from ui with different types
      */
     public boolean isUserTeam(User user) {
         return getCurrentTeam() == null ? false : currentTeam.getTeamMembers().contains(user);
@@ -158,7 +158,7 @@ public class GameRoundController {
 
     /**
      * Method to get the formatted current countdown value for the saved user's current game.
-     * @return
+     * @return formatted countdown value
      */
     public String getCountDown() {
         return gameManagerController.getCountDownForGame(currentGame);
@@ -166,7 +166,7 @@ public class GameRoundController {
 
     /**
      * Method to get the numeric current countdown value for the saved user's current game.
-     * @return
+     * @return numeric countdown value
      */
     public int getTimer() {
         return gameManagerController.getTimerForGame(currentGame);
@@ -174,7 +174,7 @@ public class GameRoundController {
 
     /**
      * Returns the display state of the current game.
-     * @return
+     * @return state of current game
      */
     public RunState getCurrentRunState() {
         if (getCurrentGame() == null) return RunState.NONE;
@@ -195,19 +195,27 @@ public class GameRoundController {
     }
 
     /**
-     * Returns the state of the current round if {@link run} states for a current round in any running game
-     * @return
+     * Returns the current round state for the current game, if it is in {@link RunState#RUNNING}.
+     * @return state of current round
      */
     public RoundState getCurrentRoundState() {
         return getCurrentRunState() == RunState.RUNNING ?
             gameManagerController.getRoundStateForGame(currentGame) : RoundState.NONE;
     }
 
+    /**
+     * Returns the current reason to wait for the current game, if it is in {@link RunState#WAITING}.
+     * @return state of current game
+     */
     public WaitReason getCurrentWaitReason() {
         return getCurrentRunState() == RunState.WAITING ?
             gameManagerController.getWaitReasonForGame(currentGame) : WaitReason.NONE;
     }
 
+    /**
+     * Returns the current reason for no game for the current game, if it is in {@link RunState#NONE}.
+     * @return state of current game
+     */
     public NoGameReason getCurrentNoGameReason() {
         return getCurrentRunState() == RunState.NONE ?
             gameManagerController.getNoGameReasonForGame(currentGame) : NoGameReason.NONE;

@@ -40,7 +40,7 @@ public class TopicService {
 
     /**
      * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
-     * and {@link PostConstruct} is not invoked, so autowiring is done manually
+     * and {@link javax.annotation.PostConstruct} is not invoked, so autowiring is done manually
      */
     public TopicService() {
         if (websocketManager == null) {
@@ -74,7 +74,6 @@ public class TopicService {
 
     /**
      * Saves the Topic.
-     * @param topic the topic to save
      * Additionally fills gui message with success or failure info and triggers a push update.
      * @param topic the topic to save
      * @return the saved topic

@@ -204,6 +204,7 @@ public class GameManagerController {
      * Method is called on facet-event, checks to which game the event belongs and estimates whether a round should start or end.
      * When the countdown is running and the gamestate changes to paused, the current round can be invalidated by throwing the cube.
      * That way the same guessing team gets a new term when the game restarts.
+     * @param configuredFacetsEvent event
      */
     public synchronized void onConfiguredFacetsEvent(ConfiguredFacetsEvent configuredFacetsEvent) {
         if (status.containsCube(configuredFacetsEvent.getCube())) {
@@ -241,6 +242,7 @@ public class GameManagerController {
      * A method for processing a {@link ChannelPresenceEvent}.
      * Checks for each game currently to be played whether enough players are present and sets the games state accordingly.
      * Is called by a channel supervisor when players enter or leave the game room.
+     * @param channelPresenceEvent event
      */
     public synchronized void onChannelPresenceEvent(ChannelPresenceEvent channelPresenceEvent) {
         if (!channelPresenceEvent.getChannel().equals("newRoundChannel")) return;
@@ -256,7 +258,7 @@ public class GameManagerController {
     }
 
     /**
-     * Method to find the game in which a given user is currently playing, called by{@link CountDownController}
+     * Method to find the game in which a given user is currently playing, called by {@link GameRoundController}.
      * @param  user to find current game
      * @return current game
      */
@@ -266,7 +268,7 @@ public class GameManagerController {
     }
 
     /**
-     * Method to get the current round for a given game, called by {@link GameRoundController}
+     * Method to get the current round for a given game, called by {@link GameRoundController}.
      * @param  game to find current round
      * @return current round
      */
@@ -276,9 +278,9 @@ public class GameManagerController {
     }
 
     /**
-     * Checks if the given cube is currently in use.
+     * Checks if the given cube is currently in use, called by {@link CubeStatusController}.
      * @param  cube to find game for
-     * @return
+     * @return true if it has, false if not
      */
     public boolean hasCurrentGameForCube(Cube cube) {
         return status.containsCube(cube);
@@ -286,8 +288,8 @@ public class GameManagerController {
 
     /**
      * Returns the current round state for the given game.
-     * @param  game
-     * @return
+     * @param  game game
+     * @return round state
      */
     public RoundState getRoundStateForGame(Game game) {
         return getRoundState(status.getGameData(game));
@@ -295,17 +297,17 @@ public class GameManagerController {
 
     /**
      * Returns the current reason to wait for the given game to continue.
-     * @param  game
-     * @return
+     * @param  game game
+     * @return wait reason
      */
     public WaitReason getWaitReasonForGame(Game game) {
         return getWaitReason(status.getGameData(game));
     }
 
     /**
-     * Returns the current reason to wait for the given game to continue.
-     * @param  game
-     * @return
+     * Returns the current reason for no game for the given game.
+     * @param  game game
+     * @return no game reason
      */
     public NoGameReason getNoGameReasonForGame(Game game) {
         return getNoGameReason(status.getGameData(game));
@@ -313,8 +315,8 @@ public class GameManagerController {
 
     /**
      * Returns the formatted current countdown value for the given game.
-     * @param  game
-     * @return
+     * @param  game game
+     * @return formatted countdown value
      */
     public String getCountDownForGame(Game game) {
         GameData data = status.getGameData(game);
@@ -323,8 +325,8 @@ public class GameManagerController {
 
     /**
      * Returns the numeric current countdown value for the given game.
-     * @param  game
-     * @return
+     * @param  game game
+     * @return numeric countdown value
      */
     public int getTimerForGame(Game game) {
         GameData data = status.getGameData(game);
@@ -333,7 +335,7 @@ public class GameManagerController {
 
     /**
      * Method to calculate the points the given team has reached in the given game.
-     * @param  game
+     * @param  game game
      * @param  team of which points are to be estimated
      * @return points
      */
@@ -343,7 +345,7 @@ public class GameManagerController {
 
     /**
      * Method to check which team has won the current game.
-     * @param  game
+     * @param  game game
      * @return winning team
      */
     public Team getTeamWithMostPointsForGame(Game game) {
@@ -353,7 +355,7 @@ public class GameManagerController {
     /**
      * Method to add a newly created game to the saved list of currently available games
      * and send notifications to all participating team members.
-     * @param game
+     * @param game game
      */
     public void addGame(Game game) {
         // add game to internal list and change game status
@@ -368,7 +370,7 @@ public class GameManagerController {
     /**
      * Method to remove a canceled from the saved list of currently available games
      * and send notifications to all participating team members.
-     * @param game
+     * @param game game
      */
     public void removeGame(Game game) {
         GameData data = status.getGameData(game);
@@ -379,7 +381,7 @@ public class GameManagerController {
      * Method to validate and save a round of a game.
      * Checks if a team reached the maximum of points or if all enabled terms of topic have been used.
      * Send corresponding message to all users in the game
-     * @param game
+     * @param game game
      * @param v validation of round
      */
     public void validateRoundOfGame(Game game, Validation v) {
@@ -408,16 +410,16 @@ public class GameManagerController {
     }
 
     /**
-     * called by {@link CubeStatusController} if Cube is offline -> GameStatus should be put to {@link GameState#VALID_SETUP}
-     * @param cube which is offline
+     * called by {@link CubeStatusController} if Cube is offline -&gt; GameStatus should be put to {@link GameState#VALID_SETUP}
+     * @param cube cube which is offline
      */
     public void cubeOffline(Cube cube) {
         switchGameState(status.setCubeState(cube, false));
     }
 
     /**
-     * called by {@link CubeStatusController} if Cube is online -> GameStatus should be put to PLAYED if otherwise appropriate
-     * @param cube which is online
+     * called by {@link CubeStatusController} if Cube is online -&gt; GameStatus should be put to PLAYED if otherwise appropriate
+     * @param cube cube which is online
      */
     public void cubeOnline(Cube cube) {
         switchGameState(status.setCubeState(cube, true));
@@ -426,7 +428,7 @@ public class GameManagerController {
     /**
      * called by {@link CubeStatusController} if there is a health status to report i.e. low battery,
      * no connection puts current game on halted if cube is OFFLINE
-     * @param cube to report to the current game
+     * @param cube cube to report to the current game
      */
     public void healthNotification(Cube cube) {
         sendHealthNotification(status.getGameData(cube));
@@ -434,7 +436,7 @@ public class GameManagerController {
 
     /**
      * Method to put all usernames of players, that are online, into a list
-     * @param  listOfTeams
+     * @param  game game
      * @return list of user ids
      */
     private Set<Long> getAllUserIdsOfGameTeams(Game game) {
@@ -740,7 +742,7 @@ public class GameManagerController {
         /**
          * Ends the game. Sets its status to finished, saves it in the database
          * and removes it from the inner list.
-         * @param game game that finishes
+         * @param data game that finishes
          */
         public void endGame(GameData data, boolean finished) {
             setGameState(data.game, finished ? GameState.FINISHED : GameState.CANCELED);
@@ -853,7 +855,7 @@ public class GameManagerController {
         /**
          * Calculates the number of present teams from the given list of user ids
          * and sets its internal field accordingly.
-         * @param userIds
+         * @param userIds set of user ids
          */
         public void updateTeamPresence(Set<Long> userIds) {
             // count present teams (one player per team must be present)
@@ -939,7 +941,7 @@ public class GameManagerController {
         /**
          * starts countDown with given time and for given game
          * @param time to guess
-         * @param game for which the countdown starts
+         * @param gameData game for which the countdown starts
          */
         public void startCountDown(int time, GameData gameData) {
             reset(time);
@@ -967,6 +969,7 @@ public class GameManagerController {
 
         /**
          * counting step - informs websocket listener after each update
+         * @param gameData game for which the countdown runs
          */
         public void count(GameData gameData) {
             if (min > 0) {

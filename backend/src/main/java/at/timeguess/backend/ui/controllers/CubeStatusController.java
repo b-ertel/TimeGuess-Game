@@ -145,6 +145,8 @@ public class CubeStatusController {
 
     /**
      * is called in case cube changes its status, updates status in GUI
+     * @param mac mac address of cube
+     * @param cubeStatus cube status
      */
     public void statusChange(String mac, CubeStatus cubeStatus) {
         this.cubeStatus.get(mac).setStatus(cubeStatus);
@@ -160,15 +162,15 @@ public class CubeStatusController {
 
     /**
      * @return health status of all online cubes i.e. with status
-     * {@link CubeStatus.READY, CubeStatus.LIVE or CubeStatus.IN_CONFIGURATION}
+     * {@link CubeStatus#READY}, {@link CubeStatus#LIVE} or {@link CubeStatus#IN_CONFIG}
      */
     public Map<String, HealthStatus> getHealthStatus() {
         return healthStatus;
     }
 
     /**
-     * changes status of cube to {@link CubeStatus.OFFLINE}
-     * @param macAddress of the cubes which should be set to {@link CubeStatus.OFFLINE}
+     * changes status of cube to {@link CubeStatus#OFFLINE}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#OFFLINE}
      */
     public void setOffline(String macAddress) {
         this.healthStatus.remove(macAddress);
@@ -176,32 +178,32 @@ public class CubeStatusController {
     }
 
     /**
-     * changes status of cube to {@link CubeStatus.IN_CONFIG}
-     * @param macAddress of the cubes which should be set to {@link CubeStatus.IN_CONFIG}
+     * changes status of cube to {@link CubeStatus#IN_CONFIG}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#IN_CONFIG}
      */
     public void setInConfig(String macAddress) {
         statusChange(macAddress, CubeStatus.IN_CONFIG);
     }
 
     /**
-     * changes status of cube to {@link CubeStatus.IN_GAME}
-     * @param macAddress of the cubes which should be set to {@link CubeStatus.IN_GAME}
+     * changes status of cube to {@link CubeStatus#IN_GAME}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#IN_GAME}
      */
     public void setInGame(String macAddress) {
         statusChange(macAddress, CubeStatus.IN_GAME);
     }
 
     /**
-     * changes status of cube to {@link CubeStatus.READY}
-     * @param macAddress of the cubes which should be set to {@link CubeStatus.READY}
+     * changes status of cube to {@link CubeStatus#READY}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#READY}
      */
     public void setReady(String macAddress) {
         statusChange(macAddress, CubeStatus.READY);
     }
 
     /**
-     * changes status of cube to {@link CubeStatus.LIVE}
-     * @param macAddress of the cubes which should be set to {@link CubeStatus.LIVE}
+     * changes status of cube to {@link CubeStatus#LIVE}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#LIVE}
      */
     public void setLive(String macAddress) {
         statusChange(macAddress, CubeStatus.LIVE);
@@ -223,6 +225,7 @@ public class CubeStatusController {
 
     /**
      * checks if a Cube is configured i.e. if there is any entry for it in the Configuration Table
+     * @param cube cube
      * @return true if it has a Configuration, false otherwise
      */
     public boolean isConfigured(Cube cube) {
@@ -230,9 +233,9 @@ public class CubeStatusController {
     }
 
     /**
-     * checks if a Cube has status {@link CubeStatus.READY}
+     * checks if a Cube has status {@link CubeStatus#READY}
      * @param  cube cube to get its ready status
-     * @return true if has status {@link CubeStatus.READY}, false otherwise
+     * @return true if has status {@link CubeStatus#READY}, false otherwise
      */
     public boolean isReady(Cube cube) {
         return this.cubeStatus.get(cube.getMacAddress()).getStatus() == CubeStatus.READY;
@@ -262,7 +265,7 @@ public class CubeStatusController {
 
     /**
      * check if a cube can be deleted - i.e. if its status is OFFLINE and it has no configuration
-     * @param  mac to check status
+     * @param  cube to check status
      * @return true if status is OFFLINE false otherwise
      */
     public boolean checkDeletion(Cube cube) {
@@ -431,8 +434,8 @@ public class CubeStatusController {
 
     /**
      * Changes given fromCube status to READY if it was formerly INGAME, and toCube status to INGAME if it is not null.
-     * @param fromCube
-     * @param toCube
+     * @param fromCube before cube
+     * @param toCube   after cube
      */
     public void switchCube(Cube fromCube, Cube toCube) {
         // release previous cube if necessary

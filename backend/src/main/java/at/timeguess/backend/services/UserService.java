@@ -51,7 +51,7 @@ public class UserService {
 
     /**
      * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
-     * and {@link PostConstruct} is not invoked, so autowiring is done manually
+     * and {@link javax.annotation.PostConstruct} is not invoked, so autowiring is done manually
      */
     public UserService() {
         if (websocketManager == null) {
@@ -61,7 +61,7 @@ public class UserService {
 
     /**
      * Returns a list of all users.
-     * @return
+     * @return list of users
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<User> getAllUsers() {
@@ -70,7 +70,7 @@ public class UserService {
 
     /**
      * Returns a list of all users with role 'PLAYER'.
-     * @return
+     * @return list of users
      */
     @PreAuthorize("hasAuthority('PLAYER')")
     public List<User> getAllPlayers() {
@@ -79,7 +79,7 @@ public class UserService {
 
     /**
      * Returns a list of all users with role 'PLAYER', which are not currently playing.
-     * @return
+     * @return list of users
      */
     @PreAuthorize("hasAuthority('PLAYER')")
     public List<User> getAvailablePlayers() {
@@ -88,7 +88,8 @@ public class UserService {
 
     /**
      * Returns a list of all users being team mates of the given user (i.e. belonging to the same teams).
-     * @return
+     * @param user user
+     * @return list of users
      */
     @PreAuthorize("hasAuthority('PLAYER')")
     public List<User> getTeammates(User user) {
@@ -97,7 +98,8 @@ public class UserService {
 
     /**
      * Returns the total number of games played by the given user.
-     * @return
+     * @param user user
+     * @return count of games
      */
     @PreAuthorize("hasAuthority('PLAYER')")
     public int getTotalGames(User user) {
@@ -106,7 +108,8 @@ public class UserService {
 
     /**
      * Returns the total number of games lost by the given user.
-     * @return
+     * @param user user
+     * @return count of games
      */
     @PreAuthorize("hasAuthority('PLAYER')")
     public int getTotalGamesLost(User user) {
@@ -116,7 +119,8 @@ public class UserService {
 
     /**
      * Returns the total number of games won by the given user.
-     * @return
+     * @param user user
+     * @return count of games
      */
     @PreAuthorize("hasAuthority('PLAYER')")
     public int getTotalGamesWon(User user) {
@@ -126,7 +130,8 @@ public class UserService {
 
     /**
      * Returns the total number of games won by the given user, split up by topic.
-     * @return
+     * @param user user
+     * @return count of games split by topic
      */
     @PreAuthorize("hasAuthority('PLAYER')")
     public Map<String, Integer> getTotalGamesWonByTopic(User user) {
@@ -136,7 +141,7 @@ public class UserService {
 
     /**
      * Checks if a user with the given username already exists.
-     * @param username
+     * @param username user name
      * @return true if the given username is already saved in the database, false otherwise.
      */
     @Target(NewUserBean.class)
@@ -146,7 +151,8 @@ public class UserService {
 
     /**
      * Checks if the given user is currently playing or not.
-     * @return
+     * @param user user
+     * @return true if he is, false if not
      */
     @PreAuthorize("hasAuthority('PLAYER')")
     public boolean isAvailablePlayer(User user) {
@@ -155,7 +161,7 @@ public class UserService {
 
     /**
      * Loads a single user identified by its id.
-     * @param id the id to search for
+     * @param user the user to search for
      * @return the user with the given id
      */
     @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('PLAYER') OR principal.username eq #user.username")
@@ -175,8 +181,8 @@ public class UserService {
 
     /**
      * Saves the user.
-     * This method will also set {@link User#createDate} for new entities or {@link User#updateDate} for updated entities.
-     * The user requesting this operation will also be stored as {@link User#createUser} or {@link User#updateUser} respectively.
+     * This method will also set {@link User#setCreateDate(Date)} for new entities or {@link User#setUpdateDate(Date)} for updated entities.
+     * The user requesting this operation will also be stored as {@link User#setCreateUser(User)} or {@link User#setUpdateUser(User)} respectively.
      * Additionally fills gui message with success or failure info and triggers a push update.
      * @param user the user to save
      * @return the saved user
@@ -262,7 +268,7 @@ public class UserService {
 
     /**
      * Returns the user representing the currently authenticated principal.
-     * @return
+     * @return user
      */
     User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
