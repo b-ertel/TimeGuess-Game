@@ -28,17 +28,6 @@ public class Game implements Serializable, Persistable<Long> {
 
     private int roundNr;
 
-    // NOTE: need this to implement deletion! Otherwise will get data integrity
-    // exceptions.
-    //
-    // TODO derive roundNr from this list to be consistent.
-    //
-    // TODO works only with FetchType.EAGER - otherwise gives
-    //      `org.hibernate.LazyInitializationException:
-    //      failed to lazily initialize a collection of role: at.timeguess.backend.model.Game.rounds, could not initialize proxy - no Session`
-    //      see https://stackoverflow.com/questions/22821695/how-to-fix-hibernate-lazyinitializationexception-failed-to-lazily-initialize-a
-    //      are there alternatives?
-    //      `Hibernate.initialize(game);` does not work
     @OneToMany(mappedBy = "game", cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Round> rounds = new HashSet<>();
 
