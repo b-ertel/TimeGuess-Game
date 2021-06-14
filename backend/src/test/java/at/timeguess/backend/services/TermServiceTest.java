@@ -91,33 +91,6 @@ public class TermServiceTest {
         assertNotNull(term, "Term \"LASAGNE\" in Topic \"4\" could not be loaded from test data source");
     }
 
-    @DirtiesContext
-    @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    public void canUpdateTerm() {
-        Term term = new Term();
-        term.setName("Apple");
-        Topic topic = new Topic();
-        topic.setName("FOOD");
-        term.setTopic(topic);
-        // TODO: when ready...
-        // term = termService.updateTerm(term);
-    }
-
-    @DirtiesContext
-    @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    public void canSaveAndLoadTerm() {
-        for (long id = 0; id < 5; id++) {
-            Term term = new Term();
-            term.setTopic(topicService.loadTopicId(1L));
-            term.setName("TEST");
-            // TODO: when ready...
-            // termService.saveTerm(term);
-            // Assertions.assertEquals(term, termService.loadTerm(term.getId()));
-        }
-    }
-
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = { "1|AFRICA", "2|MOUNTAIN", "3|LAKE", "4|RIVER", "5|MEXICO",
         "6|THE LORD OF THE RINGS", "7|MATRIX", "8|TITANIC", "9|INCEPTION", "10|FIGHT CLUB", "11|C3PO",

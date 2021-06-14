@@ -172,7 +172,6 @@ public class GameServiceTest {
 
         int roundSizeBefore = rounds.size();
 
-        // TODO check adding round
         // quickly find an element to remove
         rounds.remove(0);
         game.setRounds(new HashSet<>(rounds));
@@ -197,7 +196,6 @@ public class GameServiceTest {
 
         int teamSizeBefore = teams.size();
 
-        // TODO check adding team
         // quickly find an element to remove
         List<Team> rl = teams.stream().collect(Collectors.toList());
         teams.remove(rl.get(0));
