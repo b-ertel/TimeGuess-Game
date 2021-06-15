@@ -41,7 +41,7 @@ public class TopicListController implements Serializable {
 
     /**
      * Returns a list of all topics.
-     * @return
+     * @return list of topics
      */
     public List<Topic> getTopics() {
         return topicService.getAllTopics();

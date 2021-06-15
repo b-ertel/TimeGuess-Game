@@ -5,9 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -15,18 +12,18 @@ import org.springframework.stereotype.Service;
 import at.timeguess.backend.events.ConfiguredFacetsEventPublisher;
 import at.timeguess.backend.events.UnconfiguredFacetsEventPublisher;
 import at.timeguess.backend.model.Configuration;
-import at.timeguess.backend.model.Threshold;
-import at.timeguess.backend.model.ThresholdType;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
 import at.timeguess.backend.model.Interval;
 import at.timeguess.backend.model.IntervalType;
+import at.timeguess.backend.model.Threshold;
+import at.timeguess.backend.model.ThresholdType;
 import at.timeguess.backend.model.api.FacetsMessage;
 import at.timeguess.backend.repositories.ConfigurationRepository;
-import at.timeguess.backend.repositories.IntervalRepository;
-import at.timeguess.backend.repositories.ThresholdRepository;
 import at.timeguess.backend.repositories.CubeFaceRepository;
 import at.timeguess.backend.repositories.CubeRepository;
+import at.timeguess.backend.repositories.IntervalRepository;
+import at.timeguess.backend.repositories.ThresholdRepository;
 
 /**
  * A service for all kinds of stuff related to cubes, cube faces and configurations.
@@ -34,8 +31,6 @@ import at.timeguess.backend.repositories.CubeRepository;
  */
 @Service
 public class CubeService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CubeService.class);
 
     @Autowired
     private CubeRepository cubeRepo;
@@ -57,10 +52,10 @@ public class CubeService {
      * Save a new or existing cube to the database.
      * 
      * @param cube the cube to save
-     * @throws IllegalArgumentException
+     * @return cube
+     * @throws IllegalArgumentException if cube could not be saved
      */
-    // TODO: access control
-    // @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('CUBE')")
     public Cube saveCube(Cube cube) throws IllegalArgumentException {
         try {
             return cubeRepo.save(cube);
@@ -80,7 +75,7 @@ public class CubeService {
     /**
      * Check if a cube with a given MAC address exists in the database.
      * 
-     * @param cube to find out if mac address is already known
+     * @param macAddress to find out if mac address is already known
      * @return true if mac address is known, false otherwise
      */
     public boolean isMacAddressKnown(String macAddress) {
@@ -101,7 +96,7 @@ public class CubeService {
      * Delete a given cube from the database.
      * 
      * @param cube the cube to delete
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException when cube could not be deleted
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteCube(Cube cube) throws IllegalArgumentException{
@@ -130,8 +125,6 @@ public class CubeService {
      * @param cube the cube
      * @return a boolean indicating if the cube is configured
      */
-    // TODO: access control
-    // @PreAuthorize("hasAuthority('ADMIN')")
     public boolean isConfigured(Cube cube){
         return !configurationRepository.findByCube(cube).isEmpty();
     }
@@ -141,8 +134,7 @@ public class CubeService {
      *  
      * @param cube the cube
      */
-    // TODO: access control
-    // @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('CUBE')")
     public void deleteConfigurations(Cube cube) {
         for (Configuration configuration : configurationRepository.findByCube(cube)) {
             configurationRepository.delete(configuration);
@@ -158,7 +150,7 @@ public class CubeService {
      * 
      * @param cube the cube
      * @param mapping a mapping of Cube faces to facet numbers
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if mac address is unknown or cube is already configured
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     public void saveMappingForCube(Cube cube, Map<CubeFace, Integer> mapping) throws IllegalArgumentException {
@@ -166,7 +158,7 @@ public class CubeService {
             throw new IllegalArgumentException("The given cube does not exist!");
         }
         if (isConfigured(cube)) {
-            throw new IllegalArgumentException("An existing configuration already exists for the given cube and has to be deleted first!");
+            throw new IllegalArgumentException("Configuration already exists for the given cube and has to be deleted first!");
         }
         for (Entry<CubeFace, Integer> entry : mapping.entrySet()) {
             Configuration configuration = new Configuration();
@@ -212,6 +204,7 @@ public class CubeService {
      *  
      * @param message the message
      */
+    @PreAuthorize("hasAuthority('CUBE')")
     public void processFacetsMessage(FacetsMessage message) {
         String identifier = message.getIdentifier();
         int facet = message.getFacet();

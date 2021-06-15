@@ -34,7 +34,7 @@ public enum GameState {
 
     /**
      * Returns a set containing all available game states.
-     * @return
+     * @return all possible game states
      */
     public static EnumSet<GameState> getGameStates() {
         return gameStates;

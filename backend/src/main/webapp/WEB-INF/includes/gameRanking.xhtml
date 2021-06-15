@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<body>
+    <ui:composition>
+        <h:form id="#{dialogName}Form">
+            <p:dialog id="#{dialogName}Dialog" header="#{dialogHeader}"
+                widgetVar="#{dialogName}Dialog" dynamic="true" modal="true"
+                resizable="false" closeOnEscape="false" showEffect="fade"
+                hideEffect="fade" responsive="true" closable="false">
+
+                <p:panel styleClass="rankingLabel">
+                    <c:set var="winner" value="#{gameRoundController.computeWinningTeam()}" scope="request" />
+                    <c:choose>
+                        <c:when test="#{gameOver}">
+                           <p:outputLabel>Congratulations to #{winner.name} on winning the game!</p:outputLabel>
+                        </c:when>
+                        <c:otherwise>
+                            <c:choose>
+                                <c:when test="#{gameCanceled}">
+                                    <p:outputPanel>Your game was canceled from outside!</p:outputPanel>
+                                    <p:outputPanel style="margin-top:10px">
+                                        <p:outputLabel rendered="#{not empty winner}">#{winner.name} was in the lead...</p:outputLabel>
+                                        <p:outputLabel rendered="#{empty winner}">So far the game resulted in a draw...</p:outputLabel>
+                                    </p:outputPanel>
+                                </c:when>
+                                <c:otherwise>
+                                    <p:outputPanel>You played quite some rounds... unfortunatly all terms within this topic have been used.</p:outputPanel>
+                                    <p:outputPanel style="margin-top:10px">
+                                        <p:outputLabel rendered="#{not empty winner}">Congratulations to #{winner.name} on winning the game!</p:outputLabel>
+                                        <p:outputLabel rendered="#{empty winner}">Looks like the game results in a draw!</p:outputLabel>
+                                    </p:outputPanel>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:otherwise>
+                    </c:choose>
+                </p:panel>
+
+                <p:panel styleClass="rankingHeader">
+                    <h1>Ranking</h1>
+                </p:panel>
+
+                <p:dataTable value="#{gameRoundController.computeFinalRanking()}"
+                    var="teamscore" rowIndexVar="index" style="margin-bottom:12px">
+                    <p:column headerText="Rank" style="text-align:center">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+                    <p:column headerText="Name">
+                        <h:outputText value="#{teamscore.team.name}" />
+                    </p:column>
+                    <p:column headerText="Points">
+                        <h:outputText value="#{teamscore.score}" />
+                    </p:column>
+                </p:dataTable>
+                <h:panelGrid columns="1">
+                    <p:commandButton value="Quit" ajax="false" action="games.xhmtl?faces-redirect=true" update="@all">
+                        <f:actionListener binding="#{gameRoundController.gameOver()}" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+    </ui:composition>
+</body>
+</html>

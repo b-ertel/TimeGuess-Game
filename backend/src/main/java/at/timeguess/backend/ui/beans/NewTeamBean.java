@@ -54,7 +54,7 @@ public class NewTeamBean implements Serializable {
 
     /**
      * Returns a list of all players.
-     * @return
+     * @return list of users
      */
     public List<User> getAllPlayers() {
         return userService.getAllPlayers();
@@ -62,8 +62,8 @@ public class NewTeamBean implements Serializable {
 
     /**
      * Checks if the given user is currently playing or not.
-     * @param user
-     * @return
+     * @param user user
+     * @return true if he is, false if not
      */
     public boolean isAvailablePlayer(User user) {
         return userService.isAvailablePlayer(user);
@@ -79,6 +79,7 @@ public class NewTeamBean implements Serializable {
 
     /**
      * Creates a new team with the settings saved.
+     * @return saved team
      * @apiNote shows a ui message if input fields are invalid.
      */
     public Team createTeam() {
@@ -103,7 +104,7 @@ public class NewTeamBean implements Serializable {
 
     /**
      * Checks if all fields contain valid values.
-     * @return
+     * @return true if valid, false if not
      */
     public boolean validateInput() {
         if (Strings.isBlank(teamname)) return false;

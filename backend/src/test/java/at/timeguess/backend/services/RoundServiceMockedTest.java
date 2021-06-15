@@ -53,7 +53,7 @@ public class RoundServiceMockedTest {
 
     @Test
     public void testSaveRound() {
-        Round round = createRound(5L);
+        Round round = createRound(5);
         PushContext context = mock(PushContext.class);
         when(roundRepository.save(round)).thenReturn(round);
         when(websocketManager.getUserRegistrationChannel()).thenReturn(context);
@@ -66,7 +66,7 @@ public class RoundServiceMockedTest {
 
     @Test
     public void testSaveNoSuccess() {
-        Round round = createRound(5L);
+        Round round = createRound(5);
         PushContext context = mock(PushContext.class);
         when(roundRepository.save(round)).thenThrow(RuntimeException.class);
         when(websocketManager.getUserRegistrationChannel()).thenReturn(context);

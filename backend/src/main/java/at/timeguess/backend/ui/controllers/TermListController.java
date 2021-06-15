@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,8 +16,6 @@ import at.timeguess.backend.services.TermService;
  * Controller for the term list view.
  */
 @Component
-@Named
-@RequestScoped
 @Scope(WebApplicationContext.SCOPE_SESSION)
 public class TermListController implements Serializable {
 
@@ -37,14 +32,16 @@ public class TermListController implements Serializable {
 
     /**
      * Returns a list of all all terms.
+     * @return list of terms
      */
     public List<Term> getTerms() {
         return termService.getAllTerms();
     }
 
     /**
-     * Returns and sets a list of games, by default all returned by
-     * {@link getTerms()} (helper methods for primefaces datatable filter and sort).
+     * Returns and sets a list of games, by default all returned by {@link #getTerms()}
+     * (helper methods for primefaces datatable filter and sort).
+     * @return collection of terms
      */
     public Collection<Term> getFilterTerms() {
         if (filterTerms == null) filterTerms = getTerms();
@@ -57,6 +54,7 @@ public class TermListController implements Serializable {
 
     /**
      * Returns and sets the currently selected game (helper methods for primefaces datatable contextmenu).
+     * @return term
      */
     public Term getSelectedTerm() {
         return selectedTerm;

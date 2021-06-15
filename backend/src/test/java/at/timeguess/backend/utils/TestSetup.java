@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.params.provider.Arguments;
 
+import at.timeguess.backend.model.Activity;
 import at.timeguess.backend.model.Configuration;
 import at.timeguess.backend.model.Cube;
 import at.timeguess.backend.model.CubeFace;
@@ -91,12 +92,38 @@ public class TestSetup {
     }
 
     /**
+     * Creates a simple cube with the given id and mac address.
+     * @param  cubeId
+     * @return
+     */
+    public static Cube createCube(Long cubeId, String macAddress) {
+        return createEntity(Cube::new, e -> {
+            e.setId(cubeId);
+            e.setMacAddress(macAddress);
+        });
+    }
+
+    /**
      * Creates a simple cubeface with the given id only.
      * @param cubefaceId
      * @return
      */
     public static CubeFace createCubeFace(String cubefaceId) {
         return createEntity(CubeFace::new, e -> e.setId(cubefaceId));
+    }
+
+    /**
+     * Creates a simple cubeface with the given id and params.
+     * @param  cubefaceId
+     * @return
+     */
+    public static CubeFace createCubeFace(String cubefaceId, int time, int points, Activity activity) {
+        return createEntity(CubeFace::new, e -> {
+            e.setId(cubefaceId);
+            e.setTime(time);
+            e.setPoints(points);
+            e.setActivity(activity);
+        });
     }
 
     /**
@@ -109,12 +136,22 @@ public class TestSetup {
     }
 
     /**
-     * Creates a simple round with the given id only.
-     * @param roundId
+     * Creates a simple round with the given nr only.
+     * @param nr
      * @return
      */
-    public static Round createRound(Long roundId) {
-        return createEntity(Round::new, e -> e.setId(roundId));
+    public static Round createRound(int nr) {
+        return createEntity(Round::new, e -> e.setNr(nr));
+    }
+
+    /**
+     * Creates a simple round with the given nr and game only.
+     * @param nr
+     * @param game
+     * @return
+     */
+    public static Round createRound(int nr, Game game) {
+        return createEntity(() -> new Round(game, nr), e -> {});
     }
 
     /**
@@ -141,7 +178,10 @@ public class TestSetup {
      * @return
      */
     public static Topic createTopic(Long topicId) {
-        return createEntity(Topic::new, e -> {e.setId(topicId); e.setEnabled(true);});
+        return createEntity(Topic::new, e -> {
+            e.setId(topicId);
+            e.setEnabled(true);
+        });
     }
 
     /**
@@ -163,18 +203,20 @@ public class TestSetup {
     }
 
     /**
-     * Creates a list of the given number of entities, constructing each with the given function and an arbitrary long
-     * value.
+     * Creates a list of the given number of entities, constructing each
+     * with the given function and an arbitrary long value.
      * @param count
      * @param createEntity
      * @return
      */
     public static <T> List<T> createEntities(Function<Long, T> createEntity, int count) {
-        return LongStream.range(0, count).mapToObj(id -> createEntity.apply((id + 1) * 10)).collect(Collectors.toList());
+        return LongStream.range(0, count).mapToObj(id -> createEntity.apply((id + 1) * 10))
+            .collect(Collectors.toList());
     }
 
     /**
-     * Creates a list of entities from the given D list, constructing each with the given function passing the D value.
+     * Creates a list of entities from the given D list, constructing each
+     * with the given function passing the D value.
      * @param createEntity
      * @param fromList
      * @return
@@ -201,7 +243,9 @@ public class TestSetup {
      * @return
      */
     public static <T> List<T> createEntities(Function<Long, T> createEntity, String colonSeparatedIntList) {
-        return createList(colonSeparatedIntList).stream().map(createEntity).collect(Collectors.toList());
+        return createList(colonSeparatedIntList).stream()
+            .map(createEntity)
+            .collect(Collectors.toList());
     }
 
     private static <T> T createEntity(Supplier<T> constructor, Consumer<T> keySetter) {

@@ -43,10 +43,10 @@ public class GameLogicServiceTest {
 
     @Autowired
     TermRepository termRepo;
-    
+
     @Autowired
     TeamRepository teamRepo;
-    
+
     @Autowired
     RoundRepository roundRepo;
 
@@ -93,74 +93,71 @@ public class GameLogicServiceTest {
             Assertions.assertTrue(gameLogicService.usedTerms(game).contains(termUsed));
         }
     }
-    
+
     @DirtiesContext
     @Test
     public void teststillTermsAvailable() {
-    	Game game = gameService.loadGame((long) 1);
-    	Assertions.assertTrue(!gameLogicService.stillTermsAvailable(game));
-    	Game game2 = gameService.loadGame((long) 2);
-    	Assertions.assertTrue(gameLogicService.stillTermsAvailable(game2));
+        Game game = gameService.loadGame((long) 1);
+        Assertions.assertTrue(!gameLogicService.stillTermsAvailable(game));
+        Game game2 = gameService.loadGame((long) 2);
+        Assertions.assertTrue(gameLogicService.stillTermsAvailable(game2));
     }
-    
+
     @DirtiesContext
     @Test
     public void testGetTeamWithMostPoints() {
-    	Game game = gameService.loadGame((long) 1);
-    	Team teamWithMostPoints = teamRepo.findById((long) 2).get();
-    	Assertions.assertEquals(teamWithMostPoints, gameLogicService.getTeamWithMostPoints(game));  	
+        Game game = gameService.loadGame((long) 1);
+        Team teamWithMostPoints = teamRepo.findById((long) 2).get();
+        Assertions.assertEquals(teamWithMostPoints, gameLogicService.getTeamWithMostPoints(game));
     }
-    
+
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
     @Test
     public void testSaveGame() {
-    	Game game = new Game();
-    	game.setName("TestGame");
-        game.setMaxPoints(10);
-        game.setTopic(topicRepo.findById((long) 1).get());
-        game.setStatus(GameState.PLAYED);
-        gameService.saveGame(game);
-        game.setTeams(gameService.loadGame((long) 1).getTeams());
-        gameLogicService.getNextRound(game);
-        gameLogicService.saveLastRound(game, Validation.CHEATED);
-        Assertions.assertEquals(20, roundRepo.findAll().size());
-    }
-    
-    @DirtiesContext
-    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    @Test
-    public void testPlayRound() {
-    	Game game = new Game();
+        Game game = new Game();
         game.setName("TestGame");
         game.setMaxPoints(10);
         game.setTopic(topicRepo.findById((long) 1).get());
         game.setStatus(GameState.PLAYED);
         gameService.saveGame(game);
         game.setTeams(gameService.loadGame((long) 1).getTeams());
-        
+        Round round = gameLogicService.getNextRound(game);
+        gameLogicService.validateRound(game, round, Validation.CHEATED);
+        gameService.saveGame(game);
+        Assertions.assertEquals(20, roundRepo.findAll().size());
+    }
+
+    @DirtiesContext
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
+    @Test
+    public void testPlayRound() {
+        Game game = new Game();
+        game.setName("TestGame");
+        game.setMaxPoints(10);
+        game.setTopic(topicRepo.findById((long) 1).get());
+        game.setStatus(GameState.PLAYED);
+        gameService.saveGame(game);
+        game.setTeams(gameService.loadGame((long) 1).getTeams());
+
         Round lastRound = null;
         List<Term> usedTerms = new ArrayList<>();
         int i = 1;
         while (true) {
-        	Round newRound = gameLogicService.getNextRound(game);
-        	if(i!=1) {
-	        	Assertions.assertNotEquals(newRound.getGuessingTeam(), lastRound.getGuessingTeam());
-	        	Assertions.assertNotEquals(newRound.getGuessingUser(), lastRound.getGuessingUser());
-	        	Assertions.assertNotEquals(newRound.getTermToGuess(), lastRound.getTermToGuess());
-        	}
-        	gameLogicService.saveLastRound(game, Validation.CORRECT);
-        	Assertions.assertEquals(i, newRound.getNr());
-        	usedTerms.add(newRound.getTermToGuess());
-        	Assertions.assertFalse(usedTerms.contains(gameLogicService.nextTerm(game)));
-        	lastRound = newRound;
-        	i++;
-        	if(i==3) {
-        		break;
-        	}
+            Round newRound = gameLogicService.getNextRound(game);
+            if (i != 1) {
+                Assertions.assertNotEquals(newRound.getGuessingTeam(), lastRound.getGuessingTeam());
+                Assertions.assertNotEquals(newRound.getGuessingUser(), lastRound.getGuessingUser());
+                Assertions.assertNotEquals(newRound.getTermToGuess(), lastRound.getTermToGuess());
+            }
+            gameLogicService.validateRound(game, newRound, Validation.CORRECT);
+            gameService.saveGame(game);
+            Assertions.assertEquals(i, newRound.getNr());
+            usedTerms.add(newRound.getTermToGuess());
+            Assertions.assertFalse(usedTerms.contains(gameLogicService.nextTerm(game)));
+            lastRound = newRound;
+            i++;
+            if (i == 3) { break; }
         }
     }
-    
 }
-
-

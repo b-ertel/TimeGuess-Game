@@ -40,7 +40,7 @@ public class TopicService {
 
     /**
      * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
-     * and {@link PostConstruct} is not invoked, so autowiring is done manually
+     * and {@link javax.annotation.PostConstruct} is not invoked, so autowiring is done manually
      */
     public TopicService() {
         if (websocketManager == null) {
@@ -69,12 +69,11 @@ public class TopicService {
 
     @PreAuthorize("hasAuthority('ADMIN') OR hasAuthority('MANAGER')")
     public Topic loadTopicId(Long topicId) {
-        return topicRepository.findById(topicId).get();
+        return topicRepository.findById(topicId).orElse(null);
     }
 
     /**
      * Saves the Topic.
-     * @param topic the topic to save
      * Additionally fills gui message with success or failure info and triggers a push update.
      * @param topic the topic to save
      * @return the saved topic
@@ -93,7 +92,7 @@ public class TopicService {
 
             if (websocketManager != null)
                 websocketManager.getUserRegistrationChannel().send(
-                        Map.of("type", "topicUpdate", "name", topic.getName(), "id", topic.getId()));
+                    Map.of("type", "topicUpdate", "name", topic.getName(), "id", topic.getId()));
 
             LOGGER.info("Topic '{}' (id={}) was {}", ret.getName(), ret.getId(), isNew ? "created" : "updated");
         }
