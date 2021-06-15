@@ -26,7 +26,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Term;
-import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.utils.TestSetup;
 
 /**

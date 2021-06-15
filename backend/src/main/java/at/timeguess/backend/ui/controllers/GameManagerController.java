@@ -829,6 +829,9 @@ public class GameManagerController {
         }
     }
 
+    /**
+     * Class holding running game info.
+     */
     public static class GameData {
 
         final CountDown countDown;

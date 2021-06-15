@@ -2,32 +2,33 @@ package at.timeguess.backend.model.utils;
 
 import at.timeguess.backend.model.Team;
 
+/**
+ * Helper class holding data about teams in games.
+ */
 public class TeamScore {
 
-	private Team team;
-	
-	private Integer score;
-	
-	public TeamScore(Team team, Integer score) {
-		this.team = team;
-		this.score = score;
-	}
+    private Team team;
 
-	public Team getTeam() {
-		return team;
-	}
+    private Integer score;
 
-	public void setTeam(Team team) {
-		this.team = team;
-	}
+    public TeamScore(Team team, Integer score) {
+        this.team = team;
+        this.score = score;
+    }
 
-	public Integer getScore() {
-		return score;
-	}
+    public Team getTeam() {
+        return team;
+    }
 
-	public void setScore(Integer score) {
-		this.score = score;
-	}
-	
-	
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
 }

@@ -10,6 +10,9 @@ import javax.persistence.*;
 
 import org.springframework.data.domain.Persistable;
 
+/**
+ * Entity representing a game.
+ */
 @Entity
 public class Game implements Serializable, Persistable<Long> {
 
@@ -34,7 +37,7 @@ public class Game implements Serializable, Persistable<Long> {
     @OneToMany(mappedBy = "game", cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<GameTeam> teams = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER, 
+    @ManyToMany(fetch = FetchType.EAGER,
         cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = User.class)
     @JoinTable(name = "game_user",
         joinColumns = @JoinColumn(name = "game_id", nullable = false, updatable = false),
