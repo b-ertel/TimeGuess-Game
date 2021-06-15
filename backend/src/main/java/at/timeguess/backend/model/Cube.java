@@ -14,6 +14,9 @@ import javax.persistence.OneToMany;
 
 import org.springframework.data.domain.Persistable;
 
+/**
+ * Entity representing a TimeFlip device for game playing.
+ */
 @Entity
 public class Cube implements Serializable, Comparable<Cube>, Persistable<Long> {
 
@@ -88,7 +91,7 @@ public class Cube implements Serializable, Comparable<Cube>, Persistable<Long> {
     @Override
     public int compareTo(Cube o) {
         return this.getId() == null ? o.getId() == null ? 0 : -1
-                : o.getId() == null ? 1 : this.getId().compareTo(o.getId());
+            : o.getId() == null ? 1 : this.getId().compareTo(o.getId());
     }
 
     @Override

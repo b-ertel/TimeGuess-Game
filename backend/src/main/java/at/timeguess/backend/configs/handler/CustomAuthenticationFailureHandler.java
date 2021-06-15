@@ -11,6 +11,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.web.util.UriUtils;
 
+/**
+ * Custom strategy to handle a failed authentication attempt.
+ */
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
     
     @Override

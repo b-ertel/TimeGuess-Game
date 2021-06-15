@@ -10,6 +10,9 @@ import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.utils.GroupingHelper;
 
+/**
+ * Repository for managing {@link Game} entities.
+ */
 public interface GameRepository extends AbstractRepository<Game, Long> {
 
     /**
@@ -48,7 +51,7 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
 
     /**
      * Returns a list of all games the given user is associated to.
-     * @param user user
+     * @param  user user
      * @return list of games
      */
     @Query("SELECT g FROM Game g JOIN g.teams t JOIN t.team.teamMembers u WHERE u = ?1")
@@ -57,7 +60,7 @@ public interface GameRepository extends AbstractRepository<Game, Long> {
     /**
      * Returns a list of all games the given user is associated to, which are currently not finished (states {@link GameState#SETUP},
      * {@link GameState#VALID_SETUP}, {@link GameState#PLAYED}, {@link GameState#HALTED}).
-     * @param user user
+     * @param  user user
      * @return list of games
      */
     @Query("SELECT g FROM Game g JOIN g.teams t JOIN t.team.teamMembers u WHERE u = ?1 AND g.status IN (0, 1, 2, 3)")

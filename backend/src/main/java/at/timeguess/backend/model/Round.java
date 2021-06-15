@@ -14,6 +14,9 @@ import javax.persistence.Transient;
 
 import org.springframework.data.domain.Persistable;
 
+/**
+ * Entity representing a round.
+ */
 @Entity
 public class Round implements Serializable, Persistable<RoundId> {
 

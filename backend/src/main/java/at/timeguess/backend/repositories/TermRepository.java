@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
 
+/**
+ * Repository for managing {@link Term} entities.
+ */
 public interface TermRepository extends AbstractRepository<Term, Long> {
 
     List<Term> findByTopic(Topic topic);

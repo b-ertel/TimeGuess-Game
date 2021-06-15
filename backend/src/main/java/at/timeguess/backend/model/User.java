@@ -11,7 +11,7 @@ import javax.persistence.*;
 import org.springframework.data.domain.Persistable;
 
 /**
- * Entity representing users.
+ * Entity representing a user.
  */
 @Entity
 public class User implements Serializable, Comparable<User>, Persistable<Long> {
@@ -49,12 +49,14 @@ public class User implements Serializable, Comparable<User>, Persistable<Long> {
     @Enumerated(EnumType.STRING)
     private Set<UserRole> roles = new HashSet<>();
     
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST }, targetEntity = Team.class)
+    @ManyToMany(fetch = FetchType.EAGER,
+        cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST },
+        targetEntity = Team.class)
     @JoinTable(name = "team_user",
-            joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
-            inverseJoinColumns = @JoinColumn(name = "team_id", nullable = false, updatable = false),
-            foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
-            inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+        joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false),
+        inverseJoinColumns = @JoinColumn(name = "team_id", nullable = false, updatable = false),
+        foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
+        inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
     private Set<Team> teams;
 
     @Override
