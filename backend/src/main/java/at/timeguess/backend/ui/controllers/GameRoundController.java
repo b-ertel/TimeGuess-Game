@@ -132,7 +132,7 @@ public class GameRoundController {
 	 */
     public void correctRound() {
     	Game game = gameManagerController.getCurrentGameForUser(sessionInfoBean.getCurrentUser());
-    	gameManagerController.validateRoundOfGame(game, Validation.CORRECT);
+    	gameManagerController.validavteRoundOfGame(game, Validation.CORRECT);
     }
     
     /**
