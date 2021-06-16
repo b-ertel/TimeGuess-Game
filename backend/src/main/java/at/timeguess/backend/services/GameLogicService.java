@@ -21,6 +21,9 @@ import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.model.Validation;
 
+/**
+ * Service for logic actions during a running game.
+ */
 @Component
 @Scope("application")
 public class GameLogicService {

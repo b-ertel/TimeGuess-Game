@@ -5,6 +5,9 @@ import java.util.Objects;
 
 import javax.persistence.Embeddable;
 
+/**
+ * Entity representing a round in a game.
+ */
 @Embeddable
 public class RoundId implements Serializable {
 

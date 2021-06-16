@@ -222,6 +222,14 @@ public class GameRoundController {
     }
 
     /**
+     * Checks whether a round is currently running, idependent of other states.
+     * @return true if a round is currently running, false otherwise
+     */
+    public boolean isRoundRunning() {
+        return getCurrentGame() != null && gameManagerController.getRoundStateForGame(currentGame) == RoundState.RUNNING;
+    }
+
+    /**
      * Method that sets the attributes for the current game state depending on the set user.
      */
     public void setup() {

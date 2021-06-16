@@ -120,7 +120,9 @@ public class GameService {
         Game ret = null;
         try {
             boolean isNew = game.isNew();
-            if (isNew) { game.setCreator(userService.getAuthenticatedUser()); }
+            if (isNew) {
+                game.setCreator(userService.getAuthenticatedUser());
+            }
             ret = gameRepo.save(game);
 
             // fill ui message, send update and log

@@ -10,6 +10,9 @@ import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.TopicStatisticService;
 
+/**
+ * Controller for the topic related statics view.
+ */
 @Component
 @Scope("view")
 public class TopicStatisticController {

@@ -25,6 +25,10 @@ import at.timeguess.backend.spring.ApplicationContextProvider;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.Utils;
 
+/**
+ * Class observing users entering and exiting pages containing web sockets,
+ * as well as reporting currently present user ids within channels.
+ */
 @Named
 @ApplicationScoped
 public class ChannelObserver implements Serializable {
@@ -95,12 +99,12 @@ public class ChannelObserver implements Serializable {
         publishChange(channel);
 
         LOGGER.info("user {} switched to {} on channel {}", previousUserId == null ? 0 : previousUserId,
-                currentUserId == null ? 0 : currentUserId, channel);
+            currentUserId == null ? 0 : currentUserId, channel);
     }
 
     private void publishChange(String channel) {
         channelPresenceEventPublisher.publishChannelPresenceEvent(channel,
-                Collections.unmodifiableSet(channelPresence.getOrDefault(channel, Set.of())));
+            Collections.unmodifiableSet(channelPresence.getOrDefault(channel, Set.of())));
     }
 
     private void setAbsent(Long userId, String channel) {

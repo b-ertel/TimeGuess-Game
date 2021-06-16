@@ -19,7 +19,7 @@ import javax.persistence.SequenceGenerator;
 import org.springframework.data.domain.Persistable;
 
 /**
- * Entity representing Topics.
+ * Entity representing a topic.
  */
 @Entity
 @SequenceGenerator(name = "seq", initialValue = 30, allocationSize = 100)

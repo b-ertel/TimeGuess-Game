@@ -5,6 +5,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+/**
+ * Class for autowiring classes at runtime if it doesn't work automatically.
+ */
 @Component
 public class ApplicationContextProvider implements ApplicationContextAware {
 

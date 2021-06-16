@@ -9,8 +9,11 @@ import javax.persistence.MapsId;
 
 import org.springframework.data.domain.Persistable;
 
+/**
+ * Entity to store the points a team reached in a game.
+ */
 @Entity
-public class GameTeam implements Serializable, Persistable<GameTeamId>{
+public class GameTeam implements Serializable, Persistable<GameTeamId> {
 
     private static final long serialVersionUID = 6862225865089517788L;
 
@@ -37,7 +40,6 @@ public class GameTeam implements Serializable, Persistable<GameTeamId>{
 
     private int points;
 
-
     public Team getTeam() {
         return team;
     }
@@ -45,9 +47,9 @@ public class GameTeam implements Serializable, Persistable<GameTeamId>{
     public Game getGame() {
         return game;
     }
-    
+
     public void setPoints(int points) {
-    	this.points = points;
+        this.points = points;
     }
 
     public int getPoints() {
@@ -56,7 +58,7 @@ public class GameTeam implements Serializable, Persistable<GameTeamId>{
 
     @Override
     public boolean isNew() {
-        return this.id == null ;
+        return this.id == null;
     }
 
     @Override

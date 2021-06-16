@@ -11,6 +11,9 @@ import at.timeguess.backend.model.RoundId;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.User;
 
+/**
+ * Repository for managing {@link Round} entities.
+ */
 public interface RoundRepository extends AbstractRepository<Round, RoundId> {
 
     List<Round> findByGuessingUser(String username);

@@ -176,11 +176,15 @@ public class GameManagerController {
     @Scheduled(fixedDelayString = "${backend.game.check.delay.seconds:5}000")   // 5000 means every 5 seconds
     public void updateGameStatus() {
         if (isJobEnabled) {
-            for (Game game : gameService
-                .getByStatus(new GameState[] { GameState.SETUP, GameState.HALTED, GameState.CANCELED })) {
+            for (Game game : gameService.getByStatus(new GameState[] {
+                GameState.SETUP, GameState.VALID_SETUP, GameState.HALTED, GameState.CANCELED })) {
                 switch (game.getStatus()) {
                     case SETUP:
                         addGame(game);
+                        break;
+
+                    case VALID_SETUP:
+                        reviveGame(game);
                         break;
 
                     case CANCELED:
@@ -188,8 +192,7 @@ public class GameManagerController {
                         break;
 
                     case HALTED:
-                        GameData data = status.getGameData(game);
-                        if (data != null) switchGameState(data);
+                        haltGame(game);
                         break;
 
                     default:
@@ -227,6 +230,7 @@ public class GameManagerController {
                     }
                     break;
 
+                case HALTED:
                 case VALID_SETUP:
                     // set round to invalid to repeat it with different term
                     switchRoundState(data, RoundState.ERROR);
@@ -340,7 +344,7 @@ public class GameManagerController {
      * @return points
      */
     public Integer getPointsOfTeamForGame(Game game, Team team) {
-        return roundService.getPointsOfTeamInGame(game, team);
+        return game == null || team == null ? 0 : roundService.getPointsOfTeamInGame(game, team);
     }
 
     /**
@@ -349,13 +353,15 @@ public class GameManagerController {
      * @return winning team
      */
     public Team getTeamWithMostPointsForGame(Game game) {
-        return gameLogicService.getTeamWithMostPoints(game);
+        return game == null ? null : gameLogicService.getTeamWithMostPoints(game);
     }
 
     /**
-     * Method to add a newly created game to the saved list of currently available games
-     * and send notifications to all participating team members.
+     * Method to add the given game to the saved list of currently available
+     * games and send notifications to all participating team members.
      * @param game game
+     * @throws IllegalArgumentException if game is null, not in state 
+     * {@link GameState#SETUP} or if set cube is already associated with another game
      */
     public void addGame(Game game) {
         // add game to internal list and change game status
@@ -368,13 +374,42 @@ public class GameManagerController {
     }
 
     /**
-     * Method to remove a canceled from the saved list of currently available games
-     * and send notifications to all participating team members.
-     * @param game game
+     * Method to halt the given game, i.e. keep it in the saved list of currently
+     * available games and send paused notifications to all participating team members.
+     * @param  game game
+     * @throws IllegalArgumentException if given game is not in state {@link GameState#HALTED}
+     */
+    public void haltGame(Game game) {
+        adaptInnerGameState(game, GameState.HALTED, "halting");
+    }
+
+    /**
+     * Method to remove the given game from the saved list of currently
+     * available games and send notifications to all participating team members.
+     * @param  game game
+     * @throws IllegalArgumentException if given game is not in state {@link GameState#CANCELED}
      */
     public void removeGame(Game game) {
-        GameData data = status.getGameData(game);
-        if (data != null) switchGameState(data);
+        adaptInnerGameState(game, GameState.CANCELED, "removing");
+    }
+
+    /**
+     * Method to revive the given game after it was in state {@link GameState#HALTED}
+     * and send notifications to all participating team members.
+     * @param  game game
+     * @throws IllegalArgumentException if game is not in state {@link GameState#VALID_SETUP}
+     */
+    public void reviveGame(Game game) {
+        checkGameState(game, GameState.VALID_SETUP, "reviving");
+
+        if (getWaitReasonForGame(game) == WaitReason.GAME_HALTED) {
+            GameData data = status.getGameData(game);
+            data.game.setStatus(GameState.VALID_SETUP);
+            switchGameState(data);
+
+            if (data.game.getStatus() == GameState.VALID_SETUP)
+                pauseGame(data);
+        }
     }
 
     /**
@@ -483,15 +518,32 @@ public class GameManagerController {
         }
     }
 
+    private void adaptInnerGameState(Game fromGame, GameState toState, String forWhat) {
+        checkGameState(fromGame, toState, forWhat);
+
+        GameData data = status.getGameData(fromGame);
+        if (data != null) { switchGameState(data, data.game.getStatus(), toState); data.game.setStatus(toState); }
+    }
+
     /**
-     * Switches the state of the given game and acts according to a change if necessary.
+     * Switches the state of the given game according to its inner settings
+     * and acts to a change if necessary.
      * @param data
      */
     private void switchGameState(GameData data) {
         if (data == null) return;
 
-        GameState oldState = data.game.getStatus();
-        GameState newState = status.switchGameState(data);
+        switchGameState(data, data.game.getStatus(), status.switchGameState(data));
+    }
+
+    /**
+     * Sends notifications according to the given game states, if necessary.
+     * @param data     game data
+     * @param oldState old game state
+     * @param newState new game state
+     */
+    private void switchGameState(GameData data, GameState oldState, GameState newState) {
+        if (data == null) return;
 
         switch (newState) {
             case PLAYED:
@@ -514,7 +566,7 @@ public class GameManagerController {
                 break;
 
             default:
-                pauseGame(data);
+                if (oldState != newState) pauseGame(data);
                 break;
         }
     }
@@ -560,6 +612,12 @@ public class GameManagerController {
                 data.isValidating = true;
                 break;
         }
+    }
+
+    private void checkGameState(Game game, GameState state, String forDoing) {
+        if (game.getStatus() != state)
+            throw new IllegalArgumentException(String.format(
+                "Game %s is in state %s, must be in state %s for %s", game, game.getStatus(), state, forDoing));
     }
 
     /* --- START - push message sending functions --- */
@@ -694,11 +752,10 @@ public class GameManagerController {
             switch (oldState) {
                 case VALID_SETUP:
                 case PLAYED:
-                    // GameState newState = data.isTeamsPresent && data.isCubeOnline ?
                     GameState newState = data.isTeamsPresent && data.isCubeOnline ? GameState.PLAYED
                         : GameState.VALID_SETUP;
                     Game game = setGameState(data.game, newState);
-                    // problematic: if (game != null) data.game = game;
+                    // would cause problems: if (game != null) data.game = game;
                     assert game == null && data.game.getStatus() == oldState || data.game.getStatus() == newState;
                     return newState;
 
@@ -712,7 +769,7 @@ public class GameManagerController {
          * @param  game
          * @throws IllegalArgumentException if game is null
          * @throws IllegalArgumentException if game is not in state {@link GameState#SETUP}
-         * @throws IllegalArgumentException if set cube is already associated with another contained game
+         * @throws IllegalArgumentException if set cube is already associated with another game
          */
         @SuppressWarnings("unlikely-arg-type")
         public boolean addGame(Game game) {
@@ -720,9 +777,7 @@ public class GameManagerController {
                 throw new IllegalArgumentException("Game must not be null");
 
             // check correct initial state
-            if (game.getStatus() != GameState.SETUP)
-                throw new IllegalArgumentException(String.format(
-                    "Game %s is in state %s, must be in %s state for adding", game, game.getStatus(), GameState.SETUP));
+            checkGameState(game, GameState.SETUP, "adding");
 
             // check cube already in use
             Cube cube = game.getCube();
@@ -747,6 +802,7 @@ public class GameManagerController {
         public void endGame(GameData data, boolean finished) {
             setGameState(data.game, finished ? GameState.FINISHED : GameState.CANCELED);
             gameTeamService.updatePoints(data.game);
+            data.countDown.reset();
             cube2Game.remove(data.game.getCube());
         }
 
@@ -766,7 +822,12 @@ public class GameManagerController {
         }
 
         private GameData getGameData(Game game, boolean reload) {
-            return game == null ? null : getGameData(game.getCube(), reload);
+            if (game == null) return null;
+
+            // have to check if this is the correct game
+            // because it might be an old game having the same cube still set
+            GameData data = getGameData(game.getCube(), false);
+            return data == null || !data.game.equals(game) ? null : reload ? reload(data) : data;
         }
 
         /**
@@ -829,6 +890,9 @@ public class GameManagerController {
         }
     }
 
+    /**
+     * Class holding running game info.
+     */
     public static class GameData {
 
         final CountDown countDown;
@@ -839,6 +903,12 @@ public class GameManagerController {
         boolean isTeamsPresent = false; // assume cube is online (otherwise would have to wait for online-message)
         boolean isCubeOnline = true;
 
+        /**
+         * Initializes a game info instance.
+         * @param  game game
+         * @param  countDown countDown
+         * @throws IllegalArgumentException if game is null
+         */
         public GameData(Game game, CountDown countDown) {
             if (game == null) throw new IllegalArgumentException("Cannot hold null game");
             this.game = game;
