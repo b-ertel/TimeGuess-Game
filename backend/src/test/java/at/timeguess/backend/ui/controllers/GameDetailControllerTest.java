@@ -308,7 +308,7 @@ public class GameDetailControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
-    public void testDoSaveTermFailure(Long termId) {
+    public void testDoSaveGameFailure(Long termId) {
         Game game = assertMockGame(termId, true, false);
         when(gameService.saveGame(game)).thenReturn(null);
 
@@ -405,6 +405,7 @@ public class GameDetailControllerTest {
             game.setCube(createCube(100L));
             game.setTopic(createTopic(15L));
             game.setTeams(Set.of(createTeam(2L), createTeam(15L)));
+            game.setStatus(GameState.CANCELED);
         }
         when(gameService.loadGame(gameId)).thenReturn(game);
 
