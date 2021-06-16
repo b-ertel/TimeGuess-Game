@@ -260,8 +260,21 @@ public class GameDetailController implements Serializable {
     }
 
     private void checkCubeChange(Cube fromCube, Cube toCube) {
-        if (game.getStatus() == GameState.SETUP && !Objects.equals(fromCube, toCube)) {
-            cubeStatusController.switchCube(fromCube, toCube);
+        switch (game.getStatus()) {
+            case SETUP:
+                if (!Objects.equals(fromCube, toCube)) {
+                    cubeStatusController.switchCube(fromCube, toCube);
+                }
+                break;
+
+            case CANCELED:
+                // once canceled any related cube is freed (no matter if saving the game succeeds)
+                cubeStatusController.switchCube(fromCube, null);
+                cubeStatusController.switchCube(toCube, null);
+                break;
+
+            default:
+                break;
         }
     }
 }
