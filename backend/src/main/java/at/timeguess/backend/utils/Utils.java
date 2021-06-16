@@ -8,11 +8,11 @@ public class Utils {
 
     /**
      * Adds the given entry to the set saved in given map for given key, creating a new set if necessary.
-     * @param <K>
-     * @param <V>
-     * @param map
-     * @param key
-     * @param entry
+     * @param <K> key type
+     * @param <V> value type
+     * @param map map
+     * @param key key
+     * @param entry entry
      */
     public static <K, V> void addToSet(Map<K, Set<V>> map, K key, V entry) {
         if (map != null && key != null && entry != null) {
@@ -28,11 +28,11 @@ public class Utils {
 
     /**
      * Removes the given entry from the set in given map, doing null-checks where necessary.
-     * @param <K>
-     * @param <V>
-     * @param map
-     * @param key
-     * @param entry
+     * @param <K> key type
+     * @param <V> value type
+     * @param map map
+     * @param key key
+     * @param entry entry
      */
     public static <K, V> void removeFromSet(Map<K, Set<V>> map, K key, V entry) {
         if (map != null && key != null && entry != null) {

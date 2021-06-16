@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import at.timeguess.backend.model.Term;
-import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.utils.TestSetup;
 
 /**
@@ -90,33 +88,6 @@ public class TermServiceTest {
         term = null;
         term = termService.loadTerm(4L);
         assertNotNull(term, "Term \"LASAGNE\" in Topic \"4\" could not be loaded from test data source");
-    }
-
-    @DirtiesContext
-    @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    public void canUpdateTerm() {
-        Term term = new Term();
-        term.setName("Apple");
-        Topic topic = new Topic();
-        topic.setName("FOOD");
-        term.setTopic(topic);
-        // TODO: when ready...
-        // term = termService.updateTerm(term);
-    }
-
-    @DirtiesContext
-    @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN", "MANAGER" })
-    public void canSaveAndLoadTerm() {
-        for (long id = 0; id < 5; id++) {
-            Term term = new Term();
-            term.setTopic(topicService.loadTopicId(1L));
-            term.setName("TEST");
-            // TODO: when ready...
-            // termService.saveTerm(term);
-            // Assertions.assertEquals(term, termService.loadTerm(term.getId()));
-        }
     }
 
     @ParameterizedTest
@@ -214,7 +185,7 @@ public class TermServiceTest {
         termService.deleteTerm(term);
 
         assertEquals(ctBefore - 1, termService.getAllTerms().size(), "No term has been deleted after calling termService.deleteTerm");
-        assertThrows(NoSuchElementException.class, () -> termService.loadTerm(termId));
+        assertNull(termService.loadTerm(termId));
     }
 
     @Test

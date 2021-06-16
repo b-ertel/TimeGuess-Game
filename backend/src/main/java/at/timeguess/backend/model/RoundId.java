@@ -6,22 +6,21 @@ import java.util.Objects;
 import javax.persistence.Embeddable;
 
 /**
- * Entity representing a team in a game.
+ * Entity representing a round in a game.
  */
 @Embeddable
-public class GameTeamId implements Serializable {
+public class RoundId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Long gameId;
-    private Long teamId;
+    private Integer nr;
 
-    public GameTeamId() {}
+    public RoundId() {}
 
-    public GameTeamId(Long gameId, Long teamId) {
-        super();
+    public RoundId(Long gameId, Integer nr) {
         this.gameId = gameId;
-        this.teamId = teamId;
+        this.nr = nr;
     }
 
     public Long getGameId() {
@@ -32,20 +31,20 @@ public class GameTeamId implements Serializable {
         this.gameId = gameId;
     }
 
-    public Long getTeamId() {
-        return teamId;
+    public Integer getNr() {
+        return nr;
     }
 
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
+    public void setNr(Integer nr) {
+        this.nr = nr;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 5;
+        final int prime = 17;
+        int result = 7;
         result = prime * result + (gameId == null ? 0 : gameId.hashCode());
-        result = prime * result + (teamId == null ? 0 : teamId.hashCode());
+        result = prime * result + (nr == null ? 0 : nr.hashCode());
         return result;
     }
 
@@ -57,7 +56,7 @@ public class GameTeamId implements Serializable {
         if (obj == null || getClass() != obj.getClass())
             return false;
 
-        final GameTeamId other = (GameTeamId) obj;
-        return Objects.equals(getGameId(), other.getGameId()) && Objects.equals(getTeamId(), other.getTeamId());
+        final RoundId other = (RoundId) obj;
+        return Objects.equals(getGameId(), other.getGameId()) && Objects.equals(getNr(), other.getNr());
     }
 }

@@ -25,6 +25,10 @@ import at.timeguess.backend.spring.ApplicationContextProvider;
 import at.timeguess.backend.utils.CDIAutowired;
 import at.timeguess.backend.utils.Utils;
 
+/**
+ * Class observing users entering and exiting pages containing web sockets,
+ * as well as reporting currently present user ids within channels.
+ */
 @Named
 @ApplicationScoped
 public class ChannelObserver implements Serializable {
@@ -53,7 +57,7 @@ public class ChannelObserver implements Serializable {
     /**
      * Removes user leaving channel from stored list, if present. Also sends current userId list to registered
      * subscribers.
-     * @param event
+     * @param event event
      */
     public void onClose(@Observes @Closed SocketEvent event) {
         String channel = event.getChannel(); // returns <o:socket channel>
@@ -68,7 +72,7 @@ public class ChannelObserver implements Serializable {
 
     /**
      * Adds user entering channel to stored list, if present. Also sends current userId list to registered subscribers.
-     * @param event
+     * @param event event
      * @apiNote a single person can open multiple sockets on same channel/user
      */
     public void onOpen(@Observes @Opened SocketEvent event) {
@@ -83,7 +87,7 @@ public class ChannelObserver implements Serializable {
 
     /**
      * Changes switching users in stored list. Also sends current userId list to registered subscribers.
-     * @param event
+     * @param event event
      */
     public void onSwitch(@Observes @Switched SocketEvent event) {
         String channel = event.getChannel(); // returns <o:socket channel>
@@ -95,12 +99,12 @@ public class ChannelObserver implements Serializable {
         publishChange(channel);
 
         LOGGER.info("user {} switched to {} on channel {}", previousUserId == null ? 0 : previousUserId,
-                currentUserId == null ? 0 : currentUserId, channel);
+            currentUserId == null ? 0 : currentUserId, channel);
     }
 
     private void publishChange(String channel) {
         channelPresenceEventPublisher.publishChannelPresenceEvent(channel,
-                Collections.unmodifiableSet(channelPresence.getOrDefault(channel, Set.of())));
+            Collections.unmodifiableSet(channelPresence.getOrDefault(channel, Set.of())));
     }
 
     private void setAbsent(Long userId, String channel) {

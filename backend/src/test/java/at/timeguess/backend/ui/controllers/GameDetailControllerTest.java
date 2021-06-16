@@ -89,7 +89,7 @@ public class GameDetailControllerTest {
         assertMockGame(gameId);
 
         assertCanTraverse(GameState.SETUP, GameState.SETUP, true);
-        assertCanTraverse(GameState.SETUP, GameState.VALID_SETUP, true);
+        assertCanTraverse(GameState.SETUP, GameState.VALID_SETUP, false);
         assertCanTraverse(GameState.SETUP, GameState.PLAYED, false);
         assertCanTraverse(GameState.SETUP, GameState.HALTED, false);
         assertCanTraverse(GameState.SETUP, GameState.FINISHED, false);
@@ -97,7 +97,7 @@ public class GameDetailControllerTest {
 
         assertCanTraverse(GameState.VALID_SETUP, GameState.SETUP, false);
         assertCanTraverse(GameState.VALID_SETUP, GameState.VALID_SETUP, true);
-        assertCanTraverse(GameState.VALID_SETUP, GameState.PLAYED, true);
+        assertCanTraverse(GameState.VALID_SETUP, GameState.PLAYED, false);
         assertCanTraverse(GameState.VALID_SETUP, GameState.HALTED, true);
         assertCanTraverse(GameState.VALID_SETUP, GameState.FINISHED, false);
         assertCanTraverse(GameState.VALID_SETUP, GameState.CANCELED, true);
@@ -106,14 +106,13 @@ public class GameDetailControllerTest {
         assertCanTraverse(GameState.PLAYED, GameState.VALID_SETUP, false);
         assertCanTraverse(GameState.PLAYED, GameState.PLAYED, true);
         assertCanTraverse(GameState.PLAYED, GameState.HALTED, true);
-        assertCanTraverse(GameState.PLAYED, GameState.FINISHED, true);
+        assertCanTraverse(GameState.PLAYED, GameState.FINISHED, false);
         assertCanTraverse(GameState.PLAYED, GameState.CANCELED, true);
 
         assertCanTraverse(GameState.HALTED, GameState.SETUP, false);
-        assertCanTraverse(GameState.HALTED, GameState.VALID_SETUP, false);
-        assertCanTraverse(GameState.HALTED, GameState.PLAYED, true);
+        assertCanTraverse(GameState.HALTED, GameState.VALID_SETUP, true);
+        assertCanTraverse(GameState.HALTED, GameState.PLAYED, false);
         assertCanTraverse(GameState.HALTED, GameState.HALTED, true);
-        assertCanTraverse(GameState.HALTED, GameState.FINISHED, false);
         assertCanTraverse(GameState.HALTED, GameState.CANCELED, true);
 
         assertCanTraverse(GameState.FINISHED, GameState.SETUP, false);
@@ -121,7 +120,7 @@ public class GameDetailControllerTest {
         assertCanTraverse(GameState.FINISHED, GameState.PLAYED, false);
         assertCanTraverse(GameState.FINISHED, GameState.HALTED, false);
         assertCanTraverse(GameState.FINISHED, GameState.FINISHED, true);
-        assertCanTraverse(GameState.FINISHED, GameState.CANCELED, true);
+        assertCanTraverse(GameState.FINISHED, GameState.CANCELED, false);
 
         assertCanTraverse(GameState.CANCELED, GameState.SETUP, false);
         assertCanTraverse(GameState.CANCELED, GameState.VALID_SETUP, false);
@@ -156,11 +155,11 @@ public class GameDetailControllerTest {
 
         game.setStatus(GameState.SETUP);
         assertFalse(gameDetailController.isLockedMaxPoints());
-        game.setStatus(GameState.VALID_SETUP);
-        assertFalse(gameDetailController.isLockedMaxPoints());
         game.setStatus(GameState.HALTED);
         assertFalse(gameDetailController.isLockedMaxPoints());
 
+        game.setStatus(GameState.VALID_SETUP);
+        assertTrue(gameDetailController.isLockedMaxPoints());
         game.setStatus(GameState.PLAYED);
         assertTrue(gameDetailController.isLockedMaxPoints());
         game.setStatus(GameState.FINISHED);
@@ -179,12 +178,12 @@ public class GameDetailControllerTest {
 
         game.setStatus(GameState.SETUP);
         assertFalse(gameDetailController.isLockedTopic());
-        game.setStatus(GameState.VALID_SETUP);
+        game.setStatus(GameState.HALTED);
         assertFalse(gameDetailController.isLockedTopic());
 
-        game.setStatus(GameState.PLAYED);
+        game.setStatus(GameState.VALID_SETUP);
         assertTrue(gameDetailController.isLockedTopic());
-        game.setStatus(GameState.HALTED);
+        game.setStatus(GameState.PLAYED);
         assertTrue(gameDetailController.isLockedTopic());
         game.setStatus(GameState.FINISHED);
         assertTrue(gameDetailController.isLockedTopic());
@@ -202,9 +201,9 @@ public class GameDetailControllerTest {
 
         game.setStatus(GameState.SETUP);
         assertFalse(gameDetailController.isLockedTeam());
-        game.setStatus(GameState.VALID_SETUP);
-        assertFalse(gameDetailController.isLockedTeam());
 
+        game.setStatus(GameState.VALID_SETUP);
+        assertTrue(gameDetailController.isLockedTeam());
         game.setStatus(GameState.PLAYED);
         assertTrue(gameDetailController.isLockedTeam());
         game.setStatus(GameState.HALTED);
@@ -225,12 +224,12 @@ public class GameDetailControllerTest {
 
         game.setStatus(GameState.SETUP);
         assertFalse(gameDetailController.isLockedCube());
-        game.setStatus(GameState.VALID_SETUP);
-        assertFalse(gameDetailController.isLockedCube());
-        game.setStatus(GameState.HALTED);
-        assertFalse(gameDetailController.isLockedCube());
 
+        game.setStatus(GameState.VALID_SETUP);
+        assertTrue(gameDetailController.isLockedCube());
         game.setStatus(GameState.PLAYED);
+        assertTrue(gameDetailController.isLockedCube());
+        game.setStatus(GameState.HALTED);
         assertTrue(gameDetailController.isLockedCube());
         game.setStatus(GameState.FINISHED);
         assertTrue(gameDetailController.isLockedCube());
@@ -262,6 +261,9 @@ public class GameDetailControllerTest {
 
         verify(gameService, times(2)).loadGame(gameId);
         assertEquals(gameId, gameDetailController.getGame().getId());
+
+        gameDetailController.setGame(null);
+        assertDoesNotThrow(() -> gameDetailController.doReloadGame());
     }
 
     @ParameterizedTest
@@ -306,7 +308,7 @@ public class GameDetailControllerTest {
 
     @ParameterizedTest
     @ValueSource(longs = { 11, 22 })
-    public void testDoSaveTermFailure(Long termId) {
+    public void testDoSaveGameFailure(Long termId) {
         Game game = assertMockGame(termId, true, false);
         when(gameService.saveGame(game)).thenReturn(null);
 
@@ -403,6 +405,7 @@ public class GameDetailControllerTest {
             game.setCube(createCube(100L));
             game.setTopic(createTopic(15L));
             game.setTeams(Set.of(createTeam(2L), createTeam(15L)));
+            game.setStatus(GameState.CANCELED);
         }
         when(gameService.loadGame(gameId)).thenReturn(game);
 

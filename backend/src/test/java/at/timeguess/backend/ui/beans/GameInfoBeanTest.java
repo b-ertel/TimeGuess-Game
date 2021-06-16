@@ -78,8 +78,8 @@ public class GameInfoBeanTest {
         team2.setTeamMembers(Set.of(user2));
         game.setTeams(Set.of(team1, team2));
 
-        Round round1 = createRound(1L);
-        Round round2 = createRound(2L);
+        Round round1 = createRound(1);
+        Round round2 = createRound(2);
         round1.setGuessingTeam(team1);
         round2.setGuessingTeam(team2);
         round1.setGuessingUser(user1);
@@ -88,6 +88,7 @@ public class GameInfoBeanTest {
 
         gameInfoBean.setGame(game);
         TreeNode result = gameInfoBean.getTeams();
+        assertEquals(game, ((GameInfo) result.getData()).getObject());
         assertEquals(2, result.getChildCount());
 
         var nodes = result.getChildren();

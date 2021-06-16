@@ -9,6 +9,9 @@ import org.springframework.data.repository.query.Param;
 import at.timeguess.backend.model.Term;
 import at.timeguess.backend.model.Topic;
 
+/**
+ * Repository for managing {@link Term} entities.
+ */
 public interface TermRepository extends AbstractRepository<Term, Long> {
 
     List<Term> findByTopic(Topic topic);
@@ -18,12 +21,12 @@ public interface TermRepository extends AbstractRepository<Term, Long> {
     @Query("SELECT COUNT (id) FROM Term")
     int nrOfTerms();
 
-    @Query("SELECT COUNT(t.topic) FROM Term t WHERE t.topic = :topicid")
-    int nrOfTermPerTopic(@Param("topicid") Topic topic);
+    @Query("SELECT COUNT(t.topic) FROM Term t JOIN t.topic WHERE t.topic = :topic")
+    int nrOfTermPerTopic(@Param("topic") Topic topic);
 
-    @Query("SELECT t FROM Term t WHERE t.name=:name AND t.topic=:topic")
+    @Query("SELECT t FROM Term t JOIN t.topic WHERE t.name=:name AND t.topic=:topic")
     Term findByName(String name, Topic topic);
-    
-    @Query("SELECT t FROM Term t WHERE t.enabled=TRUE AND t.topic=:topic")
+
+    @Query("SELECT t FROM Term t JOIN t.topic WHERE t.enabled=TRUE AND t.topic=:topic")
     List<Term> findEnablesByTopic(Topic topic);
 }

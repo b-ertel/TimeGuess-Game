@@ -43,8 +43,8 @@ public class TopicStatisticService {
 
     /**
      * Returns the count of games for the given topic.
-     * @param topic
-     * @return
+     * @param topic topic
+     * @return count of games
      */
     public Integer nrOfGamesWithTopic(Topic topic) {
         return gameRepository.countByTopicId(topic.getId());

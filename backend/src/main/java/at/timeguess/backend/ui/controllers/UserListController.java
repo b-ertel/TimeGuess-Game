@@ -13,21 +13,19 @@ import at.timeguess.backend.services.UserService;
 
 /**
  * Controller for the user list view.
- *
  */
 @Component
 @Scope(WebApplicationContext.SCOPE_SESSION)
 public class UserListController implements Serializable {
 
     private static final long serialVersionUID = 1L;
-	
-	@Autowired
+
+    @Autowired
     private UserService userService;
 
     /**
      * Returns a list of all users.
-     *
-     * @return
+     * @return list of users
      */
     public List<User> getUsers() {
         return userService.getAllUsers();
@@ -35,8 +33,7 @@ public class UserListController implements Serializable {
 
     /**
      * Returns a list of all users with role 'PLAYER'.
-     *
-     * @return
+     * @return list of users
      */
     public List<User> getAllPlayers() {
         return userService.getAllPlayers();

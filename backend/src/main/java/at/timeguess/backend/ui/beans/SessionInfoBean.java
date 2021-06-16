@@ -32,7 +32,7 @@ public class SessionInfoBean implements Serializable {
 
     /**
      * Returns the currently logged on user, null if no user is authenticated for this session.
-     * @return
+     * @return user
      */
     public User getCurrentUser() {
         if (currentUser == null) {
@@ -48,7 +48,7 @@ public class SessionInfoBean implements Serializable {
     /**
      * Returns the username of the user for this session,
      * empty string if no user has been authenticated for this session.
-     * @return
+     * @return user name
      */
     public String getCurrentUserName() {
         if (!isLoggedIn()) {
@@ -62,7 +62,7 @@ public class SessionInfoBean implements Serializable {
     /**
      * Returns the roles of the user for this session as space-separated list,
      * empty string if no user has been authenticated for this session-
-     * @return
+     * @return user roles
      */
     public String getCurrentUserRoles() {
         if (!isLoggedIn()) {

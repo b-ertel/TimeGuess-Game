@@ -41,7 +41,7 @@ public class TopicListController implements Serializable {
 
     /**
      * Returns a list of all topics.
-     * @return
+     * @return list of topics
      */
     public List<Topic> getTopics() {
         return topicService.getAllTopics();
@@ -72,7 +72,6 @@ public class TopicListController implements Serializable {
      * Imports terms for topics in given JSON file.
      * @param filename
      * @param file
-     * @apiNote TODO: for each new topic/term a single gui-message is shown (by the saving service) - make that only one message
      */
     @SuppressWarnings("unchecked")
     private boolean importJSON(String filename, InputStream file) {

@@ -36,7 +36,6 @@ import at.timeguess.backend.model.Topic;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
 import at.timeguess.backend.ui.controllers.CubeStatusController;
-import at.timeguess.backend.ui.controllers.GameManagerController;
 import at.timeguess.backend.utils.TestSetup;
 
 /**
@@ -56,8 +55,6 @@ public class NewGameBeanTest {
     private TeamService teamService;
     @Mock
     private CubeStatusController cubeStatusController;
-    @Mock
-    private GameManagerController gameManagerController;
     @Mock
     private MessageBean messageBean;
 
@@ -137,7 +134,6 @@ public class NewGameBeanTest {
         verify(cubeStatusController).switchCube(nullable(Cube.class), any(Cube.class));
         verify(gameService).saveGame(any(Game.class));
         verifyNoMoreInteractions(cubeStatusController);
-        verify(gameManagerController).addGame(any(Game.class));
         verifyNoInteractions(messageBean);
         assertEquals(expected, result);
         assertFieldsClear();
@@ -159,7 +155,6 @@ public class NewGameBeanTest {
         Game result = newGameBean.createGame();
 
         verify(gameService).saveGame(any(Game.class));
-        verifyNoInteractions(gameManagerController);
         verifyNoInteractions(messageBean);
         assertNull(result);
         assertFields(expected);
@@ -205,11 +200,17 @@ public class NewGameBeanTest {
         teams = new HashSet<>();
         newGameBean.setTeams(teams);
         assertFalse(newGameBean.validateInput());
-        teams.add(createTeam(8L));
+        Team team1 = createTeam(8L);
+        team1.setTeamMembers(Set.of(createUser(3L)));
+        teams.add(team1);
         newGameBean.setTeams(teams);
         assertFalse(newGameBean.validateInput());
-        teams.add(createTeam(9L));
+        Team team2 = createTeam(9L);
+        team2.setTeamMembers(Set.of(createUser(3L)));
+        teams.add(team2);
         newGameBean.setTeams(teams);
+        assertFalse(newGameBean.validateInput());
+        team2.setTeamMembers(Set.of(createUser(4L)));
         assertTrue(newGameBean.validateInput());
 
         verifyNoInteractions(gameService);
@@ -238,7 +239,11 @@ public class NewGameBeanTest {
         newGameBean.setMaxPoints(100);
         newGameBean.setCube(createCube(6L));
         newGameBean.setTopic(createTopic(12L));
-        newGameBean.setTeams(Set.of(createTeam(2L), createTeam(15L)));
+        Team team1 = createTeam(8L);
+        team1.setTeamMembers(Set.of(createUser(3L)));
+        Team team2 = createTeam(9L);
+        team2.setTeamMembers(Set.of(createUser(4L)));
+        newGameBean.setTeams(Set.of(team1, team2));
         return foo;
     }
 

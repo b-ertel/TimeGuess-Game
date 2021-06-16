@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +34,7 @@ public class RoundService {
 
     /**
      * @apiNote neither {@link Autowired} nor {@link CDIAutowired} work for a {@link Component},
-     *          and {@link PostConstruct} is not invoked, so autowiring is done manually
+     * and {@link javax.annotation.PostConstruct} is not invoked, so autowiring is done manually
      */
     public RoundService() {
         if (websocketManager == null) {
@@ -46,7 +44,7 @@ public class RoundService {
 
     /**
      * Returns a collection of all rounds.
-     * @return
+     * @return collection of rounds
      */
     public Collection<Round> getAllRounds() {
         return roundRepository.findAll();
@@ -54,7 +52,7 @@ public class RoundService {
 
     /**
      * method to estimate last round of a game
-     * @param  game
+     * @param  game game
      * @return last round of game
      */
     public Round getLastRound(Game game) {
@@ -64,8 +62,8 @@ public class RoundService {
 
     /**
      * method to check whether rounds where played in game or not
-     * @param  game
-     * @return boolean
+     * @param  game game
+     * @return true if yes, false if no
      */
     public boolean roundsPlayedInGame(Game game) {
         return (roundRepository.getRoundOfGame(game).size() != 0);
@@ -73,8 +71,8 @@ public class RoundService {
 
     /**
      * Method to estimate which round was the last round, a certain team has played in a game
-     * @param  game that team played
-     * @param  team of which last round should be evaluated
+     * @param  game game that team played
+     * @param  team team of which last round should be evaluated
      * @return last round of the team in the game
      */
     public Round getLastRoundOfTeam(Game game, Team team) {
@@ -84,9 +82,9 @@ public class RoundService {
 
     /**
      * check whether team played rounds in game
-     * @param  game
-     * @param  team
-     * @return boolean
+     * @param  game game
+     * @param  team team
+     * @return true if it did, false if not
      */
     public boolean teamPlayedRoundsInGame(Game game, Team team) {
         return (roundRepository.getRoundOfGameWithTeam(game, team).size() != 0);
@@ -94,8 +92,8 @@ public class RoundService {
 
     /**
      * Method to estimate how many points a team has reached in a certain game
-     * @param  game
-     * @param  team
+     * @param  game game
+     * @param  team team
      * @return points of team in game
      */
     public Integer getPointsOfTeamInGame(Game game, Team team) {

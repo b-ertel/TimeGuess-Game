@@ -33,6 +33,16 @@
                     </p:commandButton>
                 </p>
             </p:panel>
+            <p:spacer height="15" />
+            <p:panel header="How can you add and configure a new cube?" rendered="#{sessionInfoBean.hasRole('ADMIN')}">
+            <ol>
+                <li>First, go to the "Timeflip Cubes" page under the menu item "Administration".</li>
+                <li>After your cube has been switched on, a new entry with the description "LIVE and has to be configured" will show up there automatically in the list of cubes.</li>
+                <li>Remember the number of this entry and select it from the drop down menu located below the list of all cubes.</li>
+                <li>On the dialog that opens check if the MAC address displayed is correct.</li>
+                <li>Click the button "Configure" and follow the instructions.</li>
+            </ol>
+            </p:panel>
         </h:form>
 
         <h:form id="userDetailForm" prependId="false">

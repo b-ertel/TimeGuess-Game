@@ -46,8 +46,7 @@ public class CubeTestController implements Consumer<ConfiguredFacetsEvent> {
     
     /**
      * Prepare the controller for a fresh attempt to test a cube.
-     * 
-     * @param cube the cube to configure
+     * @param cubeToConfigure the cube to configure
      */
     public void prepareForNewTest(Cube cubeToConfigure) {
         cube = cubeToConfigure;

@@ -1,32 +1,29 @@
 package at.timeguess.backend.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.MapsId;
 import javax.persistence.Transient;
 
 import org.springframework.data.domain.Persistable;
 
+/**
+ * Entity representing a round.
+ */
 @Entity
-@SequenceGenerator(name = "seq", initialValue = 30, allocationSize = 100)
-public class Round implements Serializable, Persistable<Long> {
+public class Round implements Serializable, Persistable<RoundId> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1284766274669269322L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
-    private Long id;
-
-    @Transient
-    private int nr;
+    @EmbeddedId
+    private RoundId id;
 
     @Transient
     private Activity activity;
@@ -52,19 +49,24 @@ public class Round implements Serializable, Persistable<Long> {
     private Term termToGuess;
 
     @ManyToOne
-    @JoinColumn(name = "gameId", nullable = false)
+    @MapsId("gameId")
     private Game game;
+
+    public Round() {
+        this.id = new RoundId();
+    }
+
+    public Round(Game game, Integer nr) {
+        this.id = new RoundId(game.getId(), nr);
+        this.game = game;
+    }
 
     @Transient
     private int time;
 
     @Override
-    public Long getId() {
+    public RoundId getId() {
         return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public int getTime() {
@@ -84,11 +86,11 @@ public class Round implements Serializable, Persistable<Long> {
     }
 
     public int getNr() {
-        return nr;
+        return id.getNr();
     }
 
     public void setNr(int nr) {
-        this.nr = nr;
+        this.id.setNr(nr);
     }
 
     public User getGuessingUser() {
@@ -137,6 +139,7 @@ public class Round implements Serializable, Persistable<Long> {
 
     public void setGame(Game game) {
         this.game = game;
+        this.id.setGameId(game.getId());
     }
 
     public Activity getActivity() {
@@ -148,7 +151,26 @@ public class Round implements Serializable, Persistable<Long> {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 7;
+        int result = 7;
+        result = prime * result + (id == null ? 0 : id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+
+        if (obj == null || getClass() != obj.getClass()) { return false; }
+
+        final Round other = (Round) obj;
+        return Objects.equals(getId(), other.getId());
+    }
+
+    @Override
     public boolean isNew() {
-        return this.id == null || this.id == 0L;
+        return this.id == null || this.id.getNr() == 0;
     }
 }
