@@ -346,14 +346,6 @@ public class CubeStatusController {
                 // sets status offline
                 setOffline(m.getKey());
 
-                // message for current game that cube is offline
-                StringBuilder message = new StringBuilder();
-                message.append("Cube with mac ")
-                    .append(m.getKey())
-                    .append(" lost connection and is OFFLINE!");
-                addHealthMessage(message.toString());
-                gameManagerController.healthNotification(cube);
-
                 // game cannot be continued
                 if (gameManagerController.hasCurrentGameForCube(cube)) {
                     gameManagerController.cubeOffline(cube);
