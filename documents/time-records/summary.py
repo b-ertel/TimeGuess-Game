@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
 import pandas as pd
-import datetime
 
 FILES = {"Clemens": "Ager_Clemens_csab8299.xlsx",
-    "Bernhard": "Ertel_Bernhard.xlsx",
-    "Verena": "Fritz Verena_c7031304.xlsx",
-    "Lorenz": "Lorenz-Oberhammer.xlsx",
-    "Felix": "TimeRecord_Tschimben.xlsx",
-    "Michael": "Vorlage-0-Zeitaufzeichnung-Sonnerer.xlsx",
+    "Bernhard": "Ertel_Bernhard_csar8812.xlsx",
+    "Verena": "Fritz_Verena_c7031304.xlsx",
+    "Lorenz": "Oberhammer_Lorenz_csam6460.xlsx",
+    "Michael": "Sonnerer_Michael_csat5545.xlsx",
+    "Felix": "Tschimben_Felix_csat4895.xlsx",
     "Claudia": "Wagner_Claudia_csaw9017.xlsx"}
 
 TASKS = ["LV-Einheit",
@@ -51,9 +50,6 @@ def read_files(files):
     
     for key, value in files.items():
         excel = pd.read_excel(value)
-        # superscript "1"
-        if key == "Bernhard":
-            excel.at[21, "Dauer \n[hh:mm]"] = datetime.time(hour=1, minute=30)
         df = pd.DataFrame({"name": key,
             "date": excel["Datum"],
             "duration": excel["Dauer \n[hh:mm]"].apply(time_to_duration),
