@@ -69,7 +69,7 @@
             <h:panelGroup rendered="#{grc.currentWaitReason == 'NONE'}">
                 <p:outputPanel>There is no reason to wait... please try to reload the page.</p:outputPanel>
             </h:panelGroup>
-            <p:outputPanel rendered="#{grc.roundRunning}" style="font-size:smaller !important">
+            <p:outputPanel rendered="#{grc.roundRunning and grc.currentWaitReason != 'CUBE_OFFLINE'}" style="font-size:smaller !important">
                 You can invalidate the currently running round by flipping the cube, so #{grc.currentRound.guessingTeam.name} will get another chance once the game restarts... if the countdown ends without that, this will result in 0 points for them.
             </p:outputPanel>
             <p:progressBar id="progressBarIndeterminate" mode="indeterminate" />

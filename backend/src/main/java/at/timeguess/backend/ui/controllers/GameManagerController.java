@@ -617,7 +617,7 @@ public class GameManagerController {
     private void checkGameState(Game game, GameState state, String forDoing) {
         if (game.getStatus() != state)
             throw new IllegalArgumentException(String.format(
-                "Game %s is in state %s, must be in state %s for %s", game, game.getStatus(), state, forDoing));
+                "Game '%s' (id=%s) is in state %s, must be in state %s for %s", game.getName(), game.getId(), game.getStatus(), state, forDoing));
     }
 
     /* --- START - push message sending functions --- */
@@ -677,8 +677,15 @@ public class GameManagerController {
     private void endRoundByCountDown(GameData data) {
         // send countdown ended only on first call
         if (getRoundState(data) == RoundState.RUNNING) {
-            switchRoundState(data, RoundState.VALIDATING);
-            sendGameMessage(data.game, "endRoundViaCountDown");
+            // if game is halted for other reasons than offline cube
+            // players can invalidate current round by throwing cube
+            if (getWaitReason(data) == WaitReason.CUBE_OFFLINE) {
+                switchRoundState(data, RoundState.ERROR);
+            }
+            else {
+                switchRoundState(data, RoundState.VALIDATING);
+                sendGameMessage(data.game, "endRoundViaCountDown");
+            }
         }
     }
 
