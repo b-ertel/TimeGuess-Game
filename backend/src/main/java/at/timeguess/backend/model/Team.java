@@ -21,6 +21,9 @@ import javax.persistence.OneToMany;
 
 import org.springframework.data.domain.Persistable;
 
+/**
+ * Entity representing a team.
+ */
 @Entity
 public class Team implements Serializable, Comparable<Team>, Persistable<Long> {
 

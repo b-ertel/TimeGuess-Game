@@ -1,0 +1,59 @@
+*********************************************************
+Notes on measures to ensure stability in case of failures
+*********************************************************
+
+T1 = low battery level of TimeFlip device
+
+The battery level of TimeFlip devices is constantly
+monitored and a warning message is displayed if during
+a game the battery level falls below a configurable
+threshold.
+
+T2 = limited communication between TimeFlip device and Raspberry Pi
+
+The RSSI property of TimeFlip devices is constantly
+monitored and a warning message is displayed if during
+a game the RSSI property falls below a configurable
+threshold.
+
+In addition to this, the Raspberry Pi constantly checks
+if the Bluetooth connection with the TimeFlip device is lost
+and will automatically make attempts to reconnect if this
+is required.
+
+(Automatic reconnection was successfully tested with the real
+hardware using "rfkill block" and "rfkill unblock" on the
+Raspberry Pi.)
+
+T3 = unexpected reboot of Raspberry Pi
+
+Due to the stateless nature of our communication protocol
+between Raspberry Pi and backend, this will cause no
+problems other than possibly a temporary timeout, displayed
+as a warning message in the web app, if the reboot takes
+longer than a configurable amount of time, and operation
+will continue normally after that.
+
+T4 = temporary unavailability of connection between Raspberry Pi and backend
+
+Due to the stateless nature of our communication protocol
+between Raspberry Pi and backend, this will cause no
+problems other than possibly a temporary timeout, displayed
+as a warning message in the web app, if the connection is
+unavailable for longer than a configurable amount of time, and
+operation will continue normally after that.
+
+(This was successfully tested with the real hardware by
+removing the network cable.)
+
+T5 = temporary unavailability of backend
+
+The Raspberry Pi will wait for the backend to be available again
+and will continue to work normally once this is the case.
+
+However, note that due to the fact that we use an in-memory database (H2)
+rather than a "real" one, it will usually not be the case
+that operation continues normally after such an event (e.g., continue
+games that were in status played when the backend went down)
+because of a data loss.
+

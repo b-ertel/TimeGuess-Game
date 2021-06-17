@@ -9,16 +9,18 @@ import org.springframework.stereotype.Component;
 import at.timeguess.backend.model.utils.UserScores;
 import at.timeguess.backend.services.HighscoreService;
 
+/**
+ * Controller for the game results view.
+ */
 @Component
 @Scope("view")
 public class HighscoreController {
 
-	@Autowired
-	HighscoreService highscoreService;
-	
-	public List<UserScores> getHighscoresOnGamesWon() {
-		return highscoreService.getHighscoresByGamesWon();
-	}
-	
-	
+    @Autowired
+    HighscoreService highscoreService;
+
+    public List<UserScores> getHighscoresOnGamesWon() {
+        return highscoreService.getHighscoresByGamesWon();
+    }
+
 }

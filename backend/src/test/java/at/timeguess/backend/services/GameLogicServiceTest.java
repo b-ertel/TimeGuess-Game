@@ -77,8 +77,6 @@ public class GameLogicServiceTest {
             }
         }
         Assertions.assertTrue(nrDifferentStartTeams > 1);
-
-        // TODO: check for existing game with rounds
     }
 
     @DirtiesContext

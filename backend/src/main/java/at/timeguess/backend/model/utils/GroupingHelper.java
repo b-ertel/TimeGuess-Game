@@ -61,6 +61,9 @@ public class GroupingHelper {
         return String.format("id=%d, name=%s, count=%d", id, name, count);
     }
 
+    /**
+     * Helper class for evaluating a list of {@link GroupingHelper}s.
+     */
     public static class List {
 
         private java.util.List<GroupingHelper> list;
@@ -79,7 +82,7 @@ public class GroupingHelper {
 
         /**
          * Sums up the Counts of the intersecting Ids.
-         * @param ids A list to intersect with the contained instances Ids.
+         * @param  ids A list to intersect with the contained instances Ids.
          * @return A number representing the summed up value of the intersecting instances Counts.
          */
         public int getSumForIds(java.util.List<Long> ids) {
@@ -88,7 +91,7 @@ public class GroupingHelper {
 
         /**
          * Sums up the Counts of the intersecting Ids.
-         * @param ids A list to intersect with the contained instances Ids.
+         * @param  ids A list to intersect with the contained instances Ids.
          * @return A number representing the summed up value of the intersecting instances Counts.
          */
         public Map<String, Integer> getSumForIdsGroupedByName(java.util.List<Long> ids) {
