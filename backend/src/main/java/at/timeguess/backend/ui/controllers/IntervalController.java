@@ -10,6 +10,9 @@ import at.timeguess.backend.model.IntervalType;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.ui.beans.MessageBean;
 
+/**
+ * Controller for the cube connection check view.
+ */
 @Component
 @Scope("view")
 public class IntervalController {
@@ -47,7 +50,6 @@ public class IntervalController {
 
     /**
      * Get the reporting interval from the database.
-     * 
      * @return the reporting interval
      */
     public int getSavedReportingInterval() {
@@ -56,7 +58,6 @@ public class IntervalController {
 
     /**
      * Get the expiration interval from the database.
-     * 
      * @return the expiration interval
      */
     public int getSavedExpirationInterval() {
@@ -90,4 +91,3 @@ public class IntervalController {
     }
 
 }
-

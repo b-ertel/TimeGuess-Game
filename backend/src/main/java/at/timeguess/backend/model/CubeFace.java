@@ -10,9 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 /**
- * this class represents a face of the timeflip, which consists of an activity, the number of points to get if the round was successful
- * and the time to guess the given term
- *
+ * Entity representing a face of a TimeFlip device, which consists of an activity,
+ * the number of points to get if the round was successful and the time to guess the given term.
  */
 @Entity
 public class CubeFace {
@@ -27,7 +26,7 @@ public class CubeFace {
     @Enumerated(EnumType.STRING)
     private Activity activity;
 
-    @OneToMany(mappedBy="cubeface")
+    @OneToMany(mappedBy = "cubeface")
     private List<Configuration> configs = new ArrayList<>();
 
     public Integer getTime() {
@@ -91,9 +90,9 @@ public class CubeFace {
         if (id == null) {
             if (other.id != null)
                 return false;
-        } else if (!id.equals(other.id))
+        }
+        else if (!id.equals(other.id))
             return false;
         return true;
     }
-
 }

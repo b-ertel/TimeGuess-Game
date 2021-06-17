@@ -9,12 +9,15 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameTeam;
 import at.timeguess.backend.model.GameTeamId;
 
+/**
+ * Repository for managing {@link GameTeam} entities.
+ */
 public interface GameTeamRepository extends AbstractRepository<GameTeam, GameTeamId> {
 
     /**
      * to find GameTeams of a certain game
-     * @param game
-     * @return
+     * @param  game game
+     * @return list of {@link GameTeam}s
      */
     @Query("SELECT g FROM GameTeam g WHERE :game =  g.game")
     List<GameTeam> findByGame(@Param("game") Game game);

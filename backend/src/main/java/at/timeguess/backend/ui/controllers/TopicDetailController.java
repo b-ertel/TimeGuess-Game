@@ -12,10 +12,13 @@ import at.timeguess.backend.services.TopicService;
 import at.timeguess.backend.services.TopicStatisticService;
 import at.timeguess.backend.ui.beans.MessageBean;
 
+/**
+ * Controller for the topic detail view.
+ */
 @Component
 @Scope(WebApplicationContext.SCOPE_SESSION)
 public class TopicDetailController implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
 
     @Autowired
@@ -34,10 +37,8 @@ public class TopicDetailController implements Serializable {
 
     /**
      * Sets the currently displayed topic and reloads it form db. This term is
-     * targeted by any further calls of
-     * {@link #doReloadTopic()}, {@link #doSaveTopic()}.
-     *
-     * @param term
+     * targeted by any further calls of {@link #doReloadTopic()}, {@link #doSaveTopic(Topic)}.
+     * @param topic topic
      */
     public void setTopic(Topic topic) {
         this.topic = topic;
@@ -46,7 +47,6 @@ public class TopicDetailController implements Serializable {
 
     /**
      * Returns the currently displayed topic.
-     *
      * @return the currently displayed topic
      */
     public Topic getTopic() {
@@ -56,9 +56,12 @@ public class TopicDetailController implements Serializable {
     public void doSaveTopic(Topic selectedTopic) {
         this.topicService.saveTopic(selectedTopic);
         if (selectedTopic.isEnabled()) {
-            messageBean.alertInformation("Successfully enabled", String.format("Topic %s enabled.", selectedTopic.getName()));
-        } else {
-            messageBean.alertInformation("Successfully disabled", String.format("Topic %s disabled.", selectedTopic.getName()));
+            messageBean.alertInformation("Successfully enabled",
+                String.format("Topic %s enabled.", selectedTopic.getName()));
+        }
+        else {
+            messageBean.alertInformation("Successfully disabled",
+                String.format("Topic %s disabled.", selectedTopic.getName()));
         }
     }
 
@@ -73,5 +76,4 @@ public class TopicDetailController implements Serializable {
         Integer num = topicStatisticService.getNrOfTermsPerTopic(topic);
         return num;
     }
-    
 }

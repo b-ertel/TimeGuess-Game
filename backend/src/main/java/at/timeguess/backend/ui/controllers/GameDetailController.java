@@ -48,9 +48,9 @@ public class GameDetailController implements Serializable {
     private Cube orgCube;
 
     /**
-     * Sets the currently displayed game and reloads it form db. This game is targeted by any further calls of
-     * {@link #doReloadGame()}, {@link #doSaveGame()} and {@link #doDeleteGame()}.
-     * @param game
+     * Sets the currently displayed game and reloads it form db. This game is targeted by any
+     * further calls of {@link #doReloadGame()}, {@link #doSaveGame()} and {@link #doDeleteGame()}.
+     * @param game game
      */
     public void setGame(Game game) {
         this.game = game;
@@ -59,7 +59,7 @@ public class GameDetailController implements Serializable {
 
     /**
      * Returns the currently displayed game.
-     * @return
+     * @return game
      */
     public Game getGame() {
         return game;
@@ -67,7 +67,7 @@ public class GameDetailController implements Serializable {
 
     /**
      * Returns a set containing all available game states.
-     * @return
+     * @return set of game states
      */
     public Set<GameState> getAllGameStates() {
         return GameState.getGameStates();
@@ -75,7 +75,7 @@ public class GameDetailController implements Serializable {
 
     /**
      * Returns a list of all teams.
-     * @return
+     * @return list of teams
      */
     public List<Team> getAllTeams() {
         return teamService.getAllTeams();
@@ -83,36 +83,32 @@ public class GameDetailController implements Serializable {
 
     /**
      * Returns a list of teams currently not playing.
-     * @return
+     * @return list of teams
      */
     public List<Team> getAvailableTeams() {
         return teamService.getAvailableTeams();
     }
 
     /**
-     * Return the
-     * @return
+     * Return the possible state transitions from the current one.
+     * @return set of game states
      */
     public Set<GameState> getPossNextStates() {
         EnumSet<GameState> poss = EnumSet.noneOf(GameState.class);
         // always include current state in list of options
-        // always allow cancellation
         poss.add(game.getStatus());
-        poss.add(GameState.CANCELED);
         switch (game.getStatus()) {
             case SETUP:
-                poss.add(GameState.VALID_SETUP);
+                poss.add(GameState.CANCELED);
                 break;
             case VALID_SETUP:
-                poss.add(GameState.PLAYED);
-                poss.add(GameState.HALTED);
-                break;
             case PLAYED:
                 poss.add(GameState.HALTED);
-                poss.add(GameState.FINISHED);
+                poss.add(GameState.CANCELED);
                 break;
             case HALTED:
-                poss.add(GameState.PLAYED);
+                poss.add(GameState.VALID_SETUP);
+                poss.add(GameState.CANCELED);
                 break;
             default:
                 break;
@@ -122,8 +118,8 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if state can change from the saved to the given.
-     * @param  next
-     * @return
+     * @param  next next state
+     * @return true if it can, false if not
      */
     public boolean canTraverse(GameState next) {
         return getPossNextStates().contains(next);
@@ -131,8 +127,8 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if the given team is currently playing in any other than the saved game or not.
-     * @param  team
-     * @return
+     * @param  team team
+     * @return true if it is, false if not
      */
     public boolean isAvailableTeam(Team team) {
         return teamService.isAvailableTeamForGame(team, game);
@@ -140,10 +136,11 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if the maximum points can be changed for the saved game.
-     * @return
+     * @return true if it is, false if not
      */
     public boolean isLockedMaxPoints() {
         switch (game.getStatus()) {
+            case VALID_SETUP:
             case PLAYED:
             case FINISHED:
             case CANCELED:
@@ -155,12 +152,12 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if the topic can be changed for the saved game.
-     * @return
+     * @return true if it is, false if not
      */
     public boolean isLockedTopic() {
         switch (game.getStatus()) {
+            case VALID_SETUP:
             case PLAYED:
-            case HALTED:
             case FINISHED:
             case CANCELED:
                 return true;
@@ -171,10 +168,11 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if the associated teams can be changed for the saved game.
-     * @return
+     * @return true if it is, false if not
      */
     public boolean isLockedTeam() {
         switch (game.getStatus()) {
+            case VALID_SETUP:
             case PLAYED:
             case HALTED:
             case FINISHED:
@@ -187,11 +185,13 @@ public class GameDetailController implements Serializable {
 
     /**
      * Checks if the cube can be changed for the saved game.
-     * @return
+     * @return true if it is, false if not
      */
     public boolean isLockedCube() {
         switch (game.getStatus()) {
+            case VALID_SETUP:
             case PLAYED:
+            case HALTED:
             case FINISHED:
             case CANCELED:
                 return true;
@@ -260,8 +260,21 @@ public class GameDetailController implements Serializable {
     }
 
     private void checkCubeChange(Cube fromCube, Cube toCube) {
-        if (game.getStatus() == GameState.SETUP && !Objects.equals(fromCube, toCube)) {
-            cubeStatusController.switchCube(fromCube, toCube);
+        switch (game.getStatus()) {
+            case SETUP:
+                if (!Objects.equals(fromCube, toCube)) {
+                    cubeStatusController.switchCube(fromCube, toCube);
+                }
+                break;
+
+            case CANCELED:
+                // once canceled any related cube is freed (no matter if saving the game succeeds)
+                cubeStatusController.switchCube(fromCube, null);
+                cubeStatusController.switchCube(toCube, null);
+                break;
+
+            default:
+                break;
         }
     }
 }

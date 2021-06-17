@@ -28,8 +28,7 @@
                             
                             <h:outputLabel for="topic" value="Topic: " />
                             <p:selectOneMenu id="topic" value="#{curr.topic}" converter="omnifaces.SelectItemsConverter"
-                                required="true" requiredMessage="#{topicMsg}"
-                                disabled="#{gameDetailController.lockedTopic}">
+                                required="true" requiredMessage="#{topicMsg}" disabled="#{gameDetailController.lockedTopic}">
                                 <p:ajax event="change" process="@this" />
                                 <f:selectItem itemLabel="Select" />
                                 <f:selectItems value="#{topicListController.topics}" var="topval" itemLabel="#{topval.name}" itemDisabled="#{!topval.enabled}" />
@@ -62,7 +61,7 @@
                             <h:outputLabel for="teams" value="Teams: " />
                             <p:selectCheckboxMenu id="teams" value="#{curr.teams}" label="#{sel2Label}"
                                 required="true" requiredMessage="#{teamsMsg}"
-                                disabled="#{gameDetailController.lockedTopic}"
+                                disabled="#{gameDetailController.lockedTeam}"
                                 multiple="true" filter="true" filterMatchMode="contains">
                                 <!-- have to use all teams, otherwise list doesn't work -->
                                 <f:selectItems value="#{gameDetailController.allTeams}" var="t" itemLabel="#{t.name}"

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,10 @@ import at.timeguess.backend.model.Game;
 import at.timeguess.backend.model.GameState;
 import at.timeguess.backend.model.Team;
 import at.timeguess.backend.model.Topic;
+import at.timeguess.backend.model.User;
 import at.timeguess.backend.services.GameService;
 import at.timeguess.backend.services.TeamService;
 import at.timeguess.backend.ui.controllers.CubeStatusController;
-import at.timeguess.backend.ui.controllers.GameManagerController;
 
 /**
  * Bean for creating a new game.
@@ -40,8 +41,6 @@ public class NewGameBean implements Serializable {
     @Autowired
     private TeamService teamService;
 
-    @Autowired
-    private GameManagerController gameManagerController;
     @Autowired
     private CubeStatusController cubeStatusController;
 
@@ -121,7 +120,7 @@ public class NewGameBean implements Serializable {
 
     /**
      * Returns a list of all teams.
-     * @return
+     * @return list of teams
      */
     public List<Team> getAllTeams() {
         return teamService.getAllTeams();
@@ -129,8 +128,8 @@ public class NewGameBean implements Serializable {
 
     /**
      * Checks if the given team is currently playing or not.
-     * @param team
-     * @return
+     * @param  team team
+     * @return true if it is, false if not
      */
     public boolean isAvailableTeam(Team team) {
         return teamService.isAvailableTeam(team);
@@ -138,7 +137,7 @@ public class NewGameBean implements Serializable {
 
     /**
      * Adds the given team to the saved list.
-     * @param team
+     * @param team team
      */
     public void addNewTeam(Team team) {
         if (team != null) {
@@ -161,6 +160,7 @@ public class NewGameBean implements Serializable {
 
     /**
      * Creates a new game with the settings saved.
+     * @return  saved game
      * @apiNote shows a ui message if input fields are invalid.
      */
     public Game createGame() {
@@ -181,7 +181,6 @@ public class NewGameBean implements Serializable {
                 cubeStatusController.switchCube(cube, null);
             }
             else {
-                gameManagerController.addGame(game);
                 this.clearFields();
             }
 
@@ -195,14 +194,32 @@ public class NewGameBean implements Serializable {
 
     /**
      * Checks if all fields contain valid values.
-     * @return
+     * @return true if valid, false if not
      */
     public boolean validateInput() {
         if (Strings.isBlank(gameName)) return false;
         if (maxPoints <= 0) return false;
         if (cube == null || cube.isNew()) return false;
         if (topic == null || !topic.isEnabled()) return false;
-        if (teams == null || teams.size() < 2) return false;
+        if (teams == null || teams.size() < 2 || hasOverlappingTeams()) return false;
         return true;
+    }
+
+    /**
+     * Checks if there are overlapping teams, i.e. the same player in more than one team.
+     * @return true if at least one player is in different teams, otherwise false
+     */
+    private boolean hasOverlappingTeams() {
+        Set<User> users = new HashSet<>();
+        if (teams.stream()
+            .flatMap(t -> t.getTeamMembers().stream()
+            .filter(u -> !users.add(u)))
+            .collect(Collectors.toSet()).size() > 0) {
+
+            messageBean.alertErrorFailValidation("Overlapping Teams",
+                "There is at least one player in multiple selected teams");
+            return true;
+        }
+        return false;
     }
 }

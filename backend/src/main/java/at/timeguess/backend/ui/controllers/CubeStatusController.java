@@ -59,387 +59,375 @@ public class CubeStatusController {
     @Autowired
     private MessageBean messageBean;
 
-	private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
-	private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
-	private List<String> healthMessage = new CopyOnWriteArrayList<>();
-    
+    private Map<String, CubeStatusInfo> cubeStatus = new ConcurrentHashMap<>();
+    private Map<String, HealthStatus> healthStatus = new ConcurrentHashMap<>();
+    private List<String> healthMessage = new CopyOnWriteArrayList<>();
+
     /**
      * creates a status for each Cube in the database
      */
     @PostConstruct
-    public void setupCubeStatus() {   	
+    public void setupCubeStatus() {
         this.cubeService.allCubes()
-                .forEach(cube -> this.cubeStatus.put(cube.getMacAddress(), new CubeStatusInfo(cube)));
+            .forEach(cube -> this.cubeStatus.put(cube.getMacAddress(), new CubeStatusInfo(cube)));
     }
-    
+
     /**
-	 * manages status messages of timeflip device
-	 * 
-	 * @param message from the timeflip device from online cube
-	 * @return status response with an interval
-	 */
+     * manages status messages of timeflip device
+     * @param  message from the timeflip device from online cube
+     * @return status response with an interval
+     */
     public StatusResponse processStatus(StatusMessage message) {
 
-    	if(this.healthStatus.containsKey(message.getIdentifier())){
-    		LOGGER.info("status message received.....");
-    		this.healthStatus.get(message.getIdentifier()).setBatteryLevel(message.getBatteryLevel());
-    		this.healthStatus.get(message.getIdentifier()).setRssi(message.getRssi());
-    		this.healthStatus.get(message.getIdentifier()).setTimestamp(LocalDateTime.now());
-    	}
-    	else {
-    		LOGGER.info("cube is onboarding.....");
-    		this.healthStatus.put(message.getIdentifier(), new HealthStatus(LocalDateTime.now(), message.getBatteryLevel(), message.getRssi(), message.getIdentifier()));
-    		updateCube(message); 
-    	}
-   	
+        if (this.healthStatus.containsKey(message.getIdentifier())) {
+            LOGGER.info("status message received.....");
+            this.healthStatus.get(message.getIdentifier()).setBatteryLevel(message.getBatteryLevel());
+            this.healthStatus.get(message.getIdentifier()).setRssi(message.getRssi());
+            this.healthStatus.get(message.getIdentifier()).setTimestamp(LocalDateTime.now());
+        }
+        else {
+            LOGGER.info("cube is onboarding.....");
+            this.healthStatus.put(message.getIdentifier(), new HealthStatus(LocalDateTime.now(),
+                message.getBatteryLevel(), message.getRssi(), message.getIdentifier()));
+            updateCube(message);
+        }
+
         StatusResponse response = new StatusResponse();
         response.setReportingInterval(cubeService.queryInterval(IntervalType.REPORTING_INTERVAL));
         response.setCalibrationVersion(CALIBRATION_VERSION_AFTER_CONNECTION);
         return response;
     }
-    
+
     /**
-     * checks if Cube is already in database, create a new entry if not 
-     * and sets actual {@link CubeStatus} 
-     * 
-     * @param message of the cube device
+     * checks if Cube is already in database, create a new entry if not
+     * and sets actual {@link CubeStatus}
+     * @param  message of the cube device
      * @return updated Cube
      */
     public Cube updateCube(StatusMessage message) {
-    	
-		Cube updatedCube = new Cube(); 
-																						 
-		if(cubeService.isMacAddressKnown(message.getIdentifier())) {							// Cube is already in database
-			updatedCube = cubeService.getByMacAddress(message.getIdentifier());
-			LOGGER.info("cube is known..."); 
-			
-			if(gameManagerController.getCurrentGameForCube(updatedCube) != null) {				// check if there exits a halted game with the cube just got online,
-				gameManagerController.cubeOnline(updatedCube);										// if so start game again and set CubeStatus to IN_GAME
-				setInGame(updatedCube.getMacAddress());
-			}																		
-			else { 
-				if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {		// delete any existing configurations if a reset of the TimeFlip device is detected
-			    	LOGGER.info("calibration version is 0 --> cube lost configuration");
-					cubeService.deleteConfigurations(updatedCube);
-				}
-				if(cubeService.isConfigured(updatedCube)){										// Cube is configured and ready
-					statusChange(updatedCube.getMacAddress(), CubeStatus.READY);
-				}
-				else { 
-					statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);					// Cube lost his configuration or has not been configured yet
-				}
-			}
-		}
-		else {
-			LOGGER.info("cube is not known...new cube is created");
-			updatedCube.setMacAddress(message.getIdentifier());
-			updatedCube = cubeService.saveCube(updatedCube);
-			LOGGER.info("new Cube createt with mac {}", updatedCube.getMacAddress());
-			this.cubeStatus.put(updatedCube.getMacAddress(), new CubeStatusInfo(updatedCube));
-			statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);
-		}
-	
-		LOGGER.info("cube {} was updated and set status to {}", updatedCube.getId(), this.cubeStatus.get(updatedCube.getMacAddress()).getStatus());
-    	
-    	return updatedCube;
+
+        Cube updatedCube = new Cube();
+
+        if (cubeService.isMacAddressKnown(message.getIdentifier())) {							// Cube is already in database
+            updatedCube = cubeService.getByMacAddress(message.getIdentifier());
+            LOGGER.info("cube is known...");
+
+            if (gameManagerController.hasCurrentGameForCube(updatedCube)) {				        // check if there exits a halted game with the cube just got online,
+                gameManagerController.cubeOnline(updatedCube);									// if so start game again and set CubeStatus to IN_GAME
+                setInGame(updatedCube.getMacAddress());
+            }
+            else {
+                if (message.getCalibrationVersion() == CALIBRATION_VERSION_AFTER_RESET) {		// delete any existing configurations if a reset of the TimeFlip device is detected
+                    LOGGER.info("calibration version is 0 --> cube lost configuration");
+                    cubeService.deleteConfigurations(updatedCube);
+                }
+                if (cubeService.isConfigured(updatedCube)) {									// Cube is configured and ready
+                    statusChange(updatedCube.getMacAddress(), CubeStatus.READY);
+                }
+                else {
+                    statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);					// Cube lost his configuration or has not been configured yet
+                }
+            }
+        }
+        else {
+            LOGGER.info("cube is not known...new cube is created");
+            updatedCube.setMacAddress(message.getIdentifier());
+            updatedCube = cubeService.saveCube(updatedCube);
+            LOGGER.info("new Cube createt with mac {}", updatedCube.getMacAddress());
+            this.cubeStatus.put(updatedCube.getMacAddress(), new CubeStatusInfo(updatedCube));
+            statusChange(updatedCube.getMacAddress(), CubeStatus.LIVE);
+        }
+
+        LOGGER.info("cube {} was updated and set status to {}", updatedCube.getId(), this.cubeStatus.get(updatedCube.getMacAddress()).getStatus());
+
+        return updatedCube;
     }
-      
-	/**
+
+    /**
      * is called in case cube changes its status, updates status in GUI
-     */  
+     * @param mac mac address of cube
+     * @param cubeStatus cube status
+     */
     public void statusChange(String mac, CubeStatus cubeStatus) {
         this.cubeStatus.get(mac).setStatus(cubeStatus);
         updateSockets();
     }
-        
-	/**
+
+    /**
      * @return collection of cube-status
      */
     public Collection<CubeStatusInfo> getCubeStatusInfos() {
         return Collections.unmodifiableCollection(this.cubeStatus.values());
-    }  
-    
-	/**
-	 * @return health status of all online cubes i.e. with status 
-	 * {@link CubeStatus.READY, CubeStatus.LIVE or CubeStatus.IN_CONFIGURATION}
-	 */
-	public Map<String, HealthStatus> getHealthStatus() {
-		return healthStatus;
-	}
+    }
 
-	/**
-	 * changes status of cube to {@link CubeStatus.OFFLINE}
-	 * @param macAddress of the cubes which should be set to {@link CubeStatus.OFFLINE}
-	 */
-	public void setOffline(String macAddress) {
-		this.healthStatus.remove(macAddress);
-		statusChange(macAddress, CubeStatus.OFFLINE);
-	}
-	
-	/**
-	 * changes status of cube to {@link CubeStatus.IN_CONFIG}
-	 * @param macAddress of the cubes which should be set to {@link CubeStatus.IN_CONFIG}
-	 */
-	public void setInConfig(String macAddress) {
-		statusChange(macAddress, CubeStatus.IN_CONFIG);
-	}
-	
-	/**
-	 * changes status of cube to {@link CubeStatus.IN_GAME}
-	 * @param macAddress of the cubes which should be set to {@link CubeStatus.IN_GAME}
-	 */
-	public void setInGame(String macAddress) {
-		statusChange(macAddress, CubeStatus.IN_GAME);
-	}
-	
-	/**
-	 * changes status of cube to {@link CubeStatus.READY}
-	 * @param macAddress of the cubes which should be set to {@link CubeStatus.READY}
-	 */
-	public void setReady(String macAddress) {
-		statusChange(macAddress, CubeStatus.READY);
-	}
-	
-	/**
-	 * changes status of cube to {@link CubeStatus.LIVE}
-	 * @param macAddress of the cubes which should be set to {@link CubeStatus.LIVE}
-	 */
-	public void setLive(String macAddress) {
-	    statusChange(macAddress, CubeStatus.LIVE);
-
-	}
-	
-	/**
-	 * gets status of a given cube
-	 * 
-	 * @param macAddress of cube to get its status
-	 * @return CubeStatus
-	 */
-	public CubeStatus getStatus(String macAddress) {
-		if(this.cubeStatus.get(macAddress) != null)
-			return this.cubeStatus.get(macAddress).getStatus();
-		else {
-			return null;
-		}
-			
-	}
-	
-	/**
-	 * checks if a Cube is configured i.e. if there is any entry for it in the Configuration Table
-	 * 
-	 * @return true if it has a Configuration, false otherwise
-	 */
-	public boolean isConfigured(Cube cube) {
-		return cubeService.isConfigured(cube);
-	}
-    
     /**
-     * checks if a Cube has status {@link CubeStatus.READY}
-     * 
-     * @param cube cube to get its ready status
-     * @return true if has status {@link CubeStatus.READY}, false otherwise
+     * @return health status of all online cubes i.e. with status
+     * {@link CubeStatus#READY}, {@link CubeStatus#LIVE} or {@link CubeStatus#IN_CONFIG}
+     */
+    public Map<String, HealthStatus> getHealthStatus() {
+        return healthStatus;
+    }
+
+    /**
+     * changes status of cube to {@link CubeStatus#OFFLINE}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#OFFLINE}
+     */
+    public void setOffline(String macAddress) {
+        this.healthStatus.remove(macAddress);
+        statusChange(macAddress, CubeStatus.OFFLINE);
+    }
+
+    /**
+     * changes status of cube to {@link CubeStatus#IN_CONFIG}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#IN_CONFIG}
+     */
+    public void setInConfig(String macAddress) {
+        statusChange(macAddress, CubeStatus.IN_CONFIG);
+    }
+
+    /**
+     * changes status of cube to {@link CubeStatus#IN_GAME}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#IN_GAME}
+     */
+    public void setInGame(String macAddress) {
+        statusChange(macAddress, CubeStatus.IN_GAME);
+    }
+
+    /**
+     * changes status of cube to {@link CubeStatus#READY}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#READY}
+     */
+    public void setReady(String macAddress) {
+        statusChange(macAddress, CubeStatus.READY);
+    }
+
+    /**
+     * changes status of cube to {@link CubeStatus#LIVE}
+     * @param macAddress of the cubes which should be set to {@link CubeStatus#LIVE}
+     */
+    public void setLive(String macAddress) {
+        statusChange(macAddress, CubeStatus.LIVE);
+
+    }
+
+    /**
+     * gets status of a given cube
+     * @param  macAddress of cube to get its status
+     * @return CubeStatus
+     */
+    public CubeStatus getStatus(String macAddress) {
+        if (this.cubeStatus.get(macAddress) != null)
+            return this.cubeStatus.get(macAddress).getStatus();
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * checks if a Cube is configured i.e. if there is any entry for it in the Configuration Table
+     * @param cube cube
+     * @return true if it has a Configuration, false otherwise
+     */
+    public boolean isConfigured(Cube cube) {
+        return cubeService.isConfigured(cube);
+    }
+
+    /**
+     * checks if a Cube has status {@link CubeStatus#READY}
+     * @param  cube cube to get its ready status
+     * @return true if has status {@link CubeStatus#READY}, false otherwise
      */
     public boolean isReady(Cube cube) {
         return this.cubeStatus.get(cube.getMacAddress()).getStatus() == CubeStatus.READY;
     }
 
-	/** remove status of a deleted user, called by {@link CubeController} if a cube is deleted via UI
-	 * @param macAddress of the deleted cube
-	 */
-	public void deleteStatus(String macAddress) {
-		this.cubeStatus.remove(macAddress);  
-		updateSockets();
-	}
-	
-	/** changes Status if configuration is deleted via UI
-	 * @param macAddress of cube which status should be changed
-	 */
-	public void changeStatus(String macAddress) {
-		if(this.cubeStatus.get(macAddress).getStatus().equals(CubeStatus.READY)){
-			statusChange(macAddress, CubeStatus.LIVE);
-		}
-		else {
-			statusChange(macAddress, CubeStatus.OFFLINE);
-		}
-	}
-	
-	/**
-	 * check if a cube can be deleted - i.e. if its status is OFFLINE and it has no configuration
-	 * 
-	 * @param mac to check status
-	 * @return true if status is OFFLINE false otherwise
-	 */
-	public boolean checkDeletion(Cube cube) {
-		if(cubeStatus.get(cube.getMacAddress()) != null) {
-			if(cubeStatus.get(cube.getMacAddress()).getStatus().equals(CubeStatus.OFFLINE) && !isConfigured(cube)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * check if a cube can be configured - i.e. if its status is LIVE or READY
-	 * 
-	 * @param mac to check status
-	 * @return true if status is LIVE or READY false otherwise
-	 */
-	public boolean checkConfiguration(String mac) {
-		if(cubeStatus.get(mac) != null) {
-			if(cubeStatus.get(mac).getStatus().equals(CubeStatus.LIVE) ||
-					cubeStatus.get(mac).getStatus().equals(CubeStatus.READY)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * checks if a configuration is aborted if there exists a configuration and
-	 * sets status of cube either to LIVE or to READY
-	 * 
-	 * @param macAddress to check
-	 */
-	public void checkAbort(String macAddress) {
-	    if (!isConfigured(cubeService.getByMacAddress(macAddress))) {
-	        setLive(macAddress);
-	    }
-	    else {
-	        setReady(macAddress);
-	    }
-	}
-	
-	/**
-	 * sends a "connectionCubeUpdate" to all socket listener
-	 */
-	public void updateSockets() {
-		if(this.websocketManager != null) {
-			this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
-		}
-	}
+    /**
+     * remove status of a deleted user, called by {@link CubeController} if a cube is deleted via UI
+     * @param macAddress of the deleted cube
+     */
+    public void deleteStatus(String macAddress) {
+        this.cubeStatus.remove(macAddress);
+        updateSockets();
+    }
 
-	/** updates cube in CubeStatusInfo
-	 * @param cube to update
-	 */
-	public void updateCubeInStatus(Cube cube) {
-		this.cubeStatus.get(cube.getMacAddress()).setCube(cube);
-	}
-	
-	/**
-	 * scheduled task which checks in a fixed interval which cubes are online; 
-	 * if online cubes are not reporting in the given reporting interval (set by admin) 
-	 * their status is set to OFFLINE and their healthStatus is removed
-	 */
-	@Scheduled(fixedRate = 5000) 		// 5000 means every 5 seconds
+    /**
+     * changes Status if configuration is deleted via UI
+     * @param macAddress of cube which status should be changed
+     */
+    public void changeStatus(String macAddress) {
+        if (this.cubeStatus.get(macAddress).getStatus().equals(CubeStatus.READY)) {
+            statusChange(macAddress, CubeStatus.LIVE);
+        }
+        else {
+            statusChange(macAddress, CubeStatus.OFFLINE);
+        }
+    }
+
+    /**
+     * check if a cube can be deleted - i.e. if its status is OFFLINE and it has no configuration
+     * @param  cube to check status
+     * @return true if status is OFFLINE false otherwise
+     */
+    public boolean checkDeletion(Cube cube) {
+        if (cubeStatus.get(cube.getMacAddress()) != null) {
+            if (cubeStatus.get(cube.getMacAddress()).getStatus().equals(CubeStatus.OFFLINE) && !isConfigured(cube)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * check if a cube can be configured - i.e. if its status is LIVE or READY
+     * @param  mac to check status
+     * @return true if status is LIVE or READY false otherwise
+     */
+    public boolean checkConfiguration(String mac) {
+        if (cubeStatus.get(mac) != null) {
+            if (cubeStatus.get(mac).getStatus().equals(CubeStatus.LIVE) ||
+                cubeStatus.get(mac).getStatus().equals(CubeStatus.READY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * checks if a configuration is aborted if there exists a configuration and
+     * sets status of cube either to LIVE or to READY
+     * @param macAddress to check
+     */
+    public void checkAbort(String macAddress) {
+        if (!isConfigured(cubeService.getByMacAddress(macAddress))) {
+            setLive(macAddress);
+        }
+        else {
+            setReady(macAddress);
+        }
+    }
+
+    /**
+     * sends a "connectionCubeUpdate" to all socket listener
+     */
+    public void updateSockets() {
+        if (this.websocketManager != null) {
+            this.websocketManager.getCubeChannel().send("connectionCubeUpdate");
+        }
+    }
+
+    /**
+     * updates cube in CubeStatusInfo
+     * @param cube to update
+     */
+    public void updateCubeInStatus(Cube cube) {
+        this.cubeStatus.get(cube.getMacAddress()).setCube(cube);
+    }
+
+    /**
+     * scheduled task which checks in a fixed interval which cubes are online;
+     * if online cubes are not reporting in the given reporting interval (set by admin)
+     * their status is set to OFFLINE and their healthStatus is removed
+     */
+    @Scheduled(fixedDelayString = "${backend.cube.check.delay.seconds:5}000") 	// 5000 means every 5 seconds
     public void updateHealthStatus() {
-		this.healthMessage.clear();
-		
-		for(Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) { 
-			
-			Cube cube = cubeService.getByMacAddress(m.getKey());
-			
-			if(getStatus(cube.getMacAddress()).equals(CubeStatus.IN_GAME) && gameManagerController.getCurrentGameForCube(cube) == null) {
-				setReady(cube.getMacAddress());
-			}
+        this.healthMessage.clear();
 
-			if(m.getValue().getTimestamp().isBefore(LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
-				
-				// sets status offline
-				setOffline(m.getKey());
-				
-				// message for current game that cube is offline
-				StringBuilder message = new StringBuilder();
-				message.append("Cube with mac ")
-					.append(m.getKey())
-					.append(" lost connection and is OFFLINE!");	
-				addHealthMessage(message.toString());				
-				gameManagerController.healthNotification(cube);	
-				
-				// game cannot be continued
-				if(gameManagerController.getCurrentGameForCube(cube) != null) {
-					gameManagerController.cubeOffline(cube);
-				}
-				
-			}              
-			else {                 
-				if(m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {
-					
-					// message for current game that cube is has low battery
-					StringBuilder message = new StringBuilder();
-					message.append("Cube with mac ")
-						.append(m.getKey())
-						.append(" has low battery! Level at ")
-						.append(m.getValue().getBatteryLevel());	
-					
-					addHealthMessage(message.toString());
-				}
-				if(m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {   
-					
-					// message for current game that rssi of cube is below threshold
-					StringBuilder message = new StringBuilder();
-					message.append("Cube with mac ")
-						.append(m.getKey())
-						.append(" reported rssi level at ")
-						.append(m.getValue().getRssi());
-					
-					addHealthMessage(message.toString());
-				}
-				gameManagerController.healthNotification(cube);
-			}
-		}
-	}
-	
-	/**
-	 * displays health message(s) in current game
-	 */
-	public void displayHealthMessage() {
-		messageBean.alertError("Health Message", healthMessage);
-	}
+        for (Map.Entry<String, HealthStatus> m : healthStatus.entrySet()) {
 
-	/**
-	 * Get the latest reported value of the battery level characteristic for a given cube.
-	 * 
-	 * @param cube the cube
-	 * @return the battery level
-	 */
-	public Integer getBatteryLevel(Cube cube) {
-	    HealthStatus hs = healthStatus.get(cube.getMacAddress());
-	    if (hs != null) {
-	        return hs.getBatteryLevel();
-	    }
-	    else {
-	        return null;
-	    }
-	}
+            Cube cube = cubeService.getByMacAddress(m.getKey());
 
-	/**
-	 * Get the latest reported value of the RSSI for a given cube.
-	 * 
-	 * @param cube the cube
-	 * @return the RSSI
-	 */
-	public Integer getRssi(Cube cube) {
-	    HealthStatus hs = healthStatus.get(cube.getMacAddress());
-            if (hs != null) {
-                return hs.getRssi();
+            if (getStatus(cube.getMacAddress()).equals(CubeStatus.IN_GAME) && !gameManagerController.hasCurrentGameForCube(cube)) {
+                setReady(cube.getMacAddress());
+            }
+
+            if (m.getValue().getTimestamp().isBefore(
+                LocalDateTime.now().minusSeconds(cubeService.queryInterval(IntervalType.EXPIRATION_INTERVAL)))) {
+
+                // sets status offline
+                setOffline(m.getKey());
+
+                // game cannot be continued
+                if (gameManagerController.hasCurrentGameForCube(cube)) {
+                    gameManagerController.cubeOffline(cube);
+                }
             }
             else {
-                return null;
+                if (m.getValue().getBatteryLevel() < cubeService.queryThreshold(ThresholdType.BATTERY_LEVEL_THRESHOLD)) {
+
+                    // message for current game that cube is has low battery
+                    StringBuilder message = new StringBuilder();
+                    message.append("Cube with mac ")
+                        .append(m.getKey())
+                        .append(" has low battery! Level at ")
+                        .append(m.getValue().getBatteryLevel());
+
+                    addHealthMessage(message.toString());
+                }
+                if (m.getValue().getRssi() < cubeService.queryThreshold(ThresholdType.RSSI_THRESHOLD)) {
+
+                    // message for current game that rssi of cube is below threshold
+                    StringBuilder message = new StringBuilder();
+                    message.append("Cube with mac ")
+                        .append(m.getKey())
+                        .append(" reported rssi level at ")
+                        .append(m.getValue().getRssi());
+
+                    addHealthMessage(message.toString());
+                }
+                gameManagerController.healthNotification(cube);
             }
-	}
+        }
+    }
 
-	public List<String> getHealthMessage() {
-		return healthMessage;
-	}
+    /**
+     * displays health message(s) in current game
+     */
+    public void displayHealthMessage() {
+        messageBean.alertError("Health Message", healthMessage);
+    }
 
-	public void addHealthMessage(String healthMessage) {
-		this.healthMessage.add(healthMessage);
-	}
-	
+    /**
+     * Get the latest reported value of the battery level characteristic for a given cube.
+     * @param  cube the cube
+     * @return the battery level
+     */
+    public Integer getBatteryLevel(Cube cube) {
+        HealthStatus hs = healthStatus.get(cube.getMacAddress());
+        if (hs != null) {
+            return hs.getBatteryLevel();
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * Get the latest reported value of the RSSI for a given cube.
+     * @param  cube the cube
+     * @return the RSSI
+     */
+    public Integer getRssi(Cube cube) {
+        HealthStatus hs = healthStatus.get(cube.getMacAddress());
+        if (hs != null) {
+            return hs.getRssi();
+        }
+        else {
+            return null;
+        }
+    }
+
+    public List<String> getHealthMessage() {
+        return healthMessage;
+    }
+
+    public void addHealthMessage(String healthMessage) {
+        this.healthMessage.add(healthMessage);
+    }
+
     /**
      * Changes given fromCube status to READY if it was formerly INGAME, and toCube status to INGAME if it is not null.
-     * @param fromCube
-     * @param toCube
+     * @param fromCube before cube
+     * @param toCube   after cube
      */
     public void switchCube(Cube fromCube, Cube toCube) {
         // release previous cube if necessary

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -78,7 +77,7 @@ public class GameServiceTest {
         gameService.deleteGame(gameToDelete);
 
         assertEquals(ctBefore - 1, gameService.getAllGames().size(), "No game has been deleted after calling gameService.deleteGame");
-        assertThrows(NoSuchElementException.class, () -> gameService.loadGame(id_to_del));
+        assertNull(gameService.loadGame(id_to_del));
     }
 
     @Test
@@ -173,7 +172,6 @@ public class GameServiceTest {
 
         int roundSizeBefore = rounds.size();
 
-        // TODO check adding round
         // quickly find an element to remove
         rounds.remove(0);
         game.setRounds(new HashSet<>(rounds));
@@ -198,7 +196,6 @@ public class GameServiceTest {
 
         int teamSizeBefore = teams.size();
 
-        // TODO check adding team
         // quickly find an element to remove
         List<Team> rl = teams.stream().collect(Collectors.toList());
         teams.remove(rl.get(0));
@@ -318,6 +315,17 @@ public class GameServiceTest {
     }
 
     @ParameterizedTest
+    @CsvSource(delimiter = '|', value = { "0;1|6;7", "0;1;2|5;6;7;8;9", "2;3;4|1;2;3;4;5;8;9", "3|", "4|1;2;3;4", "3;5|" })
+    @WithMockUser(username = "user2", authorities = { "PLAYER" })
+    public void testGetByStatus(String gameStates, final String gameIdsExpected) {
+        List<Game> expected = createEntities(TestSetup::createGame, gameIdsExpected);
+        List<Game> result = gameService
+            .getByStatus(createEntities(gs -> GAMESTATES.get(gs.intValue()), gameStates).toArray(GameState[]::new));
+
+        assertLists(expected, result);
+    }
+
+    @ParameterizedTest
     @CsvSource(delimiter = '|', value = { "1|", "2|4;5;9", "3|4;6;9", "4|", "5|1;2;3;8", "6|1;2;3;6;8", "7|1;2;3;5;8", "8|1;3;5;8", "9|1;4;6;9", "10|2;4;5;6;9" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetByUserAll(long userId, String gamesIdsExpected) {
@@ -328,7 +336,7 @@ public class GameServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = '|', value = { "1|", "2|", "3|6", "4|", "5|", "6|6", "7|", "8|", "9|6", "10|6" })
+    @CsvSource(delimiter = '|', value = { "1|", "2|5;9", "3|6;9", "4|", "5|8", "6|6;8", "7|5;8", "8|5;8", "9|6;9", "10|5;6;9" })
     @WithMockUser(username = "user2", authorities = { "PLAYER" })
     public void testGetByUserCurrent(long userId, String gamesIdsExpected) {
         List<Game> expected = createEntities(TestSetup::createGame, gamesIdsExpected);

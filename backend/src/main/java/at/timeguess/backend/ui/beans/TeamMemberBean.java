@@ -42,7 +42,7 @@ public class TeamMemberBean implements Serializable {
 
     /**
      * Sets the currently displayed game.
-     * @param game
+     * @param game game
      */
     public void setGame(Game game) {
         this.game = game;
@@ -50,7 +50,7 @@ public class TeamMemberBean implements Serializable {
 
     /**
      * Sets the currently selected team.
-     * @param game
+     * @param team team
      */
     public void setTeam(Team team) {
         this.team = team;
@@ -58,7 +58,7 @@ public class TeamMemberBean implements Serializable {
 
     /**
      * Returns the currently selected team.
-     * @return
+     * @return team
      */
     public Team getTeam() {
         return team;
@@ -67,7 +67,7 @@ public class TeamMemberBean implements Serializable {
     /**
      * Returns the currently displayed teams.
      * If game is not set this means all teams.
-     * @param game
+     * @return list of {@link SelectItem}s
      */
     public List<SelectItem> getTeams() {
         return game == null ? createAll() : create(game);

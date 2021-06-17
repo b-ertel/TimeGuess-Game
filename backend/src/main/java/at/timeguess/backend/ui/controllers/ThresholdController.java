@@ -10,6 +10,9 @@ import at.timeguess.backend.model.ThresholdType;
 import at.timeguess.backend.services.CubeService;
 import at.timeguess.backend.ui.beans.MessageBean;
 
+/**
+ * Controller for the cube health status view.
+ */
 @Component
 @Scope("view")
 public class ThresholdController {
@@ -47,7 +50,6 @@ public class ThresholdController {
 
     /**
      * Get the battery level threshold from the database.
-     * 
      * @return the battery level threshold
      */
     public int getSavedBatteryLevelThreshold() {
@@ -56,7 +58,6 @@ public class ThresholdController {
 
     /**
      * Get the RSSI threshold from the database.
-     * 
      * @return the RSSI threshold
      */
     public int getSavedRssiThreshold() {
@@ -80,4 +81,3 @@ public class ThresholdController {
     }
 
 }
-

@@ -64,7 +64,7 @@ public class MessageBean implements Serializable {
 
     /**
      * Redirects user to given page.
-     * @param toPage
+     * @param toPage to page address
      */
     public void redirect(String toPage) {
         FacesContext context = FacesContext.getCurrentInstance();

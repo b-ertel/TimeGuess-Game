@@ -57,6 +57,7 @@ public class NewTermBean implements Serializable {
 
     /**
      * Creates a new term with the settings saved.
+     * @return saved term
      * @apiNote shows a ui message if input fields are invalid.
      */
     public Term createTerm() {
@@ -82,7 +83,7 @@ public class NewTermBean implements Serializable {
 
     /**
      * Checks if all fields contain valid values.
-     * @return
+     * @return true if valid, false if not
      */
     public boolean validateInput() {
         if (Strings.isBlank(termname)) return false;

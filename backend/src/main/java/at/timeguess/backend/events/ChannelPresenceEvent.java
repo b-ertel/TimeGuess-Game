@@ -23,6 +23,7 @@ public class ChannelPresenceEvent extends ApplicationEvent {
 
     /**
      * the channel the presence changed in
+     * @return channel name
      */
     public String getChannel() {
         return channel;
@@ -30,6 +31,7 @@ public class ChannelPresenceEvent extends ApplicationEvent {
 
     /**
      * the user ids currently present in the channel
+     * @return list of user ids
      */
     public Set<Long> getUserIds() {
         return userIds;

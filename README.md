@@ -11,5 +11,3 @@ In this repository:
 
 - `raspberry` contains the source code that is running on a Raspberry Pi and connects the TimeFlip
   device with the central server backend
-
-- `gitlab-ci` files for the pipeline of the CI in gitlab
