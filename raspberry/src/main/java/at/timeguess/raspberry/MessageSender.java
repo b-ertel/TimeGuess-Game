@@ -15,7 +15,7 @@ public class MessageSender {
     private static final String STATUS_API_PATH = "/api/status";
 
     private static final String USERNAME = "cube";
-    private static final String PASSWORD = "passwd";
+    private static final String PASSWORD = "passwd123";
 
     private static final Logger LOGGER = Logger.getLogger("at.timeguess.raspberry");
 
