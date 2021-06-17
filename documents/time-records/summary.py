@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
 import pandas as pd
-import datetime
 
 FILES = {"Clemens": "Ager_Clemens_csab8299.xlsx",
-    "Bernhard": "Ertel_Bernhard.xlsx",
-    "Verena": "Fritz Verena_c7031304.xlsx",
-    "Lorenz": "Lorenz-Oberhammer.xlsx",
-    "Felix": "TimeRecord_Tschimben.xlsx",
-    "Michael": "Vorlage-0-Zeitaufzeichnung-Sonnerer.xlsx",
+    "Bernhard": "Ertel_Bernhard_csar8812.xlsx",
+    "Verena": "Fritz_Verena_c7031304.xlsx",
+    "Lorenz": "Oberhammer_Lorenz_csam6460.xlsx",
+    "Michael": "Sonnerer_Michael_csat5545.xlsx",
+    "Felix": "Tschimben_Felix_csat4895.xlsx",
     "Claudia": "Wagner_Claudia_csaw9017.xlsx"}
 
 TASKS = ["LV-Einheit",
@@ -51,12 +50,6 @@ def read_files(files):
     
     for key, value in files.items():
         excel = pd.read_excel(value)
-        # superscript "1"
-        if key == "Bernhard":
-            excel.at[21, "Dauer \n[hh:mm]"] = datetime.time(hour=1, minute=30)
-        # empty line
-        if key == "Verena":
-            excel.drop(29, inplace=True)
         df = pd.DataFrame({"name": key,
             "date": excel["Datum"],
             "duration": excel["Dauer \n[hh:mm]"].apply(time_to_duration),
@@ -71,8 +64,16 @@ def read_files(files):
 def main():
     df = read_files(FILES)
     
+    # check for alternative categories of tasks
+    idx = df["task"].apply(lambda task : task not in TASKS)
+    if (df[idx].shape[0] > 0):
+        print("Alternative categories of tasks detected!")
+        print(df[idx])
+    
     total = df["duration"].sum()
+    print("***")
     print("TOTAL: {:.2f} h".format(total))
+    print("***")
     
     for task in TASKS:
         idx = df["task"] == task
@@ -80,13 +81,6 @@ def main():
         percentage = 100 * duration / total
         print("{}: {:.2f} h ({:.2f} %)".format(task, duration, percentage))
     
-    # other categories
-    idx = df["task"].apply(lambda task : task not in TASKS)
-    duration = df.loc[idx, "duration"].sum()
-    percentage = 100 * duration / total
-    print("?: {:.2f} h ({:.2f} %)".format(duration, percentage))
-    print(df[idx])
-
 if __name__ == "__main__":
     main()
 

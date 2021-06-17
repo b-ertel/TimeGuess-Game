@@ -2,6 +2,9 @@ package at.timeguess.backend.model;
 
 import java.util.EnumSet;
 
+/**
+ * Enumeration of different states a game can be in.
+ */
 public enum GameState {
 
     /**

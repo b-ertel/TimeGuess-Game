@@ -158,9 +158,9 @@
 
 					<p:dataTable var="cubeFace" scrollable="true" scrollHeight="300"
 						value="#{cubeConfigurationController.cubeFaces}">
-						<p:column headerText="Cube Face Description">
+						<p:column headerText="Cube Face Description" style="width:200px;">
 							<h:outputText
-								value="#{cubeFace.activity} / #{cubeFace.time} / #{cubeFace.points}" />
+								value="#{cubeFace.activity} / #{cubeFace.time} min. / #{cubeFace.points} p." />
 						</p:column>
 						<p:column headerText="Assigned Facet Number">
 							<h:outputText

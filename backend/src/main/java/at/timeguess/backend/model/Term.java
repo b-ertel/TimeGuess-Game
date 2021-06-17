@@ -17,9 +17,9 @@ import javax.persistence.UniqueConstraint;
 import org.springframework.data.domain.Persistable;
 
 /**
- * Entity representing Terms.
+ * Entity representing a term.
  */
-@Table(uniqueConstraints = @UniqueConstraint(columnNames={"topic", "name"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "topic", "name" }))
 @Entity
 @SequenceGenerator(name = "seq", initialValue = 30, allocationSize = 100)
 public class Term implements Persistable<Long>, Serializable {

@@ -125,6 +125,9 @@ public class GameInfoBean implements Serializable {
         }
     }
 
+    /**
+     * Class holding game/team/user info.
+     */
     public static class GameInfo implements Comparable<GameInfo> {
 
         private Persistable<Long> object;

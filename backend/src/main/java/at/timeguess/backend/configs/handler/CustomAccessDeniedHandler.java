@@ -14,6 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
+/**
+ * Custom handler for {@link AccessDeniedException}s.
+ */
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
