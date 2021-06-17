@@ -77,11 +77,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .inMemoryAuthentication()
             .withUser("cube")
-            .password(passwordEncoder().encode("passwd123"))
+            .password(passwordEncoder().encode("passwd"))
             .authorities("CUBE")
             .and()
             .withUser("system")
-            .password(passwordEncoder().encode("passwd123"))
+            .password(passwordEncoder().encode("passwd"))
             .authorities("ADMIN", "MANAGER", "PLAYER");
     }
 
